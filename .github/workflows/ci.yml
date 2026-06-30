@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  php-syntax:
+    name: PHP syntax check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up PHP 8.2
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: none
+
+    - name: Check PHP syntax
+      run: |
+        find snappymail/v/0.0.0/app/libraries integrations \
+          -name "*.php" -print0 \
+          | xargs -0 -P4 php -l \
+          | grep -v "^No syntax errors" && exit 1 || true
+
+  js-lint:
+    name: JS/CSS lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Lint
+      run: node_modules/.bin/gulp lint

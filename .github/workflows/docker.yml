@@ -3,9 +3,9 @@ name: docker
 on:
   push:
     tags:
-    - 'v2.*'
+    - 'v*'
 
-# This is needed to push to GitHub Container Registry. See https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
+# Needed to push to GitHub Container Registry
 permissions:
   contents: read
   packages: write
@@ -14,65 +14,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    # This step generates the docker tags
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
-      env:
-        # This env var ensures {{sha}} is a real commit SHA for type=ref,event=pr
-        DOCKER_METADATA_PR_HEAD_SHA: 'true'
+      uses: docker/metadata-action@v5
       with:
         images: |
-          djmaze/snappymail
           ghcr.io/${{ github.repository }}
-        # type=ref,event=branch generates tag(s) on branch only. E.g. 'master', 'master-abc0123'
-        # type=ref,event=tag generates tag(s) on tags only. E.g. 'v0.0.0', 'v0.0.0-abc0123', and 'latest'
         tags: |
           type=ref,event=branch
           type=ref,event=tag
-        # The rest of the org.opencontainers.image.xxx labels are dynamically generated
         labels: |
-          org.opencontainers.image.description=SnappyMail
+          org.opencontainers.image.description=Tachyon webmail
           org.opencontainers.image.licenses=AGPLv3
 
-    # See: https://github.com/docker/build-push-action/blob/v2.6.1/docs/advanced/cache.md#github-cache
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Cache Docker layers
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-
-    - name: Login to Docker Hub registry
-      if: startsWith(github.ref, 'refs/tags/')  # Login only on tags
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      uses: docker/setup-buildx-action@v3
 
     - name: Login to GitHub Container Registry
-      if: startsWith(github.ref, 'refs/tags/')  # Login only on tags
-      uses: docker/login-action@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    # See: https://github.com/docker/buildx/issues/59
     - name: Build
       id: build
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v6
       with:
         context: '.'
         file: ./.docker/release/Dockerfile
@@ -81,12 +54,8 @@ jobs:
         load: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
-    - name: Docker images
-      run: |
-        docker images
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Test
       run: |
@@ -94,24 +63,13 @@ jobs:
         .docker/release/test/test.sh "$TAG"
 
     - name: Build and push
-      id: build-and-push
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v6
       with:
         context: '.'
         file: ./.docker/release/Dockerfile
-        # TODO: Add more arches?
-        # platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/s390x
-        platforms: linux/386,linux/amd64,linux/arm64
-        push: ${{ startsWith(github.ref, 'refs/tags/') }}  # Push only on tags
+        platforms: linux/amd64,linux/arm64
+        push: ${{ startsWith(github.ref, 'refs/tags/') }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
-    # Temp fix
-    # https://github.com/docker/build-push-action/issues/252
-    # https://github.com/moby/buildkit/issues/1896
-    - name: Move cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
