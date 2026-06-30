@@ -9,7 +9,6 @@ class CSP implements \Stringable
 {
 	public
 		$report = false,
-		$report_to = [],
 		$report_only = false;
 
 	/**
@@ -46,18 +45,17 @@ class CSP implements \Stringable
 
 	function __toString() : string
 	{
-		// report-uri deprecated
-		unset($this->directives['report-uri']);
+		$directives = $this->directives;
 		if ($this->report || $this->report_only) {
-			$this->directives['report-uri'] = [\Tachyon\Utils::WebPath() . '?/CspReport'];
+			// report-to takes a group name defined via Reporting-Endpoints header
+			$directives['report-to'] = ['csp-endpoint'];
+			// report-uri kept as fallback for browsers that don't support report-to
+			$directives['report-uri'] = [\Tachyon\Utils::WebPath() . '?/CspReport'];
 		}
 		$params = [];
-		foreach ($this->directives as $directive => $sources) {
+		foreach ($directives as $directive => $sources) {
 			$params[] = $directive . ' ' . \implode(' ', \array_unique($sources));
 		}
-//		if (empty($this->directives['frame-ancestors'])) {
-//			$params[] = "frame-ancestors 'none';";
-//		}
 		return \implode('; ', $params);
 	}
 
@@ -78,6 +76,11 @@ class CSP implements \Stringable
 
 	public function setHeaders() : void
 	{
+		if ($this->report || $this->report_only) {
+			// Register the CSP reporting endpoint (modern Reporting API)
+			$sReportUri = \Tachyon\Utils::WebPath() . '?/CspReport';
+			\header('Reporting-Endpoints: csp-endpoint="' . $sReportUri . '"');
+		}
 		if ($this->report_only) {
 			\header('Content-Security-Policy-Report-Only: ' . $this);
 		} else {
