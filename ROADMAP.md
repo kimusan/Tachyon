@@ -314,10 +314,9 @@ Investigation findings (2026-06-30):
 
 ## Phase 7: Security Hardening
 
-- [ ] Add `Content-Security-Policy` header with strict-dynamic
-- [ ] Switch from `report-uri` to `report-to` in CSP (noted as deprecated in codebase)
+- [x] Fix CSP `report-to` implementation (was buggy — removed then re-added `report-uri`; now sends both `Reporting-Endpoints` + `report-to` directive and `report-uri` fallback)
+- [x] Add `Permissions-Policy` header: deny camera, microphone, geolocation, payment, usb
 - [ ] Implement Subresource Integrity (SRI) hashes for all static assets
-- [ ] Review `Permissions-Policy` headers (camera, microphone, geolocation)
 - [ ] Audit CORS settings
 - [ ] Add rate limiting hooks for auth endpoints
 - [ ] Review and document threat model for public deployments
@@ -326,14 +325,13 @@ Investigation findings (2026-06-30):
 
 ## Phase 8: Developer Experience
 
+- [x] Add GitHub Actions CI pipeline: `ci.yml` (PHP syntax check + JS/CSS lint on every push/PR)
+- [x] Update Docker workflows: action versions v4/v5/v6, gha cache, remove DockerHub push, Tachyon labels
 - [ ] Add `composer.json` for proper PHP dependency management (currently manual bundling)
-- [ ] Add GitHub Actions CI pipeline: PHP lint, JS lint, PHPUnit, build check
 - [ ] Add `.devcontainer` configuration for VS Code
 - [ ] Update `.editorconfig` for PHP 8 style
-- [ ] Improve `docker-compose.yml` dev setup documentation
 - [ ] Add PHPStan or Psalm for static analysis
-- [ ] Add Rector for automated PHP upgrade refactoring
-- [ ] Update `.browserslistrc`: drop Firefox 78+ (ESR is now 115+), raise Chrome to 90+
+- [ ] Add Rector for automated PHP upgrade refactoring (especially for `declare(strict_types=1)` and constructor property promotion batches)
 
 ---
 
@@ -378,37 +376,32 @@ Applied 2026-06-30 in commit `165d74d29`:
 ## Next Actions (for next agent session)
 
 ### Priority 1 — Phase 3.2 Vendor library updates (remaining)
-- **marked v14**: bundled in `vendors/marked/marked.js` but NOT used in the build pipeline or app. Safe to remove (`git rm vendors/marked/`) to reduce clutter.
-- **turndown**: bundled `vendors/turndown/turndown.js` is v7.2.0 modified by SnappyMail to ES2020. Latest npm is v7.2.4. Check GitHub diff for v7.2.1-7.2.4 changelog and backport if applicable.
+- **turndown**: `vendors/turndown/turndown.js` is v7.2.0 modified by SnappyMail to ES2020. Latest npm is v7.2.4. Check GitHub diff for v7.2.1-7.2.4 changelog and backport bug fixes if applicable.
 - **OpenPGP.js**: Updated to v5.11.3 (done). V6.x is a major API change — defer.
-- **Squire2**: Custom fork at `vendors/squire2/`. Check upstream `neilj/squire` for security fixes since the fork was taken.
+- **Squire2**: Custom fork at `vendors/squire2/` with SnappyMail-specific patches. Upstream npm `squire-rte@2.4.8` has 4599 lines vs our 3663-line fork — update would lose patches. Check upstream changelog for security fixes and cherry-pick rather than wholesale replace.
 
-### Priority 2 — Phase 2.4 remaining PHP modernization
-- **`declare(strict_types=1)`**: zero usage in codebase — adding piecemeal is inconsistent. Defer to batch effort via Rector (Phase 8) with actual test coverage.
-- **Constructor property promotion**: sparse candidates (most constructors derive props from params). No sweep without testing.
-- **Additional enums**: `ConnectionSecurityType` has `TLS=1, SSL=1` (dupe values — cannot be enum), `Log/Type` has dupes too. `MessageFlag` (string-backed, 19 usages), `PluginPropertyType` (int-backed, 134 usages), `Capa` (string-backed, 34 usages) are possible but high-risk without tests.
+### Priority 2 — Phase 6 features
+- **6.1 Multi-account unread badge** (done): total unread count now shows on account switcher button; individual account unread counts in dropdown menu were already showing.
+- **6.1 Responsive mobile layout**: `@maxMobileWidth: 799px` is the breakpoint. Currently only dialog sizing is mobile-specific; the main 3-panel layout likely breaks on small screens. Audit and document.
+- **6.6 IMAP IDLE / push notifications**: check `serviceworker.js` for push notification infrastructure; scope if true IMAP IDLE or SSE-based check can be added.
+- **6.5 Command palette** (Cmd+K / Ctrl+K): high-value feature for power users.
 
-### Priority 3 — Phase 1.4 config migration shim
-- Verify no config key changes from SnappyMail→Tachyon that would break existing users' data on upgrade.
-- The `_data_/_default_/configs/application.ini` file uses keys like `sign_me_auto = DefaultOff` — now stored as enum string value. Since `SignMeType::DefaultOff->value === 'DefaultOff'` and SnappyMail also stored 'DefaultOff', no migration needed.
+### Priority 3 — Phase 2.4 remaining PHP modernization
+- **`declare(strict_types=1)`**: defer to batch effort via Rector (Phase 8) with actual test coverage.
+- **Additional enums**: `MessageFlag` (complex: some callers pass arbitrary strings), `Capa` (complex: plugin-extensible string keys), `PluginPropertyType` (134 usages). All have blockers. Skip until there's a test suite.
 
-### Priority 4 — Phase 6 features (pick one to start)
-- **6.1 Multi-account quick-switch UI** (better alternative to unified inbox): show unread counts per account in the account switcher, one-click switching. Feasible in the current architecture.
-- **6.1 Responsive mobile layout**: audit `dev/Styles/@Main.less` for current mobile breakpoints, document what works and what needs improvement.
-- **6.6 IMAP IDLE**: check if `serviceworker.js` already has push notification infrastructure; scope adding true IMAP IDLE via a persistent connection or SSE.
-
-### Priority 5 — Phase 7 Security hardening
-- CSP: switch from `report-uri` to `report-to` directive (noted as TODO in codebase)
-- Audit `Permissions-Policy` headers
+### Priority 4 — Phase 7/8 remaining
+- **Phase 7**: Implement SRI hashes for static assets (`gulp` task to compute SHA256 and inject into HTML).
+- **Phase 8**: `.devcontainer` for VS Code, PHPStan integration.
 
 ### Git log (commits on master as of 2026-06-30)
-1. `7d5d8f9b3` php: convert DkimStatus abstract class to PHP 8.1 string-backed enum
-2. `8fcece61b` rebrand: update docker-compose.yml and Dockerfile label to Tachyon
-3. `d7135a175` vendor: update OpenPGP.js v5.11.1 → v5.11.3
-4. `ab337c05a` upstream: apply PRs #2052, #1882, #2035
-5. `84c56c6e7` rebrand: rename SnappyMail references in Docker entrypoint.sh
-6. `165d74d29` php: convert abstract enum classes to PHP 8.1 native enums (Phase 5)
-7. `3e1886903` upstream: apply critical bug fixes from PRs #2039-#1922
-8. `a136968fb` build: remove legacy rollup.config.js
-9. `435399f` build: upgrade to Rollup v4, ESLint v9 flat config
-10. `b1081f97` rebrand: fix Nextcloud/OwnCloud app ID, session keys, and file rename
+1. `fa4093cba` rebrand: rename release artifact prefix snappymail- → tachyon-
+2. `fa6b7cfc5` rebrand: update FUNDING.yml to Tachyon maintainer
+3. `69d4f9af0` ci: add code quality workflow, update Docker workflows for Tachyon
+4. `5705d9232` feat: show total unread count badge on account switcher dropdown
+5. `b8dec2ce2` security: fix CSP report-to implementation and add Permissions-Policy header
+6. `74579b64b` vendor: remove unused marked.js library
+7. `aefe85f05` roadmap: unified inbox NO-GO decision
+8. `7d5d8f9b3` php: convert DkimStatus abstract class to PHP 8.1 string-backed enum
+9. `8fcece61b` rebrand: docker-compose.yml and Dockerfile label
+10. `d7135a175` vendor: update OpenPGP.js v5.11.1 → v5.11.3
