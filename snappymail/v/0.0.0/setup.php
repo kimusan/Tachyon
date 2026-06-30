@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/app/libraries/snappymail/integrity.php';
+require_once __DIR__ . '/app/libraries/tachyon_util/integrity.php';
 
 $result = \Tachyon\Util\Integrity::phpVersion();
 if ($result) {
