@@ -1,40 +1,40 @@
 # This script is probably broken and not tested!
 # https://forum.virtualmin.com/t/add-snappymail-to-install-scripts/112560
 
-# script_snappymail_desc()
-sub script_snappymail_desc
+# script_tachyon_desc()
+sub script_tachyon_desc
 {
-return "SnappyMail";
+return "Tachyon";
 }
 
-sub script_snappymail_uses
+sub script_tachyon_uses
 {
 return ( "php" );
 }
 
-sub script_snappymail_longdesc
+sub script_tachyon_longdesc
 {
-return "SnappyMail Webmail is a browser-based multilingual IMAP client with an application-like user interface";
+return "Tachyon Webmail is a browser-based multilingual IMAP client with an application-like user interface";
 }
 
-# script_snappymail_versions()
-sub script_snappymail_versions
+# script_tachyon_versions()
+sub script_tachyon_versions
 {
-return ( "2.38.2" );
+return ( "3.0.0" );
 }
 
-sub script_snappymail_version_desc
+sub script_tachyon_version_desc
 {
 local ($ver) = @_;
-return &compare_versions($ver, "2.7") >= 0 ? "$ver" : "$ver (Un-supported)";
+return &compare_versions($ver, "3.0") >= 0 ? "$ver" : "$ver (Un-supported)";
 }
 
-sub script_snappymail_category
+sub script_tachyon_category
 {
 return "Email";
 }
 
-sub script_snappymail_php_modules
+sub script_tachyon_php_modules
 {
 local ($dbtype, $dbname) = split(/_/, $opts->{'db'}, 2);
 local @modules = ( "zlib", "mbstring" );
@@ -42,19 +42,19 @@ push(@modules, $dbtype eq "mysql" ? "pdo_mysql" : $dbtype eq "sqlite" ? "pdo_sql
 return @modules;
 }
 
-sub script_snappymail_php_optional_modules
+sub script_tachyon_php_optional_modules
 {
 return ( "gd", "openssl", "sockets", "xxtea", "curl", "intl", "ldap", "zip", "gmagick", "imagick" );
 }
 
-sub script_snappymail_dbs
+sub script_tachyon_dbs
 {
 return ("mysql", "postgres", "sqlite");
 }
 
-# script_snappymail_php_vars(&domain)
+# script_tachyon_php_vars(&domain)
 # Returns an array of extra PHP variables needed for this script
-sub script_snappymail_php_vars
+sub script_tachyon_php_vars
 {
 return ([ 'memory_limit', '64M', '+' ],
         [ 'max_execution_time', 300, '+' ],
@@ -66,24 +66,24 @@ return ([ 'memory_limit', '64M', '+' ],
 }
 
 
-sub script_snappymail_php_vers
+sub script_tachyon_php_vers
 {
-return ( 7 );
+return ( 8 );
 }
 
-sub script_snappymail_release
+sub script_tachyon_release
 {
 return 3;	# For folders path fix
 }
 
-sub script_snappymail_php_fullver
+sub script_tachyon_php_fullver
 {
-return "7.4";
+return "8.2";
 }
 
-# script_snappymail_params(&domain, version, &upgrade-info)
+# script_tachyon_params(&domain, version, &upgrade-info)
 # Returns HTML for table rows for options for installing PHP-NUKE
-sub script_snappymail_params
+sub script_tachyon_params
 {
 local ($d, $ver, $upgrade) = @_;
 local $rv;
@@ -91,7 +91,7 @@ local $hdir = &public_html_dir($d, 1);
 if ($upgrade) {
 	# Options are fixed when upgrading
 	local ($dbtype, $dbname) = split(/_/, $upgrade->{'opts'}->{'db'}, 2);
-	$rv .= &ui_table_row("Database for SnappyMail preferences", $dbname);
+	$rv .= &ui_table_row("Database for Tachyon preferences", $dbname);
 	local $dir = $upgrade->{'opts'}->{'dir'};
 	$dir =~ s/^$d->{'home'}\///;
 	$rv .= &ui_table_row("Install directory", $dir);
@@ -99,17 +99,17 @@ if ($upgrade) {
 else {
 	# Show editable install options
 	local @dbs = &domain_databases($d, [ "mysql", "postgres", "sqlite" ]);
-	$rv .= &ui_table_row("Database for SnappyMail preferences",
-		     &ui_database_select("db", undef, \@dbs, $d, "snappymail"));
+	$rv .= &ui_table_row("Database for Tachyon preferences",
+		     &ui_database_select("db", undef, @dbs, $d, "tachyon"));
 	$rv .= &ui_table_row("Install sub-directory under <tt>$hdir</tt>",
-			     &ui_opt_textbox("dir", &substitute_scriptname_template("snappymail", $d), 30, "At top level"));
+			     &ui_opt_textbox("dir", &substitute_scriptname_template("tachyon", $d), 30, "At top level"));
 	}
 return $rv;
 }
 
-# script_snappymail_parse(&domain, version, &in, &upgrade-info)
+# script_tachyon_parse(&domain, version, &in, &upgrade-info)
 # Returns either a hash ref of parsed options, or an error string
-sub script_snappymail_parse
+sub script_tachyon_parse
 {
 local ($d, $ver, $in, $upgrade) = @_;
 if ($upgrade) {
@@ -129,44 +129,44 @@ else {
 	}
 }
 
-# script_snappymail_check(&domain, version, &opts, &upgrade-info)
+# script_tachyon_check(&domain, version, &opts, &upgrade-info)
 # Returns an error message if a required option is missing or invalid
-sub script_snappymail_check
+sub script_tachyon_check
 {
 local ($d, $ver, $opts, $upgrade) = @_;
 $opts->{'dir'} =~ /^\// || return "Missing or invalid install directory";
 $opts->{'db'} || return "Missing database";
 if (-r "$opts->{'dir'}/config/db.inc.php") {
-	return "SnappyMail appears to be already installed in the selected directory";
+	return "Tachyon appears to be already installed in the selected directory";
 	}
 local ($dbtype, $dbname) = split(/_/, $opts->{'db'}, 2);
 local $clash = &find_database_table($dbtype, $dbname, "system|filestore|contacts|users");
-$clash && return "SnappyMail appears to be already using the selected database (table $clash)";
+$clash && return "Tachyon appears to be already using the selected database (table $clash)";
 return undef;
 }
 
-# script_snappymail_files(&domain, version, &opts, &upgrade-info)
-# Returns a list of files needed by SnappyMail, each of which is a hash ref
+# script_tachyon_files(&domain, version, &opts, &upgrade-info)
+# Returns a list of files needed by Tachyon, each of which is a hash ref
 # containing a name, filename and URL
-sub script_snappymail_files
+sub script_tachyon_files
 {
 local ($d, $ver, $opts, $upgrade) = @_;
 local @files = ( { 'name' => "source",
-	           'file' => "snappymail-$ver.tar.gz",
-	           'url' => "https://github.com/the-djmaze/snappymail/releases/download/v${ver}/snappymail-${ver}.tar.gz" },
+	           'file' => "tachyon-$ver.tar.gz",
+	           'url' => "https://github.com/YOUR_ORG/tachyon/releases/download/v${ver}/tachyon-${ver}.tar.gz" },
 	    );
 return @files;
 }
 
-sub script_snappymail_commands
+sub script_tachyon_commands
 {
 return ("tar", "gunzip");
 }
 
-# script_snappymail_install(&domain, version, &opts, &files, &upgrade-info)
-# Actually installs SnappyMail, and returns either 1 and an informational
+# script_tachyon_install(&domain, version, &opts, &files, &upgrade-info)
+# Actually installs Tachyon, and returns either 1 and an informational
 # message, or 0 and an error
-sub script_snappymail_install
+sub script_tachyon_install
 {
 local ($d, $version, $opts, $files, $upgrade) = @_;
 local ($out, $ex);
@@ -189,7 +189,7 @@ local $temp = &transname();
 local $verdir = $ver;
 $verdir =~ s/-complete$//;
 local $err = &extract_script_archive($files->{'source'}, $temp, $d,
-                                     $opts->{'dir'}, "snappymail-$verdir");
+                                     $opts->{'dir'}, "tachyon-$verdir");
 $err && return (0, "Failed to extract source : $err");
 
 if (!$upgrade) {
@@ -333,12 +333,12 @@ else {
 local $url = &script_path_url($d, $opts);
 local $rp = $opts->{'dir'};
 $rp =~ s/^$d->{'home'}\///;
-return (1, "SnappyMail installation complete. It can be accessed at <a target=_blank href='$url'>$url</a>.", "Under $rp using $dbphptype database $dbname", $url);
+return (1, "Tachyon installation complete. It can be accessed at <a target=_blank href='$url'>$url</a>.", "Under $rp using $dbphptype database $dbname", $url);
 }
 
 # script_wordpress_db_conn_desc()
 # Returns a list of options for config file to update
-sub script_snappymail_db_conn_desc
+sub script_tachyon_db_conn_desc
 {
 my $conn_desc =
     {
@@ -361,14 +361,14 @@ my $db_conn_desc =
 return $db_conn_desc;
 }
 
-# script_snappymail_uninstall(&domain, version, &opts)
-# Un-installs a SnappyMail installation, by deleting the directory and database.
+# script_tachyon_uninstall(&domain, version, &opts)
+# Un-installs a Tachyon installation, by deleting the directory and database.
 # Returns 1 on success and a message, or 0 on failure and an error
-sub script_snappymail_uninstall
+sub script_tachyon_uninstall
 {
 local ($d, $version, $opts) = @_;
 
-# Remove snappymail tables from the database
+# Remove tachyon tables from the database
 &cleanup_script_database($d, $opts->{'db'}, "(.*)");
 
 # Take out the DB
@@ -380,24 +380,24 @@ if ($opts->{'newdb'}) {
 local $derr = &delete_script_install_directory($d, $opts);
 return (0, $derr) if ($derr);
 
-return (1, "SnappyMail directory and tables deleted.");
+return (1, "Tachyon directory and tables deleted.");
 }
 
-# script_snappymail_latest(version)
+# script_tachyon_latest(version)
 # Returns a URL and regular expression or callback func to get the version
-sub script_snappymail_latest
+sub script_tachyon_latest
 {
 local ($ver) = @_;
-return ( "https://snappymail.eu/download/",
-         "snappymail-([0-9\\.]+).tar.gz" );
+return ( "https://github.com/YOUR_ORG/tachyon/releases/",
+         "tachyon-([0-9\\.]+).tar.gz" );
 }
 
-sub script_snappymail_site
+sub script_tachyon_site
 {
-return 'https://snappymail.eu/';
+return 'https://github.com/YOUR_ORG/tachyon/';
 }
 
-sub script_snappymail_gpl
+sub script_tachyon_gpl
 {
 return 1;
 }

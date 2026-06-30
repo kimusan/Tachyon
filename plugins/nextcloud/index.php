@@ -93,7 +93,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 		// it is enabled in config, the user is currently logged in with OIDC,
 		// the current snappymail account is the OIDC account and no account defined explicitly
 		if ($oAccount instanceof \Tachyon\Model\MainAccount
-		 && \OCA\SnappyMail\Util\SnappyMailHelper::isOIDCLogin()
+		 && \OCA\Tachyon\Util\TachyonHelper::isOIDCLogin()
 //		 && $oClient->supportsAuthType('OAUTHBEARER') // v2.28
 		 && \str_starts_with($oSettings->passphrase, 'oidc_login|')
 		) {

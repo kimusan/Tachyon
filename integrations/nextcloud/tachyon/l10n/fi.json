@@ -1,0 +1,11 @@
+{ "translations": {
+    "Email" : "Sähköposti",
+    "Error" : "Virhe",
+    "Invalid argument(s)" : "Yksi tai useampi virheellinen argumentti",
+    "Saved successfully" : "Tallennettu onnistuneesti",
+    "Tachyon" : "Tachyon",
+    "Save" : "Tallenna",
+    "Tachyon Webmail is not configured yet." : "Tachyon Webmailia ei ole vielä määritetty.",
+    "Password" : "Salasana"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

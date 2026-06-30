@@ -1,0 +1,19 @@
+{ "translations": {
+    "Email" : "E-Mail",
+    "Error" : "Fehler",
+    "Invalid argument(s)" : "Ungültige(r) Parameter",
+    "Saved successfully" : "Gespeichert",
+    "Tachyon" : "Tachyon",
+    "Tachyon Webmail" : "Tachyon Webmail",
+    "Go to Tachyon Webmail admin panel" : "Gehe zum Administrator-Bereich von Tachyon Webmail ",
+    "Users will login manually, or define credentials in their personal settings for automatic logins." : "Benutzer melden sich manuell an oder definieren Zugangsdaten in ihren persönlichen Einstellungen für die automatische Anmeldung.",
+    "Attempt to automatically login users with their Nextcloud username and password, or user-defined credentials, if set." : "Es wird versucht Benutzer automatisch mit ihrem Benutzername und Passwort von Nextcloud oder, falls festgelegt, mit benutzerdefinierten Anmeldedaten anzumelden.",
+    "Attempt to automatically login users with their Nextcloud email and password, or user-defined credentials, if set." : "Es wird versucht Benutzer automatisch mit der E-Mail-Adresse und Passwort von Nextcloud oder, falls festgelegt, mit benutzerdefinierten Anmeldedaten anzumelden.",
+    "Save" : "Speichern",
+    "Tachyon Webmail is not configured yet." : "Tachyon Webmail ist noch nicht eingerichtet.",
+    "may have some" : "möglicherweise einige",
+    "security considerations" : "Sicherheitsüberlegungen benötigt",
+    "Enter an email and password to auto-login to Tachyon." : "E-Mail-Adresse und Passwort für die automatische Anmeldung bei Tachyon eingeben.",
+    "Password" : "Passwort"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
