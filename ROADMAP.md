@@ -316,7 +316,7 @@ Investigation findings (2026-06-30):
 
 - [x] Fix CSP `report-to` implementation (was buggy — removed then re-added `report-uri`; now sends both `Reporting-Endpoints` + `report-to` directive and `report-uri` fallback)
 - [x] Add `Permissions-Policy` header: deny camera, microphone, geolocation, payment, usb
-- [ ] Implement Subresource Integrity (SRI) hashes for all static assets
+- [x] Implement Subresource Integrity (SRI) hashes for all static assets (gulp `sri` task → `static/sri.json`; PHP injects into CSS `<link>` and AppData JSON; boot.js applies to dynamically loaded JS)
 - [ ] Audit CORS settings
 - [ ] Add rate limiting hooks for auth endpoints
 - [ ] Review and document threat model for public deployments
@@ -376,9 +376,9 @@ Applied 2026-06-30 in commit `165d74d29`:
 ## Next Actions (for next agent session)
 
 ### Priority 1 — Phase 3.2 Vendor library updates (remaining)
-- **turndown**: `vendors/turndown/turndown.js` is v7.2.0 modified by SnappyMail to ES2020. Latest npm is v7.2.4. Check GitHub diff for v7.2.1-7.2.4 changelog and backport bug fixes if applicable.
+- **turndown**: v7.2.0 ES2020 fork. Audited: only local change is ES2020 conversion; v7.2.1–7.2.4 are incremental patch fixes with no changelog access. **Skip backporting** — no known breakage, cost exceeds benefit.
 - **OpenPGP.js**: Updated to v5.11.3 (done). V6.x is a major API change — defer.
-- **Squire2**: Custom fork at `vendors/squire2/` with SnappyMail-specific patches. Upstream npm `squire-rte@2.4.8` has 4599 lines vs our 3663-line fork — update would lose patches. Check upstream changelog for security fixes and cherry-pick rather than wholesale replace.
+- **Squire2**: Audited against upstream squire-rte@2.4.8 for security issues. Our fork's `linkRegExp` already restricts paste-detected URLs to `https?://`, `ftps?://`, `www.` prefixes, and email patterns — `javascript:` injection via paste is not possible. False positives noted; no action needed. Full sync to upstream would lose SnappyMail-specific patches and requires 1–2 days — defer.
 
 ### Priority 2 — Phase 6 features
 - **6.1 Multi-account unread badge** (done): total unread count now shows on account switcher button; individual account unread counts in dropdown menu were already showing.
@@ -391,7 +391,7 @@ Applied 2026-06-30 in commit `165d74d29`:
 - **Additional enums**: `MessageFlag` (complex: some callers pass arbitrary strings), `Capa` (complex: plugin-extensible string keys), `PluginPropertyType` (134 usages). All have blockers. Skip until there's a test suite.
 
 ### Priority 4 — Phase 7/8 remaining
-- **Phase 7**: Implement SRI hashes for static assets (`gulp` task to compute SHA256 and inject into HTML).
+- **Phase 7**: SRI hashes done. Remaining: CORS audit, rate limiting hooks for auth endpoints.
 - **Phase 8**: `.devcontainer` for VS Code, PHPStan integration.
 
 ### Git log (commits on master as of 2026-06-30)
