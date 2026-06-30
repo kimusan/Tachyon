@@ -1,6 +1,6 @@
 {
-	"name": "SnappyMail Webmail",
-	"short_name": "SnappyMail",
+	"name": "Tachyon Webmail",
+	"short_name": "Tachyon",
 	"description": "Simple, modern & fast web-based email client",
 	"display": "standalone",
 	"background_color": "white",

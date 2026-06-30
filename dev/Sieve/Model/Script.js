@@ -11,7 +11,7 @@ function filtersToSieveScript(filters)
 		split = /.{0,74}/g,
 		require = {},
 		parts = [
-			'# This is SnappyMail sieve script.',
+			'# This is Tachyon sieve script.',
 			'# Please don\'t change anything here.',
 			'# RAINLOOP:SIEVE',
 			''

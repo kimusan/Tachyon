@@ -38,13 +38,13 @@ class SquireUI
 		const
 			clr = createElement('input'),
 			doClr = name => input => {
-				// https://github.com/the-djmaze/snappymail/issues/826
+				// https://github.com/the-djmaze/tachyon/issues/826
 				clr.style.left = (input.offsetLeft + input.parentNode.offsetLeft) + 'px';
 				clr.style.width = input.offsetWidth + 'px';
 
 				clr.value = '';
 				clr.onchange = () => squire.setStyle({[name]:clr.value});
-				// Chrome 110+ https://github.com/the-djmaze/snappymail/issues/1199
+				// Chrome 110+ https://github.com/the-djmaze/tachyon/issues/1199
 //				clr.oninput = () => squire.setStyle({[name]:clr.value});
 				setTimeout(()=>clr.click(),1);
 			},

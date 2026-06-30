@@ -10,7 +10,7 @@ let __themeTimer = 0;
 export const
 	// Also see Styles/_Values.less @maxMobileWidth
 	isMobile = matchMedia('(max-width: 799px)'),
-	// https://github.com/the-djmaze/snappymail/issues/1150
+	// https://github.com/the-djmaze/tachyon/issues/1150
 //	isSmall = matchMedia('(max-width: 1400px)'),
 
 	ThemeStore = {

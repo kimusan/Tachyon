@@ -31,7 +31,7 @@ export const
 	translateTrigger = ko.observable(false),
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
-	// see /snappymail/v/0.0.0/app/localization/relativetimeformat/
+	// see /tachyon/v/0.0.0/app/localization/relativetimeformat/
 	relativeTime = seconds => {
 		let unit = 'second',
 			t = [[60,'minute'],[3600,'hour'],[86400,'day'],[2628000,'month'],[31536000,'year']],

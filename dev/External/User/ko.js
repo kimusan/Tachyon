@@ -11,7 +11,7 @@ import { setExpandedFolder } from 'Model/FolderCollection';
 import { FolderUserStore } from 'Stores/User/Folder';
 import { MessagelistUserStore } from 'Stores/User/Messagelist';
 
-const rlContentType = 'snappymail/action',
+const rlContentType = 'tachyon/action',
 
 	// In Chrome we have no access to dataTransfer.getData unless it's the 'drop' event
 	// In Chrome Mobile dataTransfer.types.includes(rlContentType) fails, only text/plain is set

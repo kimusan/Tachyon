@@ -77,7 +77,7 @@ export class UserSettingsSecurity extends AbstractViewSettings {
 		 */
 		window.mailvelope && mailvelope.createSettingsContainer('#mailvelope-settings'/*[, keyring], options*/);
 		/**
-		 * https://github.com/the-djmaze/snappymail/issues/973
+		 * https://github.com/the-djmaze/tachyon/issues/973
 		Remote.request('GetStoredPGPKeys', (iError, data) => {
 			console.dir([iError, data]);
 		});

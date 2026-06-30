@@ -257,7 +257,7 @@ export const
 				rightmargin: (value, node) => node.style.marginRight = pInt(value) + 'px'
 			},
 			allowedAttributes = [
-				// SnappyMail
+				// Tachyon
 //				'data-x-href-broken',
 //				'data-x-href-tracking',
 				'data-x-src',

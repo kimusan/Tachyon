@@ -2,7 +2,7 @@ import { doc, createElement, addEventsListeners } from 'Common/Globals';
 import { EmailModel } from 'Model/Email';
 import { addressparser } from 'Mime/Address';
 
-const contentType = 'snappymail/emailaddress',
+const contentType = 'tachyon/emailaddress',
 	getAddressKey = li => li?.emailaddress?.key,
 
 	parseEmailLine = line => addressparser(line).map(item =>

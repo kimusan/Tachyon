@@ -16,7 +16,7 @@
 		"build",
 		"data",
 		"vendors",
-		"snappymail",
+		"tachyon",
 		"plugins",
 		"node_modules",
 		"bower_components",

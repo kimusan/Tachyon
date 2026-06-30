@@ -63,8 +63,8 @@ export class OpenPgpKeyPopupView extends AbstractViewPopup {
 			{
 				"name": "demo",
 				"comment": "",
-				"email": "demo@snappymail.eu",
-				"uid": "demo <demo@snappymail.eu>",
+				"email": "demo@tachyon.eu",
+				"uid": "demo <demo@tachyon.eu>",
 				"revoked": false,
 				"invalid": false
 			}

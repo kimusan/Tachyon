@@ -14,7 +14,7 @@ export const FolderType = {
 	IMPORTANT : 10;
 	FLAGGED : 11;
 	ALL : 13;
-	// TODO: SnappyMail
+	// TODO: Tachyon
 	TEMPLATES : 19;
 	// Kolab
 	CONFIGURATION : 20;
