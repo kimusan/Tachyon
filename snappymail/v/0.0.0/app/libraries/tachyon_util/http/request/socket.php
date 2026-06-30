@@ -76,7 +76,8 @@ class Socket extends \Tachyon\Util\HTTP\Request
 		$errno = 0;
 		$errstr = '';
 
-		$sock = \stream_socket_client("{$parts['host']}:{$parts['port']}", $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
+		// @ suppresses PHP warnings for DNS/TLS failures — errors are handled via return value below
+		$sock = @\stream_socket_client("{$parts['host']}:{$parts['port']}", $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
 		if (false === $sock) {
 			throw new \RuntimeException($errstr ?: "Connection failed (errno {$errno})");
 		}
