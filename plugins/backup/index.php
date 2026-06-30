@@ -30,34 +30,20 @@ class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 			return $this->jsonResponse(__FUNCTION__, false);
 		}
 
-		\file_put_contents(APP_PRIVATE_DATA.'cache/CACHEDIR.TAG', 'Signature: 8a477f597d28d172789f06886806bc55');
+		$sFileName = APP_PRIVATE_DATA . \MailSo\Base\Utils::Sha1Rand() . '.zip';
+		$sType = 'application/zip';
 
-		$sFileName = APP_PRIVATE_DATA . \MailSo\Base\Utils::Sha1Rand();
+		$oArchive = new \Tachyon\Util\Stream\ZIP($sFileName);
 
-		if (true) {
-			$sType = 'application/zip';
-			$sFileName .= '.zip';
-			if (\class_exists('ZipArchive')) {
-//				$oArchive = new \ZipArchive();
-//				$oArchive->open($sFileName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
-//				$oArchive->setArchiveComment('SnappyMail/'.APP_VERSION);
+		foreach (['configs', 'domains', 'plugins', 'storage'] as $dir) {
+			$sDir = APP_PRIVATE_DATA . $dir;
+			if (\is_dir($sDir)) {
+				$oArchive->addRecursive($sDir, $dir);
 			}
-			$oArchive = new \Tachyon\Util\Stream\ZIP($sFileName);
-		} else {
-			$sType = 'application/x-gzip';
-			$sFileName .= '.tgz';
-			$oArchive = new \Tachyon\Util\Stream\TAR($sFileName);
 		}
-
-//		$oArchive->addRecursive(APP_PRIVATE_DATA, '#/(cache.*)#');
-		$oArchive->addRecursive(APP_PRIVATE_DATA.'configs', 'configs');
-		$oArchive->addRecursive(APP_PRIVATE_DATA.'domains', 'domains');
-		$oArchive->addRecursive(APP_PRIVATE_DATA.'plugins', 'plugins');
-		$oArchive->addRecursive(APP_PRIVATE_DATA.'storage', 'storage');
 		if (\is_readable(APP_PRIVATE_DATA.'AddressBook.sqlite')) {
 			$oArchive->addFile(APP_PRIVATE_DATA.'AddressBook.sqlite');
 		}
-//		$oArchive->addFile(APP_DATA_FOLDER_PATH.'SALT.php');
 		$oArchive->close();
 
 		$data = \base64_encode(\file_get_contents($sFileName));

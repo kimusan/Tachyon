@@ -240,10 +240,10 @@ class ActionsAdmin extends Actions
 
 		$info = \Tachyon\Util\Repository::getLatestCoreInfo();
 
-		$sVersion = empty($info->version) ? '' : $info->version;
+		$sVersion = $info?->version ?? '';
 
 		$bShowWarning = false;
-		if (!empty($info->warnings) && !TACHYON_DEV) {
+		if ($info && !empty($info->warnings) && !TACHYON_DEV) {
 			foreach ($info->warnings as $sWarningVersion) {
 				$sWarningVersion = \trim($sWarningVersion);
 
