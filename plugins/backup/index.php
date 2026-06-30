@@ -30,29 +30,34 @@ class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 			return $this->jsonResponse(__FUNCTION__, false);
 		}
 
-		$sFileName = APP_PRIVATE_DATA . \MailSo\Base\Utils::Sha1Rand() . '.zip';
-		$sType = 'application/zip';
+		try {
+			$sFileName = APP_PRIVATE_DATA . \MailSo\Base\Utils::Sha1Rand() . '.zip';
+			$sType = 'application/zip';
 
-		$oArchive = new \Tachyon\Util\Stream\ZIP($sFileName);
+			$oArchive = new \Tachyon\Util\Stream\ZIP($sFileName);
 
-		foreach (['configs', 'domains', 'plugins', 'storage'] as $dir) {
-			$sDir = APP_PRIVATE_DATA . $dir;
-			if (\is_dir($sDir)) {
-				$oArchive->addRecursive($sDir, $dir);
+			foreach (['configs', 'domains', 'plugins', 'storage'] as $dir) {
+				$sDir = APP_PRIVATE_DATA . $dir;
+				if (\is_dir($sDir)) {
+					$oArchive->addRecursive($sDir, $dir);
+				}
 			}
-		}
-		if (\is_readable(APP_PRIVATE_DATA.'AddressBook.sqlite')) {
-			$oArchive->addFile(APP_PRIVATE_DATA.'AddressBook.sqlite');
-		}
-		$oArchive->close();
+			if (\is_readable(APP_PRIVATE_DATA.'AddressBook.sqlite')) {
+				$oArchive->addFile(APP_PRIVATE_DATA.'AddressBook.sqlite');
+			}
+			$oArchive->close();
 
-		$data = \base64_encode(\file_get_contents($sFileName));
-		\unlink($sFileName);
+			$data = \base64_encode(\file_get_contents($sFileName));
+			\unlink($sFileName);
 
-		return $this->jsonResponse(__FUNCTION__, array(
-			'name' => \basename($sFileName),
-			'data' => "data:{$sType};base64,{$data}"
-		));
+			return $this->jsonResponse(__FUNCTION__, array(
+				'name' => \basename($sFileName),
+				'data' => "data:{$sType};base64,{$data}"
+			));
+		} catch (\Throwable $e) {
+			\error_log('Tachyon backup error: ' . $e->getMessage());
+			return $this->jsonResponse(__FUNCTION__, false);
+		}
 	}
 
 	public function JsonAdminRestoreData()

@@ -458,7 +458,11 @@ class ActionsAdmin extends Actions
 			$aResult['Admin']['clientLanguage'] = $oActions->ValidateLanguage($oActions->detectClientLanguage(true), '', true, true);
 
 			$gnupg = \Tachyon\Util\PGP\GnuPG::getInstance('');
-			$aResult['gnupg'] = $gnupg ? ($gnupg->getEngineInfo()['version'] ?? '') : '';
+			$gnupgVersion = $gnupg ? ($gnupg->getEngineInfo()['version'] ?? '') : '';
+			if (!$gnupgVersion && \extension_loaded('gnupg')) {
+				$gnupgVersion = \phpversion('gnupg') ?: 'available';
+			}
+			$aResult['gnupg'] = $gnupgVersion;
 		} else {
 			$passfile = APP_PRIVATE_DATA.'admin_password.txt';
 			$sPassword = $oConfig->Get('security', 'admin_password', '');
