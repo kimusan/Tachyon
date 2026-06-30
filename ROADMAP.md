@@ -289,23 +289,20 @@ Tasks:
 - [ ] **Selective sync**: choose which folders to sync/display
 - [ ] **WebP/AVIF avatar support**: use modern image formats
 
-### 6.7 Unified inbox (investigate feasibility)
+### 6.7 Unified inbox (investigated 2026-06-30: NO-GO)
 
-> **Complexity: potentially very high. May not be feasible without major architectural changes.**
+> **Decision: No-go without major architectural overhaul. Estimated 3+ months. Too risky for v1.**
 
-SnappyMail already supports multiple signed-in accounts. The idea is a virtual "All Inboxes" view that
-aggregates messages from all of them in a single chronological feed.
+Investigation findings (2026-06-30):
 
-- [ ] Audit how multi-account is currently handled in `RainLoop\Model\AdditionalAccount` and storage
-- [ ] Determine if IMAP connections for all accounts can be held open concurrently per session
-- [ ] Assess KnockoutJS store/view model changes needed to merge multiple account message lists
-- [ ] Assess whether the folder tree and message actions (reply, move, delete) can route back
-  to the correct account transparently
-- [ ] Consider a read-only unified view first (display only, no compose/move from unified view)
-- [ ] Document decision: go/no-go with rationale once investigation is complete
+**Architecture today:** Only one IMAP connection active per session via a shared `MailClient()` singleton. The `ImapClient` is bound to a single account's credentials. Switching accounts disconnects and reconnects — concurrent multi-account fetching is not possible in the current design.
 
-Blockers to watch for: session/storage model is per-primary-account, IMAP connection pooling
-is not currently abstracted, and the JS store model assumes a single active account context.
+**Critical blockers:**
+1. Single-connection constraint: `initMailClientConnection()` logs into one account at a time. Parallel IMAP requires pooling `ImapClient` instances (major refactor).
+2. Message identity coupled to current account context: `encodeRawKey` bakes the account hash into every message reference. Frontend `MessagelistUserStore` is a single observable array, not per-account.
+3. All message operations (flag, delete, move) assume single active account — would need per-message account routing.
+
+**Alternative for v1:** A "quick-switch" UI showing unread counts across all accounts with one-click switching. Far less work than true unified inbox, and useful immediately.
 
 ### 6.8 Admin improvements
 - [ ] **Admin dashboard**: usage stats, storage per user, active sessions
@@ -351,6 +348,7 @@ is not currently abstracted, and the JS store model assumes a single active acco
 | 2026-06-30 | PHP 8.2 minimum | 8.1 reached EOL Dec 2025; 8.2 is LTS until Dec 2026 |
 | 2026-06-30 | Version bump to 3.0.0 | Breaking: PHP 8.2 req + namespace rename; clean major version signal |
 | 2026-06-30 | Keep KnockoutJS for now | Migration is a major effort; not blocking for v1 |
+| 2026-06-30 | Unified inbox: no-go for v1 | Single IMAP connection per session, message IDs tied to account, frontend stores single-account; full impl ~3 months |
 
 ---
 
@@ -379,36 +377,38 @@ Applied 2026-06-30 in commit `165d74d29`:
 
 ## Next Actions (for next agent session)
 
-### Priority 1 — Phase 2 remaining PHP modernization
-- `declare(strict_types=1)` audit — add to new/modified files (non-breaking change)
-- Readonly properties: scan for `private $x` that are set once in constructor → `readonly`
-- Start Phase 2.4: match expressions, constructor property promotion
+### Priority 1 — Phase 3.2 Vendor library updates (remaining)
+- **marked v14**: bundled in `vendors/marked/marked.js` but NOT used in the build pipeline or app. Safe to remove (`git rm vendors/marked/`) to reduce clutter.
+- **turndown**: bundled `vendors/turndown/turndown.js` is v7.2.0 modified by SnappyMail to ES2020. Latest npm is v7.2.4. Check GitHub diff for v7.2.1-7.2.4 changelog and backport if applicable.
+- **OpenPGP.js**: Updated to v5.11.3 (done). V6.x is a major API change — defer.
+- **Squire2**: Custom fork at `vendors/squire2/`. Check upstream `neilj/squire` for security fixes since the fork was taken.
 
-### Priority 2 — Phase 3.2 Vendor library updates
-- **marked**: v14 (bundled) → latest v18.0.5. Check if API is compatible.
-- **OpenPGP.js v5**: check if v6 was released (v5.11.1 is current in vendors/)
-- **turndown**: check bundled version vs 7.2.4 latest
-- **Squire2**: custom fork, check for security commits in upstream neil jenkins/squire
+### Priority 2 — Phase 2.4 remaining PHP modernization
+- **`declare(strict_types=1)`**: zero usage in codebase — adding piecemeal is inconsistent. Defer to batch effort via Rector (Phase 8) with actual test coverage.
+- **Constructor property promotion**: sparse candidates (most constructors derive props from params). No sweep without testing.
+- **Additional enums**: `ConnectionSecurityType` has `TLS=1, SSL=1` (dupe values — cannot be enum), `Log/Type` has dupes too. `MessageFlag` (string-backed, 19 usages), `PluginPropertyType` (int-backed, 134 usages), `Capa` (string-backed, 34 usages) are possible but high-risk without tests.
 
-### Priority 3 — Phase 3.1 rollup.config.js
-- Already removed in `a136968fb`. Nothing to do.
+### Priority 3 — Phase 1.4 config migration shim
+- Verify no config key changes from SnappyMail→Tachyon that would break existing users' data on upgrade.
+- The `_data_/_default_/configs/application.ini` file uses keys like `sign_me_auto = DefaultOff` — now stored as enum string value. Since `SignMeType::DefaultOff->value === 'DefaultOff'` and SnappyMail also stored 'DefaultOff', no migration needed.
 
-### Priority 4 — Phase 1.4 (config migration shim + Docker cleanup)
-- `docker-compose.yml` and `.docker/` image names/labels may still say SnappyMail
-- Add upgrade migration shim for config key changes (if any)
+### Priority 4 — Phase 6 features (pick one to start)
+- **6.1 Multi-account quick-switch UI** (better alternative to unified inbox): show unread counts per account in the account switcher, one-click switching. Feasible in the current architecture.
+- **6.1 Responsive mobile layout**: audit `dev/Styles/@Main.less` for current mobile breakpoints, document what works and what needs improvement.
+- **6.6 IMAP IDLE**: check if `serviceworker.js` already has push notification infrastructure; scope adding true IMAP IDLE via a persistent connection or SSE.
 
-### Priority 5 — Phase 6 feature investigation
-- Begin Phase 6.7 unified inbox feasibility audit
-- Phase 6.1 responsive layout: audit current mobile CSS breakpoints
+### Priority 5 — Phase 7 Security hardening
+- CSP: switch from `report-uri` to `report-to` directive (noted as TODO in codebase)
+- Audit `Permissions-Policy` headers
 
 ### Git log (commits on master as of 2026-06-30)
-1. `ab337c05a` upstream: apply PRs #2052, #1882, #2035
-2. `84c56c6e7` rebrand: rename SnappyMail references in Docker entrypoint.sh
-3. `165d74d29` php: convert abstract enum classes to PHP 8.1 native enums (Phase 5)
-4. `3e1886903` upstream: apply critical bug fixes from PRs #2039, #2037, #2024, #2019, #2007, #1981, #1922
-5. `a136968fb` build: remove legacy rollup.config.js
-6. `40fc8e2` roadmap: mark Phases 1.5, 3 done; add upstream PR/branch findings
-7. `435399f` build: upgrade to Rollup v4, ESLint v9 flat config, fix JS lint errors
-8. `b1081f97` rebrand: fix Nextcloud/OwnCloud app ID, session keys, and file rename
-9. `835c079` rebrand: rename integration packages to Tachyon (Phase 1.5)
-10. `02ac9e0` rebrand: rename PHP namespaces and modernize PHP floor
+1. `7d5d8f9b3` php: convert DkimStatus abstract class to PHP 8.1 string-backed enum
+2. `8fcece61b` rebrand: update docker-compose.yml and Dockerfile label to Tachyon
+3. `d7135a175` vendor: update OpenPGP.js v5.11.1 → v5.11.3
+4. `ab337c05a` upstream: apply PRs #2052, #1882, #2035
+5. `84c56c6e7` rebrand: rename SnappyMail references in Docker entrypoint.sh
+6. `165d74d29` php: convert abstract enum classes to PHP 8.1 native enums (Phase 5)
+7. `3e1886903` upstream: apply critical bug fixes from PRs #2039-#1922
+8. `a136968fb` build: remove legacy rollup.config.js
+9. `435399f` build: upgrade to Rollup v4, ESLint v9 flat config
+10. `b1081f97` rebrand: fix Nextcloud/OwnCloud app ID, session keys, and file rename
