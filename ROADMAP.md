@@ -39,7 +39,7 @@ modern UX, and hardened security. The name references the theoretical particle t
 - [x] Update `_include.php`: renamed `SNAPPYMAIL_UPDATE_PLUGINS` -> `TACHYON_UPDATE_PLUGINS` in comments
 - [x] Update `.browserslistrc`: raised browser targets (Chrome/Edge 90+, FF 115+, Safari 15.4+)
 
-### 1.2 PHP directory structure (upgrade-path-safe)
+### 1.2 PHP directory structure (done: 2026-06-30)
 The main app directory is `snappymail/v/<version>/`. Strategy:
 - Keep `snappymail/` directory name for now to preserve upgrade paths from SnappyMail installations
 - All internal references will be updated but the disk layout stays compatible
@@ -60,11 +60,10 @@ The main app directory is `snappymail/v/<version>/`. Strategy:
   3. String literals (UI text only, not config keys)
   4. Constants
 
-### 1.3 JavaScript rename
-- [ ] Search/replace `SnappyMail` in 18 JS files under `dev/`
-- [ ] Update 8 LESS files under `dev/Styles/`
-- [ ] Update `snappymail/v/0.0.0/static/manifest.json`
-- [ ] Update JS constants and app name strings
+### 1.3 JavaScript rename (done: 2026-06-30)
+- [x] 12 JS files and 8 LESS files in `dev/` updated
+- [x] `snappymail/v/0.0.0/static/manifest.json` updated
+- [x] `jsconfig.json` updated
 
 ### 1.4 Configuration and data path
 - [ ] Decide on config directory naming: keep `data/` as-is (upgrade safe)
@@ -86,7 +85,7 @@ The main app directory is `snappymail/v/<version>/`. Strategy:
 
 ## Phase 2: PHP Modernization
 
-### 2.1 Raise minimum PHP version
+### 2.1 Raise minimum PHP version (done: 2026-06-30)
 - Current floor: PHP 7.4 (EOL Dec 2022)
 - PHP 8.0 EOL: Nov 2023
 - PHP 8.1 EOL: Dec 2025 (past)
@@ -94,28 +93,22 @@ The main app directory is `snappymail/v/<version>/`. Strategy:
 - **Target: PHP 8.2 minimum, test on 8.3 and 8.4**
 
 Tasks:
-- [ ] Update integrity check in `snappymail/v/0.0.0/app/libraries/snappymail/integrity.php` (line 93: change "7.4.0" to "8.2.0")
-- [ ] Update PHP version check in `snappymail/v/0.0.0/include.php` (currently checks < 80000)
-- [ ] Remove `app/libraries/polyfill/php8.php` (no longer needed)
-- [ ] Review `app/libraries/polyfill/ctype.php` and `intl.php` - keep for environments without extensions
-- [ ] Update all documentation/README references to PHP version requirements
+- [x] Updated `tachyon_util/integrity.php` (line 93): "7.4.0" → "8.2.0"
+- [x] PHP 8 polyfill guard in `include.php` restored to `< 80000` (polyfill is for PHP 7.x only, inner guard makes it safe)
+- [x] `polyfill/ctype.php` and `intl.php` kept (valid for environments without the extensions)
+- [x] README updated with PHP 8.2 requirement
 
-### 2.2 Remove PHP 7.x compatibility code
-- [ ] Remove null-coalescing workarounds where native syntax is now safe
-- [ ] Replace all `array()` short-form leftovers (should already be `[]` but verify)
-- [ ] Review typed property declarations - PHP 8.0+ allows more strict typing
-- [ ] Remove any `/* PHP7.4: ... */` comments and apply the typed hints directly
-  (found in `RainLoop/Model/AdditionalAccount.php:45`)
+### 2.2 Remove PHP 7.x compatibility code (done: 2026-06-30)
+- [x] `/* PHP7.4: ?self */` comment in `Tachyon/Model/AdditionalAccount.php` - type hint applied
+- [x] `ini_set('register_globals', '0')` dead code removed from `include.php`
+- [ ] Full audit: null-coalescing workarounds, remaining `array()` long-form, typed property coverage
 
-### 2.3 PHP 8.x deprecated/removed functions
-- [ ] Audit and fix `openssl_pkey_free()` usage (deprecated PHP 8.0, removed PHP 8.3)
-  - Already noted in git log commit `dea7f4d1d`; verify it was fully resolved
-- [ ] Audit `register_globals` ini_set calls (removed PHP 5.4, but harmless in 8.x)
-  - Found in `include.php:33` - safe to remove
-- [ ] Scan for `str_contains`, `str_starts_with`, `str_ends_with` already used (PHP 8.0 native) vs polyfill
-- [ ] Audit for implicit null parameter passing to non-nullable typed params (deprecated PHP 8.1)
-- [ ] Replace `FILTER_SANITIZE_STRING` usage (deprecated PHP 8.1)
-- [ ] Add strict typing (`declare(strict_types=1)`) to new files; audit existing files for correctness
+### 2.3 PHP 8.x deprecated/removed functions (partial: 2026-06-30)
+- [x] `openssl_pkey_free()` - confirmed resolved in prior commit `dea7f4d1d`
+- [x] `register_globals` ini_set removed
+- [ ] Audit for `FILTER_SANITIZE_STRING` usage (deprecated PHP 8.1)
+- [ ] Audit for implicit null param passing to non-nullable typed params (deprecated PHP 8.1)
+- [ ] `declare(strict_types=1)` audit for new and modified files
 
 ### 2.4 Modern PHP typing
 - [ ] Add return type declarations to key public API methods
@@ -337,15 +330,37 @@ _Populated during Phase 5_
 
 ## Next Actions (for next agent session)
 
-Start with **Phase 1.1** (metadata rename in `package.json` and `README.md`), then
-**Phase 1.2** (PHP namespace rename), then **Phase 2.1** (PHP version floor update).
+### Immediate (Phase 1.5 — Integration packages)
+The `integrations/` directory contains Nextcloud, Cloudron, cPanel, HestiaCP, OwnCloud, Virtualmin packages.
+The Nextcloud integration (`integrations/nextcloud/snappymail/`) still uses `OCA\SnappyMail` namespace internally
+(left intact intentionally - requires coordinated rename of appid, directory name, l10n files, app manifest).
 
-For each file change, run a grep verify pass to confirm no orphaned references remain.
+Steps:
+1. Rename `integrations/nextcloud/snappymail/` dir to `integrations/nextcloud/tachyon/`
+2. Update `appinfo/info.xml`: `<id>snappymail</id>` → `<id>tachyon</id>`, name, description
+3. Update all `OCA\SnappyMail\` → `OCA\Tachyon\` inside the app
+4. Update `plugins/nextcloud/index.php` line 96: revert `OCA\SnappyMail\Util\SnappyMailHelper` to `OCA\Tachyon\Util\TachyonHelper` (after renaming the helper class too)
+5. Update other integration packages similarly
 
-The rename is the highest-risk operation. Do it in git commits per subsystem:
-1. Commit: metadata files (package.json, README, docs)
-2. Commit: PHP namespace declarations
-3. Commit: PHP use statements and string literals
-4. Commit: JS/CSS
-5. Commit: config/constants
-6. Commit: integration packages
+### Phase 3 — Build toolchain update
+- Update `package.json` deps (already updated version numbers, but yarn.lock needs refresh: `yarn upgrade`)
+- `rollup.config.js` is stale/legacy — either align with `tasks/rollup.js` or remove
+- `gulpfile.js` and `tasks/*.js` still have "RainLoop Webmail" copyright headers
+- `tasks/js.js:89` has `snappymail/v/` path string — acceptable while disk path is preserved
+- Run `yarn install` then `gulp build` to verify the build still works after namespace changes
+
+### Phase 4 — Review upstream PRs
+- `gh pr list --repo the-djmaze/snappymail --state open --limit 50`
+
+### Phase 5 — Review upstream branches
+- `gh api repos/the-djmaze/snappymail/branches --paginate`
+
+### Phase 2 remaining items
+- FILTER_SANITIZE_STRING audit
+- Implicit null param audit
+- strict_types coverage
+
+### Git log (commits so far)
+1. `8750ac7` rebrand: rename project to Tachyon (metadata and docs)
+2. `854e850` rebrand: rename SnappyMail -> Tachyon in JS, LESS, and static JSON
+3. `02ac9e0` rebrand: rename PHP namespaces and modernize PHP floor
