@@ -92,6 +92,20 @@ if (!defined('TACHYON_LIBRARIES_PATH')) {
 		}
 		if (is_file($file)) {
 			include_once $file;
+			return;
+		}
+		// Compatibility shims for user-installed plugins that use legacy namespaces.
+		// RainLoop\ -> Tachyon\, SnappyMail\ -> Tachyon\Util\
+		if (strpos($sClassName, 'RainLoop\\') === 0) {
+			$alias = 'Tachyon\\' . substr($sClassName, 9);
+			if (class_exists($alias) || interface_exists($alias)) {
+				class_alias($alias, $sClassName);
+			}
+		} elseif (strpos($sClassName, 'SnappyMail\\') === 0) {
+			$alias = 'Tachyon\\Util\\' . substr($sClassName, 11);
+			if (class_exists($alias) || interface_exists($alias)) {
+				class_alias($alias, $sClassName);
+			}
 		}
 	});
 }
