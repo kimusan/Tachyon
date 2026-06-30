@@ -22,6 +22,8 @@ class Manager
 
 	public function __construct(\Tachyon\Actions $oActions)
 	{
+		static::registerLegacyAliases();
+
 		$this->oActions = $oActions;
 		$this->SetLogger($oActions->Logger());
 
@@ -41,6 +43,33 @@ class Manager
 					$oConfig->Set('plugins', 'enabled_list', $aList);
 					$oConfig->Save();
 				}
+			}
+		}
+	}
+
+	private static function registerLegacyAliases() : void
+	{
+		static $done = false;
+		if ($done) return;
+		$done = true;
+		foreach ([
+			'Tachyon\\Actions'                        => 'RainLoop\\Actions',
+			'Tachyon\\ServiceActions'                 => 'RainLoop\\ServiceActions',
+			'Tachyon\\Config\\Application'            => 'RainLoop\\Config\\Application',
+			'Tachyon\\Config\\Plugin'                 => 'RainLoop\\Config\\Plugin',
+			'Tachyon\\Model\\Account'                 => 'RainLoop\\Model\\Account',
+			'Tachyon\\Model\\MainAccount'             => 'RainLoop\\Model\\MainAccount',
+			'Tachyon\\Model\\AdditionalAccount'       => 'RainLoop\\Model\\AdditionalAccount',
+			'Tachyon\\Model\\Domain'                  => 'RainLoop\\Model\\Domain',
+			'Tachyon\\Plugins\\AbstractPlugin'        => 'RainLoop\\Plugins\\AbstractPlugin',
+			'Tachyon\\Plugins\\Manager'               => 'RainLoop\\Plugins\\Manager',
+			'Tachyon\\Plugins\\Property'              => 'RainLoop\\Plugins\\Property',
+			'Tachyon\\Enumerations\\PluginPropertyType' => 'RainLoop\\Enumerations\\PluginPropertyType',
+			'Tachyon\\Util\\AttachmentsAction'        => 'SnappyMail\\AttachmentsAction',
+			'Tachyon\\Util\\HTTP\\CSP'                => 'SnappyMail\\HTTP\\CSP',
+		] as $sNew => $sOld) {
+			if (!\class_exists($sOld, false) && !\interface_exists($sOld, false)) {
+				\class_alias($sNew, $sOld);
 			}
 		}
 	}
