@@ -33,6 +33,7 @@ abstract class Repository
 		$oHTTP->proxy = \Tachyon\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \Tachyon\Api::Config()->Get('labs', 'curl_proxy_auth', '');
 		$oHTTP->max_response_kb = 0;
+		$oHTTP->max_redirects = 5;
 		$oHTTP->timeout = 15;
 		$oHTTP->streamBodyTo($pDest);
 		\set_time_limit(120);
