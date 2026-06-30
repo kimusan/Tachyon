@@ -27,13 +27,13 @@ class PageController extends Controller
 			}
 		}
 
-		if (!$bAdmin && $config->getAppValue('snappymail', 'snappymail-no-embed')) {
-			\OC::$server->getNavigationManager()->setActiveEntry('snappymail');
-			\OCP\Util::addScript('snappymail', 'snappymail');
-			\OCP\Util::addStyle('snappymail', 'style');
+		if (!$bAdmin && $config->getAppValue('tachyon', 'tachyon-no-embed')) {
+			\OC::$server->getNavigationManager()->setActiveEntry('tachyon');
+			\OCP\Util::addScript('tachyon', 'tachyon');
+			\OCP\Util::addStyle('tachyon', 'style');
 			TachyonHelper::startApp();
-			$response = new TemplateResponse('snappymail', 'index', [
-				'snappymail-iframe-url' => TachyonHelper::normalizeUrl(TachyonHelper::getAppUrl())
+			$response = new TemplateResponse('tachyon', 'index', [
+				'tachyon-iframe-url' => TachyonHelper::normalizeUrl(TachyonHelper::getAppUrl())
 					. (empty($_GET['target']) ? '' : "#{$_GET['target']}")
 			]);
 			$csp = new ContentSecurityPolicy();
@@ -43,9 +43,9 @@ class PageController extends Controller
 			return $response;
 		}
 
-		\OC::$server->getNavigationManager()->setActiveEntry('snappymail');
+		\OC::$server->getNavigationManager()->setActiveEntry('tachyon');
 
-		\OCP\Util::addStyle('snappymail', 'embed');
+		\OCP\Util::addStyle('tachyon', 'embed');
 
 		TachyonHelper::startApp();
 		$oConfig = \Tachyon\Api::Config();
@@ -74,14 +74,14 @@ class PageController extends Controller
 			)
 		];
 
-//		\OCP\Util::addScript('snappymail', '../app/snappymail/v/'.APP_VERSION.'/static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin);
+//		\OCP\Util::addScript('tachyon', '../app/snappymail/v/'.APP_VERSION.'/static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin);
 
 		// Nextcloud html encodes, so addHeader('style') is not possible
 //		\OCP\Util::addHeader('style', ['id'=>'app-boot-css'], \file_get_contents(APP_VERSION_ROOT_PATH.'static/css/boot'.$sAppCssMin.'.css'));
 		\OCP\Util::addHeader('link', ['type'=>'text/css','rel'=>'stylesheet','href'=>\Tachyon\Utils::WebStaticPath('css/'.($bAdmin?'admin':'app').$sAppCssMin.'.css')], '');
 //		\OCP\Util::addHeader('style', ['id'=>'app-theme-style','data-href'=>$params['BaseAppThemeCssLink']], $params['BaseAppThemeCss']);
 
-		$response = new TemplateResponse('snappymail', 'index_embed', $params);
+		$response = new TemplateResponse('tachyon', 'index_embed', $params);
 
 		$response->setContentSecurityPolicy($csp);
 

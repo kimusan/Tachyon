@@ -20,14 +20,14 @@ class AdminSettings implements ISettings
 		\OCA\Tachyon\Util\Util\TachyonHelper::loadApp();
 
 		$keys = [
-			'snappymail-autologin',
-			'snappymail-autologin-with-email',
-			'snappymail-no-embed',
-			'snappymail-autologin-oidc'
+			'tachyon-autologin',
+			'tachyon-autologin-with-email',
+			'tachyon-no-embed',
+			'tachyon-autologin-oidc'
 		];
 		$parameters = [];
 		foreach ($keys as $k) {
-			$v = $this->config->getAppValue('snappymail', $k);
+			$v = $this->config->getAppValue('tachyon', $k);
 			$parameters[$k] = $v;
 		}
 		$uid = \OC::$server->getUserSession()->getUser()->getUID();
@@ -53,7 +53,7 @@ class AdminSettings implements ISettings
 			. '/rainloop-storage'
 		);
 
-		$parameters['snappymail-debug'] = $oConfig->Get('debug', 'enable', false);
+		$parameters['tachyon-debug'] = $oConfig->Get('debug', 'enable', false);
 
 		// Check for nextcloud plugin update, if so then update
 		foreach (\Tachyon\Util\Repository::getPackagesList()['List'] as $plugin) {
@@ -65,16 +65,16 @@ class AdminSettings implements ISettings
 		// Prevent "Failed loading /nextcloud/snappymail/v/2.N.N/static/js/min/libs.min.js"
 		$app_path = $oConfig->Get('webmail', 'app_path');
 		if (!$app_path) {
-			$app_path = \OC::$server->getAppManager()->getAppWebPath('snappymail') . '/app/';
+			$app_path = \OC::$server->getAppManager()->getAppWebPath('tachyon') . '/app/';
 			$oConfig->Set('webmail', 'app_path', $app_path);
 			$oConfig->Set('webmail', 'theme', 'NextcloudV25+');
 			$oConfig->Save();
 		}
-		$parameters['snappymail-app_path'] = $oConfig->Get('webmail', 'app_path', false);
-		$parameters['snappymail-nc-lang'] = !$oConfig->Get('webmail', 'allow_languages_on_settings', true);
+		$parameters['tachyon-app_path'] = $oConfig->Get('webmail', 'app_path', false);
+		$parameters['tachyon-nc-lang'] = !$oConfig->Get('webmail', 'allow_languages_on_settings', true);
 
-		\OCP\Util::addScript('snappymail', 'snappymail');
-		return new TemplateResponse('snappymail', 'admin-local', $parameters);
+		\OCP\Util::addScript('tachyon', 'tachyon');
+		return new TemplateResponse('tachyon', 'admin-local', $parameters);
 	}
 
 	public function getSection()

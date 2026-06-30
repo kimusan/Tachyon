@@ -21,7 +21,7 @@ use OCA\OIDCLogin\Events\AccessTokenUpdatedEvent;
 
 class Application extends App implements IBootstrap
 {
-	public const APP_ID = 'snappymail';
+	public const APP_ID = 'tachyon';
 
 	public function __construct(array $urlParams = [])
 	{
@@ -72,7 +72,7 @@ class Application extends App implements IBootstrap
 
 	public function boot(IBootContext $context): void
 	{
-		if (!\is_dir(\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/') . '/appdata_snappymail')) {
+		if (!\is_dir(\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/') . '/appdata_tachyon')) {
 			return;
 		}
 
@@ -82,12 +82,12 @@ class Application extends App implements IBootstrap
 			$config = \OC::$server->getConfig();
 			// Only store the user's password in the current session if they have
 			// enabled auto-login using Nextcloud username or email address.
-			if ($config->getAppValue('snappymail', 'snappymail-autologin', false)
-			 || $config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
+			if ($config->getAppValue('tachyon', 'tachyon-autologin', false)
+			 || $config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 */
 				$sUID = $Event->getUser()->getUID();
-				\OC::$server->getSession()['snappymail-nc-uid'] = $sUID;
-				\OC::$server->getSession()['snappymail-passphrase'] = TachyonHelper::encodePassword($Event->getPassword(), $sUID);
+				\OC::$server->getSession()['tachyon-nc-uid'] = $sUID;
+				\OC::$server->getSession()['tachyon-passphrase'] = TachyonHelper::encodePassword($Event->getPassword(), $sUID);
 /*
 			}
 */
@@ -95,7 +95,7 @@ class Application extends App implements IBootstrap
 
 		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) {
 			// https://github.com/nextcloud/server/issues/36083#issuecomment-1387370634
-//			\OC::$server->getSession()['snappymail-passphrase'] = '';
+//			\OC::$server->getSession()['tachyon-passphrase'] = '';
 			TachyonHelper::loadApp();
 //			\Tachyon\Api::Actions()->Logout(true);
 			\Tachyon\Api::Actions()->DoLogout();
@@ -106,12 +106,12 @@ class Application extends App implements IBootstrap
 		$class = 'OCA\Impersonate\Events\BeginImpersonateEvent';
 		if (\class_exists($class)) {
 			$dispatcher->addListener($class, function ($Event) {
-				\OC::$server->getSession()['snappymail-passphrase'] = '';
+				\OC::$server->getSession()['tachyon-passphrase'] = '';
 				TachyonHelper::loadApp();
 				\Tachyon\Api::Actions()->Logout(true);
 			});
 			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) {
-				\OC::$server->getSession()['snappymail-passphrase'] = '';
+				\OC::$server->getSession()['tachyon-passphrase'] = '';
 				TachyonHelper::loadApp();
 				\Tachyon\Api::Actions()->Logout(true);
 			});

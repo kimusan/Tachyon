@@ -16,7 +16,7 @@ class AccessTokenUpdatedListener implements IEventListener {
 	private ISession $session;
 	private IAppManager $appManager;
 
-	private const SNAPPYMAIL_APP_ID = 'snappymail';
+	private const TACHYON_APP_ID = 'tachyon';
 	private const OIDC_LOGIN_APP_ID = 'oidc_login';
 
 
@@ -31,7 +31,7 @@ class AccessTokenUpdatedListener implements IEventListener {
 			return;
 		}
 		// just-in-case checks(also maybe useful for selfhosters)
-		if (!$this->appManager->isEnabledForUser(self::SNAPPYMAIL_APP_ID) || !$this->appManager->isEnabledForUser(self::OIDC_LOGIN_APP_ID)) {
+		if (!$this->appManager->isEnabledForUser(self::TACHYON_APP_ID) || !$this->appManager->isEnabledForUser(self::OIDC_LOGIN_APP_ID)) {
 			return;
 		}
 		$accessToken = $event->getAccessToken();
@@ -40,6 +40,6 @@ class AccessTokenUpdatedListener implements IEventListener {
 		}
 
 		$username = $this->userSession->getUser()->getUID();
-		$this->session->set('snappymail-nc-uid', $username);
+		$this->session->set('tachyon-nc-uid', $username);
 	}
 }

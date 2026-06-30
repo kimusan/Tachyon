@@ -17,17 +17,17 @@ class PersonalSettings implements ISettings
 	public function getForm()
 	{
 		$uid = \OC::$server->getUserSession()->getUser()->getUID();
-		$sEmail = $this->config->getUserValue($uid, 'snappymail', 'snappymail-email');
-		if ($sPass = $this->config->getUserValue($uid, 'snappymail', 'snappymail-password')) {
-			$this->config->deleteUserValue($uid, 'snappymail', 'snappymail-password');
-			$this->config->setUserValue($uid, 'snappymail', 'passphrase', $sPass);
+		$sEmail = $this->config->getUserValue($uid, 'tachyon', 'tachyon-email');
+		if ($sPass = $this->config->getUserValue($uid, 'tachyon', 'tachyon-password')) {
+			$this->config->deleteUserValue($uid, 'tachyon', 'tachyon-password');
+			$this->config->setUserValue($uid, 'tachyon', 'passphrase', $sPass);
 		}
 		$parameters = [
-			'snappymail-email' => $sEmail,
-			'snappymail-password' => $this->config->getUserValue($uid, 'snappymail', 'passphrase') ? '******' : ''
+			'tachyon-email' => $sEmail,
+			'tachyon-password' => $this->config->getUserValue($uid, 'tachyon', 'passphrase') ? '******' : ''
 		];
-		\OCP\Util::addScript('snappymail', 'snappymail');
-		return new TemplateResponse('snappymail', 'personal_settings', $parameters, '');
+		\OCP\Util::addScript('tachyon', 'tachyon');
+		return new TemplateResponse('tachyon', 'personal_settings', $parameters, '');
 	}
 
 	public function getSection()

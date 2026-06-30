@@ -46,12 +46,12 @@ class FetchController extends Controller {
 			$sUrl = '';
 			$sPath = '';
 
-			if (isset($_POST['appname']) && 'snappymail' === $_POST['appname']) {
-				$this->config->setAppValue('snappymail', 'snappymail-autologin',
-					isset($_POST['snappymail-autologin']) ? '1' === $_POST['snappymail-autologin'] : false);
-				$this->config->setAppValue('snappymail', 'snappymail-autologin-with-email',
-					isset($_POST['snappymail-autologin']) ? '2' === $_POST['snappymail-autologin'] : false);
-				$this->config->setAppValue('snappymail', 'snappymail-no-embed', isset($_POST['snappymail-no-embed']));
+			if (isset($_POST['appname']) && 'tachyon' === $_POST['appname']) {
+				$this->config->setAppValue('tachyon', 'tachyon-autologin',
+					isset($_POST['tachyon-autologin']) ? '1' === $_POST['tachyon-autologin'] : false);
+				$this->config->setAppValue('tachyon', 'tachyon-autologin-with-email',
+					isset($_POST['tachyon-autologin']) ? '2' === $_POST['tachyon-autologin'] : false);
+				$this->config->setAppValue('tachyon', 'tachyon-no-embed', isset($_POST['tachyon-no-embed']));
 			} else {
 				return new JSONResponse([
 					'status' => 'error',
@@ -68,7 +68,7 @@ class FetchController extends Controller {
 			}
 
 			TachyonHelper::loadApp();
-			$debug = !empty($_POST['snappymail-debug']);
+			$debug = !empty($_POST['tachyon-debug']);
 			$oConfig = \Tachyon\Api::Config();
 			if ($debug != $oConfig->Get('debug', 'enable', false)) {
 				$oConfig->Set('debug', 'enable', $debug);
@@ -93,21 +93,21 @@ class FetchController extends Controller {
 	public function setPersonal(): JSONResponse {
 		try {
 
-			if (isset($_POST['appname'], $_POST['snappymail-password'], $_POST['snappymail-email']) && 'snappymail' === $_POST['appname']) {
+			if (isset($_POST['appname'], $_POST['tachyon-password'], $_POST['tachyon-email']) && 'tachyon' === $_POST['appname']) {
 				$sUser =  \OC::$server->getUserSession()->getUser()->getUID();
 
-				$sPostEmail = $_POST['snappymail-email'];
-				$this->config->setUserValue($sUser, 'snappymail', 'snappymail-email', $sPostEmail);
+				$sPostEmail = $_POST['tachyon-email'];
+				$this->config->setUserValue($sUser, 'tachyon', 'tachyon-email', $sPostEmail);
 
-				$sPass = $_POST['snappymail-password'];
+				$sPass = $_POST['tachyon-password'];
 				if ('******' !== $sPass) {
 					require_once $this->appManager->getAppPath('snappymail').'/lib/Util/TachyonHelper.php';
 
-					$this->config->setUserValue($sUser, 'snappymail', 'snappymail-password',
+					$this->config->setUserValue($sUser, 'tachyon', 'tachyon-password',
 						$sPass ? TachyonHelper::encodePassword($sPass, \md5($sPostEmail)) : '');
 				}
 
-				$sEmail = $this->config->getUserValue($sUser, 'snappymail', 'snappymail-email', '');
+				$sEmail = $this->config->getUserValue($sUser, 'snappymail', 'tachyon-email', '');
 			} else {
 				return new JSONResponse([
 					'status' => 'error',

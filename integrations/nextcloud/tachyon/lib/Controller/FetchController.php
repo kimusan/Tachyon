@@ -47,13 +47,13 @@ class FetchController extends Controller {
 			$sUrl = '';
 			$sPath = '';
 
-			if (isset($_POST['appname']) && 'snappymail' === $_POST['appname']) {
-				$this->config->setAppValue('snappymail', 'snappymail-autologin',
-					isset($_POST['snappymail-autologin']) ? '1' === $_POST['snappymail-autologin'] : false);
-				$this->config->setAppValue('snappymail', 'snappymail-autologin-with-email',
-					isset($_POST['snappymail-autologin']) ? '2' === $_POST['snappymail-autologin'] : false);
-				$this->config->setAppValue('snappymail', 'snappymail-no-embed', isset($_POST['snappymail-no-embed']));
-				$this->config->setAppValue('snappymail', 'snappymail-autologin-oidc', isset($_POST['snappymail-autologin-oidc']));
+			if (isset($_POST['appname']) && 'tachyon' === $_POST['appname']) {
+				$this->config->setAppValue('tachyon', 'tachyon-autologin',
+					isset($_POST['tachyon-autologin']) ? '1' === $_POST['tachyon-autologin'] : false);
+				$this->config->setAppValue('tachyon', 'tachyon-autologin-with-email',
+					isset($_POST['tachyon-autologin']) ? '2' === $_POST['tachyon-autologin'] : false);
+				$this->config->setAppValue('tachyon', 'tachyon-no-embed', isset($_POST['tachyon-no-embed']));
+				$this->config->setAppValue('tachyon', 'tachyon-autologin-oidc', isset($_POST['tachyon-autologin-oidc']));
 			} else {
 				return new JSONResponse([
 					'status' => 'error',
@@ -64,11 +64,11 @@ class FetchController extends Controller {
 			TachyonHelper::loadApp();
 
 			$oConfig = \Tachyon\Api::Config();
-			if (!empty($_POST['snappymail-app_path'])) {
-				$oConfig->Set('webmail', 'app_path', $_POST['snappymail-app_path']);
+			if (!empty($_POST['tachyon-app_path'])) {
+				$oConfig->Set('webmail', 'app_path', $_POST['tachyon-app_path']);
 			}
-			$oConfig->Set('webmail', 'allow_languages_on_settings', empty($_POST['snappymail-nc-lang']));
-			$oConfig->Set('login', 'allow_languages_on_login', empty($_POST['snappymail-nc-lang']));
+			$oConfig->Set('webmail', 'allow_languages_on_settings', empty($_POST['tachyon-nc-lang']));
+			$oConfig->Set('login', 'allow_languages_on_login', empty($_POST['tachyon-nc-lang']));
 			$oConfig->Save();
 
 			if (!empty($_POST['import-rainloop'])) {
@@ -78,7 +78,7 @@ class FetchController extends Controller {
 				]);
 			}
 
-			$debug = !empty($_POST['snappymail-debug']);
+			$debug = !empty($_POST['tachyon-debug']);
 			$oConfig = \Tachyon\Api::Config();
 			if ($debug != $oConfig->Get('debug', 'enable', false)) {
 				$oConfig->Set('debug', 'enable', $debug);
@@ -103,15 +103,15 @@ class FetchController extends Controller {
 	public function setPersonal(): JSONResponse {
 		try {
 			$sEmail = '';
-			if (isset($_POST['appname'], $_POST['snappymail-password'], $_POST['snappymail-email']) && 'snappymail' === $_POST['appname']) {
+			if (isset($_POST['appname'], $_POST['tachyon-password'], $_POST['tachyon-email']) && 'tachyon' === $_POST['appname']) {
 				$sUser =  \OC::$server->getUserSession()->getUser()->getUID();
 
-				$sEmail = $_POST['snappymail-email'];
-				$this->config->setUserValue($sUser, 'snappymail', 'snappymail-email', $sEmail);
+				$sEmail = $_POST['tachyon-email'];
+				$this->config->setUserValue($sUser, 'tachyon', 'tachyon-email', $sEmail);
 
-				$sPass = $_POST['snappymail-password'];
+				$sPass = $_POST['tachyon-password'];
 				if ('******' !== $sPass) {
-					$this->config->setUserValue($sUser, 'snappymail', 'passphrase',
+					$this->config->setUserValue($sUser, 'tachyon', 'passphrase',
 						$sPass ? TachyonHelper::encodePassword($sPass, \md5($sEmail)) : '');
 				}
 			} else {

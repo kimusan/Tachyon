@@ -16,7 +16,7 @@ use OCP\IContainer;
 
 class Application extends App
 {
-	public const APP_ID = 'snappymail';
+	public const APP_ID = 'tachyon';
 
 	public function __construct(array $urlParams = [])
 	{
@@ -63,7 +63,7 @@ class Application extends App
 /*
 	public function boot(IBootContext $context): void
 	{
-		if (!\is_dir(\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/') . '/appdata_snappymail')) {
+		if (!\is_dir(\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/') . '/appdata_tachyon')) {
 			return;
 		}
 
@@ -72,16 +72,16 @@ class Application extends App
 			$config = \OC::$server->getConfig();
 			// Only store the user's password in the current session if they have
 			// enabled auto-login using ownCloud username or email address.
-			if ($config->getAppValue('snappymail', 'snappymail-autologin', false)
-			 || $config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
+			if ($config->getAppValue('tachyon', 'tachyon-autologin', false)
+			 || $config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 				$sUID = $Event->getUser()->getUID();
-				\OC::$server->getSession()['snappymail-nc-uid'] = $sUID;
-				\OC::$server->getSession()['snappymail-password'] = TachyonHelper::encodePassword($Event->getPassword(), $sUID);
+				\OC::$server->getSession()['tachyon-nc-uid'] = $sUID;
+				\OC::$server->getSession()['tachyon-password'] = TachyonHelper::encodePassword($Event->getPassword(), $sUID);
 			}
 		});
 
 		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) {
-			\OC::$server->getSession()['snappymail-password'] = '';
+			\OC::$server->getSession()['tachyon-password'] = '';
 			TachyonHelper::loadApp();
 			\Tachyon\Api::Actions()->Logout(true);
 		});
@@ -91,12 +91,12 @@ class Application extends App
 		$class = 'OCA\Impersonate\Events\BeginImpersonateEvent';
 		if (\class_exists($class)) {
 			$dispatcher->addListener($class, function ($Event) {
-				\OC::$server->getSession()['snappymail-password'] = '';
+				\OC::$server->getSession()['tachyon-password'] = '';
 				TachyonHelper::loadApp();
 				\Tachyon\Api::Actions()->Logout(true);
 			});
 			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) {
-				\OC::$server->getSession()['snappymail-password'] = '';
+				\OC::$server->getSession()['tachyon-password'] = '';
 				TachyonHelper::loadApp();
 				\Tachyon\Api::Actions()->Logout(true);
 			});

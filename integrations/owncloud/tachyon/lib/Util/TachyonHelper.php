@@ -7,25 +7,25 @@ class TachyonHelper
 
 	public static function loadApp() : void
 	{
-		if (\class_exists('RainLoop\\Api')) {
+		if (\class_exists('Tachyon\\Api')) {
 			return;
 		}
 
 		// ownCloud the default spl_autoload_register() not working
 		\spl_autoload_register(function($sClassName){
-			$file = SNAPPYMAIL_LIBRARIES_PATH . \strtolower(\strtr($sClassName, '\\', DIRECTORY_SEPARATOR)) . '.php';
+			$file = TACHYON_LIBRARIES_PATH . \strtolower(\strtr($sClassName, '\\', DIRECTORY_SEPARATOR)) . '.php';
 			if (\is_file($file)) {
 				include_once $file;
 			}
 		});
 
-		$_ENV['SNAPPYMAIL_OWNCLOUD'] = true; // Obsolete
-		$_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = true;
+		$_ENV['TACHYON_OWNCLOUD'] = true; // Obsolete
+		$_ENV['TACHYON_INCLUDE_AS_API'] = true;
 
 //		define('APP_VERSION', '0.0.0');
 //		define('APP_INDEX_ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR);
 //		include APP_INDEX_ROOT_PATH.'snappymail/v/'.APP_VERSION.'/include.php';
-//		define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_snappymail/');
+//		define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_tachyon/');
 
 		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
 		require_once $app_dir . '/index.php';
@@ -45,7 +45,7 @@ class TachyonHelper
 		$bSave = false;
 
 		if (!$oConfig->Get('webmail', 'app_path')) {
-			$oConfig->Set('webmail', 'app_path', \OC::$server->getAppManager()->getAppWebPath('snappymail') . '/app/');
+			$oConfig->Set('webmail', 'app_path', \OC::$server->getAppManager()->getAppWebPath('tachyon') . '/app/');
 			$bSave = true;
 		}
 
@@ -69,8 +69,8 @@ class TachyonHelper
 
 		// Pre-configure domain
 		$ocConfig = \OC::$server->getConfig();
-		if ($ocConfig->getAppValue('snappymail', 'snappymail-autologin', false)
-		 || $ocConfig->getAppValue('snappymail', 'snappymail-autologin-with-email', false)
+		if ($ocConfig->getAppValue('tachyon', 'tachyon-autologin', false)
+		 || $ocConfig->getAppValue('tachyon', 'tachyon-autologin-with-email', false)
 		) {
 			$oProvider = \Tachyon\Api::Actions()->DomainProvider();
 			$oDomain = $oProvider->Load('owncloud');
@@ -131,12 +131,12 @@ class TachyonHelper
 				if (24 < $OC_Version[0]) {
 					$ocSession = \OC::$server->getSession();
 					$ocSession->reopen();
-					if (!$doLogin && $ocSession['snappymail-uid'] && $ocSession['snappymail-uid'] != $aCredentials[0]) {
+					if (!$doLogin && $ocSession['tachyon-uid'] && $ocSession['tachyon-uid'] != $aCredentials[0]) {
 						// UID changed, Impersonate plugin probably active
 						$oActions->Logout(true);
 						$doLogin = true;
 					}
-					$ocSession->set('snappymail-uid', $aCredentials[0]);
+					$ocSession->set('tachyon-uid', $aCredentials[0]);
 				}
 */
 				if ($doLogin && $aCredentials[1] && $aCredentials[2]) {
@@ -164,13 +164,13 @@ class TachyonHelper
 		$ocSession = \OC::$server->getSession();
 		// Only use the user's password in the current session if they have
 		// enabled auto-login using ownCloud username or email address.
-		if ($ocSession['snappymail-nc-uid'] == $sUID) {
-			if ($config->getAppValue('snappymail', 'snappymail-autologin', false)) {
+		if ($ocSession['tachyon-nc-uid'] == $sUID) {
+			if ($config->getAppValue('tachyon', 'tachyon-autologin', false)) {
 				$sEmail = $sUID;
-				$sPassword = $ocSession['snappymail-password'];
-			} else if ($config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
+				$sPassword = $ocSession['tachyon-password'];
+			} else if ($config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 				$sEmail = $config->getUserValue($sUID, 'settings', 'email', '');
-				$sPassword = $ocSession['snappymail-password'];
+				$sPassword = $ocSession['tachyon-password'];
 			}
 			if ($sPassword) {
 				$sPassword = static::decodePassword($sPassword, $sUID);
@@ -179,10 +179,10 @@ class TachyonHelper
 
 		// If the user has set credentials for SnappyMail in their personal
 		// settings, override everything before and use those instead.
-		$sCustomEmail = $config->getUserValue($sUID, 'snappymail', 'snappymail-email', '');
+		$sCustomEmail = $config->getUserValue($sUID, 'tachyon', 'tachyon-email', '');
 		if ($sCustomEmail) {
 			$sEmail = $sCustomEmail;
-			$sPassword = $config->getUserValue($sUID, 'snappymail', 'snappymail-password', '');
+			$sPassword = $config->getUserValue($sUID, 'tachyon', 'tachyon-password', '');
 			if ($sPassword) {
 				$sPassword = static::decodePassword($sPassword, \md5($sEmail));
 			}
@@ -192,7 +192,7 @@ class TachyonHelper
 
 	public static function getAppUrl() : string
 	{
-		return \OC::$server->getURLGenerator()->linkToRoute('snappymail.page.appGet');
+		return \OC::$server->getURLGenerator()->linkToRoute('tachyon.page.appGet');
 	}
 
 	public static function normalizeUrl(string $sUrl) : string
@@ -223,7 +223,7 @@ class TachyonHelper
 		$result = [];
 
 		$dir = \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/');
-		$dir_snappy = $dir . '/appdata_snappymail/';
+		$dir_snappy = $dir . '/appdata_tachyon/';
 		$dir_rainloop = $dir . '/rainloop-storage';
 		$rainloop_plugins = [];
 		if (\is_dir($dir_rainloop)) {

@@ -18,11 +18,11 @@ class PersonalSettings implements ISettings
 	{
 		$uid = \OC::$server->getUserSession()->getUser()->getUID();
 		$parameters = [
-			'snappymail-email' => $this->config->getUserValue($uid, 'snappymail', 'snappymail-email'),
-			'snappymail-password' => $this->config->getUserValue($uid, 'snappymail', 'snappymail-password') ? '******' : ''
+			'tachyon-email' => $this->config->getUserValue($uid, 'tachyon', 'tachyon-email'),
+			'tachyon-password' => $this->config->getUserValue($uid, 'tachyon', 'tachyon-password') ? '******' : ''
 		];
-		\OCP\Util::addScript('snappymail', 'snappymail');
-		return new TemplateResponse('snappymail', 'personal_settings', $parameters, '');
+		\OCP\Util::addScript('tachyon', 'tachyon');
+		return new TemplateResponse('tachyon', 'personal_settings', $parameters, '');
 	}
 
 	public function getSectionID()

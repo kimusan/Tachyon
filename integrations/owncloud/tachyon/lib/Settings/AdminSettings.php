@@ -20,13 +20,13 @@ class AdminSettings implements ISettings
 		\OCA\Tachyon\Util\Util\TachyonHelper::loadApp();
 
 		$keys = [
-			'snappymail-autologin',
-			'snappymail-autologin-with-email',
-			'snappymail-no-embed'
+			'tachyon-autologin',
+			'tachyon-autologin-with-email',
+			'tachyon-no-embed'
 		];
 		$parameters = [];
 		foreach ($keys as $k) {
-			$v = $this->config->getAppValue('snappymail', $k);
+			$v = $this->config->getAppValue('tachyon', $k);
 			$parameters[$k] = $v;
 		}
 		$uid = \OC::$server->getUserSession()->getUser()->getUID();
@@ -52,7 +52,7 @@ class AdminSettings implements ISettings
 			. '/rainloop-storage'
 		);
 
-		$parameters['snappymail-debug'] = $oConfig->Get('debug', 'enable', false);
+		$parameters['tachyon-debug'] = $oConfig->Get('debug', 'enable', false);
 
 		// Check for owncloud plugin update, if so then update
 		foreach (\Tachyon\Util\Repository::getPackagesList()['List'] as $plugin) {
@@ -61,8 +61,8 @@ class AdminSettings implements ISettings
 			}
 		}
 
-		\OCP\Util::addScript('snappymail', 'snappymail');
-		return new TemplateResponse('snappymail', 'admin-local', $parameters);
+		\OCP\Util::addScript('tachyon', 'tachyon');
+		return new TemplateResponse('tachyon', 'admin-local', $parameters);
 	}
 
 	public function getSectionID()

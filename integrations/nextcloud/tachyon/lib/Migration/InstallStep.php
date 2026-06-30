@@ -53,7 +53,7 @@ class InstallStep implements IRepairStep
 
 		if (!$oConfig->Get('webmail', 'app_path')) {
 			$output->info('Set config [webmail]app_path');
-			$oConfig->Set('webmail', 'app_path', \OC::$server->getAppManager()->getAppWebPath('snappymail') . '/app/');
+			$oConfig->Set('webmail', 'app_path', \OC::$server->getAppManager()->getAppWebPath('tachyon') . '/app/');
 			$oConfig->Set('webmail', 'allow_languages_on_settings', false);
 			$oConfig->Set('login', 'allow_languages_on_login', false);
 			$bSave = true;

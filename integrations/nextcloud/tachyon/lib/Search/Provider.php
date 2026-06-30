@@ -92,7 +92,7 @@ class Provider implements IProvider
 
 			$baseURL = $this->urlGenerator->linkToRoute('snappymail.page.index');
 //			$config = \OC::$server->getConfig();
-//			if ($config->getAppValue('snappymail', 'snappymail-no-embed')) {
+//			if ($config->getAppValue('tachyon', 'tachyon-no-embed')) {
 //				$baseURL .= '?target=';
 //			} else {
 				$baseURL .= '#';

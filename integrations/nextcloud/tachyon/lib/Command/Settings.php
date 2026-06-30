@@ -51,7 +51,7 @@ class Settings extends Base
 		}
 
 		$sEmail = $input->getArgument('user');
-		$this->config->setUserValue($uid, 'snappymail', 'snappymail-email', $sEmail);
+		$this->config->setUserValue($uid, 'tachyon', 'tachyon-email', $sEmail);
 
 		$sPass = $input->getArgument('pass');
 		if (empty($sPass)) {
@@ -64,7 +64,7 @@ class Settings extends Base
 			}
 		}
 		$sPass = ($sEmail && $sPass) ? TachyonHelper::encodePassword($sPass, \md5($sEmail)) : '';
-		$this->config->setUserValue($uid, 'snappymail', 'passphrase', $sPass);
+		$this->config->setUserValue($uid, 'tachyon', 'passphrase', $sPass);
 		return 0;
 	}
 }

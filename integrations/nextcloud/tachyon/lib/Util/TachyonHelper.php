@@ -20,24 +20,24 @@ class TachyonHelper
 
 	public static function loadApp() : void
 	{
-		if (\class_exists('RainLoop\\Api')) {
+		if (\class_exists('Tachyon\\Api')) {
 			return;
 		}
 
 		// Nextcloud the default spl_autoload_register() not working
 		\spl_autoload_register(function($sClassName){
-			$file = SNAPPYMAIL_LIBRARIES_PATH . \strtolower(\strtr($sClassName, '\\', DIRECTORY_SEPARATOR)) . '.php';
+			$file = TACHYON_LIBRARIES_PATH . \strtolower(\strtr($sClassName, '\\', DIRECTORY_SEPARATOR)) . '.php';
 			if (\is_file($file)) {
 				include_once $file;
 			}
 		});
 
-		$_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = true;
+		$_ENV['TACHYON_INCLUDE_AS_API'] = true;
 
 //		define('APP_VERSION', '0.0.0');
 //		define('APP_INDEX_ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR);
 //		include APP_INDEX_ROOT_PATH.'snappymail/v/'.APP_VERSION.'/include.php';
-//		define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_snappymail/');
+//		define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_tachyon/');
 
 		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
 		require_once $app_dir . '/index.php';
@@ -81,12 +81,12 @@ class TachyonHelper
 				if (24 < $OC_Version[0]) {
 					$ocSession = \OC::$server->getSession();
 					$ocSession->reopen();
-					if (!$doLogin && $ocSession['snappymail-uid'] && $ocSession['snappymail-uid'] != $aCredentials[0]) {
+					if (!$doLogin && $ocSession['tachyon-uid'] && $ocSession['tachyon-uid'] != $aCredentials[0]) {
 						// UID changed, Impersonate plugin probably active
 						$oActions->Logout(true);
 						$doLogin = true;
 					}
-					$ocSession->set('snappymail-uid', $aCredentials[0]);
+					$ocSession->set('tachyon-uid', $aCredentials[0]);
 				}
 */
 				if ($doLogin && $aCredentials[1] && $aCredentials[2]) {
@@ -103,8 +103,8 @@ class TachyonHelper
 						// Login failure, reset password to prevent more attempts
 						if (!$isOIDC) {
 							$sUID = \OC::$server->getUserSession()->getUser()->getUID();
-							\OC::$server->getSession()['snappymail-passphrase'] = '';
-							\OC::$server->getConfig()->setUserValue($sUID, 'snappymail', 'passphrase', '');
+							\OC::$server->getSession()['tachyon-passphrase'] = '';
+							\OC::$server->getConfig()->setUserValue($sUID, 'tachyon', 'passphrase', '');
 							\Tachyon\Util\Log::error('Nextcloud', $e->getMessage());
 						}
 					}
@@ -128,7 +128,7 @@ class TachyonHelper
 	public static function isOIDCLogin() : bool
 	{
 		$config = \OC::$server->getConfig();
-		if ($config->getAppValue('snappymail', 'snappymail-autologin-oidc', false)) {
+		if ($config->getAppValue('tachyon', 'tachyon-autologin-oidc', false)) {
 			// Check if the OIDC Login app is enabled
 			if (\OC::$server->getAppManager()->isEnabledForUser('oidc_login')) {
 				// Check if session is an OIDC Login
@@ -155,11 +155,11 @@ class TachyonHelper
 		$config = \OC::$server->getConfig();
 		$ocSession = \OC::$server->getSession();
 
-		// If the user has set credentials for SnappyMail in their personal settings,
+		// If the user has set credentials for Tachyon in their personal settings,
 		// this has the first priority.
-		$sEmail = $config->getUserValue($sUID, 'snappymail', 'snappymail-email');
-		$sPassword = $config->getUserValue($sUID, 'snappymail', 'passphrase')
-			?: $config->getUserValue($sUID, 'snappymail', 'snappymail-password');
+		$sEmail = $config->getUserValue($sUID, 'tachyon', 'tachyon-email');
+		$sPassword = $config->getUserValue($sUID, 'tachyon', 'passphrase')
+			?: $config->getUserValue($sUID, 'tachyon', 'tachyon-password');
 		if ($sEmail && $sPassword) {
 			$sPassword = static::decodePassword($sPassword, \md5($sEmail));
 			if ($sPassword) {
@@ -171,7 +171,7 @@ class TachyonHelper
 
 		// If the current user ID is identical to login ID (not valid when using account switching),
 		// this has the second priority.
-		if ($ocSession['snappymail-nc-uid'] == $sUID) {
+		if ($ocSession['tachyon-nc-uid'] == $sUID) {
 
 			// If OpenID Connect (OIDC) is enabled and used for login, use this.
 			if (static::isOIDCLogin()) {
@@ -183,20 +183,20 @@ class TachyonHelper
 			// enabled auto-login using Nextcloud username or email address.
 			$sEmail = '';
 			$sPassword = '';
-			if ($config->getAppValue('snappymail', 'snappymail-autologin', false)) {
+			if ($config->getAppValue('tachyon', 'tachyon-autologin', false)) {
 				$sEmail = $sUID;
-				$sPassword = $ocSession['snappymail-passphrase'];
-			} else if ($config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
+				$sPassword = $ocSession['tachyon-passphrase'];
+			} else if ($config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 				$sEmail = $config->getUserValue($sUID, 'settings', 'email');
-				$sPassword = $ocSession['snappymail-passphrase'];
+				$sPassword = $ocSession['tachyon-passphrase'];
 			} else {
-				\Tachyon\Util\Log::debug('Nextcloud', 'snappymail-autologin is off');
+				\Tachyon\Util\Log::debug('Nextcloud', 'tachyon-autologin is off');
 			}
 			if ($sPassword) {
 				return [$sUID, $sEmail, static::decodePassword($sPassword, $sUID)];
 			}
 		} else {
-			\Tachyon\Util\Log::debug('Nextcloud', "snappymail-nc-uid mismatch '{$ocSession['snappymail-nc-uid']}' != '{$sUID}'");
+			\Tachyon\Util\Log::debug('Nextcloud', "tachyon-nc-uid mismatch '{$ocSession['tachyon-nc-uid']}' != '{$sUID}'");
 		}
 
 		return [$sUID, '', ''];
@@ -204,7 +204,7 @@ class TachyonHelper
 
 	public static function getAppUrl() : string
 	{
-		return \OC::$server->getURLGenerator()->linkToRoute('snappymail.page.appGet');
+		return \OC::$server->getURLGenerator()->linkToRoute('tachyon.page.appGet');
 	}
 
 	public static function normalizeUrl(string $sUrl) : string
