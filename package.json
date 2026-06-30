@@ -3,8 +3,8 @@
   "title": "Tachyon",
   "description": "Fast, modern & secure web-based email client",
   "private": true,
-  "version": "3.0.0",
-  "homepage": "https://github.com/schulz-dk/tachyon",
+  "version": "3.0.1",
+  "homepage": "https://github.com/kimusan/Tachyon",
   "author": {
     "name": "Kim Schulz"
   },
