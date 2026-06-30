@@ -13,9 +13,9 @@ RUN sed -i 's_^if.*rename.*snappymail.v.0.0.0.*$_if (!!system("mv snappymail/v/0
 RUN php release.php
 RUN set -eux; \
     VERSION=$( ls build/dist/releases/webmail ); \
-    ls -al build/dist/releases/webmail/$VERSION/snappymail-$VERSION.tar.gz; \
+    ls -al build/dist/releases/webmail/$VERSION/tachyon-$VERSION.tar.gz; \
     mkdir -p /snappymail; \
-    tar -zxvf build/dist/releases/webmail/$VERSION/snappymail-$VERSION.tar.gz -C /snappymail; \
+    tar -zxvf build/dist/releases/webmail/$VERSION/tachyon-$VERSION.tar.gz -C /snappymail; \
     find /snappymail -type d -exec chmod 550 {} \; ; \
     find /snappymail -type f -exec chmod 440 {} \; ; \
     find /snappymail/data -type d -exec chmod 750 {} \; ; \

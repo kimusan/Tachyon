@@ -3,7 +3,7 @@ echo "\x1b[33;1m === ownCloud === \x1b[0m\n";
 
 $cert_dir = false; // $_SERVER['HOME'].'/.owncloud/certificates';
 
-$nc_destination = "{$destPath}snappymail-{$package->version}-owncloud.tar";
+$nc_destination = "{$destPath}tachyon-{$package->version}-owncloud.tar";
 
 @unlink($nc_destination);
 @unlink("{$nc_destination}.gz");

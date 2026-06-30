@@ -44,8 +44,8 @@ if ($options['docker'] && $options['aur']) {
 $destPath = "build/dist/releases/webmail/{$package->version}/";
 is_dir($destPath) || mkdir($destPath, 0777, true);
 
-$zip_destination = "{$destPath}snappymail-{$package->version}.zip";
-$tar_destination = "{$destPath}snappymail-{$package->version}.tar";
+$zip_destination = "{$destPath}tachyon-{$package->version}.zip";
+$tar_destination = "{$destPath}tachyon-{$package->version}.tar";
 
 @unlink($zip_destination);
 @unlink($tar_destination);
@@ -241,10 +241,10 @@ else if (isset($options['debian'])) {
 // Docker build
 else if ($options['docker']) {
 	echo "\x1b[33;1m === Docker === \x1b[0m\n";
-	$zip_filename = "snappymail-{$package->version}.zip";
+	$zip_filename = "tachyon-{$package->version}.zip";
 	copy($zip_destination, "./.docker/release/{$zip_filename}");
 	if ($docker) {
-		passthru("{$docker} build --pull " . ROOT_DIR . "/.docker/release/ --build-arg FILES_ZIP={$zip_filename} -t snappymail:{$package->version}");
+		passthru("{$docker} build --pull " . ROOT_DIR . "/.docker/release/ --build-arg FILES_ZIP={$zip_filename} -t tachyon:{$package->version}");
 	} else {
 		echo "Docker not installed!\n";
 	}
@@ -256,15 +256,15 @@ if (isset($options['sign'])) {
 	passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($zip_destination), $return_var);
 	if (isset($options['nextcloud'])) {
 		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
-			.escapeshellarg("{$destPath}snappymail-{$package->version}-nextcloud.tar.gz"), $return_var);
+			.escapeshellarg("{$destPath}tachyon-{$package->version}-nextcloud.tar.gz"), $return_var);
 	}
 	if (isset($options['owncloud'])) {
 		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
-			.escapeshellarg("{$destPath}snappymail-{$package->version}-owncloud.tar.gz"), $return_var);
+			.escapeshellarg("{$destPath}tachyon-{$package->version}-owncloud.tar.gz"), $return_var);
 	}
 	if (isset($options['cpanel'])) {
 		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
-			.escapeshellarg("{$destPath}snappymail-{$package->version}-cpanel.tar.gz"), $return_var);
+			.escapeshellarg("{$destPath}tachyon-{$package->version}-cpanel.tar.gz"), $return_var);
 	}
 	if (isset($options['debian'])) {
 		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '

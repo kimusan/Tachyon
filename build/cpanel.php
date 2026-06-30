@@ -1,7 +1,7 @@
 <?php
 echo "\x1b[33;1m === cPanel === \x1b[0m\n";
 
-$cpanel_destination = "{$destPath}snappymail-{$package->version}-cpanel.tar";
+$cpanel_destination = "{$destPath}tachyon-{$package->version}-cpanel.tar";
 
 @unlink($cpanel_destination);
 @unlink("{$cpanel_destination}.gz");
