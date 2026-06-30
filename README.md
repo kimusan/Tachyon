@@ -35,13 +35,31 @@ Copyright (c) 2013 - 2022 RainLoop
 
 ## What changed from SnappyMail
 
-- Renamed to Tachyon
+**Compatibility**
+- Existing SnappyMail installations upgrade in-place — data directory and config are unchanged
+- User-installed plugins using `RainLoop\` or `SnappyMail\` namespaces continue to work via compatibility shims
+
+**PHP**
 - PHP 8.2 minimum (dropped support for 7.4, 8.0, 8.1)
-- Namespaces updated: `RainLoop\` and `SnappyMail\` merged into `Tachyon\`
-- Build toolchain updated: rollup v4, ESLint v9, removed deprecated plugins
-- Vendor libraries audited and updated to latest compatible versions
-- CSP headers updated: `report-uri` replaced with `report-to`
-- Dead code removal: `register_globals` ini_set, PHP 7.x compatibility shims
+- Namespaces: `RainLoop\` → `Tachyon\`, `SnappyMail\` → `Tachyon\Util\`
+- PHP 8.1 enums replacing abstract constants: `ResponseType`, `StoreAction`, `MessagePriority`, `SignMeType`, `Layout`, `DkimStatus`
+- Dead code removed: `register_globals` ini_set, PHP 7.x compatibility shims
+
+**Security**
+- Content-Security-Policy: fixed `report-to` implementation with `Reporting-Endpoints` header; `report-uri` kept as fallback
+- `Permissions-Policy` header added: denies camera, microphone, geolocation, payment, USB
+- Subresource Integrity (SRI) hashes for all static JS and CSS assets
+
+**Features**
+- Undo send: configurable delay (Off / 5 / 10 / 20 / 30 seconds) before SMTP delivery; per-user preference
+- Multi-account unread count badge on the account switcher button
+
+**Build and toolchain**
+- Rollup v4, ESLint v9 flat config
+- GitHub Actions CI: PHP syntax check and JS/CSS lint on every push and pull request
+- Release archives named `tachyon-*.tar.gz`
+- OpenPGP.js updated to v5.11.3
+- Removed unused `marked.js` vendor library
 
 
 ## What SnappyMail changed from RainLoop
@@ -95,14 +113,14 @@ No Internet Explorer. No Edge Legacy.
 
 ### JavaScript size comparison (RainLoop 1.17 vs SnappyMail vs Tachyon)
 
-|js/min/*        |RainLoop  |SnappyMail|
-|----------------|--------: |--------: |
-|admin.min.js    |  256,831 |   41,719 |
-|app.min.js      |  515,367 |  202,101 |
-|boot.min.js     |   84,659 |    2,231 |
-|libs.min.js     |  584,772 |  110,646 |
-|sieve.min.js    |        0 |   45,504 |
-|polyfills.min.js|   32,837 |        0 |
+|js/min/*        |RainLoop  |SnappyMail|  Tachyon |
+|----------------|--------: |--------: |--------: |
+|admin.min.js    |  256,831 |   41,719 |   41,317 |
+|app.min.js      |  515,367 |  202,101 |  203,861 |
+|boot.min.js     |   84,659 |    2,231 |    2,273 |
+|libs.min.js     |  584,772 |  110,646 |  110,224 |
+|sieve.min.js    |        0 |   45,504 |   45,377 |
+|polyfills.min.js|   32,837 |        0 |        0 |
 
 For a user, the payload is around 66% smaller than traditional RainLoop.
 
