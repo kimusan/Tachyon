@@ -1,4 +1,10 @@
 <div>
+	<!-- ko if: error() -->
+	<div class="alert" style="margin-bottom: 10px;">
+		<a href="#" class="close" data-bind="click: function(){ error('') }">×</a>
+		<span data-bind="text: error"></span>
+	</div>
+	<!-- /ko -->
 	<div class="form-horizontal">
 		<div class="legend">
 			Backup

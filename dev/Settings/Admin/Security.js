@@ -33,6 +33,7 @@ export class AdminSettingsSecurity extends AbstractViewSettings {
 		});
 
 		this.gnuPGversion = SettingsGet('gnupg') ? 'GnuPG v' + SettingsGet('gnupg') : 'GnuPG';
+		this.gnupgAvailable = ko.observable(!!SettingsGet('gnupg'));
 
 		const reset = () => {
 			this.saveError(false);
