@@ -209,7 +209,11 @@ abstract class Service
 			} else {
 				$aTemplateParameters['{{BaseAppBootCss}}'] = \file_get_contents(APP_VERSION_ROOT_PATH.'static/css/boot'.$sAppCssMin.'.css');
 				$aTemplateParameters['{{BaseAppBootScript}}'] = \file_get_contents(APP_VERSION_ROOT_PATH.'static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin.'.js');
-				$aTemplateParameters['{{BaseAppMainCssLink}}'] = Utils::WebStaticPath('css/'.($bAdmin ? 'admin' : 'app').$sAppCssMin.'.css');
+				$sCssFile = ($bAdmin ? 'admin' : 'app').$sAppCssMin.'.css';
+				$aSri = $sAppCssMin ? static::loadSriHashes() : [];
+				$sSriAttr = isset($aSri[$sCssFile]) ? ' integrity="'.$aSri[$sCssFile].'"' : '';
+				$aTemplateParameters['{{BaseAppMainCssLink}}'] = Utils::WebStaticPath('css/'.$sCssFile);
+				$aTemplateParameters['{{BaseAppMainCssSri}}'] = $sSriAttr;
 				$aTemplateParameters['{{BaseAppThemeCss}}'] = \preg_replace('/\\s*([:;{},]+)\\s*/s', '$1', $oActions->compileCss($sThemeName, $bAdmin));
 				$aTemplateParameters['{{BaseLanguage}}'] = $oActions->compileLanguage($sLanguage, $bAdmin);
 				$aTemplateParameters['{{BaseTemplates}}'] = Utils::ClearHtmlOutput($oServiceActions->compileTemplates($bAdmin));
@@ -254,5 +258,14 @@ abstract class Service
 	private static function setCSP(?string $sScriptNonce = null) : void
 	{
 		Api::getCSP($sScriptNonce)->setHeaders();
+	}
+
+	private static function loadSriHashes() : array
+	{
+		$path = APP_VERSION_ROOT_PATH . 'static/sri.json';
+		if (\is_file($path)) {
+			return \json_decode(\file_get_contents($path), true) ?: [];
+		}
+		return [];
 	}
 }

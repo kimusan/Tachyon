@@ -782,6 +782,16 @@ class Actions
 		$aResult['StaticLibsJs'] = Utils::WebStaticPath('js/' . ($bAppJsDebug ? '' : 'min/') .
 			'libs' . ($bAppJsDebug ? '' : '.min') . '.js');
 
+		if (!$bAppJsDebug) {
+			$sSriPath = APP_VERSION_ROOT_PATH . 'static/sri.json';
+			if (\is_file($sSriPath)) {
+				$aSri = \json_decode(\file_get_contents($sSriPath), true) ?: [];
+				$sAppKey = ($bAdmin ? 'admin' : 'app') . '.min.js';
+				$aResult['StaticLibsJsSri'] = $aSri['libs.min.js'] ?? '';
+				$aResult['StaticAppJsSri'] = $aSri[$sAppKey] ?? '';
+			}
+		}
+
 		$this->oPlugins->InitAppData($bAdmin, $aResult, $oAccount);
 
 		return $aResult;

@@ -16,11 +16,12 @@ const
 		toggle(div);
 	},
 
-	loadScript = src => src ? new Promise((resolve, reject) => {
+	loadScript = (src, integrity) => src ? new Promise((resolve, reject) => {
 			const script = doc.createElement('script');
 			script.onload = () => resolve();
 			script.onerror = () => reject('Failed loading ' + src);
 			script.src = src;
+			if (integrity) { script.integrity = integrity; }
 //			script.async = true;
 			doc.head.append(script);
 		}) : Promise.reject('src is empty');
@@ -145,9 +146,10 @@ if (!navigator.cookieEnabled) {
 	.then(appData => {
 		RL_APP_DATA = appData;
 		const url = appData.StaticLibsJs,
+			appUrl = url.replace('/libs.', `/${admin?'admin':'app'}.`),
 			cb = () => rl.app.bootstart();
-		loadScript(url)
-			.then(() => loadScript(url.replace('/libs.', `/${admin?'admin':'app'}.`)))
+		loadScript(url, appData.StaticLibsJsSri)
+			.then(() => loadScript(appUrl, appData.StaticAppJsSri))
 			.then(() => appData.PluginsLink ? loadScript(qUri(appData.PluginsLink)) : Promise.resolve())
 			.then(() => rl.app
 				? cb()
