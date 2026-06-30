@@ -1,9 +1,9 @@
-/* SnappyMail Webmail (c) SnappyMail Team | Licensed under MIT */
+/* Tachyon Webmail (c) Tachyon | Licensed under AGPL v3 */
 const path = require('path');
 
 const config = {
 	head: {
-		agpl: '/* SnappyMail Webmail (c) SnappyMail | Licensed under AGPL v3 */'
+		agpl: '/* Tachyon Webmail (c) Tachyon | Licensed under AGPL v3 */'
 	},
 	devVersion: '0.0.0',
 

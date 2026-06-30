@@ -1,4 +1,4 @@
-/* RainLoop Webmail (c) RainLoop Team | Licensed under MIT */
+/* Tachyon Webmail (c) Tachyon | Licensed under AGPL v3 */
 const gulp = require('gulp');
 
 const concat = require('gulp-concat'),
@@ -7,7 +7,7 @@ const concat = require('gulp-concat'),
 	replace = require('gulp-replace'),
 	terser = require('gulp-terser'),
 	eol = require('gulp-eol'),
-	eslint = require('gulp-eslint'),
+	eslint = require('gulp-eslint-new'),
 	cache = require('gulp-cached'),
 	expect = require('gulp-expect-file'),
 	size = require('gulp-size');

@@ -1,4 +1,4 @@
-/* RainLoop Webmail (c) RainLoop Team | Licensed under MIT */
+/* Tachyon Webmail (c) Tachyon | Licensed under AGPL v3 */
 const del = require('del');
 
 const { config } = require('./config');
