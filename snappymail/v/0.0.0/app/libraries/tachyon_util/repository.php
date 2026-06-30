@@ -4,48 +4,43 @@ namespace Tachyon\Util;
 
 abstract class Repository
 {
-	// snappyMailRepo
-	const BASE_URL = 'https://snappymail.eu/repository/v2/';
+	const PACKAGES_URL = 'https://raw.githubusercontent.com/kimusan/Tachyon/master/';
+	const CORE_API_URL = 'https://api.github.com/repos/kimusan/Tachyon/releases/latest';
 
-	private static function get(string $path) : string
+	private static function httpGet(string $url, array $headers = []) : ?string
 	{
 		$oHTTP = HTTP\Request::factory(/*'socket' or 'curl'*/);
 		$oHTTP->proxy = \Tachyon\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \Tachyon\Api::Config()->Get('labs', 'curl_proxy_auth', '');
 		$oHTTP->max_response_kb = 0;
-		$oHTTP->timeout = 15; // timeout in seconds.
-		$oResponse = $oHTTP->doRequest('GET', static::BASE_URL . $path);
-		if (!$oResponse) {
-			throw new \Exception('No HTTP response from repository');
-		}
-		if (200 !== $oResponse->status) {
-			throw new \Exception(static::body2plain($oResponse->body), $oResponse->status);
+		$oHTTP->timeout = 15;
+		$oResponse = $oHTTP->doRequest('GET', $url, null, $headers);
+		if (!$oResponse || 200 !== $oResponse->status) {
+			throw new \Exception('HTTP ' . ($oResponse ? $oResponse->status : '0') . ' from ' . $url);
 		}
 		return $oResponse->body;
 	}
 
-//	$aRep = \json_decode($sRep);
-
-	private static function download(string $path) : string
+	private static function download(string $url) : string
 	{
-		$sTmp = APP_PRIVATE_DATA . \md5(\microtime(true).$path) . \preg_replace('/^.*?(\\.[a-z\\.]+)$/Di', '$1', $path);
+		$sTmp = APP_PRIVATE_DATA . \md5(\microtime(true) . $url) . \preg_replace('/^.*?(\\.[a-z\\.]+)$/Di', '$1', $url);
 		$pDest = \fopen($sTmp, 'w+b');
 		if (!$pDest) {
-			throw new \Exception('Cannot create temp file: '.$sTmp);
+			throw new \Exception('Cannot create temp file: ' . $sTmp);
 		}
 
 		$oHTTP = HTTP\Request::factory(/*'socket' or 'curl'*/);
 		$oHTTP->proxy = \Tachyon\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \Tachyon\Api::Config()->Get('labs', 'curl_proxy_auth', '');
 		$oHTTP->max_response_kb = 0;
-		$oHTTP->timeout = 15; // timeout in seconds.
+		$oHTTP->timeout = 15;
 		$oHTTP->streamBodyTo($pDest);
 		\set_time_limit(120);
-		$oResponse = $oHTTP->doRequest('GET', static::BASE_URL . $path);
+		$oResponse = $oHTTP->doRequest('GET', $url);
 		\fclose($pDest);
 		if (!$oResponse) {
 			\unlink($sTmp);
-			throw new \Exception('No HTTP response from repository');
+			throw new \Exception('No HTTP response from ' . $url);
 		}
 		if (200 !== $oResponse->status) {
 			$body = \file_get_contents($sTmp);
@@ -68,28 +63,29 @@ abstract class Repository
 		$aRep = null;
 
 		$sRepoFile = 'packages.json';
+		$sUrl = static::PACKAGES_URL . $sRepoFile;
 
 		$oCache = \Tachyon\Api::Actions()->Cacher();
 
-		$sCacheKey = '/RepositoryCache/Repo/' . static::BASE_URL . '/File/' . $sRepoFile;
+		$sCacheKey = '/RepositoryCache/Repo/' . $sUrl;
 		$sRep = $oCache->Get($sCacheKey);
 		$iRepTime = $sRep ? $oCache->GetTimer($sCacheKey) : 0;
 
 		if (!$sRep || !$iRepTime || \time() - 3600 > $iRepTime) {
-			$sRep = static::get($sRepoFile);
+			$sRep = static::httpGet($sUrl);
 			if ($sRep) {
 				$aRep = \json_decode($sRep);
-				$bReal = \is_array($aRep) && \count($aRep);
+				$bReal = \is_array($aRep);
 				if ($bReal) {
 					$oCache->Set($sCacheKey, $sRep);
 					$oCache->SetTimer($sCacheKey);
 				}
 			} else {
-				throw new \Exception('Cannot read remote repository file: '.$sRepoFile);
+				throw new \Exception('Cannot read remote repository file: ' . $sUrl);
 			}
 		} else if ($sRep) {
 			$aRep = \json_decode($sRep, false, 10);
-			$bReal = \is_array($aRep) && \count($aRep);
+			$bReal = \is_array($aRep);
 		}
 
 		return \is_array($aRep) ? $aRep : [];
@@ -103,11 +99,8 @@ abstract class Repository
 				if ($oItem
 				 && isset($oItem->type, $oItem->id, $oItem->name, $oItem->version, $oItem->release, $oItem->file, $oItem->description)
 				 && 'plugin' === $oItem->type
-				 // is this entry newer then an already defined one
 				 && (empty($aResult[$oItem->id]) || \version_compare($aResult[$oItem->id]['version'], $oItem->version, '<'))
-				 // does this entry require same or older app version
 				 && (TACHYON_DEV || empty($oItem->required) || \version_compare(APP_VERSION, $oItem->required, '>='))
-				 // is this entry not deprecated for current app version?
 				 && (TACHYON_DEV || empty($oItem->deprecated) || \version_compare(APP_VERSION, $oItem->deprecated, '<'))
 				) {
 					$aResult[$oItem->id] = array(
@@ -132,23 +125,52 @@ abstract class Repository
 	}
 
 	/**
-	 * return object
-			$info->version
-			$info->file
-			$info->warnings
+	 * Fetches latest release info from GitHub Releases API.
+	 * Returns object with ->version (string) and ->file (full download URL).
 	 */
 	public static function getLatestCoreInfo()
 	{
 		\Tachyon\Api::Actions()->IsAdminLoggined();
-		$sRep = static::get('core.json');
-		return $sRep ? \json_decode($sRep, false, 3, JSON_THROW_ON_ERROR) : null;
+		try {
+			$sBody = static::httpGet(static::CORE_API_URL, [
+				'Accept: application/vnd.github+json',
+				'User-Agent: Tachyon/' . APP_VERSION,
+			]);
+		} catch (\Throwable $e) {
+			\Tachyon\Util\Log::error('UPDATER', $e->getMessage());
+			return null;
+		}
+		if (!$sBody) {
+			return null;
+		}
+		$data = \json_decode($sBody, false, 5);
+		if (!$data || empty($data->tag_name)) {
+			return null;
+		}
+
+		$downloadUrl = null;
+		foreach ($data->assets ?? [] as $asset) {
+			if (\str_ends_with($asset->name ?? '', '.tar.gz')) {
+				$downloadUrl = $asset->browser_download_url;
+				break;
+			}
+		}
+		if (!$downloadUrl) {
+			return null;
+		}
+
+		$info = new \stdClass();
+		$info->version = \ltrim($data->tag_name, 'v');
+		$info->file = $downloadUrl;
+		$info->warnings = [];
+		return $info;
 	}
 
 	public static function downloadCore() : ?string
 	{
 		$info = static::getLatestCoreInfo();
 		return ($info && \version_compare(APP_VERSION, $info->version, '<'))
-			? static::download($info->file) // '../latest.tar.gz'
+			? static::download($info->file)
 			: null;
 	}
 
@@ -230,8 +252,6 @@ abstract class Repository
 			}
 		}
 
-//		\uksort($aList, static function($a, $b){return \strcasecmp($a['name'], $b['name']);});
-
 		return array(
 			 'Real' => $bReal,
 			 'List' => \array_values($aList),
@@ -248,7 +268,7 @@ abstract class Repository
 
 	private static function deletePackageDir(string $sId) : bool
 	{
-		$sPath = APP_PLUGINS_PATH.$sId;
+		$sPath = APP_PLUGINS_PATH . $sId;
 		return (!\is_dir($sPath) || \MailSo\Base\Utils::RecRmDir($sPath))
 			&& (!\is_file("{$sPath}.phar") || \unlink("{$sPath}.phar"));
 	}
@@ -257,7 +277,7 @@ abstract class Repository
 	{
 		empty($_ENV['TACHYON_INCLUDE_AS_API']) && \Tachyon\Api::Actions()->IsAdminLoggined();
 
-		\Tachyon\Util\Log::info('INSTALLER', 'Start package install: '.$sId.' ('.$sType.')');
+		\Tachyon\Util\Log::info('INSTALLER', 'Start package install: ' . $sId . ' (' . $sType . ')');
 
 		$sRealFile = '';
 
@@ -279,7 +299,7 @@ abstract class Repository
 
 			if ($sTmp) {
 				if (!static::deletePackageDir($sId)) {
-					throw new \Exception('Cannot remove previous plugin folder: '.$sId);
+					throw new \Exception('Cannot remove previous plugin folder: ' . $sId);
 				}
 				if ('.phar' === \substr($sRealFile, -5)) {
 					$bResult = \copy($sTmp, APP_PLUGINS_PATH . \basename($sRealFile));
@@ -287,7 +307,6 @@ abstract class Repository
 					if (\class_exists('PharData')) {
 						$oArchive = new \PharData($sTmp, 0, $sRealFile);
 					} else {
-//						throw new \Exception('PHP Phar is disabled, you must enable it');
 						$oArchive = new \Tachyon\Util\TAR($sTmp);
 					}
 					$bResult = $oArchive->extractTo(\rtrim(APP_PLUGINS_PATH, '\\/'));
