@@ -330,6 +330,7 @@ Values:
                 'mail_list_grouped'      => array(false),
                 'mail_use_threads'       => array(false),
 				'allow_draft_autosave'   => array(true),
+				'undo_send_delay'        => array(0, 'Seconds to delay sending (0 = disabled, max 30). Lets users cancel a send.'),
 				'mail_reply_same_folder' => array(false),
 				'msg_default_action'     => array(1, '1 - reply, 2 - reply all'),
                 'collapse_blockquotes'   => array(true),

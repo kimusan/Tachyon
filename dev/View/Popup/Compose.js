@@ -261,6 +261,7 @@ export class ComposePopupView extends AbstractViewPopup {
 			draftUid: 0,
 			sending: false,
 			saving: false,
+			sendUndoCountdown: 0,
 
 			viewArea: 'body',
 
@@ -302,6 +303,7 @@ export class ComposePopupView extends AbstractViewPopup {
 		this.doClose = this.doClose.debounce(200);
 
 		this.iTimer = 0;
+		this.iSendUndoTimer = 0;
 
 		addComputablesTo(this, {
 			sendButtonSuccess: () => !this.sendError() && !this.sendSuccessButSaveError(),
@@ -347,7 +349,7 @@ export class ComposePopupView extends AbstractViewPopup {
 					optText: item
 				})),
 
-			canBeSentOrSaved: () => !this.sending() && !this.saving()
+			canBeSentOrSaved: () => !this.sending() && !this.saving() && !this.sendUndoCountdown()
 		});
 
 		addSubscribablesTo(this, {
@@ -574,13 +576,38 @@ export class ComposePopupView extends AbstractViewPopup {
 					};
 
 					this.getMessageRequestParams(sSentFolder)
-					.then(sendMessage)
+					.then(params => {
+						const delay = SettingsGet('UndoSendDelay') | 0;
+						if (delay > 0) {
+							this.sending(false);
+							this.sendUndoCountdown(delay);
+							const tick = () => {
+								const n = this.sendUndoCountdown() - 1;
+								if (n <= 0) {
+									this.sendUndoCountdown(0);
+									this.sending(true);
+									sendMessage(params);
+								} else {
+									this.sendUndoCountdown(n);
+									this.iSendUndoTimer = setTimeout(tick, 1000);
+								}
+							};
+							this.iSendUndoTimer = setTimeout(tick, 1000);
+						} else {
+							sendMessage(params);
+						}
+					})
 					.catch(sendError);
 				} catch (e) {
 					sendError(e);
 				}
 			}
 		}
+	}
+
+	sendUndoCommand() {
+		clearTimeout(this.iSendUndoTimer);
+		this.sendUndoCountdown(0);
 	}
 
 	saveCommand() {
@@ -723,8 +750,9 @@ export class ComposePopupView extends AbstractViewPopup {
 	}
 
 	onHide() {
-		// Stop autosave
+		// Stop autosave and any pending undo-send
 		clearTimeout(this.iTimer);
+		this.sendUndoCommand();
 
 		ComposePopupView.inEdit() || this.reset();
 

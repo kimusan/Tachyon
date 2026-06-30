@@ -103,7 +103,8 @@ export class UserSettingsGeneral extends AbstractViewSettings {
 		 'editorDefaultType', 'editorWysiwyg', 'msgDefaultAction', 'maxBlockquotesLevel',
 		 // These are in addSettings()
 		 'requestReadReceipt', 'requestDsn', 'requireTLS', 'pgpSign', 'pgpEncrypt',
-		 'viewHTML', 'viewImages', 'viewImagesWhitelist', 'removeColors', 'allowStyles', 'allowDraftAutosave',
+		 'viewHTML', 'viewImages', 'viewImagesWhitelist', 'removeColors', 'allowStyles',
+		 'allowDraftAutosave', 'undoSendDelay',
 		 'hideDeleted', 'listInlineAttachments', 'simpleAttachmentsList', 'collapseBlockquotes',
 		 'useCheckboxesInList', 'listGrouped', 'replySameFolder', 'allowSpellcheck',
 		 'messageReadAuto', 'showNextMessage', 'messageNewWindow', 'markdown'
@@ -166,6 +167,7 @@ export class UserSettingsGeneral extends AbstractViewSettings {
 		this.addSettings([
 			'requestReadReceipt', 'requestDsn', 'requireTLS', 'pgpSign', 'pgpEncrypt',
 			'ViewHTML', 'ViewImages', 'ViewImagesWhitelist', 'RemoveColors', 'AllowStyles', 'AllowDraftAutosave',
+			'UndoSendDelay',
 			'HideDeleted', 'ListInlineAttachments', 'simpleAttachmentsList', 'CollapseBlockquotes',
 			'UseCheckboxesInList', 'listGrouped', 'ReplySameFolder', 'allowSpellcheck',
 			'messageReadAuto', 'showNextMessage', 'messageNewWindow', 'markdown',

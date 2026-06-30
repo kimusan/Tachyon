@@ -241,6 +241,7 @@
 	"COMPOSE": {
 		"LINK_SHOW_INPUTS": "show all fields",
 		"BUTTON_SEND": "Send",
+		"BUTTON_SEND_UNDO": "Undo",
 		"BUTTON_MINIMIZE": "Minimize",
 		"SAVED_TIME": "Saved at %TIME%",
 		"SAVED_ERROR_ON_SEND": "Message was sent but not saved to sent items folder",
@@ -256,6 +257,8 @@
 		"ATTACHMENTS_UPLOAD_ERROR_DESC": "Not all attachments have been uploaded yet.",
 		"ALLOW_SPELLCHECK": "Enable browser spelling checker",
 		"ALLOW_DRAFT_AUTOSAVE": "Automatically save draft",
+		"UNDO_SEND_DELAY_LABEL": "Undo send delay",
+		"UNDO_SEND_DELAY_OFF": "Off",
 		"BUTTON_REQUEST_READ_RECEIPT": "Request a read receipt",
 		"BUTTON_MARK_AS_IMPORTANT": "Mark as important",
 		"BUTTON_REQUEST_DSN": "Request a delivery receipt",

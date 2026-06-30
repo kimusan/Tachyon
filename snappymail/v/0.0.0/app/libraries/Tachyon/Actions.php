@@ -610,6 +610,7 @@ class Actions
 						'AutoLogout' => (int) $oConfig->Get('defaults', 'autologout', 30),
 						'keyPassForget' => 15,
 						'AllowDraftAutosave' => (bool) $oConfig->Get('defaults', 'allow_draft_autosave', true),
+						'UndoSendDelay' => (int) $oConfig->Get('defaults', 'undo_send_delay', 0),
 						'ContactsAutosave' => (bool) $oConfig->Get('defaults', 'contacts_autosave', true)
 					],
 					// MainAccount or AdditionalAccount
@@ -702,6 +703,7 @@ class Actions
 					$aResult['UseCheckboxesInList'] = (bool)$oSettings->GetConf('UseCheckboxesInList', $aResult['UseCheckboxesInList']);
 					$aResult['showNextMessage'] = (bool)$oSettings->GetConf('showNextMessage', $aResult['showNextMessage']);
 					$aResult['AllowDraftAutosave'] = (bool)$oSettings->GetConf('AllowDraftAutosave', $aResult['AllowDraftAutosave']);
+					$aResult['UndoSendDelay'] = \min(30, \max(0, (int)$oSettings->GetConf('UndoSendDelay', $aResult['UndoSendDelay'])));
 					$aResult['AutoLogout'] = (int)$oSettings->GetConf('AutoLogout', $aResult['AutoLogout']);
 					$aResult['keyPassForget'] = (int)$oSettings->GetConf('keyPassForget', $aResult['keyPassForget']);
 					$aResult['Layout'] = (int)$oSettings->GetConf('Layout', $aResult['Layout']);

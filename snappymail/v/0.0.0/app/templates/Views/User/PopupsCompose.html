@@ -1,8 +1,17 @@
 <header class="g-ui-user-select-none" data-bind="css: {loading: saving() || sending()}">
+	<!-- ko if: sendUndoCountdown() -->
+	<a class="btn btn-warning send-undo" data-bind="click: sendUndoCommand">
+		<i class="fontastic">↩</i>
+		<span data-i18n="COMPOSE/BUTTON_SEND_UNDO"></span>
+		<b data-bind="text: sendUndoCountdown"></b>
+	</a>
+	<!-- /ko -->
+	<!-- ko ifnot: sendUndoCountdown() -->
 	<a class="btn" data-bind="command: sendCommand, tooltipErrorTip: sendErrorDesc, css: {'btn-success': sendButtonSuccess, 'btn-danger': sendError, 'btn-warning': sendSuccessButSaveError }">
 		<i data-bind="css: {'icon-paper-plane': !sending(), 'icon-spinner': sending()}"></i>
 		<span class="hide-mobile" data-i18n="COMPOSE/BUTTON_SEND"></span>
 	</a>
+	<!-- /ko -->
 	<a class="btn button-save" data-bind="command: saveCommand, tooltipErrorTip: savedErrorDesc, css: {'btn-danger': savedError }">
 		<i class="fontastic" data-bind="css: {'icon-spinner': saving()}">💾</i>
 		<span class="hide-mobile" data-i18n="GLOBAL/SAVE"></span>

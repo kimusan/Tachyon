@@ -191,6 +191,7 @@ trait User
 		$this->setSettingsFromParams($oSettings, 'NotificationSound', 'string');
 		$this->setSettingsFromParams($oSettings, 'UseCheckboxesInList', 'bool');
 		$this->setSettingsFromParams($oSettings, 'AllowDraftAutosave', 'bool');
+		$this->setSettingsFromParams($oSettings, 'UndoSendDelay', 'int');
 		$this->setSettingsFromParams($oSettings, 'AutoLogout', 'int');
 		$this->setSettingsFromParams($oSettings, 'keyPassForget', 'int');
 		$this->setSettingsFromParams($oSettings, 'messageNewWindow', 'bool');
