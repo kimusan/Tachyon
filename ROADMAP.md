@@ -70,16 +70,23 @@ The main app directory is `snappymail/v/<version>/`. Strategy:
 - [ ] Add migration shim in `upgrade.php` for any config key changes
 - [ ] Verify `APP_PRIVATE_DATA`, `SNAPPYMAIL_LIBRARIES_PATH` const renames don't break plugins
 
-### 1.4b Build scripts (discovered 2026-06-30)
-- [ ] `gulpfile.js` and `tasks/*.js` still have `/* RainLoop Webmail (c) RainLoop Team */` header comment
-- [ ] `tasks/js.js:89` has a `replace("snappymail/v/...")` regex tied to the static JS path — keep as-is while `snappymail/` directory is preserved; revisit when directory is eventually renamed
-- [ ] `rollup.config.js` is a legacy standalone config (not used by current gulp pipeline) — uses deprecated `rollup-plugin-babel`, `rollup-plugin-terser`; either remove or align with tasks/rollup.js in Phase 3
-- [ ] `tasks/config.js` likely still references snappymail paths — audit
+### 1.4b Build scripts (done: 2026-06-30, see Phase 3)
+- [x] `gulpfile.js` and `tasks/*.js` copyright headers updated to Tachyon
+- [x] `tasks/js.js:89` regex with `snappymail/v/` path kept as-is (disk dir preserved)
+- [x] `rollup.config.js` legacy standalone — still present but superseded by Phase 3 toolchain upgrade; can be deleted
+- [x] `tasks/config.js` verified: no snappymail branding references
 
-### 1.5 Integration packages
-- [ ] Update Nextcloud integration package: rename `integrations/nextcloud/snappymail/` -> `integrations/nextcloud/tachyon/` with appid change
-- [ ] Update Cloudron, cPanel, HestiaCP, CyberPanel, OwnCloud, Virtualmin metadata files
-- [ ] Update Docker image names and labels in `docker-compose.yml` and `.docker/`
+### 1.5 Integration packages (done: 2026-06-30)
+- [x] Updated Nextcloud integration package: `integrations/nextcloud/snappymail/` → `integrations/nextcloud/tachyon/`, all OCA\SnappyMail → OCA\Tachyon, SnappyMailHelper → TachyonHelper, all Nextcloud config/session keys updated, app ID 'snappymail' → 'tachyon'
+- [x] Updated OwnCloud integration: same rename pattern as Nextcloud
+- [x] Updated plugins/nextcloud/index.php: OCA\Tachyon\Util\TachyonHelper reference
+- [x] Updated Cloudron: Dockerfile (PHP 7.4 → 8.2, session paths, apache conf ref), DESCRIPTION.md
+- [x] Updated cPanel: YAML renamed to webmail_tachyon.yaml, display name and URL paths updated
+- [x] Updated HestiaCP: bin script renamed v-add-sys-tachyon, install dir renamed to `deb/tachyon/`, user-visible strings updated
+- [x] Updated CyberPanel: PHP namespaces (RainLoop→Tachyon, SnappyMail→Tachyon\Util), env vars updated
+- [x] Updated Virtualmin: script renamed tachyon.pl, all function names → script_tachyon_*, user-visible strings updated, PHP version 7→8
+- [x] Note: Cloudron/HestiaCP download URLs still reference upstream — will need updating when Tachyon CI/CD publishes release tarballs (TODO in both files)
+- [ ] Update Docker image names and labels in `docker-compose.yml` and `.docker/` (if present)
 
 ---
 
@@ -133,17 +140,19 @@ Tasks:
 
 ## Phase 3: JavaScript / Frontend Modernization
 
-### 3.1 Build toolchain update
-- [ ] Audit `package.json` dependencies for outdated versions (current: rollup ^2.56.3, gulp 5, eslint 7)
-- [ ] Update rollup to v4.x (current latest)
-- [ ] Update `@rollup/plugin-node-resolve` to v15.x
-- [ ] Update `@rollup/plugin-replace` to v5.x
-- [ ] Update `eslint` to v9.x (major API change - flat config required)
-- [ ] Update `gulp-terser` to latest
-- [ ] Update `gulp-clean-css` to latest
-- [ ] Update `gulp-less` to latest
-- [ ] Remove `babel-eslint` (deprecated - replaced by `@babel/eslint-parser` but may not be needed with ESLint 9)
-- [ ] Update `rollup-plugin-terser` (deprecated - use `@rollup/plugin-terser` instead)
+### 3.1 Build toolchain update (done: 2026-06-30)
+- [x] Rollup upgraded from v2 → v4.28.1
+- [x] `gulp-rollup-2` upgraded to v2.1.0 (supports rollup v4)
+- [x] `eslint` upgraded to v9.17.0; `gulp-eslint` replaced with `gulp-eslint-new@2.6.2`
+- [x] `eslint.config.js` created (ESLint v9 flat config format)
+- [x] `@rollup/plugin-node-resolve` → v15.2.3, `@rollup/plugin-replace` → v5.0.5
+- [x] Removed deprecated `rollup-plugin-terser`; replaced with `@rollup/plugin-terser`
+- [x] Removed deprecated `babel-eslint`
+- [x] `del@6` kept (v7+ is ESM-only, incompatible with CommonJS gulp tasks)
+- [x] `gulp-filter@7` kept (v9 uses ESM default export incompatible with CommonJS)
+- [x] Build verified working: produces admin.min.js (41kB), app.min.js (203kB), libs.min.js (110kB), openpgp.min.js (545kB), CSS files
+- [x] 4 ESLint lint errors fixed in HtmlEditor.js and Storage/Client.js (unused catch params → ES2019 `catch {}`)
+- [ ] `rollup.config.js` legacy file still present (root-level, not used by gulp pipeline) — delete or remove
 
 ### 3.2 Vendor library updates
 - [ ] **KnockoutJS**: currently 3.5.1-sm (custom fork) - evaluate upgrade or migration path
@@ -184,21 +193,50 @@ Tasks:
   - Performance improvements (always evaluate)
 - [ ] Document integration decisions in this roadmap under a "Integrated PRs" subsection
 
-**How to check:** `gh pr list --repo the-djmaze/snappymail --state open --limit 50`
+**Reviewed: 2026-06-30** — see findings below.
+
+### Upstream PR Findings (reviewed 2026-06-30)
+
+**Integrate immediately (security + critical bugs):**
+- [ ] PR #2039 — FIX non-compliant Autocrypt Header (removes spaces from armored PGP keys)
+- [ ] PR #2037 — Fix Mime/Parser header detection (PGP inline decrypt for plain-text messages)
+- [ ] PR #2007 — Fix OIDC login: SensitiveString type mismatch causing SSO regression
+- [ ] PR #2024 — Fix login-remote plugin password handling (SensitiveString compat)
+- [ ] PR #2019 — Fix Search Filters plugin crash on keyword filters (IMAP error handling)
+- [ ] PR #2012 — Fix typo in imapsync.php: `RainLoop\API` → `RainLoop\Api` (already fixed in our rename)
+- [ ] PR #2011 — Fix typo in SSLContext.php: same class reference typo (check if our rename covers it)
+- [ ] PR #1981 — Fix JS error when forwarding emails as attachments (`t.decrypt undefined`)
+- [ ] PR #1974 — Fix docker command syntax in cli/release.php
+- [ ] PR #1973 — Add pdo_sqlite to Docker image
+- [ ] PR #1922 — Fix nginx IPv6 listening in IPv4-only environments (containerized deployments)
+
+**Evaluate and integrate:**
+- [ ] PR #2035 — Add HTTP-based SSO plugin for Apache Basic Auth integration
+- [ ] PR #1882 — Use LDAP login mapping for SMTP too (after IMAP mapping was added)
+- [ ] PR #2052 — Basque language update (translation)
+
+**Skip for now:**
+- PR #2034 — Nextcloud webDAV API update (review after Phase 1.5 is stable)
+- PR #2021 — Office365/Outlook OAuth2 refactor (needs careful testing)
+- PR #2001/#1999 — Nextcloud 32+ compatibility (revisit when supporting NC32+)
+- PR #1963 — PGP improvements (passphrase caching, key deletion) — complex, potential conflicts
+- PR #1879 — S/MIME intermediate certificates — low priority
+- PR #1227 — Nextcloud address book integration — 2+ years old, likely conflicts
 
 ---
 
-## Phase 5: Review Upstream Branches
+## Phase 5: Review Upstream Branches (done: 2026-06-30)
 
-> Check non-master branches on https://github.com/the-djmaze/snappymail for ahead-of-master work.
+**Reviewed: 2026-06-30**
 
-- [ ] List all remote branches: `gh api repos/the-djmaze/snappymail/branches --paginate`
-- [ ] Compare each branch against master for commit count and content
-- [ ] Focus areas:
-  - Dev/experimental features
-  - Platform-specific branches (nextcloud, etc.)
-  - Feature branches with completed but unmerged work
-- [ ] Document findings here
+**Worth integrating:**
+- [ ] **`php81` branch** (7 commits ahead): PHP 8.1 modernization converting state constants to PHP enums (SignMeType, ResponseType, StoreAction, MessagePriority, etc.). Last activity Feb 2024. Cherry-pick enum conversions that don't conflict with our Phase 2 work.
+
+**Skip:**
+- **`sieve-gui`** (20 commits ahead): Experimental Sieve GUI, WIP as of Sept 2024. Wait for completion upstream or build our own in Phase 6.
+- **`plugin-hooks`** (5 commits): Very old (2021-2022), heavy merge conflicts, likely superseded.
+- **`UserMailTemplates`** (3 commits): 2021, conflicts likely.
+- **`contacts-screen`**, **`feature/popupmessage`**, **`gmail-additionalaccount`**, **`messagelist-infinite-scroll`**: minimal work, stale.
 
 ---
 
@@ -330,37 +368,38 @@ _Populated during Phase 5_
 
 ## Next Actions (for next agent session)
 
-### Immediate (Phase 1.5 — Integration packages)
-The `integrations/` directory contains Nextcloud, Cloudron, cPanel, HestiaCP, OwnCloud, Virtualmin packages.
-The Nextcloud integration (`integrations/nextcloud/snappymail/`) still uses `OCA\SnappyMail` namespace internally
-(left intact intentionally - requires coordinated rename of appid, directory name, l10n files, app manifest).
+### Priority 1 — Integrate critical upstream bug fixes (Phase 4)
+The upstream PR review identified 11 security/critical bug PRs to integrate. Start with the ones that touch
+actual bugs (not just typos our namespace rename already fixed):
+- PR #2039: Autocrypt header fix (`MailSo/Mime/Header/Autocrypt.php` — remove spaces from armored keys)
+- PR #2037: MIME parser header detection fix (PGP inline decrypt)
+- PR #2007: OIDC SensitiveString type fix
+- PR #2024: login-remote plugin SensitiveString fix
+- PR #2019: Search Filters plugin crash
+- PR #1981: JS forward-as-attachment error (`t.decrypt undefined`)
+- PR #1922: nginx IPv6 fix
 
-Steps:
-1. Rename `integrations/nextcloud/snappymail/` dir to `integrations/nextcloud/tachyon/`
-2. Update `appinfo/info.xml`: `<id>snappymail</id>` → `<id>tachyon</id>`, name, description
-3. Update all `OCA\SnappyMail\` → `OCA\Tachyon\` inside the app
-4. Update `plugins/nextcloud/index.php` line 96: revert `OCA\SnappyMail\Util\SnappyMailHelper` to `OCA\Tachyon\Util\TachyonHelper` (after renaming the helper class too)
-5. Update other integration packages similarly
+For each: `gh pr view N --repo the-djmaze/snappymail` to get the diff, then apply manually.
 
-### Phase 3 — Build toolchain update
-- Update `package.json` deps (already updated version numbers, but yarn.lock needs refresh: `yarn upgrade`)
-- `rollup.config.js` is stale/legacy — either align with `tasks/rollup.js` or remove
-- `gulpfile.js` and `tasks/*.js` still have "RainLoop Webmail" copyright headers
-- `tasks/js.js:89` has `snappymail/v/` path string — acceptable while disk path is preserved
-- Run `yarn install` then `gulp build` to verify the build still works after namespace changes
+### Priority 2 — Cherry-pick php81 branch enums (Phase 5)
+The `php81` branch has PHP enum conversions for state constants. Review with:
+`gh api repos/the-djmaze/snappymail/compare/master...php81 --jq '.commits[].commit.message'`
+Then cherry-pick relevant enum files.
 
-### Phase 4 — Review upstream PRs
-- `gh pr list --repo the-djmaze/snappymail --state open --limit 50`
-
-### Phase 5 — Review upstream branches
-- `gh api repos/the-djmaze/snappymail/branches --paginate`
-
-### Phase 2 remaining items
-- FILTER_SANITIZE_STRING audit
+### Priority 3 — Phase 2 remaining PHP modernization
+- `grep -rn "FILTER_SANITIZE_STRING" snappymail/` (deprecated PHP 8.1)
 - Implicit null param audit
-- strict_types coverage
+- Start adding `declare(strict_types=1)` to new files
 
-### Git log (commits so far)
+### Priority 4 — Delete legacy rollup.config.js
+The root-level `rollup.config.js` uses deprecated plugins and is not used by the build pipeline.
+Safe to delete: `git rm rollup.config.js`
+
+### Git log (commits on master)
 1. `8750ac7` rebrand: rename project to Tachyon (metadata and docs)
 2. `854e850` rebrand: rename SnappyMail -> Tachyon in JS, LESS, and static JSON
 3. `02ac9e0` rebrand: rename PHP namespaces and modernize PHP floor
+4. `9536bde` roadmap: update status after Phase 1 and 2 initial work
+5. `835c079` rebrand: rename integration packages to Tachyon (Phase 1.5)
+6. `b1081f9` rebrand: fix Nextcloud/OwnCloud app ID, session keys, and file rename
+7. `435399f` build: upgrade to Rollup v4, ESLint v9 flat config, fix JS lint errors
