@@ -3,11 +3,7 @@
 define('ROOT_DIR', dirname(__DIR__));
 chdir(ROOT_DIR);
 
-$options = getopt('', ['aur','docker','plugins','skip-gulp','debian','nextcloud','owncloud','cpanel','sign']);
-
-if (isset($options['plugins'])) {
-	require(ROOT_DIR . '/build/plugins.php');
-}
+$options = getopt('', ['aur','docker','skip-gulp','debian','nextcloud','owncloud','cpanel','sign']);
 
 $gulp = trim(`which gulp`);
 if (!$gulp) {
@@ -178,6 +174,10 @@ if (isset($options['cpanel'])) {
 }
 
 rename("snappymail/v/{$package->version}", 'snappymail/v/0.0.0');
+
+echo "\x1b[33;1m === Plugins === \x1b[0m\n";
+$options['release-tag'] = "v{$package->version}";
+require(ROOT_DIR . '/build/plugins.php');
 
 file_put_contents("{$destPath}core.json", '{
 	"version": "'.$package->version.'",

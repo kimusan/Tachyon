@@ -12,8 +12,23 @@ foreach ($files as $fileinfo) {
 
 $terser = ROOT_DIR . '/node_modules/terser/bin/terser';
 
+// --release-tag v3.0.1 → use absolute GitHub download URLs in packages.json
+$releaseTag = $options['release-tag'] ?? null;
+$githubBase = $releaseTag
+	? "https://github.com/kimusan/Tachyon/releases/download/{$releaseTag}/"
+	: null;
+
 $manifest = [];
-require ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/RainLoop/Plugins/AbstractPlugin.php';
+
+// Load AbstractPlugin so plugin classes can extend it
+if (is_file(ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/Tachyon/Plugins/AbstractPlugin.php')) {
+	require ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/Tachyon/Plugins/AbstractPlugin.php';
+	// Alias for plugins that still use the RainLoop namespace
+	class_alias(\Tachyon\Plugins\AbstractPlugin::class, \RainLoop\Plugins\AbstractPlugin::class);
+} else {
+	require ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/RainLoop/Plugins/AbstractPlugin.php';
+}
+
 $keys = [
 	'author',
 	'category',
@@ -28,46 +43,11 @@ $keys = [
 	'url',
 	'version'
 ];
-/*
-$released = [
-	'add-x-originating-ip-header',
-	'avatars',
-	'backup',
-	'black-list',
-	'change-password',
-	'change-password-froxlor',
-	'change-password-hestia',
-	'change-password-hmailserver',
-	'change-password-ispconfig',
-	'change-password-poppassd',
-	'custom-login-mapping',
-	'imap-contacts-suggestions',
-	'kolab',
-	'ldap-contacts-suggestions',
-	'ldap-identities',
-	'ldap-login-mapping',
-	'ldap-mail-accounts',
-	'login-external',
-	'login-external-sso',
-	'login-override',
-	'login-register',
-	'login-remote',
-	'mailbox-detect',
-	'nextcloud',
-	'override-smtp-credentials',
-	'set-remote-addr',
-	'smtp-use-from-adr-account',
-	'snowfall-on-login-screen',
-	'two-factor-auth',
-	'view-ics',
-	'white-list'
-];
-*/
+
 foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 	if (is_file("{$dir}/index.php") && !strpos($dir, '.bak')) {
 		require "{$dir}/index.php";
 		$name = basename($dir);
-//		if (!in_array($name, $released)) continue;
 		$class = new ReflectionClass(str_replace('-', '', $name) . 'Plugin');
 		$manifest_item = [];
 		foreach ($class->getConstants() as $key => $value) {
@@ -76,7 +56,7 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 				$manifest_item[$key] = $value;
 			}
 		}
-		$version = $manifest_item['version'];
+		$version = $manifest_item['version'] ?? '0';
 		if (0 < floatval($version)) {
 			echo "+ {$name} {$version}\n";
 
@@ -94,11 +74,15 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 				}
 			}
 
+			$archive = "{$name}-{$version}.tgz";
 			$manifest_item['type'] = 'plugin';
 			$manifest_item['id']   = $name;
-			$manifest_item['file'] = "plugins/{$name}-{$version}.tgz";
+			$manifest_item['file'] = $githubBase
+				? $githubBase . $archive
+				: "plugins/{$archive}";
+
 			$tar_destination = PLUGINS_DEST_DIR . "/{$name}-{$version}.tar";
-			$tgz_destination = PLUGINS_DEST_DIR . "/{$name}-{$version}.tgz";
+			$tgz_destination = PLUGINS_DEST_DIR . "/{$archive}";
 			@unlink($tgz_destination);
 			@unlink("{$tar_destination}.gz");
 			$tar = new PharData($tar_destination);
@@ -106,17 +90,7 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 			$tar->compress(Phar::GZ);
 			unlink($tar_destination);
 			rename("{$tar_destination}.gz", $tgz_destination);
-/*
-			if (Phar::canWrite()) {
-				$phar_destination = PLUGINS_DEST_DIR . "/{$name}.phar";
-				@unlink($phar_destination);
-				$tar = new Phar($phar_destination);
-				$tar->buildFromDirectory("./plugins/{$name}/", '/^((?!\.bak).)*$/');
-				$tar->compress(Phar::GZ);
-				unlink($phar_destination);
-				rename("{$phar_destination}.gz", $phar_destination);
-			}
-*/
+
 			if (isset($options['sign'])) {
 				passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($tgz_destination), $return_var);
 				$manifest_item['pgp_sig'] = trim(preg_replace('/-----(BEGIN|END) PGP SIGNATURE-----/', '', file_get_contents($tgz_destination.'.asc')));
@@ -128,17 +102,18 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 			echo "- {$name} {$version}\n";
 		}
 	} else {
-		echo "- {$name}\n";
+		echo "- " . basename($dir) . "\n";
 	}
 }
 
 ksort($manifest);
-$manifest = json_encode(array_values($manifest));
-$manifest = str_replace('{"', "\n\t{\n\t\t\"", $manifest);
-$manifest = str_replace('"}', "\"\n\t}", $manifest);
-$manifest = str_replace('}]', "}\n]", $manifest);
-$manifest = str_replace('","', "\",\n\t\t\"", $manifest);
-$manifest = str_replace('\/', '/', $manifest);
-file_put_contents(dirname(PLUGINS_DEST_DIR) . "/packages.json", $manifest);
+$json = json_encode(array_values($manifest), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+// Write to build output dir
+file_put_contents(dirname(PLUGINS_DEST_DIR) . '/packages.json', $json . "\n");
+
+// Also write to repo root so raw.githubusercontent.com serves the current version
+file_put_contents(ROOT_DIR . '/packages.json', $json . "\n");
+echo "packages.json written (" . count($manifest) . " plugins)\n";
 
 exit;

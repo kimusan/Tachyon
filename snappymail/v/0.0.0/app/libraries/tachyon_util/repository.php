@@ -5,6 +5,7 @@ namespace Tachyon\Util;
 abstract class Repository
 {
 	const PACKAGES_URL = 'https://raw.githubusercontent.com/kimusan/Tachyon/master/';
+	const SNAPPYMAIL_PACKAGES_URL = 'https://snappymail.eu/repository/v2/';
 	const CORE_API_URL = 'https://api.github.com/repos/kimusan/Tachyon/releases/latest';
 
 	private static function httpGet(string $url, array $headers = []) : ?string
@@ -57,38 +58,65 @@ abstract class Repository
 		));
 	}
 
+	/**
+	 * Fetch and decode a packages.json from a URL, with 1-hour cache.
+	 * Returns decoded array or null on failure.
+	 */
+	private static function fetchPackages(string $sUrl, \MailSo\Cache\CacheClient $oCache) : ?array
+	{
+		$sCacheKey = '/RepositoryCache/Repo/' . \md5($sUrl);
+		$sCached = $oCache->Get($sCacheKey);
+		$iCachedAt = $sCached ? $oCache->GetTimer($sCacheKey) : 0;
+
+		if (!$sCached || !$iCachedAt || \time() - 3600 > $iCachedAt) {
+			try {
+				$sBody = static::httpGet($sUrl);
+			} catch (\Throwable $e) {
+				\Tachyon\Util\Log::warning('REPOSITORY', "Failed to fetch {$sUrl}: " . $e->getMessage());
+				return null;
+			}
+			$aData = $sBody ? \json_decode($sBody) : null;
+			if (\is_array($aData)) {
+				$oCache->Set($sCacheKey, $sBody);
+				$oCache->SetTimer($sCacheKey);
+				return $aData;
+			}
+			return null;
+		}
+
+		$aData = \json_decode($sCached, false, 10);
+		return \is_array($aData) ? $aData : null;
+	}
+
 	private static function getRepositoryDataByUrl(bool &$bReal = false) : array
 	{
 		$bReal = false;
-		$aRep = null;
-
-		$sRepoFile = 'packages.json';
-		$sUrl = static::PACKAGES_URL . $sRepoFile;
-
 		$oCache = \Tachyon\Api::Actions()->Cacher();
 
-		$sCacheKey = '/RepositoryCache/Repo/' . $sUrl;
-		$sRep = $oCache->Get($sCacheKey);
-		$iRepTime = $sRep ? $oCache->GetTimer($sCacheKey) : 0;
+		// Tachyon-native packages (takes precedence)
+		$aTachyon = static::fetchPackages(static::PACKAGES_URL . 'packages.json', $oCache) ?? [];
 
-		if (!$sRep || !$iRepTime || \time() - 3600 > $iRepTime) {
-			$sRep = static::httpGet($sUrl);
-			if ($sRep) {
-				$aRep = \json_decode($sRep);
-				$bReal = \is_array($aRep);
-				if ($bReal) {
-					$oCache->Set($sCacheKey, $sRep);
-					$oCache->SetTimer($sCacheKey);
-				}
-			} else {
-				throw new \Exception('Cannot read remote repository file: ' . $sUrl);
+		// SnappyMail packages as fallback for migrating users (graceful on failure)
+		$aSnappyMail = static::fetchPackages(static::SNAPPYMAIL_PACKAGES_URL . 'packages.json', $oCache) ?? [];
+
+		// Make SnappyMail file paths absolute before merging
+		foreach ($aSnappyMail as $oItem) {
+			if ($oItem && isset($oItem->file)
+			 && !\str_starts_with($oItem->file, 'http://') && !\str_starts_with($oItem->file, 'https://')) {
+				$oItem->file = static::SNAPPYMAIL_PACKAGES_URL . $oItem->file;
 			}
-		} else if ($sRep) {
-			$aRep = \json_decode($sRep, false, 10);
-			$bReal = \is_array($aRep);
 		}
 
-		return \is_array($aRep) ? $aRep : [];
+		// Merge: index by id, Tachyon entries override SnappyMail entries
+		$aById = [];
+		foreach (\array_merge($aSnappyMail, $aTachyon) as $oItem) {
+			if ($oItem && !empty($oItem->id)) {
+				$aById[$oItem->id] = $oItem;
+			}
+		}
+
+		$bReal = !empty($aById);
+		return \array_values($aById);
 	}
 
 	private static function getRepositoryData(bool &$bReal, string &$sError) : array
