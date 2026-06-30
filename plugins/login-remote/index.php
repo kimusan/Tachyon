@@ -43,6 +43,7 @@ class LoginRemotePlugin extends \Tachyon\Plugins\AbstractPlugin
 			try
 			{
 				static::$login = true;
+				$sPassword = new \Tachyon\Util\SensitiveString($sPassword);
 				$oAccount = $oActions->LoginProcess($sEmail, $sPassword);
 			}
 			catch (\Throwable $oException)

@@ -51,45 +51,33 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$Filters = $aSettings['SFilters'];
 
 		foreach ($Filters as $filter) {
-			$this->Manager()->logWrite(json_encode([
-				'filter' => $filter,
-			]), LOG_WARNING);
+			$this->Manager()->logWrite(json_encode(['filter' => $filter]), LOG_WARNING);
 
-			$folder = 'INBOX';
 			$searchQ = $filter['searchQ'];
-			$uids = $this->searchMessages($oImapClient, $searchQ, "INBOX");
 
-			//Mark as read/seen
-			if ($filter['fSeen']) {
-				foreach ($uids as $uid) {
-					$oRange = new MailSo\Imap\SequenceSet([$uid]);
-					$this->Manager()->Actions()->MailClient()->MessageSetFlag(
-						$folder,
-						$oRange,
-						MailSo\Imap\Enumerations\MessageFlag::SEEN
-					);
+			// obsługa keyword (multi-folder)
+			if (stripos($searchQ, 'keyword=') !== false) {
+				$oMailClient = $this->Manager()->Actions()->MailClient();
+
+				// Pobieramy wszystkie foldery top-level
+				$folders = $oMailClient->Folders('', false, '');
+				foreach ($folders as $f) {
+					$folder = $f->FullName ?? null;
+					if (!$folder) continue;
+
+					$uids = $this->searchMessages($oImapClient, $searchQ, $folder);
+					if (!empty($uids)) {
+						$this->applyActions($oImapClient, $filter, $uids, $folder);
+					}
 				}
+
+				continue; // przechodzimy do następnego filtra
 			}
 
-			//Flag/Star message
-			if ($filter['fFlag']) {
-				foreach ($uids as $uid) {
-					$oRange = new MailSo\Imap\SequenceSet([$uid]);
-					$this->Manager()->Actions()->MailClient()->MessageSetFlag(
-						$folder,
-						$oRange,
-						MailSo\Imap\Enumerations\MessageFlag::FLAGGED
-					);
-				}
-			}
-
-			// Move to folder
-			if ($filter['fFolder']) {
-				$folder = $filter['fFolder'];
-				foreach ($uids as $uid) {
-					$oRange = new MailSo\Imap\SequenceSet([$uid]);
-					$oImapClient->MessageMove("INBOX", $folder, $oRange);
-				}
+			// normalny search w INBOX
+			$uids = $this->searchMessages($oImapClient, $searchQ, 'INBOX');
+			if (!empty($uids)) {
+				$this->applyActions($oImapClient, $filter, $uids, 'INBOX');
 			}
 		}
 	}
@@ -99,21 +87,66 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 		string $search,
 		string $folder = "INBOX"
 	): array {
-		$oParams = new \MailSo\Mail\MessageListParams();
-		$oParams->sSearch = $search;
-		$oParams->sFolderName = $folder;
+		try {
+			$bUseCache = false;
+			$oSearchCriterias = \MailSo\Imap\SearchCriterias::fromString(
+				$imapClient,
+				$folder,
+				$search,
+				true,
+				$bUseCache
+			);
 
-		$bUseCache = false;
-		$oSearchCriterias = \MailSo\Imap\SearchCriterias::fromString(
-			$imapClient,
-			$folder,
-			$search,
-			true,
-			$bUseCache
-		);
+			$imapClient->FolderSelect($folder);
+			return $imapClient->MessageSearch($oSearchCriterias, true);
 
-		$imapClient->FolderSelect($folder);
-		return $imapClient->MessageSearch($oSearchCriterias, true);
+		} catch (\Throwable $e) {
+			$this->Manager()->logWrite(
+				'SearchFilters IMAP error in folder "' . $folder .
+				'" for search "' . $search . '": ' . $e->getMessage(),
+				LOG_ERR
+			);
+			return [];
+		}
+	}
+
+	private function applyActions(
+		\MailSo\Imap\ImapClient $imapClient,
+		array $filter,
+		array $uids,
+		string $folder
+	) {
+		// Mark as read/seen
+		if (!empty($filter['fSeen'])) {
+			foreach ($uids as $uid) {
+				$oRange = new \MailSo\Imap\SequenceSet([$uid]);
+				$this->Manager()->Actions()->MailClient()->MessageSetFlag(
+					$folder,
+					$oRange,
+					\MailSo\Imap\Enumerations\MessageFlag::SEEN
+				);
+			}
+		}
+
+		// Flag/Star message
+		if (!empty($filter['fFlag'])) {
+			foreach ($uids as $uid) {
+				$oRange = new \MailSo\Imap\SequenceSet([$uid]);
+				$this->Manager()->Actions()->MailClient()->MessageSetFlag(
+					$folder,
+					$oRange,
+					\MailSo\Imap\Enumerations\MessageFlag::FLAGGED
+				);
+			}
+		}
+
+		// Move to folder
+		if (!empty($filter['fFolder']) && $filter['fFolder'] !== -1) {
+			foreach ($uids as $uid) {
+				$oRange = new \MailSo\Imap\SequenceSet([$uid]);
+				$imapClient->MessageMove('INBOX', $filter['fFolder'], $oRange);
+			}
+		}
 	}
 
 	public function GetFilters()
