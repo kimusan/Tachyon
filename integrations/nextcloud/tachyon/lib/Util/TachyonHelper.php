@@ -95,7 +95,7 @@ class TachyonHelper
 						$ocSession = \OC::$server->getSession();
 						$oAccount = $oActions->LoginProcess($aCredentials[1], $aCredentials[2]);
 						if (!$isOIDC && $oAccount
-						 && $oConfig->Get('login', 'sign_me_auto', \Tachyon\Enumerations\SignMeType::DefaultOff) === \Tachyon\Enumerations\SignMeType::DefaultOn
+						 && $oConfig->Get('login', 'sign_me_auto', \Tachyon\Enumerations\SignMeType::DefaultOff->value) === \Tachyon\Enumerations\SignMeType::DefaultOn->value
 						) {
 							$oActions->SetSignMeToken($oAccount);
 						}

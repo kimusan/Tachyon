@@ -161,9 +161,9 @@ trait User
 		});
 
 		$this->setSettingsFromParams($oSettings, 'Layout', 'int', function ($iValue) {
-			return (int) (\in_array((int) $iValue, array(\Tachyon\Enumerations\Layout::NO_PREVIEW,
-				\Tachyon\Enumerations\Layout::SIDE_PREVIEW, \Tachyon\Enumerations\Layout::BOTTOM_PREVIEW)) ?
-					$iValue : \Tachyon\Enumerations\Layout::SIDE_PREVIEW);
+			return (
+				\Tachyon\Enumerations\Layout::tryFrom((int) $iValue) ?? \Tachyon\Enumerations\Layout::SIDE_PREVIEW
+			)->value;
 		});
 
 		$this->setSettingsFromParams($oSettings, 'EditorDefaultType', 'string');

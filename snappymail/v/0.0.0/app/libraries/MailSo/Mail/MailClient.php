@@ -119,8 +119,9 @@ class MailClient
 	{
 		if (\count($oRange)) {
 			if ($this->oImapClient->FolderSelect($sFolderName)->IsFlagSupported($sMessageFlag)) {
-				$sStoreAction = $bSetAction ? StoreAction::ADD_FLAGS_SILENT : StoreAction::REMOVE_FLAGS_SILENT;
-				$this->oImapClient->MessageStoreFlag($oRange, array($sMessageFlag), $sStoreAction);
+				$this->oImapClient->MessageStoreFlag($oRange, array($sMessageFlag),
+					$bSetAction ? StoreAction::ADD_FLAGS_SILENT : StoreAction::REMOVE_FLAGS_SILENT
+				);
 			} else if (!$bSkipUnsupportedFlag) {
 				throw new \MailSo\RuntimeException('Message flag "'.$sMessageFlag.'" is not supported.');
 			}
