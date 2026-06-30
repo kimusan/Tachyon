@@ -1,11 +1,11 @@
 <?php
 
-namespace OCA\SnappyMail\AppInfo;
+namespace OCA\Tachyon\Util\AppInfo;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
-use OCA\SnappyMail\Controller\FetchController;
-use OCA\SnappyMail\Controller\PageController;
-use OCA\SnappyMail\Search\Provider;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\Controller\FetchController;
+use OCA\Tachyon\Util\Controller\PageController;
+use OCA\Tachyon\Util\Search\Provider;
 
 use OCP\AppFramework\App;
 use OCP\IL10N;
@@ -83,7 +83,7 @@ class Application extends App
 		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) {
 			\OC::$server->getSession()['snappymail-password'] = '';
 			SnappyMailHelper::loadApp();
-			\RainLoop\Api::Actions()->Logout(true);
+			\Tachyon\Api::Actions()->Logout(true);
 		});
 
 		// https://github.com/nextcloud/impersonate/issues/179
@@ -93,12 +93,12 @@ class Application extends App
 			$dispatcher->addListener($class, function ($Event) {
 				\OC::$server->getSession()['snappymail-password'] = '';
 				SnappyMailHelper::loadApp();
-				\RainLoop\Api::Actions()->Logout(true);
+				\Tachyon\Api::Actions()->Logout(true);
 			});
 			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) {
 				\OC::$server->getSession()['snappymail-password'] = '';
 				SnappyMailHelper::loadApp();
-				\RainLoop\Api::Actions()->Logout(true);
+				\Tachyon\Api::Actions()->Logout(true);
 			});
 		}
 	}

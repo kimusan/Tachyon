@@ -107,7 +107,7 @@ class TNEFFile extends TNEFFileBase
 				break;
 
 			case TNEF_MAPI_ATTACH_EXTENSION:
-				$type = \SnappyMail\File\MimeType::fromFilename($value);
+				$type = \Tachyon\Util\File\MimeType::fromFilename($value);
 				if ($type)
 					$this->type = $type;
 				break;

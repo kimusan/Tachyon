@@ -1,6 +1,6 @@
 <?php
 
-class CustomLoginMappingPlugin extends \RainLoop\Plugins\AbstractPlugin
+class CustomLoginMappingPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Custom Login Mapping',
@@ -22,7 +22,7 @@ class CustomLoginMappingPlugin extends \RainLoop\Plugins\AbstractPlugin
 	 * @param string $sPassword
 	 * @param string $sSmtpUser
 	 *
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function FilterLoginCredentials(string &$sEmail, string &$sImapUser, string &$sPassword, string &$sSmtpUser)
 	{
@@ -47,8 +47,8 @@ class CustomLoginMappingPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('mapping')->SetLabel('Mapping')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('mapping')->SetLabel('Mapping')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('email:imap-login:smtp-login mapping')
 				->SetDefaultValue("user@domain.com:imapuser.bob:smtpuser.bob\nadmin@domain.com:imapuser.john")
 		);

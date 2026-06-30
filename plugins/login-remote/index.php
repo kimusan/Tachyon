@@ -1,10 +1,10 @@
 <?php
 
-class LoginRemotePlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginRemotePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login Remote',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.5',
 		RELEASE  = '2024-09-20',
@@ -31,7 +31,7 @@ class LoginRemotePlugin extends \RainLoop\Plugins\AbstractPlugin
 	private static bool $login = false;
 	public function ServiceRemoteAutoLogin() : bool
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 
 		$oException = null;
 		$oAccount = null;

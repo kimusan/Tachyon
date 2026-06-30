@@ -1,6 +1,6 @@
 <?php
 
-class ProxyAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ProxyAuthPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Proxy Auth',
@@ -43,7 +43,7 @@ class ProxyAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function MapEmailAddress(string &$sEmail, string &$sImapUser, string &$sPassword, string &$sSmtpUser)
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oLogger = $oActions->Logger();
 		$sPrefix = "ProxyAuth";
 		$sLevel = LOG_DEBUG;
@@ -63,7 +63,7 @@ class ProxyAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 	private static bool $login = false;
 	public function ServiceProxyAuth() : bool
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 
 		$oException = null;
 		$oAccount = null;
@@ -118,7 +118,7 @@ class ProxyAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 		if ($sProxyRequest) {
 			/* create master user login from remote user header and settings */
 			$sEmail = $sRemoteUser . $sMasterSeparator . $sMasterUser;
-			$sPassword =  new \SnappyMail\SensitiveString(\trim($this->Config()->getDecrypted('plugin', 'master_password', '')));
+			$sPassword =  new \Tachyon\Util\SensitiveString(\trim($this->Config()->getDecrypted('plugin', 'master_password', '')));
 
 			try
 			{
@@ -141,7 +141,7 @@ class ProxyAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function ServiceUserHeaderSet() : bool
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 
 		$oLogger = $oActions->Logger();
 		$sLevel = LOG_DEBUG;
@@ -164,46 +164,46 @@ class ProxyAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('master_separator')
+			\Tachyon\Plugins\Property::NewInstance('master_separator')
 				->SetLabel('Master User separator')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Sets the master user separator (format: <username><separator><master username>)')
 				->SetDefaultValue('*')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('master_user')
+			\Tachyon\Plugins\Property::NewInstance('master_user')
 				->SetLabel('Master User')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Username of master user')
 				->SetDefaultValue('admin')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('master_password')
+			\Tachyon\Plugins\Property::NewInstance('master_password')
 				->SetLabel('Master Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Password for master user')
 				->SetDefaultValue('adminpassword')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('header_name')
+			\Tachyon\Plugins\Property::NewInstance('header_name')
 				->SetLabel('Header Name')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Name of header containing username')
 				->SetDefaultValue('Remote-User')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('check_proxy')
+			\Tachyon\Plugins\Property::NewInstance('check_proxy')
 				->SetLabel('Check Proxy')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Activates check if proxy is connecting')
 				->SetDefaultValue(true)
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('proxy_ip')
+			\Tachyon\Plugins\Property::NewInstance('proxy_ip')
 				->SetLabel('Proxy IPNet')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('IP or Subnet of proxy, auth header will only be accepted from this address')
 				->SetDefaultValue('10.1.0.0/24')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('auto_login')
+			\Tachyon\Plugins\Property::NewInstance('auto_login')
 				->SetAllowedInJs(true)
 				->SetLabel('Activate automatic login')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Activates automatic login, if User Header is set (note: Use custom_logout_link to enable logout, see plugin README)')
 				->SetDefaultValue(true)
 		);

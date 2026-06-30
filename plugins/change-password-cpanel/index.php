@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordCPanelPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordCPanelPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password cPanel',

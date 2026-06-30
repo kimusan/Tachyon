@@ -31,7 +31,7 @@ class PartCollection extends \MailSo\Base\Collection
 		if (!$this->sBoundary) {
 			$this->sBoundary =
 				\MailSo\Config::$BoundaryPrefix
-				. \SnappyMail\UUID::generate()
+				. \Tachyon\Util\UUID::generate()
 				. '-' . ++static::$increment;
 
 		}

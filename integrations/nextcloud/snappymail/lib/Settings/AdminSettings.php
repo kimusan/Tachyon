@@ -1,7 +1,7 @@
 <?php
-namespace OCA\SnappyMail\Settings;
+namespace OCA\Tachyon\Util\Settings;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
@@ -17,7 +17,7 @@ class AdminSettings implements ISettings
 
 	public function getForm()
 	{
-		\OCA\SnappyMail\Util\SnappyMailHelper::loadApp();
+		\OCA\Tachyon\Util\Util\SnappyMailHelper::loadApp();
 
 		$keys = [
 			'snappymail-autologin',
@@ -36,10 +36,10 @@ class AdminSettings implements ISettings
 			SnappyMailHelper::loadApp();
 			$parameters['snappymail-admin-panel-link'] =
 				\OC::$server->getURLGenerator()->linkToRoute('snappymail.page.index')
-				. '?' . \RainLoop\Api::Config()->Get('security', 'admin_panel_key', 'admin');
+				. '?' . \Tachyon\Api::Config()->Get('security', 'admin_panel_key', 'admin');
 		}
 
-		$oConfig = \RainLoop\Api::Config();
+		$oConfig = \Tachyon\Api::Config();
 		$passfile = APP_PRIVATE_DATA . 'admin_password.txt';
 		$sPassword = '';
 		if (\is_file($passfile)) {
@@ -56,9 +56,9 @@ class AdminSettings implements ISettings
 		$parameters['snappymail-debug'] = $oConfig->Get('debug', 'enable', false);
 
 		// Check for nextcloud plugin update, if so then update
-		foreach (\SnappyMail\Repository::getPackagesList()['List'] as $plugin) {
+		foreach (\Tachyon\Util\Repository::getPackagesList()['List'] as $plugin) {
 			if ('nextcloud' == $plugin['id'] && $plugin['canBeUpdated']) {
-				\SnappyMail\Repository::installPackage('plugin', 'nextcloud');
+				\Tachyon\Util\Repository::installPackage('plugin', 'nextcloud');
 			}
 		}
 

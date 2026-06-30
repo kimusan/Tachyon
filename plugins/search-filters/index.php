@@ -1,6 +1,6 @@
 <?php
 
-class SearchFiltersPlugin extends \RainLoop\Plugins\AbstractPlugin
+class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	public const
 		NAME = 'Search Filters',
@@ -32,7 +32,7 @@ class SearchFiltersPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	public function ApplyFilters(
-		\RainLoop\Model\Account $oAccount,
+		\Tachyon\Model\Account $oAccount,
 		\MailSo\Imap\ImapClient $oImapClient,
 		bool $bSuccess,
 		\MailSo\Imap\Settings $oSettings

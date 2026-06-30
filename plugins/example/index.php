@@ -1,6 +1,6 @@
 <?php
 
-use RainLoop\Model\Account;
+use Tachyon\Model\Account;
 use MailSo\Imap\ImapClient;
 use MailSo\Imap\Settings as ImapSettings;
 use MailSo\Sieve\SieveClient;
@@ -9,13 +9,13 @@ use MailSo\Smtp\SmtpClient;
 use MailSo\Smtp\Settings as SmtpSettings;
 use MailSo\Mime\Message as MimeMessage;
 
-class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
+class ExamplePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 //	use \MailSo\Log\Inherit;
 
 	const
 		NAME     = 'Example',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '0.0',
 		RELEASE  = '2022-03-29',
@@ -142,7 +142,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function JsonAdminGetData()
 	{
-		if (!($this->Manager()->Actions() instanceof \RainLoop\ActionsAdmin)
+		if (!($this->Manager()->Actions() instanceof \Tachyon\ActionsAdmin)
 		 || !$this->Manager()->Actions()->IsAdminLoggined()
 		) {
 			return $this->jsonResponse(__FUNCTION__, false);
@@ -157,7 +157,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	 * @param string $sLogin
 	 * @param string $sPassword
 	 *
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function FilterLoginCredentials(&$sEmail, &$sLogin, &$sPassword)
 	{
@@ -172,11 +172,11 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 		else
 		{
 			// or throw auth exeption
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::AuthError);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::AuthError);
 			// or
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::AccountNotAllowed);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::AccountNotAllowed);
 			// or
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DomainNotAllowed);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DomainNotAllowed);
 		}
 	}
 
@@ -232,7 +232,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 	}
 
-	public function loginSuccess(\RainLoop\Model\MainAccount $oAccount)
+	public function loginSuccess(\Tachyon\Model\MainAccount $oAccount)
 	{
 	}
 
@@ -300,7 +300,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 	}
 
-	public function filterApplicationConfig(\RainLoop\Config\Application $oConfig)
+	public function filterApplicationConfig(\Tachyon\Config\Application $oConfig)
 	{
 	}
 
@@ -312,7 +312,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 	}
 
-	public function filterDomain(\RainLoop\Model\Domain $oDomain)
+	public function filterDomain(\Tachyon\Model\Domain $oDomain)
 	{
 	}
 
@@ -380,7 +380,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 	}
 
-	public function jsonAttachments(\SnappyMail\AttachmentsAction $oData)
+	public function jsonAttachments(\Tachyon\Util\AttachmentsAction $oData)
 	{
 	}
 
@@ -388,7 +388,7 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 	}
 
-	public function mainContentSecurityPolicy(\SnappyMail\HTTP\CSP $oCSP)
+	public function mainContentSecurityPolicy(\Tachyon\Util\HTTP\CSP $oCSP)
 	{
 	}
 
@@ -404,17 +404,17 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 	}
 
-	public function Config() : \RainLoop\Config\Plugin
+	public function Config() : \Tachyon\Config\Plugin
 	public function Description() : string
 	public function FilterAppDataPluginSection(bool $bAdmin, bool $bAuth, array &$aConfig) : void
 	public function Hash() : string
-	public function Manager() : \RainLoop\Plugins\Manager
+	public function Manager() : \Tachyon\Plugins\Manager
 	public function Name() : string
 	public function Path() : string
 	public function SetName(string $sName) : self
 	public function SetPath(string $sPath) : self
-	public function SetPluginConfig(\RainLoop\Config\Plugin $oPluginConfig) : self
-	public function SetPluginManager(\RainLoop\Plugins\Manager $oPluginManager) : self
+	public function SetPluginConfig(\Tachyon\Config\Plugin $oPluginConfig) : self
+	public function SetPluginManager(\Tachyon\Plugins\Manager $oPluginManager) : self
 	public function SetVersion(string $sVersion) : self
 	public function Supported() : string
 	public function UseLangs(?bool $bLangs = null) : bool
@@ -427,11 +427,11 @@ class ExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	$this->Manager()
 	$this->Manager()->Actions()
-	$this->Manager()->CreatePluginByName(string $sName) : ?\RainLoop\Plugins\AbstractPlugin
+	$this->Manager()->CreatePluginByName(string $sName) : ?\Tachyon\Plugins\AbstractPlugin
 	$this->Manager()->InstalledPlugins() : array
 	$this->Manager()->convertPluginFolderNameToClassName(string $sFolderName) : string
 	$this->Manager()->loadPluginByName(string $sName) : ?string
-	$this->Manager()->Actions() : \RainLoop\Actions
+	$this->Manager()->Actions() : \Tachyon\Actions
 	$this->Manager()->Hash() : string
 	$this->Manager()->HaveJs(bool $bAdminScope = false) : bool
 	$this->Manager()->CompileCss(bool $bAdminScope = false) : string

@@ -1,10 +1,10 @@
 <?php
 
-class LoginExternalPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginExternalPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login External',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.4',
 		RELEASE  = '2024-07-01',
@@ -20,7 +20,7 @@ class LoginExternalPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function ServiceExternalLogin() : bool
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oActions->Http()->ServerNoCache();
 
 		$oAccount = null;
@@ -32,11 +32,11 @@ class LoginExternalPlugin extends \RainLoop\Plugins\AbstractPlugin
 		try
 		{
 			// Convert password to SensitiveString type
-			$oPassword = new \SnappyMail\SensitiveString($sPassword);
+			$oPassword = new \Tachyon\Util\SensitiveString($sPassword);
 			$oAccount = $oActions->LoginProcess($sEmail, $oPassword);
-			if (!$oAccount instanceof \RainLoop\Model\MainAccount) {
+			if (!$oAccount instanceof \Tachyon\Model\MainAccount) {
 				$oAccount = null;
-				\SnappyMail\LOG::info(\get_class($this), 'LoginProcess failed');
+				\Tachyon\Util\LOG::info(\get_class($this), 'LoginProcess failed');
 			}
 		}
 		catch (\Throwable $oException)
@@ -53,10 +53,10 @@ class LoginExternalPlugin extends \RainLoop\Plugins\AbstractPlugin
 				'ErrorCode' => 0
 			);
 			if (!$oAccount) {
-				if ($oException instanceof \RainLoop\Exceptions\ClientException) {
+				if ($oException instanceof \Tachyon\Exceptions\ClientException) {
 					$aResult['ErrorCode'] = $oException->getCode();
 				} else {
-					$aResult['ErrorCode'] = \RainLoop\Notifications::AuthError;
+					$aResult['ErrorCode'] = \Tachyon\Notifications::AuthError;
 				}
 			}
 			echo \json_encode($aResult);

@@ -1,6 +1,6 @@
 <?php
 
-class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginOAuth2Plugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'OAuth2',
@@ -44,16 +44,16 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 	public function configMapping() : array
 	{
 		return [
-			\RainLoop\Plugins\Property::NewInstance('client_id')
+			\Tachyon\Plugins\Property::NewInstance('client_id')
 				->SetLabel('Client ID')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING),
-			\RainLoop\Plugins\Property::NewInstance('client_secret')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING),
+			\Tachyon\Plugins\Property::NewInstance('client_secret')
 				->SetLabel('Client Secret')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING),
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING),
 		];
 	}
 
-	public function clientLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
+	public function clientLogin(\Tachyon\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
 		$sPassword = $oSettings->passphrase;
 		$iGatLen = \strlen(static::GMAIL_TOKENS_PREFIX);
@@ -68,9 +68,9 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 	}
 
-	public function filterAccount(\RainLoop\Model\Account $oAccount) : void
+	public function filterAccount(\Tachyon\Model\Account $oAccount) : void
 	{
-		if ($oAccount instanceof \RainLoop\Model\MainAccount) {
+		if ($oAccount instanceof \Tachyon\Model\MainAccount) {
 			/**
 			 * TODO
 			 * Because password rotates, so does the CryptKey.
@@ -78,33 +78,33 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 			 * Encrypted using the old/new refresh token is an option:
 			 *   1. decrypt cryptkey with the old refresh token
 			 *   2. encrypt cryptkey with the new refresh token
-			 *   = $oAccount->resealCryptKey(new \SnappyMail\SensitiveString('old refresh token'))
+			 *   = $oAccount->resealCryptKey(new \Tachyon\Util\SensitiveString('old refresh token'))
 			 */
 		}
 	}
 
 	protected function loginProcess(&$oAccount, $sEmail, $sPassword) : int
 	{
-		$oActions = \RainLoop::Actions();
-		$iErrorCode = \RainLoop\Notifications::UnknownError;
+		$oActions = \Tachyon::Actions();
+		$iErrorCode = \Tachyon\Notifications::UnknownError;
 		try
 		{
 			$oAccount = $oActions->LoginProcess($sEmail, $sPassword);
-			if ($oAccount instanceof \RainLoop\Model\Account) {
+			if ($oAccount instanceof \Tachyon\Model\Account) {
 				$iErrorCode = 0;
 			} else {
 				$oAccount = null;
-				$iErrorCode = \RainLoop\Notifications::AuthError;
+				$iErrorCode = \Tachyon\Notifications::AuthError;
 			}
 		}
-		catch (\RainLoop\Exceptions\ClientException $oException)
+		catch (\Tachyon\Exceptions\ClientException $oException)
 		{
 			$iErrorCode = $oException->getCode();
 		}
 		catch (\Exception $oException)
 		{
 			unset($oException);
-			$iErrorCode = \RainLoop\Notifications::UnknownError;
+			$iErrorCode = \Tachyon\Notifications::UnknownError;
 		}
 
 		return $iErrorCode;
@@ -128,7 +128,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 
 	protected function gmailRefreshToken($sAccessToken, $sRefreshToken) : string
 	{
-		$oActions = \RainLoop::Actions();
+		$oActions = \Tachyon::Actions();
 		$oAccount = $oActions->getAccountFromToken(false);
 		$oDomain  = $oAccount->Domain();
 		$oLogger  = $oImapClient->Logger();
@@ -177,7 +177,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function gmailConnector() : ?\OAuth2\Client
 	{
 		$oGMail = null;
-		$oActions = \RainLoop::Actions();
+		$oActions = \Tachyon::Actions();
 		$client_id = \trim($this->Config()->Get('plugin', 'client_id', ''));
 		$client_secret = \trim($this->Config()->Get('plugin', 'client_secret', ''));
 		if ($client_id && $client_secret) {
@@ -211,18 +211,18 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 		$sLoginUrl = '';
 		$oAccount = null;
-		$oActions = \RainLoop::Actions();
+		$oActions = \Tachyon::Actions();
 		$oHttp    = $oActions->Http();
 
 		$bLogin = false;
-		$iErrorCode = \RainLoop\Notifications::UnknownError;
+		$iErrorCode = \Tachyon\Notifications::UnknownError;
 
 		try
 		{
 			$oGMail = $this->gmailConnector();
 			if ($oHttp->HasQuery('error')) {
 				$iErrorCode = ('access_denied' === $oHttp->GetQuery('error')) ?
-					\RainLoop\Notifications::SocialGMailLoginAccessDisable : \RainLoop\Notifications::UnknownError;
+					\Tachyon\Notifications::SocialGMailLoginAccessDisable : \Tachyon\Notifications::UnknownError;
 			} else if ($oGMail) {
 				$oAccount = $oActions->GetAccount();
 				$bLogin = !$oAccount;
@@ -244,7 +244,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 							'https://www.googleapis.com/auth/userinfo.profile',
 							'https://mail.google.com/'
 						))),
-						'state' => '1|'.\RainLoop\Utils::GetConnectionToken().'|'.$oActions->GetSpecAuthToken(),
+						'state' => '1|'.\Tachyon\Utils::GetConnectionToken().'|'.$oActions->GetSpecAuthToken(),
 						'response_type' => 'code'
 					);
 
@@ -252,7 +252,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 					// $aParams['prompt'] = 'consent';
 
 					$sLoginUrl = $oGMail->getAuthenticationUrl(static::LOGIN_URI, $sRedirectUrl, $aParams);
-				} else if (!empty($sState) && $sCheckToken === \RainLoop\Utils::GetConnectionToken()) {
+				} else if (!empty($sState) && $sCheckToken === \Tachyon\Utils::GetConnectionToken()) {
 					if (!empty($sCheckAuth)) {
 						$oActions->SetSpecAuthToken($sCheckAuth);
 						$oAccount = $oActions->GetAccount();
@@ -288,7 +288,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 								if ($aUserData && \is_array($aUserData) && !empty($aUserData['Email']) && isset($aUserData['Password'])) {
 									$iErrorCode = $this->loginProcess($oAccount, $aUserData['Email'], $aUserData['Password']);
 								} else {
-									$iErrorCode = \RainLoop\Notifications::SocialGMailLoginAccessDisable;
+									$iErrorCode = \Tachyon\Notifications::SocialGMailLoginAccessDisable;
 								}
 							}
 						}
@@ -301,7 +301,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 			$oActions->Logger()->WriteException($oException, \LOG_ERR);
 		}
 
-		$oActions = \RainLoop::Actions();
+		$oActions = \Tachyon::Actions();
 		$oActions->Http()->ServerNoCache();
 		\header('Content-Type: text/html; charset=utf-8');
 		$sHtml = \file_get_contents(APP_VERSION_ROOT_PATH.'app/templates/Social.html');
@@ -312,7 +312,7 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 			));
 		} else {
 			$sCallBackType = $bLogin ? '_login' : '';
-			$sConnectionFunc = 'rl_'.\md5(\RainLoop\Utils::GetConnectionToken()).'_gmail'.$sCallBackType.'_service';
+			$sConnectionFunc = 'rl_'.\md5(\Tachyon\Utils::GetConnectionToken()).'_gmail'.$sCallBackType.'_service';
 			$sHtml = \strtr($sHtml, array(
 				'{{RefreshMeta}}' => '',
 				'{{Script}}' => '<script data-cfasync="false">opener && opener.'.$sConnectionFunc.' && opener.'.

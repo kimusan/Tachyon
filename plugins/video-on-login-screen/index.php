@@ -1,6 +1,6 @@
 <?php
 
-class VideoOnLoginScreenPlugin extends \RainLoop\Plugins\AbstractPlugin
+class VideoOnLoginScreenPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 	NAME = 'Video On Login Screen',
@@ -25,18 +25,18 @@ class VideoOnLoginScreenPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('mp4_file')->SetLabel('Url to a mp4 file')
+			\Tachyon\Plugins\Property::NewInstance('mp4_file')->SetLabel('Url to a mp4 file')
 				->SetPlaceholder('http://')
 				->SetAllowedInJs(true)
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('playback_rate')->SetLabel('Playback rate')
+			\Tachyon\Plugins\Property::NewInstance('playback_rate')->SetLabel('Playback rate')
 				->SetAllowedInJs(true)
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(array('100%', '25%', '50%', '75%', '125%', '150%', '200%')),
 		);
 	}
 
-	public function ContentSecurityPolicy(\SnappyMail\HTTP\CSP $CSP)
+	public function ContentSecurityPolicy(\Tachyon\Util\HTTP\CSP $CSP)
 	{
 		$vSource = $this->Config()->Get('plugin', 'mp4_file', 'self');
 		$CSP->add('media-src', $vSource);

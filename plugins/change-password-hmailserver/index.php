@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordHMailServerPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordHMailServerPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password hMailServer',

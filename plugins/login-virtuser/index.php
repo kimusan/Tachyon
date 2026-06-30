@@ -1,6 +1,6 @@
 <?php
 
-class LoginVirtuserPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginVirtuserPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Virtuser Login',
@@ -23,7 +23,7 @@ class LoginVirtuserPlugin extends \RainLoop\Plugins\AbstractPlugin
 	 * @param string $sPassword
 	 * @param string $sSmtpUser
 	 *
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function ParseVirtuserFiles(string &$sEmail, string &$sImapUser, string &$sPassword, string &$sSmtpUser)
 	{
@@ -62,8 +62,8 @@ class LoginVirtuserPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('virtuser_files')->SetLabel('Virtuser files')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('virtuser_files')->SetLabel('Virtuser files')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Each line is an absolute path to virtuser file')
 				->SetDefaultValue("/etc/postfix/virtual\n/etc/mail/virtusertable")
 		);

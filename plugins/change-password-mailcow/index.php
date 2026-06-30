@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordMailcowPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordMailcowPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
     const
         NAME     = 'Change Password Mailcow',

@@ -3,11 +3,11 @@
 use MailSo\Imap\Enumerations\FolderType;
 use MailSo\Imap\Enumerations\MetadataKeys;
 
-class MailboxDetectPlugin extends \RainLoop\Plugins\AbstractPlugin
+class MailboxDetectPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'MailboxDetect',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '2.6',
 		RELEASE  = '2023-03-13',
@@ -24,8 +24,8 @@ class MailboxDetectPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('autocreate_system_folders')->SetLabel('Autocreate system folders')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('autocreate_system_folders')->SetLabel('Autocreate system folders')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false),
 		);
 	}
@@ -38,7 +38,7 @@ class MailboxDetectPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function AfterFolders(array &$aResponse)
 	{
 		if (!empty($aResponse['Result']['@Collection'])) {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			$oAccount = $oActions->getAccountFromToken();
 			if (!$oAccount) {
 				$this->Logger()->Write('No Account');
@@ -167,7 +167,7 @@ class MailboxDetectPlugin extends \RainLoop\Plugins\AbstractPlugin
 	/**
 	 * @staticvar array $aCache
 	 */
-	private function systemFoldersNames(\RainLoop\Model\Account $oAccount) : array
+	private function systemFoldersNames(\Tachyon\Model\Account $oAccount) : array
 	{
 		static $aCache = null;
 		if (null === $aCache) {

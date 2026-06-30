@@ -1,6 +1,6 @@
 <?php
 
-class BlackListPlugin extends \RainLoop\Plugins\AbstractPlugin
+class BlackListPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Blacklist',
@@ -16,18 +16,18 @@ class BlackListPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	/**
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function FilterLoginCredentials(string &$sEmail)
 	{
 		$sBlackList = \trim($this->Config()->Get('plugin', 'black_list', ''));
-		if (\strlen($sBlackList) && \RainLoop\Plugins\Helper::ValidateWildcardValues($sEmail, $sBlackList)) {
+		if (\strlen($sBlackList) && \Tachyon\Plugins\Helper::ValidateWildcardValues($sEmail, $sBlackList)) {
 			$sExceptions = \trim($this->Config()->Get('plugin', 'exceptions', ''));
-			if (!\strlen($sExceptions) || !\RainLoop\Plugins\Helper::ValidateWildcardValues($sEmail, $sExceptions)) {
-				throw new \RainLoop\Exceptions\ClientException(
+			if (!\strlen($sExceptions) || !\Tachyon\Plugins\Helper::ValidateWildcardValues($sEmail, $sExceptions)) {
+				throw new \Tachyon\Exceptions\ClientException(
 					$this->Config()->Get('plugin', 'auth_error', false)
-					? \RainLoop\Notifications::AuthError
-					: \RainLoop\Notifications::AccountNotAllowed
+					? \Tachyon\Notifications::AuthError
+					: \Tachyon\Notifications::AccountNotAllowed
 				);
 			}
 		}
@@ -39,16 +39,16 @@ class BlackListPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('auth_error')->SetLabel('Auth Error')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('auth_error')->SetLabel('Auth Error')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Throw an authentication error instead of an access error.')
 				->SetDefaultValue(false),
-			\RainLoop\Plugins\Property::NewInstance('black_list')->SetLabel('Black List')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('black_list')->SetLabel('Black List')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Emails black list, space as delimiter, wildcard supported.')
 				->SetDefaultValue('*@domain1.com user@domain2.com'),
-			\RainLoop\Plugins\Property::NewInstance('exceptions')->SetLabel('Exceptions')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('exceptions')->SetLabel('Exceptions')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Exceptions for black list, space as delimiter, wildcard supported.')
 				->SetDefaultValue('demo@domain1.com *@domain2.com admin@*')
 		);

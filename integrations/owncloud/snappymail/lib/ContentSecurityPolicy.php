@@ -14,7 +14,7 @@ class ContentSecurityPolicy extends \OCP\AppFramework\Http\ContentSecurityPolicy
 	protected $inlineStyleAllowed = true;
 
 	function __construct() {
-		$CSP = \RainLoop\Api::getCSP();
+		$CSP = \Tachyon\Api::getCSP();
 
 		$this->allowedScriptDomains = \array_unique(\array_merge($this->allowedScriptDomains, $CSP->script));
 		$this->allowedScriptDomains = \array_diff($this->allowedScriptDomains, ["'unsafe-inline'", "'unsafe-eval'"]);
@@ -39,12 +39,12 @@ class ContentSecurityPolicy extends \OCP\AppFramework\Http\ContentSecurityPolicy
 		if (!$sNonce) {
 /*
 			$cspManager = \OC::$server->getContentSecurityPolicyNonceManager();
-			$sNonce = $cspManager->getNonce() ?: \SnappyMail\UUID::generate();
+			$sNonce = $cspManager->getNonce() ?: \Tachyon\Util\UUID::generate();
 			if (\method_exists($cspManager, 'browserSupportsCspV3') && !$cspManager->browserSupportsCspV3()) {
 				$this->addAllowedScriptDomain("'nonce-{$sNonce}'");
 			}
 */
-			$sNonce = \SnappyMail\UUID::generate();
+			$sNonce = \Tachyon\Util\UUID::generate();
 			$this->addAllowedScriptDomain("'nonce-{$sNonce}'");
 		}
 		return $sNonce;

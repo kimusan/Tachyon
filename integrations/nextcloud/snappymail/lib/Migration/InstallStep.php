@@ -1,8 +1,8 @@
 <?php
 // https://docs.nextcloud.com/server/19/developer_manual/app/repair.html
-namespace OCA\SnappyMail\Migration;
+namespace OCA\Tachyon\Util\Migration;
 
-use OCA\SnappyMail\AppInfo\Application;
+use OCA\Tachyon\Util\AppInfo\Application;
 use OCP\IConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
@@ -29,10 +29,10 @@ class InstallStep implements IRepairStep
 		\is_callable('opcache_reset') && \opcache_reset();
 
 		$output->info('Load App');
-		\OCA\SnappyMail\Util\SnappyMailHelper::loadApp();
+		\OCA\Tachyon\Util\Util\SnappyMailHelper::loadApp();
 
 		$output->info('Fix permissions');
-		\SnappyMail\Upgrade::fixPermissions();
+		\Tachyon\Util\Upgrade::fixPermissions();
 
 		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
 //		$app_dir = \rtrim(APP_INDEX_ROOT_PATH, '\\/');
@@ -48,7 +48,7 @@ class InstallStep implements IRepairStep
 //			\rename(APP_VERSION_ROOT_PATH . 'static/_htaccess', APP_VERSION_ROOT_PATH . 'static/.htaccess');
 //		}
 
-		$oConfig = \RainLoop\Api::Config();
+		$oConfig = \Tachyon\Api::Config();
 		$bSave = false;
 
 		if (!$oConfig->Get('webmail', 'app_path')) {
@@ -61,9 +61,9 @@ class InstallStep implements IRepairStep
 
 		if (!\is_dir(APP_PLUGINS_PATH . 'nextcloud')) {
 			$output->info('Install extension: nextcloud');
-			\SnappyMail\Repository::installPackage('plugin', 'nextcloud');
+			\Tachyon\Util\Repository::installPackage('plugin', 'nextcloud');
 			$oConfig->Set('plugins', 'enable', true);
-			$aList = \SnappyMail\Repository::getEnabledPackagesNames();
+			$aList = \Tachyon\Util\Repository::getEnabledPackagesNames();
 			$aList[] = 'nextcloud';
 			$oConfig->Set('plugins', 'enabled_list', \implode(',', \array_unique($aList)));
 			$oConfig->Set('webmail', 'theme', 'NextcloudV25+');
@@ -74,18 +74,18 @@ class InstallStep implements IRepairStep
 		if ('12345' == $sPassword || !$sPassword) {
 			$output->info('Generate admin password');
 			$sPassword = \substr(\base64_encode(\random_bytes(16)), 0, 12);
-			$oConfig->SetPassword(new \SnappyMail\SensitiveString($sPassword));
-			\RainLoop\Utils::saveFile(APP_PRIVATE_DATA . 'admin_password.txt', $sPassword . "\n");
+			$oConfig->SetPassword(new \Tachyon\Util\SensitiveString($sPassword));
+			\Tachyon\Utils::saveFile(APP_PRIVATE_DATA . 'admin_password.txt', $sPassword . "\n");
 			$bSave = true;
 		}
 
 		// Pre-configure domain
-		$oProvider = \RainLoop\Api::Actions()->DomainProvider();
+		$oProvider = \Tachyon\Api::Actions()->DomainProvider();
 		$oDomain = $oProvider->Load('nextcloud');
 		if (!$oDomain) {
 			$output->info('Add nextcloud as domain');
-//			$oDomain = \RainLoop\Model\Domain::fromIniArray('nextcloud', []);
-			$oDomain = new \RainLoop\Model\Domain('nextcloud');
+//			$oDomain = \Tachyon\Model\Domain::fromIniArray('nextcloud', []);
+			$oDomain = new \Tachyon\Model\Domain('nextcloud');
 			$iSecurityType = \MailSo\Net\Enumerations\ConnectionSecurityType::NONE;
 			$oDomain->ImapSettings()->host = 'localhost';
 			$oDomain->ImapSettings()->type = $iSecurityType;

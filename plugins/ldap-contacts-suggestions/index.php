@@ -1,6 +1,6 @@
 <?php
 
-class LdapContactsSuggestionsPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LdapContactsSuggestionsPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Contacts suggestions (LDAP)',
@@ -66,34 +66,34 @@ class LdapContactsSuggestionsPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('ldap_uri')->SetLabel('LDAP URI')
+			\Tachyon\Plugins\Property::NewInstance('ldap_uri')->SetLabel('LDAP URI')
 				->SetDescription('LDAP server URI(s), space separated')
 				->SetDefaultValue('ldap://localhost:389'),
-			\RainLoop\Plugins\Property::NewInstance('use_start_tls')->SetLabel('Use StartTLS')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('use_start_tls')->SetLabel('Use StartTLS')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(True),
-			\RainLoop\Plugins\Property::NewInstance('bind_dn')->SetLabel('Bind DN')
+			\Tachyon\Plugins\Property::NewInstance('bind_dn')->SetLabel('Bind DN')
 				->SetDescription('DN to bind (login) with. If left blank, anonymous bind will be tried and the password will be ignored')
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('bind_password')->SetLabel('Bind password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD)
+			\Tachyon\Plugins\Property::NewInstance('bind_password')->SetLabel('Bind password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('base_dn')->SetLabel('Search base DN')
+			\Tachyon\Plugins\Property::NewInstance('base_dn')->SetLabel('Search base DN')
 				->SetDescription('DN to use as the search base. Supported tokens: {domain}, {domain:dc}, {email}, {email:user}, {email:domain}, {login}, {imap:login}, {imap:host}, {imap:port}')
 				->SetDefaultValue('ou=People,dc=example,dc=com'),
-			\RainLoop\Plugins\Property::NewInstance('object_classes')->SetLabel('objectClasses')
+			\Tachyon\Plugins\Property::NewInstance('object_classes')->SetLabel('objectClasses')
 				->SetDescription('LDAP objectClasses to search for, comma separated list')
 				->SetDefaultValue('inetOrgPerson'),
-			\RainLoop\Plugins\Property::NewInstance('uid_attributes')->SetLabel('uid attributes')
+			\Tachyon\Plugins\Property::NewInstance('uid_attributes')->SetLabel('uid attributes')
 				->SetDescription('LDAP attributes for userids, comma separated list in order of preference')
 				->SetDefaultValue('uid'),
-			\RainLoop\Plugins\Property::NewInstance('name_attributes')->SetLabel('Name attributes')
+			\Tachyon\Plugins\Property::NewInstance('name_attributes')->SetLabel('Name attributes')
 				->SetDescription('LDAP attributes for user names, comma separated list in order of preference')
 				->SetDefaultValue('displayName,cn,givenName,sn'),
-			\RainLoop\Plugins\Property::NewInstance('mail_attributes')->SetLabel('Mail attributes')
+			\Tachyon\Plugins\Property::NewInstance('mail_attributes')->SetLabel('Mail attributes')
 				->SetDescription('LDAP attributes for user email addresses, comma separated list in order of preference')
 				->SetDefaultValue('mailAddress,mail,mailAlternateAddress,mailAlias'),
-			\RainLoop\Plugins\Property::NewInstance('allowed_emails')->SetLabel('Allowed emails')
+			\Tachyon\Plugins\Property::NewInstance('allowed_emails')->SetLabel('Allowed emails')
 				->SetDescription('Email addresses of users which should be allowed to do LDAP lookups, space as delimiter, wildcard supported. Example: user1@domain1.net user2@domain1.net *@domain2.net')
 				->SetDefaultValue('*')
 		);

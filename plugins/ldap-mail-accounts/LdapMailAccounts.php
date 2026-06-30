@@ -1,11 +1,11 @@
 <?php
 
-use RainLoop\Enumerations\Capa;
+use Tachyon\Enumerations\Capa;
 use MailSo\Log\Logger;
-use RainLoop\Actions;
-use RainLoop\Model\AdditionalAccount;
-use RainLoop\Model\MainAccount;
-use RainLoop\Providers\Storage\Enumerations\StorageType;
+use Tachyon\Actions;
+use Tachyon\Model\AdditionalAccount;
+use Tachyon\Model\MainAccount;
+use Tachyon\Providers\Storage\Enumerations\StorageType;
 
 class LdapMailAccounts
 {
@@ -54,7 +54,7 @@ class LdapMailAccounts
 	 *
 	 * Overwrite the MainAccount mail address by looking up the new one in the ldap directory
 	 *
-	 * The ldap search string has to be configured in the plugin configuration of the extension (in the SnappyMail Admin Panel)
+	 * The ldap search string has to be configured in the plugin configuration of the extension (in the Tachyon Admin Panel)
 	 *
 	 * @param string &$sEmail
 	 */
@@ -69,7 +69,7 @@ class LdapMailAccounts
 		// Try to get account information. IncLogin() returns the username of the user
 		// and removes the domainname if this was configured inside the domain config.
 		$username = $sEmail;
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oDomain = $oActions->DomainProvider()->Load(\MailSo\Base\Utils::getEmailAddressDomain($sEmail), true);
 		if ($oDomain->ImapSettings()->shortLogin){
 			$username = @ldap_escape($this->RemoveEventualDomainPart($sEmail), "", LDAP_ESCAPE_FILTER);
@@ -119,7 +119,7 @@ class LdapMailAccounts
 	 *
 	 * Add additional mail accounts to the given primary account by looking up the ldap directory
 	 *
-	 * The ldap search string has to be configured in the plugin configuration of the extension (in the SnappyMail Admin Panel)
+	 * The ldap search string has to be configured in the plugin configuration of the extension (in the Tachyon Admin Panel)
 	 *
 	 * @param MainAccount $oAccount
 	 * @return bool true if additional accounts have been added or no additional accounts where found in ldap. false if an error occured
@@ -134,9 +134,9 @@ class LdapMailAccounts
 
 		//Basing on https://github.com/the-djmaze/snappymail/issues/616
 
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 
-		//Check if SnappyMail is configured to allow additional accounts
+		//Check if Tachyon is configured to allow additional accounts
 		if (!$oActions->GetCapa(Capa::ADDITIONAL_ACCOUNTS)) {
 			return $oActions->FalseResponse(__FUNCTION__);
 		}
@@ -188,8 +188,8 @@ class LdapMailAccounts
 			}
 		}
 
-		//SnappyMail saves the passwords of the additional accounts by encrypting them using a cryptkey that is saved in the file .cryptkey
-		//When the password of the main account changes, SnappyMail asks the user for the old password to reencrypt the keys with the new userpassword.
+		//Tachyon saves the passwords of the additional accounts by encrypting them using a cryptkey that is saved in the file .cryptkey
+		//When the password of the main account changes, Tachyon asks the user for the old password to reencrypt the keys with the new userpassword.
 		//On a password change using ldap (or when the password has been forgotten by the user) this makes us some problems. Therefore overwrite
 		//the .cryptkey file in order to always accept the actual ldap password of the user. This has side effects on pgp keys! 
 		//See https://github.com/the-djmaze/snappymail/issues/1570#issuecomment-2085528061
@@ -221,12 +221,12 @@ class LdapMailAccounts
 				//and if the found account is different from the main account.
 				//The check if the address is different from the one of the main account when using the Nextcloud integration needs
 				//to be done twice: directly on the mail address (when Nextcloud is configured to log the user in by mail address)
-				//or on "$sUsername@$sDomain" for the case Nextcloud logs the user in to SnappyMail by his username and a default domain.
+				//or on "$sUsername@$sDomain" for the case Nextcloud logs the user in to Tachyon by his username and a default domain.
 				if (!isset($aAccounts[$sEmail]) && $oAccount->Email() !== $sEmail && $oAccount->Email() !== "$sUsername@$sDomain")
 				{
 					//Try to login the user with the same password as the primary account has
 					//if this fails the user will see the new mail addresses but will be asked for the correct password
-					$sPass = new \SnappyMail\SensitiveString($oAccount->IncPassword());
+					$sPass = new \Tachyon\Util\SensitiveString($oAccount->IncPassword());
 					//After creating the accounts here $sUsername is used as username to login to the IMAP server (see Account.php)
 					//$oNewAccount = RainLoop\Model\AdditionalAccount::NewInstanceFromCredentials($oActions, $sEmail, $sUsername, $sPass);
 
@@ -251,7 +251,7 @@ class LdapMailAccounts
 				}
 			}
 			else {
-				$this->logger->Write("Domain $sDomain is not part of configured domains in SnappyMail Admin Panel - mail address $sEmail will not be added.", \LOG_NOTICE, self::LOG_KEY);
+				$this->logger->Write("Domain $sDomain is not part of configured domains in Tachyon Admin Panel - mail address $sEmail will not be added.", \LOG_NOTICE, self::LOG_KEY);
 			}
 		}
 
@@ -357,7 +357,7 @@ class LdapMailAccounts
 	/**
 	 * Looks up the LDAP for additional mail accounts
 	 *
-	 * The search for additional mail accounts is done by a ldap search using the defined fields inside the configuration of the plugin (SnappyMail Admin Panel)
+	 * The search for additional mail accounts is done by a ldap search using the defined fields inside the configuration of the plugin (Tachyon Admin Panel)
 	 *
 	 * @param string $searchField
 	 * @param string $searchString

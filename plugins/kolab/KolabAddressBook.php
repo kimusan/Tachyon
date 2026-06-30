@@ -1,11 +1,11 @@
 <?php
 
-use RainLoop\Providers\AddressBook\Classes\Contact;
+use Tachyon\Providers\AddressBook\Classes\Contact;
 use Sabre\VObject\Component\VCard;
 
-class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInterface
+class KolabAddressBook implements \Tachyon\Providers\AddressBook\AddressBookInterface
 {
-	use \RainLoop\Providers\AddressBook\CardDAV;
+	use \Tachyon\Providers\AddressBook\CardDAV;
 
 	protected
 		$oImapClient,
@@ -24,7 +24,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 
 	protected function MailClient() : \MailSo\Mail\MailClient
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oMailClient = $oActions->MailClient();
 		if (!$oMailClient->IsLoggined()) {
 			$oActions->getAccountFromToken()->ImapConnectAndLogin($oActions->Plugins(), $oMailClient->ImapClient(), $oActions->Config());
@@ -120,7 +120,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 
 		if (!\strlen($this->sFolderName)) {
 //			return false;
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::CantGetMessageList);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::CantGetMessageList);
 		}
 
 		$this->ImapClient();
@@ -136,7 +136,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 				try {
 					if ($rCsv) {
 						$oContact = $this->MessageAsContact($oMessage);
-						\RainLoop\Providers\AddressBook\Utils::VCardToCsv($rCsv, $oContact->vCard, $bCsvHeader);
+						\Tachyon\Providers\AddressBook\Utils::VCardToCsv($rCsv, $oContact->vCard, $bCsvHeader);
 						$bCsvHeader = false;
 					} else if ($xCard = $this->fetchXCardFromMessage($oMessage)) {
 						echo $xCard->serialize();
@@ -149,7 +149,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 		catch (\Throwable $oException)
 		{
 			throw $oException;
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::CantGetMessageList, $oException);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::CantGetMessageList, $oException);
 		}
 		return true;
 	}
@@ -176,8 +176,8 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 			$id = 0;
 		}
 
-		if (!$sUID || !\SnappyMail\UUID::isValid($sUID)) {
-			$sUID = \SnappyMail\UUID::generate();
+		if (!$sUID || !\Tachyon\Util\UUID::isValid($sUID)) {
+			$sUID = \Tachyon\Util\UUID::generate();
 		}
 		$oVCard->UID = new \Sabre\VObject\Property\Uri($oVCard, 'uid', 'urn:uuid:' . $sUID);
 		$oContact->IdContactStr = $sUID;
@@ -212,7 +212,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 //		$oMessage->SetDate(\time());
 		$oMessage->SetCustomHeader('X-Kolab-Type', 'application/x-vnd.kolab.contact');
 		$oMessage->SetCustomHeader('X-Kolab-Mime-Version', '3.0');
-		$oMessage->SetCustomHeader('User-Agent', 'SnappyMail');
+		$oMessage->SetCustomHeader('User-Agent', 'Tachyon');
 
 		$oPart = new \MailSo\Mime\Part;
 		$oPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'text/plain; charset="us-ascii"');
@@ -273,7 +273,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 
 	public function DeleteAllContacts(string $sEmail) : bool
 	{
-		// Called by \RainLoop\Api::ClearUserData()
+		// Called by \Tachyon\Api::ClearUserData()
 		// Not needed as the contacts are inside IMAP mailbox
 //		$this->MailClient()->FolderClear($this->sFolderName);
 		return false;
@@ -283,7 +283,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 	{
 		if (!\strlen($this->sFolderName)) {
 //			return [];
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::CantGetMessageList);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::CantGetMessageList);
 		}
 
 		$this->ImapClient();
@@ -309,7 +309,7 @@ class KolabAddressBook implements \RainLoop\Providers\AddressBook\AddressBookInt
 		catch (\Throwable $oException)
 		{
 			throw $oException;
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::CantGetMessageList, $oException);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::CantGetMessageList, $oException);
 		}
 
 		return $aResult;

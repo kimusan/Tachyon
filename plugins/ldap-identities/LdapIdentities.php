@@ -1,9 +1,9 @@
 <?php
 
 use MailSo\Log\Logger;
-use RainLoop\Model\Account;
-use RainLoop\Model\Identity;
-use RainLoop\Providers\Identities\IIdentities;
+use Tachyon\Model\Account;
+use Tachyon\Model\Identity;
+use Tachyon\Providers\Identities\IIdentities;
 
 class LdapIdentities implements IIdentities
 {
@@ -131,11 +131,11 @@ class LdapIdentities implements IIdentities
 
 	/**
 	 * @inheritDoc
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function SetIdentities(Account $account, array $identities): void
 	{
-		throw new \RainLoop\Exceptions\ClientException("Ldap identities provider does not support storage");
+		throw new \Tachyon\Exceptions\ClientException("Ldap identities provider does not support storage");
 	}
 
 	/**

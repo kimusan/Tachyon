@@ -1,6 +1,6 @@
 <?php
 
-class LoginRegisterPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginRegisterPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Register and Forgot',
@@ -20,14 +20,14 @@ class LoginRegisterPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function configMapping() : array
 	{
 		return [
-			\RainLoop\Plugins\Property::NewInstance("forgot_password_link_url")
+			\Tachyon\Plugins\Property::NewInstance("forgot_password_link_url")
 //				->SetLabel('TAB_LOGIN/LABEL_FORGOT_PASSWORD_LINK_URL')
 				->SetLabel('Forgot password url')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::URL),
-			\RainLoop\Plugins\Property::NewInstance("registration_link_url")
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::URL),
+			\Tachyon\Plugins\Property::NewInstance("registration_link_url")
 //				->SetLabel('TAB_LOGIN/LABEL_REGISTRATION_LINK_URL')
 				->SetLabel('Register url')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::URL),
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::URL),
 		];
 	}
 

@@ -1,6 +1,6 @@
 <?php
 
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 class ChangePasswordDriverLDAP
 {
@@ -20,7 +20,7 @@ class ChangePasswordDriverLDAP
 	 */
 	private $oLogger = null;
 
-	function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+	function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
 	{
 		$this->oLogger = $oLogger;
 		$this->sLdapUri = \trim($oConfig->Get('plugin', 'ldap_uri', ''));
@@ -39,25 +39,25 @@ class ChangePasswordDriverLDAP
 	public static function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('ldap_uri')->SetLabel('LDAP URI')
+			\Tachyon\Plugins\Property::NewInstance('ldap_uri')->SetLabel('LDAP URI')
 				->SetDefaultValue('ldap://localhost:389')
 				->SetDescription('LDAP server URI(s), space separated'),
-			\RainLoop\Plugins\Property::NewInstance('ldap_use_start_tls')->SetLabel('Use StartTLS')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('ldap_use_start_tls')->SetLabel('Use StartTLS')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(True),
-			\RainLoop\Plugins\Property::NewInstance('ldap_user_dn_format')->SetLabel('User DN format')
+			\Tachyon\Plugins\Property::NewInstance('ldap_user_dn_format')->SetLabel('User DN format')
 				->SetDescription('LDAP user dn format. Supported tokens: {email}, {email:user}, {email:domain}, {login}, {domain}, {domain:dc}, {imap:login}, {imap:host}, {imap:port}, {gecos}')
 				->SetDefaultValue('uid={imap:login},ou=Users,{domain:dc}'),
-			\RainLoop\Plugins\Property::NewInstance('ldap_password_field')->SetLabel('Password field')
+			\Tachyon\Plugins\Property::NewInstance('ldap_password_field')->SetLabel('Password field')
 				->SetDefaultValue('userPassword'),
-			\RainLoop\Plugins\Property::NewInstance('ldap_password_enc_type')->SetLabel('Encryption type')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+			\Tachyon\Plugins\Property::NewInstance('ldap_password_enc_type')->SetLabel('Encryption type')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(array('SHA', 'SSHA', 'MD5', 'Crypt', 'Clear'))
 				->SetDescription('In what way do you want the passwords to be encrypted?')
 		);
 	}
 
-	public function ChangePassword(\RainLoop\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
+	public function ChangePassword(\Tachyon\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
 	{
 		$sDomain = \MailSo\Base\Utils::getEmailAddressDomain($oAccount->Email());
 		$sUserDn = \strtr($this->sUserDnFormat, array(

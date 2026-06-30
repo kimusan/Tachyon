@@ -1,6 +1,6 @@
 <?php
 
-class OverrideSmtpCredentialsPlugin extends \RainLoop\Plugins\AbstractPlugin
+class OverrideSmtpCredentialsPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Override SMTP Credentials',
@@ -17,17 +17,17 @@ class OverrideSmtpCredentialsPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	/**
-	 * @param \RainLoop\Model\Account $oAccount
+	 * @param \Tachyon\Model\Account $oAccount
 	 * @param \MailSo\Smtp\SmtpClient $oSmtpClient
 	 * @param \MailSo\Smtp\Settings $oSettings
 	 */
-	public function FilterSmtpConnect(\RainLoop\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
+	public function FilterSmtpConnect(\Tachyon\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
 	{
 		$sEmail = $oAccount->Email();
 		$sWhiteList = \trim($this->Config()->Get('plugin', 'override_users', ''));
 		$sFoundValue = '';
-		if (\strlen($sWhiteList) && \RainLoop\Plugins\Helper::ValidateWildcardValues($sEmail, $sWhiteList, $sFoundValue)) {
-			\SnappyMail\LOG::debug('SMTP Override', "{$sEmail} matched {$sFoundValue}");
+		if (\strlen($sWhiteList) && \Tachyon\Plugins\Helper::ValidateWildcardValues($sEmail, $sWhiteList, $sFoundValue)) {
+			\Tachyon\Util\LOG::debug('SMTP Override', "{$sEmail} matched {$sFoundValue}");
 			$oSettings->usePhpMail = false;
 			$sHost = \trim($this->Config()->Get('plugin', 'smtp_host', ''));
 			if (\strlen($sHost)) {
@@ -52,20 +52,20 @@ class OverrideSmtpCredentialsPlugin extends \RainLoop\Plugins\AbstractPlugin
 				}
 			}
 		} else {
-			\SnappyMail\LOG::debug('SMTP Override', "{$sEmail} no match");
+			\Tachyon\Util\LOG::debug('SMTP Override', "{$sEmail} no match");
 		}
 	}
 
 	/**
-	 * @param \RainLoop\Model\Account $oAccount
+	 * @param \Tachyon\Model\Account $oAccount
 	 * @param \MailSo\Smtp\SmtpClient $oSmtpClient
 	 * @param \MailSo\Smtp\Settings $oSettings
 	 */
-	public function FilterSmtpCredentials(\RainLoop\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
+	public function FilterSmtpCredentials(\Tachyon\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
 	{
 		$sWhiteList = \trim($this->Config()->Get('plugin', 'override_users', ''));
 		$sFoundValue = '';
-		if (\strlen($sWhiteList) && \RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $sWhiteList, $sFoundValue)) {
+		if (\strlen($sWhiteList) && \Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $sWhiteList, $sFoundValue)) {
 			$oSettings->useAuth = (bool) $this->Config()->Get('plugin', 'smtp_auth', true);
 			$oSettings->username = \trim($this->Config()->Get('plugin', 'smtp_user', ''));
 			$oSettings->passphrase = (string) $this->Config()->Get('plugin', 'smtp_password', '');
@@ -78,24 +78,24 @@ class OverrideSmtpCredentialsPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('smtp_host')->SetLabel('SMTP Host')
+			\Tachyon\Plugins\Property::NewInstance('smtp_host')->SetLabel('SMTP Host')
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('smtp_port')->SetLabel('SMTP Port')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::INT)
+			\Tachyon\Plugins\Property::NewInstance('smtp_port')->SetLabel('SMTP Port')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::INT)
 				->SetDefaultValue(25),
-			\RainLoop\Plugins\Property::NewInstance('smtp_secure')->SetLabel('SMTP Secure')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+			\Tachyon\Plugins\Property::NewInstance('smtp_secure')->SetLabel('SMTP Secure')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(array('None', 'Detect', 'SSL', 'STARTTLS')),
-			\RainLoop\Plugins\Property::NewInstance('smtp_auth')->SetLabel('Use auth')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('smtp_auth')->SetLabel('Use auth')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(true),
-			\RainLoop\Plugins\Property::NewInstance('smtp_user')->SetLabel('SMTP User')
+			\Tachyon\Plugins\Property::NewInstance('smtp_user')->SetLabel('SMTP User')
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('smtp_password')->SetLabel('SMTP Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD)
+			\Tachyon\Plugins\Property::NewInstance('smtp_password')->SetLabel('SMTP Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('override_users')->SetLabel('Override users')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('override_users')->SetLabel('Override users')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('space as delimiter, wildcard supported.')
 				->SetDefaultValue('user@example.com *@example2.com')
 		);

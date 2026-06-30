@@ -1,13 +1,13 @@
 <?php
 
-class OwnCloudSuggestions implements \RainLoop\Providers\Suggestions\ISuggestions
+class OwnCloudSuggestions implements \Tachyon\Providers\Suggestions\ISuggestions
 {
 	/**
 	 * @var \MailSo\Log\Logger
 	 */
 	protected $oLogger;
 
-	public function Process(\RainLoop\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
+	public function Process(\Tachyon\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
 	{
 		$iInputLimit = $iLimit;
 		$aResult = array();

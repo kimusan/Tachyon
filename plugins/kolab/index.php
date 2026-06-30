@@ -1,6 +1,6 @@
 <?php
 
-class KolabPlugin extends \RainLoop\Plugins\AbstractPlugin
+class KolabPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Kolab',
@@ -12,8 +12,8 @@ class KolabPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function Init() : void
 	{
-//		\RainLoop\Api::Config()->Set('contacts', 'enable', true);
-		if (\RainLoop\Api::Config()->Get('contacts', 'enable', false)) {
+//		\Tachyon\Api::Config()->Set('contacts', 'enable', true);
+		if (\Tachyon\Api::Config()->Get('contacts', 'enable', false)) {
 			$this->UseLangs(true);
 
 			$this->addHook('filter.app-data', 'FilterAppData');
@@ -30,17 +30,17 @@ class KolabPlugin extends \RainLoop\Plugins\AbstractPlugin
 		return '';
 	}
 
-	private function Account() : \RainLoop\Model\Account
+	private function Account() : \Tachyon\Model\Account
 	{
-		return \RainLoop\Api::Actions()->getAccountFromToken();
+		return \Tachyon\Api::Actions()->getAccountFromToken();
 	}
 
-	private function SettingsProvider() : \RainLoop\Providers\Settings
+	private function SettingsProvider() : \Tachyon\Providers\Settings
 	{
-		return \RainLoop\Api::Actions()->SettingsProvider(true);
+		return \Tachyon\Api::Actions()->SettingsProvider(true);
 	}
 
-	private function Settings() : \RainLoop\Settings
+	private function Settings() : \Tachyon\Settings
 	{
 		return $this->SettingsProvider()->Load($this->Account());
 	}

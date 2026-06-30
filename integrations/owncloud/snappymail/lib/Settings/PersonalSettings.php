@@ -1,5 +1,5 @@
 <?php
-namespace OCA\SnappyMail\Settings;
+namespace OCA\Tachyon\Util\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;

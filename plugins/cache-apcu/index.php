@@ -1,6 +1,6 @@
 <?php
 
-class CacheAPCuPlugin extends \RainLoop\Plugins\AbstractPlugin
+class CacheAPCuPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Cache APCu',

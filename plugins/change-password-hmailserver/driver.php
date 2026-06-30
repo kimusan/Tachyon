@@ -1,7 +1,7 @@
 <?php
 
 use MailSo\Net\ConnectSettings;
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 class ChangePasswordHMailServerDriver
 {
@@ -12,7 +12,7 @@ class ChangePasswordHMailServerDriver
 	private
 		$oConfig = null;
 
-	function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+	function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
 	{
 		$this->oConfig = $oConfig;
 		$this->oLogger = $oLogger;
@@ -26,21 +26,21 @@ class ChangePasswordHMailServerDriver
 	public static function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('hmailserver_login')->SetLabel('Admin Login')
+			\Tachyon\Plugins\Property::NewInstance('hmailserver_login')->SetLabel('Admin Login')
 				->SetDefaultValue('Administrator'),
-			\RainLoop\Plugins\Property::NewInstance('hmailserver_password')->SetLabel('Admin Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD)
+			\Tachyon\Plugins\Property::NewInstance('hmailserver_password')->SetLabel('Admin Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('hmailserver_emails')->SetLabel('Allowed emails')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('hmailserver_emails')->SetLabel('Allowed emails')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Allowed emails, space as delimiter, wildcard supported. Example: user1@domain1.net user2@domain1.net *@domain2.net')
 				->SetDefaultValue('*')
 		);
 	}
 
-	public function ChangePassword(\RainLoop\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
+	public function ChangePassword(\Tachyon\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
 	{
-		if (!\RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'hmailserver_emails', ''))) {
+		if (!\Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'hmailserver_emails', ''))) {
 			return false;
 		}
 

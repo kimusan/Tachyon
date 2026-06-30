@@ -1,10 +1,10 @@
 <?php
 
-class RecaptchaPlugin extends \RainLoop\Plugins\AbstractPlugin
+class RecaptchaPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'reCaptcha',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '2.16',
 		RELEASE  = '2024-03-12',
@@ -30,17 +30,17 @@ class RecaptchaPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('public_key')->SetLabel('Site key')
+			\Tachyon\Plugins\Property::NewInstance('public_key')->SetLabel('Site key')
 				->SetAllowedInJs(true)
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('private_key')->SetLabel('Secret key')
+			\Tachyon\Plugins\Property::NewInstance('private_key')->SetLabel('Secret key')
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('theme')->SetLabel('Theme')
+			\Tachyon\Plugins\Property::NewInstance('theme')->SetLabel('Theme')
 				->SetAllowedInJs(true)
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(array('light', 'dark')),
-			\RainLoop\Plugins\Property::NewInstance('error_limit')->SetLabel('Limit')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+			\Tachyon\Plugins\Property::NewInstance('error_limit')->SetLabel('Limit')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(array('0', 1, 2, 3, 4, 5))
 				->SetDescription('')
 		);
@@ -51,7 +51,7 @@ class RecaptchaPlugin extends \RainLoop\Plugins\AbstractPlugin
 	 */
 	private function getCaptchaCacherKey()
 	{
-		return 'CaptchaNew/Login/'.\RainLoop\Utils::GetConnectionToken();
+		return 'CaptchaNew/Login/'.\Tachyon\Utils::GetConnectionToken();
 	}
 
 	/**
@@ -87,7 +87,7 @@ class RecaptchaPlugin extends \RainLoop\Plugins\AbstractPlugin
 		if (0 >= $this->getLimit()) {
 			$bResult = false;
 
-			$HTTP = \SnappyMail\HTTP\Request::factory();
+			$HTTP = \Tachyon\Util\HTTP\Request::factory();
 			$oResponse = $HTTP->doRequest('POST', 'https://www.recaptcha.net/recaptcha/api/siteverify', array(
 				'secret' => $this->Config()->Get('plugin', 'private_key', ''),
 				'response' => $this->Manager()->Actions()->GetActionParam('RecaptchaResponse', '')
@@ -102,7 +102,7 @@ class RecaptchaPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 			if (!$bResult) {
 				$this->Manager()->Actions()->Logger()->Write('RecaptchaResponse:'.$sResult);
-				throw new \RainLoop\Exceptions\ClientException(105);
+				throw new \Tachyon\Exceptions\ClientException(105);
 			}
 		}
 	}
@@ -139,7 +139,7 @@ class RecaptchaPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 	}
 
-	public function ContentSecurityPolicy(\SnappyMail\HTTP\CSP $CSP)
+	public function ContentSecurityPolicy(\Tachyon\Util\HTTP\CSP $CSP)
 	{
 		$CSP->add('script-src', 'https://www.gstatic.com/recaptcha/');
 		$CSP->add('script-src', 'https://www.recaptcha.net/recaptcha/');

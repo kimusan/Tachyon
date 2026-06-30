@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\SnappyMail\Search;
+namespace OCA\Tachyon\Util\Search;
 
-use OCA\SnappyMail\AppInfo\Application;
-use OCA\SnappyMail\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\AppInfo\Application;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
 use OCP\IURLGenerator;
@@ -59,7 +59,7 @@ class Provider implements IProvider
 			return SearchResult::complete($this->getName(), $result);
 		}
 		SnappyMailHelper::startApp();
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 //		$oAccount = $oActions->getMainAccountFromToken(false); // Issue: when account switched, wrong email is shown
 		$oAccount = $oActions->getAccountFromToken(false);
 		$iCursor = (int) $query->getCursor();

@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordISPConfigPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordISPConfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password ISPConfig',

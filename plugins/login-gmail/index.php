@@ -6,10 +6,10 @@
  * https://console.cloud.google.com/apis/dashboard
  */
 
-use RainLoop\Model\MainAccount;
-use RainLoop\Providers\Storage\Enumerations\StorageType;
+use Tachyon\Model\MainAccount;
+use Tachyon\Providers\Storage\Enumerations\StorageType;
 
-class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginGMailPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login GMail OAuth2',
@@ -42,7 +42,7 @@ class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function httpPaths(array $aPaths) : void
 	{
 		if (!empty($aPaths[0]) && 'LoginGMail' === $aPaths[0]) {
-			$oConfig = \RainLoop\Api::Config();
+			$oConfig = \Tachyon\Api::Config();
 			$oConfig->Set('security', 'secfetch_allow',
 				\trim($oConfig->Get('security', 'secfetch_allow', '') . ';site=cross-site', ';')
 			);
@@ -51,7 +51,7 @@ class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function ServiceLoginGMail() : string
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oHttp = $oActions->Http();
 		$oHttp->ServerNoCache();
 
@@ -122,14 +122,14 @@ class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
 				'expires' => $iExpires
 			];
 
-			$oPassword = new \SnappyMail\SensitiveString($aUserInfo['id']);
+			$oPassword = new \Tachyon\Util\SensitiveString($aUserInfo['id']);
 			$oAccount = $oActions->LoginProcess($aUserInfo['email'], $oPassword);
 //			$oAccount = MainAccount::NewInstanceFromCredentials($oActions, $aUserInfo['email'], $aUserInfo['email'], $oPassword, true);
 			if ($oAccount) {
 //				$oActions->SetMainAuthAccount($oAccount);
 //				$oActions->SetAuthToken($oAccount);
-				$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \RainLoop\Utils::GetSessionToken(),
-					\SnappyMail\Crypt::EncryptToJSON(static::$auth, $oAccount->CryptKey())
+				$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken(),
+					\Tachyon\Util\Crypt::EncryptToJSON(static::$auth, $oAccount->CryptKey())
 				);
 			}
 		}
@@ -144,25 +144,25 @@ class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function configMapping() : array
 	{
 		return [
-			\RainLoop\Plugins\Property::NewInstance('client_id')
+			\Tachyon\Plugins\Property::NewInstance('client_id')
 				->SetLabel('Client ID')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetAllowedInJs()
 				->SetDescription('https://github.com/the-djmaze/snappymail/wiki/FAQ#gmail'),
-			\RainLoop\Plugins\Property::NewInstance('client_secret')
+			\Tachyon\Plugins\Property::NewInstance('client_secret')
 				->SetLabel('Client Secret')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetEncrypted()
 		];
 	}
 
-	public function clientLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
+	public function clientLogin(\Tachyon\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
 		if ($oAccount instanceof MainAccount && \str_ends_with($oAccount->Email(), '@gmail.com')) {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			try {
-				$aData = static::$auth ?: \SnappyMail\Crypt::DecryptFromJSON(
-					$oActions->StorageProvider()->Get($oAccount, StorageType::SESSION, \RainLoop\Utils::GetSessionToken()),
+				$aData = static::$auth ?: \Tachyon\Util\Crypt::DecryptFromJSON(
+					$oActions->StorageProvider()->Get($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken()),
 					$oAccount->CryptKey()
 				);
 			} catch (\Throwable $oException) {
@@ -182,8 +182,8 @@ class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
 						if (!empty($aRefreshTokenResponse['result']['access_token'])) {
 							$aData['access_token'] = $aRefreshTokenResponse['result']['access_token'];
 							$aResponse['expires'] = $iExpires + $aResponse['expires_in'];
-							$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \RainLoop\Utils::GetSessionToken(),
-								\SnappyMail\Crypt::EncryptToJSON($aData, $oAccount->CryptKey())
+							$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken(),
+								\Tachyon\Util\Crypt::EncryptToJSON($aData, $oAccount->CryptKey())
 							);
 						}
 					}
@@ -202,7 +202,7 @@ class LoginGMailPlugin extends \RainLoop\Plugins\AbstractPlugin
 			try
 			{
 				$oGMail = new \OAuth2\Client($client_id, $client_secret);
-				$oActions = \RainLoop\Api::Actions();
+				$oActions = \Tachyon\Api::Actions();
 				$sProxy = $oActions->Config()->Get('labs', 'curl_proxy', '');
 				if (\strlen($sProxy)) {
 					$oGMail->setCurlOption(CURLOPT_PROXY, $sProxy);

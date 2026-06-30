@@ -1,6 +1,6 @@
 <?php
 
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 class ChangePasswordHestiaDriver
 {
@@ -9,7 +9,7 @@ class ChangePasswordHestiaDriver
 		DESCRIPTION = 'Change passwords in Hestia.';
 
 	/**
-	 * @var \RainLoop\Config\Plugin
+	 * @var \Tachyon\Config\Plugin
 	 */
 	private $oConfig = null;
 
@@ -18,7 +18,7 @@ class ChangePasswordHestiaDriver
 	 */
 	protected $oLogger = null;
 
-	function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+	function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
 	{
 		$this->oConfig = $oConfig;
 		$this->oLogger = $oLogger;
@@ -32,18 +32,18 @@ class ChangePasswordHestiaDriver
 	public static function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('hestia_host')->SetLabel('Hestia Host')
+			\Tachyon\Plugins\Property::NewInstance('hestia_host')->SetLabel('Hestia Host')
 				->SetDefaultValue('')
 				->SetDescription('Ex: localhost or domain.com'),
-			\RainLoop\Plugins\Property::NewInstance('hestia_port')->SetLabel('Hestia Port')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::INT)
+			\Tachyon\Plugins\Property::NewInstance('hestia_port')->SetLabel('Hestia Port')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::INT)
 				->SetDefaultValue(8083)
 		);
 	}
 
-	public function ChangePassword(\RainLoop\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
+	public function ChangePassword(\Tachyon\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
 	{
-		if (!\RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'hestia_allowed_emails', ''))) {
+		if (!\Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'hestia_allowed_emails', ''))) {
 			return false;
 		}
 
@@ -52,7 +52,7 @@ class ChangePasswordHestiaDriver
 		$sHost = $this->oConfig->Get('plugin', 'hestia_host');
 		$sPort = $this->oConfig->Get('plugin', 'hestia_port');
 
-		$HTTP = \SnappyMail\HTTP\Request::factory();
+		$HTTP = \Tachyon\Util\HTTP\Request::factory();
 		$postvars = array(
 			'email'    => $oAccount->Email(),
 			'password' => (string) $oPrevPassword,

@@ -1,6 +1,6 @@
 <?php
 
-class WysiwygExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
+class WysiwygExamplePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'WYSIWYG Example',

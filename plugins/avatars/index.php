@@ -4,11 +4,11 @@
  * Like: `data/_data_/_default_/avatars/snappymail.eu.svg`
  */
 
-class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
+class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Avatars',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.22',
 		RELEASE  = '2025-03-10',
@@ -133,42 +133,42 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	protected function configMapping() : array
 	{
-		$group = new \RainLoop\Plugins\PropertyCollection('Lookup');
+		$group = new \Tachyon\Plugins\PropertyCollection('Lookup');
 		$group->exchangeArray([
-			\RainLoop\Plugins\Property::NewInstance('delay')->SetLabel('Delay lookup')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('delay')->SetLabel('Delay lookup')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetAllowedInJs(true)
 				->SetDefaultValue(true),
-			\RainLoop\Plugins\Property::NewInstance('bimi')->SetLabel('BIMI')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('bimi')->SetLabel('BIMI')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false)
 				->SetDescription('https://bimigroup.org/ (DKIM header must be valid)'),
-			\RainLoop\Plugins\Property::NewInstance('favicon')->SetLabel('Favicon')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('favicon')->SetLabel('Favicon')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false)
 				->SetDescription('Fetch favicon from domain (DKIM header must be valid)'),
-			\RainLoop\Plugins\Property::NewInstance('gravatar')->SetLabel('Gravatar')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('gravatar')->SetLabel('Gravatar')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false)
 				->SetDescription('https://wikipedia.org/wiki/Gravatar'),
 		]);
 		$aResult = array(
-			defined('RainLoop\\Enumerations\\PluginPropertyType::SELECT')
-				? \RainLoop\Plugins\Property::NewInstance('identicon')->SetLabel('Identicon')
-					->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECT)
+			defined('Tachyon\\Enumerations\\PluginPropertyType::SELECT')
+				? \Tachyon\Plugins\Property::NewInstance('identicon')->SetLabel('Identicon')
+					->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECT)
 					->SetDefaultValue([
 						['id' => '', 'name' => 'Name characters else silhouette'],
 						['id' => 'identicon', 'name' => 'Name characters else squares'],
 						['id' => 'jdenticon', 'name' => 'Triangles shape']
 					])
 					->SetDescription('https://wikipedia.org/wiki/Identicon')
-				: \RainLoop\Plugins\Property::NewInstance('identicon')->SetLabel('Identicon')
-					->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+				: \Tachyon\Plugins\Property::NewInstance('identicon')->SetLabel('Identicon')
+					->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 					->SetDefaultValue(['','identicon','jdenticon'])
 					->SetDescription('empty = default, identicon = squares, jdenticon = Triangles shape')
 				,
-			\RainLoop\Plugins\Property::NewInstance('service')->SetLabel('Preload valid domain icons')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('service')->SetLabel('Preload valid domain icons')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetAllowedInJs(true)
 				->SetDefaultValue(true)
 				->SetDescription('DKIM header must be valid and icon is found in avatars/images/services directory'),
@@ -176,8 +176,8 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 		);
 /*
 		if (\class_exists('OC') && isset(\OC::$server)) {
-			$aResult[] = \RainLoop\Plugins\Property::NewInstance('nextcloud')->SetLabel('Lookup Nextcloud Contacts')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			$aResult[] = \Tachyon\Plugins\Property::NewInstance('nextcloud')->SetLabel('Lookup Nextcloud Contacts')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 //				->SetAllowedInJs(true)
 				->SetDefaultValue(false);
 		}
@@ -223,7 +223,7 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 			return null;
 		}
 
-		$sAsciiEmail = \mb_strtolower(\SnappyMail\IDN::emailToAscii($sEmail));
+		$sAsciiEmail = \mb_strtolower(\Tachyon\Util\IDN::emailToAscii($sEmail));
 		$sEmailId = \sha1($sAsciiEmail);
 
 		\MailSo\Base\Http::setETag($sEmailId);
@@ -238,7 +238,7 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 		// TODO: lookup contacts vCard and return PHOTO value
 		/*
 		if (!$aResult) {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			$oAccount = $oActions->getAccountFromToken();
 			if ($oAccount) {
 				$oAddressBookProvider = $oActions->AddressBookProvider($oAccount);
@@ -262,13 +262,13 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$aUrls = [];
 
 			if ($this->Config()->Get('plugin', 'bimi', false)) {
-				$BIMI = $bBimi ? \SnappyMail\DNS::BIMI($sDomain, $sBimiSelector) : null;
+				$BIMI = $bBimi ? \Tachyon\Util\DNS::BIMI($sDomain, $sBimiSelector) : null;
 				if ($BIMI) {
 					$aUrls[] = $BIMI;
 //					$aResult = ['text/uri-list', $BIMI];
-					\SnappyMail\Log::debug('Avatar', "BIMI {$sDomain}: {$BIMI}");
+					\Tachyon\Util\Log::debug('Avatar', "BIMI {$sDomain}: {$BIMI}");
 				} else {
-					\SnappyMail\Log::notice('Avatar', "BIMI 404 for {$sDomain}");
+					\Tachyon\Util\Log::notice('Avatar', "BIMI 404 for {$sDomain}");
 				}
 			}
 
@@ -321,12 +321,12 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 		if (!\is_dir(\APP_PRIVATE_DATA . 'avatars')) {
 			\mkdir(\APP_PRIVATE_DATA . 'avatars', 0700);
 		}
-		$sEmailId = \mb_strtolower(\SnappyMail\IDN::emailToAscii($sEmail));
+		$sEmailId = \mb_strtolower(\Tachyon\Util\IDN::emailToAscii($sEmail));
 		if (\str_contains($sEmail, '@')) {
 			$sEmailId = \sha1($sEmailId);
 		}
 		\file_put_contents(
-			\APP_PRIVATE_DATA . 'avatars/' . $sEmailId . \SnappyMail\File\MimeType::toExtension($aResult[0]),
+			\APP_PRIVATE_DATA . 'avatars/' . $sEmailId . \Tachyon\Util\File\MimeType::toExtension($aResult[0]),
 			$aResult[1]
 		);
 		\MailSo\Base\Http::setLastModified(\time());
@@ -334,7 +334,7 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	private static function getCachedImage(string $sEmail) : ?array
 	{
-		$sEmail = \mb_strtolower(\SnappyMail\IDN::emailToAscii($sEmail));
+		$sEmail = \mb_strtolower(\Tachyon\Util\IDN::emailToAscii($sEmail));
 		$aFiles = \glob(\APP_PRIVATE_DATA . "avatars/{$sEmail}.*");
 		if (!$aFiles && \str_contains($sEmail, '@')) {
 			$sEmailId = \sha1($sEmail);
@@ -347,7 +347,7 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 		if ($aFiles) {
 			return [
-				\SnappyMail\File\MimeType::fromFile($aFiles[0]),
+				\Tachyon\Util\File\MimeType::fromFile($aFiles[0]),
 				\file_get_contents($aFiles[0])
 			];
 		}
@@ -397,9 +397,9 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	private static function getUrl(string $sUrl) : ?array
 	{
-		$oHTTP = \SnappyMail\HTTP\Request::factory(/*'socket' or 'curl'*/);
-		$oHTTP->proxy = \RainLoop\Api::Config()->Get('labs', 'curl_proxy', '');
-		$oHTTP->proxy_auth = \RainLoop\Api::Config()->Get('labs', 'curl_proxy_auth', '');
+		$oHTTP = \Tachyon\Util\HTTP\Request::factory(/*'socket' or 'curl'*/);
+		$oHTTP->proxy = \Tachyon\Api::Config()->Get('labs', 'curl_proxy', '');
+		$oHTTP->proxy_auth = \Tachyon\Api::Config()->Get('labs', 'curl_proxy_auth', '');
 		$oHTTP->max_response_kb = 0;
 		$oHTTP->timeout = 15; // timeout in seconds.
 		try {
@@ -411,12 +411,12 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 						$oResponse->body
 					];
 				}
-				\SnappyMail\Log::notice('Avatar', "error {$oResponse->status} for {$sUrl}");
+				\Tachyon\Util\Log::notice('Avatar', "error {$oResponse->status} for {$sUrl}");
 			} else {
-				\SnappyMail\Log::warning('Avatar', "failed for {$sUrl}");
+				\Tachyon\Util\Log::warning('Avatar', "failed for {$sUrl}");
 			}
 		} catch (\Throwable $e) {
-			\SnappyMail\Log::notice('Avatar', "error {$e->getMessage()}");
+			\Tachyon\Util\Log::notice('Avatar', "error {$e->getMessage()}");
 		}
 		return null;
 	}

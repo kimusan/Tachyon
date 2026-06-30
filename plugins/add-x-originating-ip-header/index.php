@@ -1,6 +1,6 @@
 <?php
 
-class AddXOriginatingIpHeaderPlugin extends \RainLoop\Plugins\AbstractPlugin
+class AddXOriginatingIpHeaderPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'X-Originating-IP',
@@ -35,9 +35,9 @@ class AddXOriginatingIpHeaderPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('check_proxy')
+			\Tachyon\Plugins\Property::NewInstance('check_proxy')
 				->SetLabel('Сheck User Proxy')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Enable, if you need to check proxy header')
 				->SetDefaultValue(false)
 		);

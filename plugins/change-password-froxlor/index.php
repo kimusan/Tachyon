@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordFroxlorPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordFroxlorPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password Froxlor',

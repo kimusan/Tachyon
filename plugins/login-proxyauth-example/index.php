@@ -1,6 +1,6 @@
 <?php
 
-class LoginProxyauthExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginProxyauthExamplePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login PROXYAUTH',
@@ -16,7 +16,7 @@ class LoginProxyauthExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 		$this->addHook('imap.after-login', 'afterLogin');
 	}
 
-	public function beforeLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\NetClient $oImapClient, \MailSo\Net\ConnectSettings $oSettings) : void
+	public function beforeLogin(\Tachyon\Model\Account $oAccount, \MailSo\Net\NetClient $oImapClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
 		if ('example.com' === $oAccount->Domain()->Name()) {
 			$oSettings->username = 'AdminUsername';
@@ -24,7 +24,7 @@ class LoginProxyauthExamplePlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 	}
 
-	public function afterLogin(\RainLoop\Model\Account $oAccount, \MailSo\Imap\ImapClient $oImapClient, bool $bSuccess)
+	public function afterLogin(\Tachyon\Model\Account $oAccount, \MailSo\Imap\ImapClient $oImapClient, bool $bSuccess)
 	{
 		if ($bSuccess && 'example.com' === $oAccount->Domain()->Name()) {
 			$oImapClient->SendRequestGetResponse('PROXYAUTH', array($oImapClient->EscapeString($oAccount->IncLogin())));

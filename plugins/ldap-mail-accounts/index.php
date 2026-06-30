@@ -1,11 +1,11 @@
 <?php
 
-use RainLoop\Enumerations\Capa;
-use RainLoop\Enumerations\PluginPropertyType;
-use RainLoop\Plugins\AbstractPlugin;
-use RainLoop\Plugins\Property;
-use RainLoop\Model\MainAccount;
-use RainLoop\Actions;
+use Tachyon\Enumerations\Capa;
+use Tachyon\Enumerations\PluginPropertyType;
+use Tachyon\Plugins\AbstractPlugin;
+use Tachyon\Plugins\Property;
+use Tachyon\Model\MainAccount;
+use Tachyon\Actions;
 
 
 class LdapMailAccountsPlugin extends AbstractPlugin
@@ -18,7 +18,7 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 		RELEASE  = '2024-09-20',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Accounts',
-		DESCRIPTION = 'Add additional mail accounts the SnappyMail user has access to by a LDAP query. Basing on the work of FWest98 (https://github.com/FWest98).';
+		DESCRIPTION = 'Add additional mail accounts the Tachyon user has access to by a LDAP query. Basing on the work of FWest98 (https://github.com/FWest98).';
 
 	public function __construct()
 	{
@@ -79,26 +79,26 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 	 */
 	protected function configMapping(): array
 	{
-		$groupOverwriteMainAccount = new \RainLoop\Plugins\PropertyCollection('Overwrite mail address of main account');
+		$groupOverwriteMainAccount = new \Tachyon\Plugins\PropertyCollection('Overwrite mail address of main account');
 		$groupOverwriteMainAccount->exchangeArray([
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BOOL_OVERWRITE_MAIL_ADDRESS_MAIN_ACCOUNT)->SetLabel('Enabled')
-			->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BOOL_OVERWRITE_MAIL_ADDRESS_MAIN_ACCOUNT)->SetLabel('Enabled')
+			->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 			->SetDefaultValue(false),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_ADDRESS_MAIN_ACCOUNT)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_ADDRESS_MAIN_ACCOUNT)
 				->SetLabel("Mail address field for main account")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
-				->SetDescription("The ldap field containing the mail address to use on the SnappyMail main account.
-					\nThe value found inside ldap will overwrite the mail address of the SnappyMail main account (the account the user logged in at SnappyMail)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
+				->SetDescription("The ldap field containing the mail address to use on the Tachyon main account.
+					\nThe value found inside ldap will overwrite the mail address of the Tachyon main account (the account the user logged in at SnappyMail)
 					\nThe mail address used at login will still be used to login to the servers.")
 				->SetDefaultValue("mail"),
 		]);
 
-		$groupAdditionalSettings = new \RainLoop\Plugins\PropertyCollection('Additional settings');
+		$groupAdditionalSettings = new \Tachyon\Plugins\PropertyCollection('Additional settings');
 		$groupAdditionalSettings->exchangeArray([
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BOOL_OVERWRITE_CRYPTKEY)->SetLabel('Overwrite user cryptkey')
-			->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
-			->SetDescription("SnappyMail saves the passwords of the additional accounts by encrypting them using a cryptkey that is saved in the file \".cryptkey\". When the password of the main account changes, SnappyMail asks the user for the old password to reencrypt the keys with the new userpassword.
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BOOL_OVERWRITE_CRYPTKEY)->SetLabel('Overwrite user cryptkey')
+			->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
+			->SetDescription("Tachyon saves the passwords of the additional accounts by encrypting them using a cryptkey that is saved in the file \".cryptkey\". When the password of the main account changes, Tachyon asks the user for the old password to reencrypt the keys with the new userpassword.
 				\nOn a password change using ldap (or when the password has been forgotten by the user) this makes problems and asks the user to insert the old password. Therefore activating this option overwrites the .cryptkey file on login in order to always accept the actual ldap password of the user.
 				\nATTENTION: This has side effects on pgp keys because these are also secured by the cryptkey and could therefore not be accessible anymore!
 				\nSee https://github.com/the-djmaze/snappymail/issues/1570#issuecomment-2085528061")
@@ -106,54 +106,54 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 		]);
 
 		return [
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_SERVER)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_SERVER)
 				->SetLabel("LDAP Server URL")
 				->SetPlaceholder("ldap://server:port")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING),
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_PROTOCOL_VERSION)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_PROTOCOL_VERSION)
 				->SetLabel("LDAP Protocol Version")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::SELECTION)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue([2, 3]),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BIND_USER)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BIND_USER)
 				->SetLabel("LDAP Username")
 				->SetDescription("The user to use for binding to the LDAP server. Should be a DN or RDN. Leave empty for anonymous bind.")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING),
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BIND_PASSWORD)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BIND_PASSWORD)
 				->SetLabel("LDAP Password")
 				->SetDescription("Leave empty for anonymous bind.")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::PASSWORD),
+				->SetType(Tachyon\Enumerations\PluginPropertyType::PASSWORD),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_OBJECTCLASS)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_OBJECTCLASS)
 				->SetLabel("Object class")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The object class to use when searching for additional mail accounts of the logged in SnappyMail user")
 				->SetDefaultValue("user"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BASE)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BASE)
 				->SetLabel("Base DN")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The base DN to search in for additional mail accounts of the logged in SnappyMail user"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_SEARCH)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_SEARCH)
 				->SetLabel("Search field")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The name of the ldap attribute that has to contain the here defined 'LDAP search string'.")
 				->SetDefaultValue("member"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_SEARCH_STRING)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_SEARCH_STRING)
 				->SetLabel("LDAP search string")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The search string used to find ldap objects of mail accounts the user has access to.
 					\nPossible placeholers:\n#USERNAME# - replaced with the username of the actual SnappyMail user
 					\n#BASE_DN# - replaced with the value inside the field 'User base DN'.")
 				->SetDefaultValue("uid=#USERNAME#"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_USERNAME)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_USERNAME)
 				->SetLabel("Username field")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("Used when searching for additional accounts or when overwriting the mail address of the main account.
 					\nThe field containing the username of the mail account.
 					\nWhen looking up additional accounts:
@@ -162,25 +162,25 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 					\nThe username from SnappyMail login gets used to search an LDAP entry containig a field with the same username.")
 				->SetDefaultValue("uid"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_DOMAIN)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_DOMAIN)
 				->SetLabel("Domain name field of additional account")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The field containing the domain name of the found additional mail account.
 					\nThis domain gets looked up by SnappyMail to choose the right connection parameters at logging in to the additional mail account.
 					\nIf this field contains an email address, only the domain-part after the @ is used.")
 				->SetDefaultValue("mail"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_ADDRESS_ADDITIONAL_ACCOUNT)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_ADDRESS_ADDITIONAL_ACCOUNT)
 				->SetLabel("Mail address field for additional account")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The ldap field containing the mail address to use on the found additional mail account.
 					\nThe value found inside ldap will be used as mail address of the additional mail accounts created by this plugin.
 					\nIn most cases this could be the same ldap field as in \"Domain name field of additional account\"")
 				->SetDefaultValue("mail"),
 
-			\RainLoop\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_NAME)
+			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_NAME)
 				->SetLabel("Additional account name field")
-				->SetType(RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The field containing the default sender name of the found additional mail account.")
 				->SetDefaultValue("displayName"),
 

@@ -71,6 +71,12 @@ The main app directory is `snappymail/v/<version>/`. Strategy:
 - [ ] Add migration shim in `upgrade.php` for any config key changes
 - [ ] Verify `APP_PRIVATE_DATA`, `SNAPPYMAIL_LIBRARIES_PATH` const renames don't break plugins
 
+### 1.4b Build scripts (discovered 2026-06-30)
+- [ ] `gulpfile.js` and `tasks/*.js` still have `/* RainLoop Webmail (c) RainLoop Team */` header comment
+- [ ] `tasks/js.js:89` has a `replace("snappymail/v/...")` regex tied to the static JS path — keep as-is while `snappymail/` directory is preserved; revisit when directory is eventually renamed
+- [ ] `rollup.config.js` is a legacy standalone config (not used by current gulp pipeline) — uses deprecated `rollup-plugin-babel`, `rollup-plugin-terser`; either remove or align with tasks/rollup.js in Phase 3
+- [ ] `tasks/config.js` likely still references snappymail paths — audit
+
 ### 1.5 Integration packages
 - [ ] Update Nextcloud integration package: rename `integrations/nextcloud/snappymail/` -> `integrations/nextcloud/tachyon/` with appid change
 - [ ] Update Cloudron, cPanel, HestiaCP, CyberPanel, OwnCloud, Virtualmin metadata files

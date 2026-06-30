@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordHestiaPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordHestiaPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password Hestia',

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\SnappyMail\Listeners;
+namespace OCA\Tachyon\Util\Listeners;
 
 use OCA\OIDCLogin\Events\AccessTokenUpdatedEvent;
 use OCP\App\IAppManager;

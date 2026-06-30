@@ -147,7 +147,7 @@ $options = get_opt('', [
 
 chdir(__DIR__);
 define('APP_VERSION', basename(__DIR__));
-$_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = true;
+$_ENV['TACHYON_INCLUDE_AS_API'] = true;
 require __DIR__ . '/include.php';
 
 function getImapClient(int $host)
@@ -182,8 +182,8 @@ function getImapClient(int $host)
 	$ImapSettings->useAuth = true;
 
 	$oImapClient = new \MailSo\Imap\ImapClient;
-//	$oAccount = new \RainLoop\Model\Account;
-	$oImapClient->SetLogger(\RainLoop\API::Logger());
+//	$oAccount = new \Tachyon\Model\Account;
+	$oImapClient->SetLogger(\Tachyon\API::Logger());
 //	$oPlugins->RunHook('imap.before-connect', array($oAccount, $oImapClient, $ImapSettings));
 	$oImapClient->Connect($ImapSettings);
 //	$oPlugins->RunHook('imap.after-connect', array($oAccount, $oImapClient, $ImapSettings));
@@ -195,7 +195,7 @@ function getImapClient(int $host)
 	return $oImapClient;
 }
 
-$oSync = new \SnappyMail\Imap\Sync;
+$oSync = new \Tachyon\Util\Imap\Sync;
 $oSync->oImapSource = getImapClient(1);
 $oSync->oImapTarget = getImapClient(2);
 

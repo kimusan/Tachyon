@@ -1,6 +1,6 @@
 <?php
 
-class ImapContactsSuggestionsPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ImapContactsSuggestionsPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Contacts suggestions (IMAP folder)',

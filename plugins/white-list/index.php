@@ -1,6 +1,6 @@
 <?php
 
-class WhiteListPlugin extends \RainLoop\Plugins\AbstractPlugin
+class WhiteListPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Whitelist',
@@ -16,18 +16,18 @@ class WhiteListPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	/**
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function FilterLoginCredentials(string &$sEmail)
 	{
 		$sWhiteList = \trim($this->Config()->Get('plugin', 'white_list', ''));
-		if (\strlen($sWhiteList) && !\RainLoop\Plugins\Helper::ValidateWildcardValues($sEmail, $sWhiteList)) {
+		if (\strlen($sWhiteList) && !\Tachyon\Plugins\Helper::ValidateWildcardValues($sEmail, $sWhiteList)) {
 			$sExceptions = \trim($this->Config()->Get('plugin', 'exceptions', ''));
-			if (!\strlen($sExceptions) || \RainLoop\Plugins\Helper::ValidateWildcardValues($sEmail, $sExceptions)) {
-				throw new \RainLoop\Exceptions\ClientException(
+			if (!\strlen($sExceptions) || \Tachyon\Plugins\Helper::ValidateWildcardValues($sEmail, $sExceptions)) {
+				throw new \Tachyon\Exceptions\ClientException(
 					$this->Config()->Get('plugin', 'auth_error', false)
-					? \RainLoop\Notifications::AuthError
-					: \RainLoop\Notifications::AccountNotAllowed
+					? \Tachyon\Notifications::AuthError
+					: \Tachyon\Notifications::AccountNotAllowed
 				);
 			}
 		}
@@ -39,16 +39,16 @@ class WhiteListPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('auth_error')->SetLabel('Auth Error')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('auth_error')->SetLabel('Auth Error')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Throw an authentication error instead of an access error.')
 				->SetDefaultValue(false),
-			\RainLoop\Plugins\Property::NewInstance('white_list')->SetLabel('White List')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('white_list')->SetLabel('White List')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Emails white list, space as delimiter, wildcard supported.')
 				->SetDefaultValue('*@domain1.com user@domain2.com'),
-			\RainLoop\Plugins\Property::NewInstance('exceptions')->SetLabel('Exceptions')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('exceptions')->SetLabel('Exceptions')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Exceptions for white list, space as delimiter, wildcard supported.')
 				->SetDefaultValue('demo@domain1.com *@domain2.com admin@*')
 		);

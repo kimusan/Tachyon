@@ -2,11 +2,11 @@
 
 namespace Plugins\Example;
 
-class ContactSuggestions implements \RainLoop\Providers\Suggestions\ISuggestions
+class ContactSuggestions implements \Tachyon\Providers\Suggestions\ISuggestions
 {
 //	use \MailSo\Log\Inherit;
 
-	public function Process(\RainLoop\Model\Account $oAccount, string $sQuery, int $iLimit = 20) : array
+	public function Process(\Tachyon\Model\Account $oAccount, string $sQuery, int $iLimit = 20) : array
 	{
 		return array(
 			array($oAccount->Email(), ''),

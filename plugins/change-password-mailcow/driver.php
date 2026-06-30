@@ -14,7 +14,7 @@ class ChangePasswordMailcowDriver
      */
     private $oLogger = null;
 
-    function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+    function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
     {
         $this->oLogger = $oLogger;
         $this->sHostName = $oConfig->Get('plugin', 'mailcow_api_hostname', '');
@@ -29,15 +29,15 @@ class ChangePasswordMailcowDriver
     public static function configMapping() : array
     {
         return array(
-            \RainLoop\Plugins\Property::NewInstance('mailcow_api_hostname')
+            \Tachyon\Plugins\Property::NewInstance('mailcow_api_hostname')
                 ->SetLabel('Mailcow API hostname'),
-            \RainLoop\Plugins\Property::NewInstance('mailcow_api_token')
+            \Tachyon\Plugins\Property::NewInstance('mailcow_api_token')
                 ->SetLabel('API token')
                 ->SetDescription('The Read/Write API token'),
         );
     }
 
-    public function ChangePassword(\RainLoop\Model\Account $oAccount, string $sPrevPassword, string $sNewPassword) : bool
+    public function ChangePassword(\Tachyon\Model\Account $oAccount, string $sPrevPassword, string $sNewPassword) : bool
     {
         $url = 'https://'.$this->sHostName.'/api/v1/edit/mailbox';
         $headers = [

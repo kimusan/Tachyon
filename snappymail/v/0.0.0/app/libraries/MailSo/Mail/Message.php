@@ -14,7 +14,7 @@ namespace MailSo\Mail;
 use MailSo\Base\Utils;
 use MailSo\Imap\Enumerations\FetchType;
 use MailSo\Mime\Enumerations\Header as MimeHeader;
-use SnappyMail\GPG\PGP as GPG;
+use Tachyon\Util\GPG\PGP as GPG;
 
 /**
  * @category MailSo

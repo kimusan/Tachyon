@@ -1,6 +1,6 @@
 <?php
 
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 class ChangePasswordISPConfigDriver
 {
@@ -9,7 +9,7 @@ class ChangePasswordISPConfigDriver
 		DESCRIPTION = 'Change passwords in ISPConfig.';
 
 	/**
-	 * @var \RainLoop\Config\Plugin
+	 * @var \Tachyon\Config\Plugin
 	 */
 	private $oConfig = null;
 
@@ -18,7 +18,7 @@ class ChangePasswordISPConfigDriver
 	 */
 	private $oLogger = null;
 
-	function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+	function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
 	{
 		$this->oConfig = $oConfig;
 		$this->oLogger = $oLogger;
@@ -34,21 +34,21 @@ class ChangePasswordISPConfigDriver
 	public static function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('ispconfig_dsn')->SetLabel('ISPConfig PDO dsn')
+			\Tachyon\Plugins\Property::NewInstance('ispconfig_dsn')->SetLabel('ISPConfig PDO dsn')
 				->SetDefaultValue('mysql:host=localhost;dbname=dbispconfig;charset=utf8'),
-			\RainLoop\Plugins\Property::NewInstance('ispconfig_user')->SetLabel('User'),
-			\RainLoop\Plugins\Property::NewInstance('ispconfig_password')->SetLabel('Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD),
-			\RainLoop\Plugins\Property::NewInstance('ispconfig_allowed_emails')->SetLabel('Allowed emails')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('ispconfig_user')->SetLabel('User'),
+			\Tachyon\Plugins\Property::NewInstance('ispconfig_password')->SetLabel('Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD),
+			\Tachyon\Plugins\Property::NewInstance('ispconfig_allowed_emails')->SetLabel('Allowed emails')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Allowed emails, space as delimiter, wildcard supported. Example: user1@domain1.net user2@domain1.net *@domain2.net')
 				->SetDefaultValue('*')
 		);
 	}
 
-	public function ChangePassword(\RainLoop\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
+	public function ChangePassword(\Tachyon\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
 	{
-		if (!\RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'ispconfig_allowed_emails', ''))) {
+		if (!\Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'ispconfig_allowed_emails', ''))) {
 			return false;
 		}
 

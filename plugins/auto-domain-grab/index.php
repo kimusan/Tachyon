@@ -11,7 +11,7 @@
  *
  */
 
-class AutoDomainGrabPlugin extends \RainLoop\Plugins\AbstractPlugin
+class AutoDomainGrabPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Auto Domain Selection',
@@ -33,7 +33,7 @@ class AutoDomainGrabPlugin extends \RainLoop\Plugins\AbstractPlugin
 	/**
 	 * This function detects the IMAP Host, and if it is set to 'auto', replaces it with the MX or email domain.
 	 */
-	public function FilterImapCredentials(\RainLoop\Model\Account $oAccount, \MailSo\Imap\ImapClient $oImapClient, \MailSo\Imap\Settings $oSettings)
+	public function FilterImapCredentials(\Tachyon\Model\Account $oAccount, \MailSo\Imap\ImapClient $oImapClient, \MailSo\Imap\Settings $oSettings)
 	{
 		// Check for mail.$DOMAIN as entered value in RL settings
 		if ('auto' === $oSettings->host)
@@ -54,7 +54,7 @@ class AutoDomainGrabPlugin extends \RainLoop\Plugins\AbstractPlugin
 	/**
 	 * This function detects the SMTP Host, and if it is set to 'auto', replaces it with the MX or email domain.
 	 */
-	public function FilterSmtpCredentials(\RainLoop\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
+	public function FilterSmtpCredentials(\Tachyon\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
 	{
 		// Check for mail.$DOMAIN as entered value in RL settings
 		if ('auto' === $oSettings->host)

@@ -1,10 +1,10 @@
 <?php
 
-class LogincPanelPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LogincPanelPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login cPanel',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.4',
 		RELEASE  = '2024-03-27',
@@ -31,7 +31,7 @@ class LogincPanelPlugin extends \RainLoop\Plugins\AbstractPlugin
 	private static bool $login = false;
 	public function AutoLogin() : bool
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 
 		$oException = null;
 		$oAccount = null;

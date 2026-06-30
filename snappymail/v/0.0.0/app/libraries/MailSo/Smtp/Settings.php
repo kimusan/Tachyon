@@ -33,7 +33,7 @@ class Settings extends \MailSo\Net\ConnectSettings
 	public function __construct()
 	{
 		parent::__construct();
-		$oConfig = \RainLoop\API::Config();
+		$oConfig = \Tachyon\API::Config();
 		$this->viewErrors = !!$oConfig->Get('labs', 'smtp_show_server_errors', false);
 	}
 

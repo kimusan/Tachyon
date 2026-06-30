@@ -1,10 +1,10 @@
 <?php
 
-use \RainLoop\Exceptions\ClientException;
-use \RainLoop\Model\Account;
-use \RainLoop\Model\MainAccount;
+use \Tachyon\Exceptions\ClientException;
+use \Tachyon\Model\Account;
+use \Tachyon\Model\MainAccount;
 
-class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
+class TwoFactorAuthPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Two Factor Authentication',
@@ -38,10 +38,10 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function configMapping() : array
 	{
 		return [
-			\RainLoop\Plugins\Property::NewInstance("force_two_factor_auth")
+			\Tachyon\Plugins\Property::NewInstance("force_two_factor_auth")
 //				->SetLabel('PLUGIN_TWO_FACTOR/LABEL_FORCE')
 				->SetLabel('Enforce 2-Step Verification')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL),
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL),
 		];
 	}
 
@@ -66,7 +66,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 				$sCode = \trim($this->jsonParam('totp_code', ''));
 				if (empty($sCode)) {
 					$this->Logger()->Write("TFA: Code required for {$oAccount->Email()}");
-					throw new ClientException(\RainLoop\Notifications::AuthError);
+					throw new ClientException(\Tachyon\Notifications::AuthError);
 				}
 
 				$bUseBackupCode = false;
@@ -81,7 +81,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 				if (!$bUseBackupCode && !$this->TwoFactorAuthProvider($oAccount)->VerifyCode($aData['Secret'], $sCode)) {
 					$this->Manager()->Actions()->LoggerAuthHelper($oAccount);
 					$this->Logger()->Write("TFA: Code failed for {$oAccount->Email()}");
-					throw new ClientException(\RainLoop\Notifications::AuthError);
+					throw new ClientException(\Tachyon\Notifications::AuthError);
 				}
 				$this->Logger()->Write("TFA: Code verified for {$oAccount->Email()}");
 			}
@@ -114,7 +114,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$aCodes = \array_map(function(){return \rand(100000000, 900000000);}, \array_fill(0, 8, null));
 
 		$this->StorageProvider()->Put($oAccount,
-			\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG,
+			\Tachyon\Providers\Storage\Enumerations\StorageType::CONFIG,
 			'two_factor',
 			\json_encode(array(
 				'User' => $sEmail,
@@ -131,11 +131,11 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 	private static function getQRCode(MainAccount $oAccount, string $secret) : string
 	{
 		$email = \rawurlencode($oAccount->Email());
-//		$issuer = \rawurlencode(\RainLoop\API::Config()->Get('webmail', 'title', 'SnappyMail'));
-		$QR = \SnappyMail\QRCode::getMinimumQRCode(
+//		$issuer = \rawurlencode(\Tachyon\API::Config()->Get('webmail', 'title', 'SnappyMail'));
+		$QR = \Tachyon\Util\QRCode::getMinimumQRCode(
 //			"otpauth://totp/{$issuer}:{$email}?secret={$secret}&issuer={$issuer}",
 			"otpauth://totp/{$email}?secret={$secret}",
-			\SnappyMail\QRCode::ERROR_CORRECT_LEVEL_M
+			\Tachyon\Util\QRCode::ERROR_CORRECT_LEVEL_M
 		);
 		return $QR->__toString();
 	}
@@ -176,7 +176,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$mData = $this->getTwoFactorInfo($oAccount);
 		if (isset($mData['Secret'], $mData['BackupCodes'])) {
 			$bResult = $this->StorageProvider()->Put($oAccount,
-				\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG,
+				\Tachyon\Providers\Storage\Enumerations\StorageType::CONFIG,
 				'two_factor',
 				\json_encode(array(
 					'User' => $sEmail,
@@ -216,7 +216,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 
 		$this->StorageProvider()->Clear($oAccount,
-			\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG,
+			\Tachyon\Providers\Storage\Enumerations\StorageType::CONFIG,
 			'two_factor'
 		);
 
@@ -231,7 +231,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 		return $this->Manager()->Actions()->getMainAccountFromToken();
 	}
-	protected function StorageProvider() : \RainLoop\Providers\Storage
+	protected function StorageProvider() : \Tachyon\Providers\Storage
 	{
 		return $this->Manager()->Actions()->StorageProvider();
 	}
@@ -265,7 +265,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$aResult['User'] = $sEmail;
 
 			$sData = $this->StorageProvider()->Get($oAccount,
-				\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG,
+				\Tachyon\Providers\Storage\Enumerations\StorageType::CONFIG,
 				'two_factor'
 			);
 
@@ -305,7 +305,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 
 		$sData = $this->StorageProvider()->Get($oAccount,
-			\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG,
+			\Tachyon\Providers\Storage\Enumerations\StorageType::CONFIG,
 			'two_factor'
 		);
 
@@ -319,7 +319,7 @@ class TwoFactorAuthPlugin extends \RainLoop\Plugins\AbstractPlugin
 				$mData['BackupCodes'] = \trim(\preg_replace('/[^\d]+/', ' ', $sBackupCodes));
 
 				return $this->StorageProvider()->Put($oAccount,
-					\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG,
+					\Tachyon\Providers\Storage\Enumerations\StorageType::CONFIG,
 					'two_factor',
 					\json_encode($mData)
 				);

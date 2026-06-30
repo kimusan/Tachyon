@@ -1,6 +1,6 @@
 <?php
 
-class ICSViewerPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ICSViewerPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'ICS Viewer',

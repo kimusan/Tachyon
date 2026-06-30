@@ -1,6 +1,6 @@
 <?php
 
-class LoginOverridePlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginOverridePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Login Override',
@@ -32,17 +32,17 @@ class LoginOverridePlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 	}
 
-	public function MapImapCredentials(\RainLoop\Model\Account $oAccount, \MailSo\Imap\ImapClient $oSmtpClient, \MailSo\Imap\Settings $oSettings)
+	public function MapImapCredentials(\Tachyon\Model\Account $oAccount, \MailSo\Imap\ImapClient $oSmtpClient, \MailSo\Imap\Settings $oSettings)
 	{
 		static::MapCredentials($oAccount, $oSettings, $this->Config()->getDecrypted('plugin', 'imap_mapping', ''));
 	}
 
-	public function MapSmtpCredentials(\RainLoop\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
+	public function MapSmtpCredentials(\Tachyon\Model\Account $oAccount, \MailSo\Smtp\SmtpClient $oSmtpClient, \MailSo\Smtp\Settings $oSettings)
 	{
 		static::MapCredentials($oAccount, $oSettings, $this->Config()->getDecrypted('plugin', 'smtp_mapping', ''));
 	}
 
-	private static function MapCredentials(\RainLoop\Model\Account $oAccount, \MailSo\Net\ConnectSettings $oSettings, string $sMapping)
+	private static function MapCredentials(\Tachyon\Model\Account $oAccount, \MailSo\Net\ConnectSettings $oSettings, string $sMapping)
 	{
 		$sEmail = $oAccount->Email();
 		$aList = \preg_split('/\\R/', \trim($sMapping));
@@ -63,21 +63,21 @@ class LoginOverridePlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('email_mapping')
+			\Tachyon\Plugins\Property::NewInstance('email_mapping')
 				->SetLabel('Email mapping')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Changes email address as login@example.com:email@example.com')
 				->SetDefaultValue('john-user1@example.com:john.doe@example.com')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('imap_mapping')
+			\Tachyon\Plugins\Property::NewInstance('imap_mapping')
 				->SetLabel('IMAP mapping')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Each line as email:loginname:password, loginname or password may be empty to use default')
 				->SetDefaultValue('user@example.com:user1:password1')
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('smtp_mapping')
+			\Tachyon\Plugins\Property::NewInstance('smtp_mapping')
 				->SetLabel('SMTP mapping')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Each line as email:loginname:password, loginname or password may be empty to use default')
 				->SetDefaultValue('user@example.com:user1:password1')
 				->SetEncrypted()

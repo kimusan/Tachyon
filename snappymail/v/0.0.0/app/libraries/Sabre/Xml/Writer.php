@@ -114,13 +114,11 @@ class Writer extends \XMLWriter
      *
      *     <entry xmlns="http://w3.org/2005/Atom">
      *
-     * Note: this function doesn't have the string typehint, because PHP's
-     * XMLWriter::startElement doesn't either.
-     * From PHP 8.0 the typehint exists, so it can be added here after PHP 7.4 is dropped.
+     * Writes a new element, with clark-notation support.
      *
      * @param string $name
      */
-    public function startElement($name): bool
+    public function startElement(string $name): bool
     {
         if ('{' === $name[0]) {
             list($namespace, $localName) =
@@ -178,14 +176,12 @@ class Writer extends \XMLWriter
      *    becomes:
      *    <author xmlns="http://www.w3.org/2005" /><name>Evert Pot</name></author>
      *
-     * Note: this function doesn't have the string typehint, because PHP's
-     * XMLWriter::startElement doesn't either.
-     * From PHP 8.0 the typehint exists, so it can be added here after PHP 7.4 is dropped.
+     * Writes a new element with optional content.
      *
      * @param string                                      $name
      * @param array<int|string, mixed>|string|object|null $content
      */
-    public function writeElement($name, $content = null): bool
+    public function writeElement(string $name, array|string|object|null $content = null): bool
     {
         $this->startElement($name);
         if (!is_null($content)) {
@@ -221,14 +217,12 @@ class Writer extends \XMLWriter
      *
      * Returns true when successful.
      *
-     * Note: this function doesn't have typehints, because for some reason
-     * PHP's XMLWriter::writeAttribute doesn't either.
-     * From PHP 8.0 the typehint exists, so it can be added here after PHP 7.4 is dropped.
+     * Writes a new attribute with clark-notation support.
      *
      * @param string $name
      * @param string $value
      */
-    public function writeAttribute($name, $value): bool
+    public function writeAttribute(string $name, string $value): bool
     {
         if ('{' !== $name[0]) {
             return parent::writeAttribute($name, $value);

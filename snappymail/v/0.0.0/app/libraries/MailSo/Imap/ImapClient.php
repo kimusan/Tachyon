@@ -119,7 +119,7 @@ class ImapClient extends \MailSo\Net\NetClient
 
 		$type = '';
 		foreach ($oSettings->SASLMechanisms as $sasl_type) {
-			if ($this->hasCapability("AUTH={$sasl_type}") && \SnappyMail\SASL::isSupported($sasl_type)) {
+			if ($this->hasCapability("AUTH={$sasl_type}") && \Tachyon\Util\SASL::isSupported($sasl_type)) {
 				$type = $sasl_type;
 				break;
 			}
@@ -140,7 +140,7 @@ class ImapClient extends \MailSo\Net\NetClient
 			);
 		}
 
-		$SASL = \SnappyMail\SASL::factory($type);
+		$SASL = \Tachyon\Util\SASL::factory($type);
 
 		try
 		{
@@ -470,7 +470,7 @@ class ImapClient extends \MailSo\Net\NetClient
 	{
 		try {
 			if (\is_resource($this->ConnectionResource())) {
-				\SnappyMail\HTTP\Stream::start();
+				\Tachyon\Util\HTTP\Stream::start();
 				$sEndTag = ($sEndTag ?: $this->getCurrentTag()) . ' ';
 				$sLine = \fgets($this->ConnectionResource());
 				do {
@@ -511,7 +511,7 @@ class ImapClient extends \MailSo\Net\NetClient
 					// RFC 5530
 					if ($sEndTag === $oResponse->Tag && \is_array($oResponse->OptionalResponse) && 'CLIENTBUG' === $oResponse->OptionalResponse[0]) {
 						// The server has detected a client bug.
-//						\SnappyMail\Log::warning('IMAP', "{$oResponse->OptionalResponse[0]}: {$this->lastCommand}");
+//						\Tachyon\Util\Log::warning('IMAP', "{$oResponse->OptionalResponse[0]}: {$this->lastCommand}");
 					}
 
 					if ($sEndTag === $oResponse->Tag || Enumerations\ResponseType::CONTINUATION === $oResponse->ResponseType) {
@@ -555,7 +555,7 @@ class ImapClient extends \MailSo\Net\NetClient
 					// RFC 5530
 					if ($sEndTag === $oResponse->Tag && \is_array($oResponse->OptionalResponse) && 'CLIENTBUG' === $oResponse->OptionalResponse[0]) {
 						// The server has detected a client bug.
-//						\SnappyMail\Log::warning('IMAP', "{$oResponse->OptionalResponse[0]}: {$this->lastCommand}");
+//						\Tachyon\Util\Log::warning('IMAP', "{$oResponse->OptionalResponse[0]}: {$this->lastCommand}");
 					}
 
 					if ($sEndTag === $oResponse->Tag || Enumerations\ResponseType::CONTINUATION === $oResponse->ResponseType) {

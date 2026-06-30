@@ -1,6 +1,6 @@
 <?php
 
-namespace OCA\SnappyMail\Util;
+namespace OCA\Tachyon\Util\Util;
 
 class SnappyMailHelper
 {
@@ -41,7 +41,7 @@ class SnappyMailHelper
 			}
 		}
 
-		$oConfig = \RainLoop\Api::Config();
+		$oConfig = \Tachyon\Api::Config();
 		$bSave = false;
 
 		if (!$oConfig->Get('webmail', 'app_path')) {
@@ -50,9 +50,9 @@ class SnappyMailHelper
 		}
 
 		if (!\is_dir(APP_PLUGINS_PATH . 'owncloud')) {
-			\SnappyMail\Repository::installPackage('plugin', 'owncloud');
+			\Tachyon\Util\Repository::installPackage('plugin', 'owncloud');
 			$oConfig->Set('plugins', 'enable', true);
-			$aList = \SnappyMail\Repository::getEnabledPackagesNames();
+			$aList = \Tachyon\Util\Repository::getEnabledPackagesNames();
 			$aList[] = 'owncloud';
 			$oConfig->Set('plugins', 'enabled_list', \implode(',', \array_unique($aList)));
 //			$oConfig->Set('webmail', 'theme', 'ownCloud@custom');
@@ -63,7 +63,7 @@ class SnappyMailHelper
 		if ('12345' == $sPassword || !$sPassword) {
 			$sPassword = \substr(\base64_encode(\random_bytes(16)), 0, 12);
 			$oConfig->SetPassword($sPassword);
-			\RainLoop\Utils::saveFile(APP_PRIVATE_DATA . 'admin_password.txt', $sPassword . "\n");
+			\Tachyon\Utils::saveFile(APP_PRIVATE_DATA . 'admin_password.txt', $sPassword . "\n");
 			$bSave = true;
 		}
 
@@ -72,11 +72,11 @@ class SnappyMailHelper
 		if ($ocConfig->getAppValue('snappymail', 'snappymail-autologin', false)
 		 || $ocConfig->getAppValue('snappymail', 'snappymail-autologin-with-email', false)
 		) {
-			$oProvider = \RainLoop\Api::Actions()->DomainProvider();
+			$oProvider = \Tachyon\Api::Actions()->DomainProvider();
 			$oDomain = $oProvider->Load('owncloud');
 			if (!$oDomain) {
-//				$oDomain = \RainLoop\Model\Domain::fromIniArray('owncloud', []);
-				$oDomain = new \RainLoop\Model\Domain('owncloud');
+//				$oDomain = \Tachyon\Model\Domain::fromIniArray('owncloud', []);
+				$oDomain = new \Tachyon\Model\Domain('owncloud');
 				$iSecurityType = \MailSo\Net\Enumerations\ConnectionSecurityType::NONE;
 				$oDomain->ImapSettings()->host = 'localhost';
 				$oDomain->ImapSettings()->type = $iSecurityType;
@@ -103,18 +103,18 @@ class SnappyMailHelper
 		static::loadApp();
 
 		try {
-			$oActions = \RainLoop\Api::Actions();
-			$oConfig = \RainLoop\Api::Config();
+			$oActions = \Tachyon\Api::Actions();
+			$oConfig = \Tachyon\Api::Config();
 			if (isset($_GET[$oConfig->Get('security', 'admin_panel_key', 'admin')])) {
 				if ($oConfig->Get('security', 'allow_admin_panel', true)
 				 && \OC_User::isAdminUser(\OC::$server->getUserSession()->getUser()->getUID())
 				 && !$oActions->IsAdminLoggined(false)
 				) {
 					$sRand = \MailSo\Base\Utils::Sha1Rand();
-					if ($oActions->Cacher(null, true)->Set(\RainLoop\KeyPathHelper::SessionAdminKey($sRand), \time())) {
-						$sToken = \RainLoop\Utils::EncodeKeyValuesQ(array('token', $sRand));
+					if ($oActions->Cacher(null, true)->Set(\Tachyon\KeyPathHelper::SessionAdminKey($sRand), \time())) {
+						$sToken = \Tachyon\Utils::EncodeKeyValuesQ(array('token', $sRand));
 //						$oActions->setAdminAuthToken($sToken);
-						\RainLoop\Utils::SetCookie('smadmin', $sToken);
+						\Tachyon\Utils::SetCookie('smadmin', $sToken);
 					}
 				}
 			} else {
@@ -150,7 +150,7 @@ class SnappyMailHelper
 
 		if ($handle) {
 			\header_remove('Content-Security-Policy');
-			\RainLoop\Service::Handle();
+			\Tachyon\Service::Handle();
 			exit;
 		}
 	}
@@ -208,13 +208,13 @@ class SnappyMailHelper
 	public static function encodePassword(string $sPassword, string $sSalt) : string
 	{
 		static::loadApp();
-		return \SnappyMail\Crypt::EncryptUrlSafe($sPassword, $sSalt);
+		return \Tachyon\Util\Crypt::EncryptUrlSafe($sPassword, $sSalt);
 	}
 
 	public static function decodePassword(string $sPassword, string $sSalt)/* : mixed */
 	{
 		static::loadApp();
-		return \SnappyMail\Crypt::DecryptUrlSafe($sPassword, $sSalt);
+		return \Tachyon\Util\Crypt::DecryptUrlSafe($sPassword, $sSalt);
 	}
 
 	// Imports data from RainLoop
@@ -256,10 +256,10 @@ class SnappyMailHelper
 
 		// Attempt to install same plugins as RainLoop
 		if ($rainloop_plugins) {
-			foreach (\SnappyMail\Repository::getPackagesList()['List'] as $plugin) {
+			foreach (\Tachyon\Util\Repository::getPackagesList()['List'] as $plugin) {
 				if (\in_array($plugin['id'], $rainloop_plugins)) {
 					$result[] = "install plugin : {$plugin['id']}";
-					\SnappyMail\Repository::installPackage('plugin', $plugin['id']);
+					\Tachyon\Util\Repository::installPackage('plugin', $plugin['id']);
 					unset($rainloop_plugins[$plugin['id']]);
 				}
 			}
@@ -268,7 +268,7 @@ class SnappyMailHelper
 			}
 		}
 
-		$oConfig = \RainLoop\Api::Config();
+		$oConfig = \Tachyon\Api::Config();
 //		$oConfig->Set('webmail', 'theme', 'ownCloud@custom');
 		$oConfig->Save();
 

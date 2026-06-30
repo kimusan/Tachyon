@@ -1,6 +1,6 @@
 <?php
 
-class ChangePasswordPoppassdPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordPoppassdPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password Poppassd',

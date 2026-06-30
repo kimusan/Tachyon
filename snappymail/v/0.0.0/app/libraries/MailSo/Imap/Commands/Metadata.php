@@ -50,7 +50,7 @@ trait Metadata
 					}
 				}
 			} catch (\Throwable $e) {
-				//\SnappyMail\Log::warning('IMAP', $e->getMessage());
+				//\Tachyon\Util\Log::warning('IMAP', $e->getMessage());
 			}
 		}
 		return $this->allMetadata;

@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\SnappyMail\Controller;
+namespace OCA\Tachyon\Util\Controller;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
 
 use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
@@ -27,7 +27,7 @@ class FetchController extends Controller {
 		$error = 'Upgrade failed';
 		try {
 			SnappyMailHelper::loadApp();
-			if (\SnappyMail\Upgrade::core()) {
+			if (\Tachyon\Util\Upgrade::core()) {
 				return new JSONResponse([
 					'status' => 'success',
 					'Message' => $this->l->t('Upgraded successfully')
@@ -63,7 +63,7 @@ class FetchController extends Controller {
 
 			SnappyMailHelper::loadApp();
 
-			$oConfig = \RainLoop\Api::Config();
+			$oConfig = \Tachyon\Api::Config();
 			if (!empty($_POST['snappymail-app_path'])) {
 				$oConfig->Set('webmail', 'app_path', $_POST['snappymail-app_path']);
 			}
@@ -74,12 +74,12 @@ class FetchController extends Controller {
 			if (!empty($_POST['import-rainloop'])) {
 				return new JSONResponse([
 					'status' => 'success',
-					'Message' => \implode("\n", \OCA\SnappyMail\Util\RainLoop::import())
+					'Message' => \implode("\n", \OCA\Tachyon\Util\Util\RainLoop::import())
 				]);
 			}
 
 			$debug = !empty($_POST['snappymail-debug']);
-			$oConfig = \RainLoop\Api::Config();
+			$oConfig = \Tachyon\Api::Config();
 			if ($debug != $oConfig->Get('debug', 'enable', false)) {
 				$oConfig->Set('debug', 'enable', $debug);
 				$oConfig->Save();
@@ -124,7 +124,7 @@ class FetchController extends Controller {
 
 			// Logout as the credentials have changed
 			SnappyMailHelper::loadApp();
-			\RainLoop\Api::Actions()->DoLogout();
+			\Tachyon\Api::Actions()->DoLogout();
 
 			return new JSONResponse([
 				'status' => 'success',
@@ -135,7 +135,7 @@ class FetchController extends Controller {
 			// Logout as the credentials might have changed, as exception could be in one attribute
 			// TODO: Handle both exceptions separately?
 			SnappyMailHelper::loadApp();
-			\RainLoop\Api::Actions()->DoLogout();
+			\Tachyon\Api::Actions()->DoLogout();
 
 			return new JSONResponse([
 				'status' => 'error',

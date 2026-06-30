@@ -1,6 +1,6 @@
 <?php
 
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 class ChangePasswordDriverPDO
 {
@@ -9,7 +9,7 @@ class ChangePasswordDriverPDO
 		DESCRIPTION = 'Use your own SQL (PDO) statement (with wildcards).';
 
 	/**
-	 * @var \RainLoop\Config\Plugin
+	 * @var \Tachyon\Config\Plugin
 	 */
 	private $oConfig = null;
 
@@ -18,7 +18,7 @@ class ChangePasswordDriverPDO
 	 */
 	private $oLogger = null;
 
-	function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+	function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
 	{
 		$this->oConfig = $oConfig;
 		$this->oLogger = $oLogger;
@@ -32,35 +32,35 @@ class ChangePasswordDriverPDO
 	public static function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('pdo_dsn')->SetLabel('DSN')
+			\Tachyon\Plugins\Property::NewInstance('pdo_dsn')->SetLabel('DSN')
 				->SetDefaultValue('mysql:host=localhost;dbname=snappymail;charset=utf8'),
-			\RainLoop\Plugins\Property::NewInstance('pdo_user')->SetLabel('User'),
-			\RainLoop\Plugins\Property::NewInstance('pdo_password')->SetLabel('Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD),
-			\RainLoop\Plugins\Property::NewInstance('pdo_sql')->SetLabel('Statement')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('pdo_user')->SetLabel('User'),
+			\Tachyon\Plugins\Property::NewInstance('pdo_password')->SetLabel('Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD),
+			\Tachyon\Plugins\Property::NewInstance('pdo_sql')->SetLabel('Statement')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('SQL statement (allowed wildcards :email, :oldpass, :newpass, :domain, :username, :login_name).')
 				->SetDefaultValue('UPDATE table SET password = :newpass WHERE (domain = :domain AND username = :username) OR loginname = :login_name'),
-			\RainLoop\Plugins\Property::NewInstance('pdo_encrypt')->SetLabel('Encryption')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+			\Tachyon\Plugins\Property::NewInstance('pdo_encrypt')->SetLabel('Encryption')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(array('none', 'bcrypt', 'Argon2i', 'Argon2id', 'SHA256-CRYPT', 'SHA512-CRYPT'))
 				->SetDescription('In what way do you want the passwords to be encrypted?'),
-			\RainLoop\Plugins\Property::NewInstance('pdo_encryptprefix')->SetLabel('Encrypt prefix')
+			\Tachyon\Plugins\Property::NewInstance('pdo_encryptprefix')->SetLabel('Encrypt prefix')
 				->SetDescription('Optional encrypted password prefix, like {ARGON2I} or {BLF-CRYPT} or {SHA512-CRYPT}'),
-			\RainLoop\Plugins\Property::NewInstance('pdo_mysql_ssl')->SetLabel('MySQL SSL connection')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('pdo_mysql_ssl')->SetLabel('MySQL SSL connection')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false),
-			\RainLoop\Plugins\Property::NewInstance('pdo_mysql_ssl_verify')->SetLabel('MySQL SSL verify server cert')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('pdo_mysql_ssl_verify')->SetLabel('MySQL SSL verify server cert')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Verify that certificate\'s Common Name of SAN matches the database server\'s hostname.')
 				->SetDefaultValue(false),
-			\RainLoop\Plugins\Property::NewInstance('pdo_mysql_ssl_ca')->SetLabel('MySQL SSL CA certificate file')
+			\Tachyon\Plugins\Property::NewInstance('pdo_mysql_ssl_ca')->SetLabel('MySQL SSL CA certificate file')
 				->SetDescription('Path to a file containing the CA certificate used to sign the server certificate, or a CA bundle. Required for SSL/TLS connections to work.')
 				->SetDefaultValue('/etc/pki/tls/certs/ca-bundle.crt')
 		);
 	}
 
-	public function ChangePassword(\RainLoop\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
+	public function ChangePassword(\Tachyon\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
 	{
 		try
 		{
@@ -110,7 +110,7 @@ class ChangePasswordDriverPDO
 		}
 		catch (\Exception $oException)
 		{
-			\SnappyMail\Log::error('change-password', $oException->getMessage());
+			\Tachyon\Util\Log::error('change-password', $oException->getMessage());
 			if ($this->oLogger) {
 				$this->oLogger->WriteException($oException);
 			}

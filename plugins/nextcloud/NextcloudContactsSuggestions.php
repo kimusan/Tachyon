@@ -1,6 +1,6 @@
 <?php
 
-class NextcloudContactsSuggestions implements \RainLoop\Providers\Suggestions\ISuggestions
+class NextcloudContactsSuggestions implements \Tachyon\Providers\Suggestions\ISuggestions
 {
 	use \MailSo\Log\Inherit;
 
@@ -11,7 +11,7 @@ class NextcloudContactsSuggestions implements \RainLoop\Providers\Suggestions\IS
 		$this->ignoreSystemAddressbook = $ignoreSystemAddressbook;
 	}
 
-	public function Process(\RainLoop\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
+	public function Process(\Tachyon\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
 	{
 		try
 		{

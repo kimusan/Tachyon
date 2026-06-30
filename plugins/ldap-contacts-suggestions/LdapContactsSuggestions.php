@@ -1,6 +1,6 @@
 <?php
 
-class LdapContactsSuggestions implements \RainLoop\Providers\Suggestions\ISuggestions
+class LdapContactsSuggestions implements \Tachyon\Providers\Suggestions\ISuggestions
 {
 	use \MailSo\Log\Inherit;
 
@@ -56,13 +56,13 @@ class LdapContactsSuggestions implements \RainLoop\Providers\Suggestions\ISugges
 		return $this;
 	}
 
-	public function Process(\RainLoop\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
+	public function Process(\Tachyon\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
 	{
 		$sQuery = \trim($sQuery);
 
 		if (2 > \strlen($sQuery)
 		 || !$oAccount
-		 || !\RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->sAllowedEmails))
+		 || !\Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->sAllowedEmails))
 		{
 			return array();
 		}

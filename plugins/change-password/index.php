@@ -1,9 +1,9 @@
 <?php
 
-use RainLoop\Exceptions\ClientException;
-use SnappyMail\SensitiveString;
+use Tachyon\Exceptions\ClientException;
+use Tachyon\Util\SensitiveString;
 
-class ChangePasswordPlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangePasswordPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change Password',
@@ -13,7 +13,7 @@ class ChangePasswordPlugin extends \RainLoop\Plugins\AbstractPlugin
 		CATEGORY = 'Security',
 		DESCRIPTION = 'Extension to allow users to change their passwords';
 
-	// \RainLoop\Notifications\
+	// \Tachyon\Notifications\
 	const
 		CouldNotSaveNewPassword = 130,
 		CurrentPasswordIncorrect = 131,
@@ -104,35 +104,35 @@ class ChangePasswordPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function configMapping() : array
 	{
 		$result = [
-			\RainLoop\Plugins\Property::NewInstance('pass_min_length')
+			\Tachyon\Plugins\Property::NewInstance('pass_min_length')
 				->SetLabel('Password minimum length')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::INT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::INT)
 				->SetDescription('Minimum length of the password')
 				->SetDefaultValue(10)
 				->SetAllowedInJs(true),
-			\RainLoop\Plugins\Property::NewInstance('pass_min_strength')
+			\Tachyon\Plugins\Property::NewInstance('pass_min_strength')
 				->SetLabel('Password minimum strength')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::INT)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::INT)
 				->SetDescription('Minimum strength of the password in %')
 				->SetDefaultValue(70)
 				->SetAllowedInJs(true),
-			\RainLoop\Plugins\Property::NewInstance('check_hibp')
+			\Tachyon\Plugins\Property::NewInstance('check_hibp')
 				->SetLabel('Check Have I Been Pwned')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDescription('Check if new passphrase is in a data breach')
 				->SetDefaultValue(false),
 		];
 		foreach ($this->getSupportedDrivers(true) as $name => $class) {
-			$group = new \RainLoop\Plugins\PropertyCollection($name);
+			$group = new \Tachyon\Plugins\PropertyCollection($name);
 			$props = [
-				\RainLoop\Plugins\Property::NewInstance("driver_{$name}_enabled")
+				\Tachyon\Plugins\Property::NewInstance("driver_{$name}_enabled")
 					->SetLabel('Enable ' . $class::NAME)
-					->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+					->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 					->SetDescription($class::DESCRIPTION)
 					->SetDefaultValue(false),
-				\RainLoop\Plugins\Property::NewInstance("driver_{$name}_allowed_emails")
+				\Tachyon\Plugins\Property::NewInstance("driver_{$name}_allowed_emails")
 					->SetLabel('Allowed emails')
-					->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+					->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 					->SetDescription('Allowed emails, space as delimiter, wildcard supported. Example: user1@example.net user2@example1.net *@example2.net')
 					->SetDefaultValue('*')
 			];
@@ -156,7 +156,7 @@ class ChangePasswordPlugin extends \RainLoop\Plugins\AbstractPlugin
 		if ($sPrevPassword !== $oAccount->IncPassword()) {
 			throw new ClientException(static::CurrentPasswordIncorrect, null, $oActions->StaticI18N('NOTIFICATIONS/CURRENT_PASSWORD_INCORRECT'));
 		}
-		$oPrevPassword = new \SnappyMail\SensitiveString($sPrevPassword);
+		$oPrevPassword = new \Tachyon\Util\SensitiveString($sPrevPassword);
 
 		$sNewPassword = $this->jsonParam('NewPassword');
 		if ($this->Config()->Get('plugin', 'pass_min_length', 10) > \strlen($sNewPassword)) {
@@ -165,15 +165,15 @@ class ChangePasswordPlugin extends \RainLoop\Plugins\AbstractPlugin
 		if ($this->Config()->Get('plugin', 'pass_min_strength', 70) > static::PasswordStrength($sNewPassword)) {
 			throw new ClientException(static::NewPasswordWeak, null, $oActions->StaticI18N('NOTIFICATIONS/NEW_PASSWORD_WEAK'));
 		}
-		$oNewPassword = new \SnappyMail\SensitiveString($sNewPassword);
-		if ($this->Config()->Get('plugin', 'check_hibp', false) && \SnappyMail\Hibp::password($oNewPassword)) {
+		$oNewPassword = new \Tachyon\Util\SensitiveString($sNewPassword);
+		if ($this->Config()->Get('plugin', 'check_hibp', false) && \Tachyon\Util\Hibp::password($oNewPassword)) {
 			throw new ClientException(static::NewPasswordHibp, null, $oActions->StaticI18N('NOTIFICATIONS/NEW_PASSWORD_HIBP'));
 		}
 
 		$bResult = false;
 		$oConfig = $this->Config();
 		foreach ($this->getSupportedDrivers() as $name => $class) {
-			if (\RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $oConfig->Get('plugin', "driver_{$name}_allowed_emails"))) {
+			if (\Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $oConfig->Get('plugin', "driver_{$name}_allowed_emails"))) {
 				$name = $class::NAME;
 				$oLogger = $oActions->Logger();
 				try
@@ -208,7 +208,7 @@ class ChangePasswordPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 
 		$oAccount->SetPassword($oNewPassword);
-		if ($oAccount instanceof \RainLoop\Model\MainAccount) {
+		if ($oAccount instanceof \Tachyon\Model\MainAccount) {
 			$oActions->SetAuthToken($oAccount);
 			$oAccount->resealCryptKey($oPrevPassword);
 		}

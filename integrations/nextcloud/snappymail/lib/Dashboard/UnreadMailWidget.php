@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\SnappyMail\Dashboard;
+namespace OCA\Tachyon\Util\Dashboard;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
 
 use OCP\AppFramework\Services\IInitialState;
 use OCP\Dashboard\IAPIWidget;
@@ -99,7 +99,7 @@ class UnreadMailWidget implements IAPIWidget, IIconWidget/*, IOptionWidget*/
 	{
 		$result = [];
 		SnappyMailHelper::startApp();
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 //		$oAccount = $oActions->getMainAccountFromToken(false); // Issue: when account switched, wrong email is shown
 		$oAccount = $oActions->getAccountFromToken(false);
 		if ($oAccount) {
@@ -155,7 +155,7 @@ class UnreadMailWidget implements IAPIWidget, IIconWidget/*, IOptionWidget*/
 	{
 		SnappyMailHelper::loadApp();
 //		return $this->urlGenerator->getAbsoluteURL(
-		return \RainLoop\Utils::WebStaticPath('images/snappymail-logo.png');
+		return \Tachyon\Utils::WebStaticPath('images/snappymail-logo.png');
 	}
 
 	// IOptionWidget

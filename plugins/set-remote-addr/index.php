@@ -5,7 +5,7 @@
  * It's an alternative to application.ini http_client_ip_check_proxy
  */
 
-class SetRemoteAddrPlugin extends \RainLoop\Plugins\AbstractPlugin
+class SetRemoteAddrPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Set REMOTE_ADDR',

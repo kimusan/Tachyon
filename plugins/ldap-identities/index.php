@@ -1,8 +1,8 @@
 <?php
 
-use RainLoop\Enumerations\PluginPropertyType;
-use RainLoop\Plugins\AbstractPlugin;
-use RainLoop\Plugins\Property;
+use Tachyon\Enumerations\PluginPropertyType;
+use Tachyon\Plugins\AbstractPlugin;
+use Tachyon\Plugins\Property;
 
 class LdapIdentitiesPlugin extends AbstractPlugin
 {

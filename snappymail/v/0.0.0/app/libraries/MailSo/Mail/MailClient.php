@@ -103,7 +103,7 @@ class MailClient
 			$aHeaders[] = MimeHeader::X_VIRUS_STATUS;
 		}
 
-		\RainLoop\Api::Actions()->Plugins()->RunHook('imap.message-headers', array(&$aHeaders));
+		\Tachyon\Api::Actions()->Plugins()->RunHook('imap.message-headers', array(&$aHeaders));
 
 		return FetchType::BuildBodyCustomHeaderRequest($aHeaders, true);
 	}
@@ -400,7 +400,7 @@ class MailClient
 		}
 		catch (\Throwable $oException)
 		{
-			\SnappyMail\Log::warning('IMAP', "FolderHash({$sFolderName}) Exception: {$oException->getMessage()}");
+			\Tachyon\Util\Log::warning('IMAP', "FolderHash({$sFolderName}) Exception: {$oException->getMessage()}");
 		}
 		return '';
 	}
@@ -421,7 +421,7 @@ class MailClient
 		}
 		catch (\MailSo\RuntimeException $oException)
 		{
-			\SnappyMail\Log::warning('MailClient', 'MessageThread ' . $oException->getMessage());
+			\Tachyon\Util\Log::warning('MailClient', 'MessageThread ' . $oException->getMessage());
 			unset($oException);
 		}
 //		$this->logWrite('MessageThreadList: '.\print_r($threads, 1));
@@ -475,7 +475,7 @@ class MailClient
 			// Idea to fetch all UID's in background
 			else if (!$bBackground) {
 				$this->logWrite('Set ThreadsMap() as background task ("'.$sFolderName.'" / '.$sSearch.')');
-				\SnappyMail\Shutdown::add(function($oMailClient, $oFolderInfo, $oCacher) {
+				\Tachyon\Util\Shutdown::add(function($oMailClient, $oFolderInfo, $oCacher) {
 					$oFolderInfo->MESSAGES = 0;
 					$oMailClient->ThreadsMap($sAlgorithm, $oMessageCollection, $oCacher, true);
 				}, [$this, $oFolderInfo, $oCacher]);
@@ -498,7 +498,7 @@ class MailClient
 		}
 		catch (\MailSo\RuntimeException $oException)
 		{
-			\SnappyMail\Log::warning('MailClient', 'ThreadsMap ' . $oException->getMessage());
+			\Tachyon\Util\Log::warning('MailClient', 'ThreadsMap ' . $oException->getMessage());
 			unset($oException);
 		}
 
@@ -813,7 +813,7 @@ class MailClient
 				$message_list_limit = 0;
 				$oMessageCollection->Sort = $oAllParams->sSort;
 			} else {
-				\SnappyMail\Shutdown::add(function($oMailClient, $oAllParams, $oInfo, $oMessageCollection) {
+				\Tachyon\Util\Shutdown::add(function($oMailClient, $oAllParams, $oInfo, $oMessageCollection) {
 					$oMailClient->GetUids($oAllParams, $oInfo);
 					if ($oAllParams->bUseThreads) {
 						$oMailClient->ThreadsMap($oAllParams->sThreadAlgorithm, $oMessageCollection, $oAllParams->oCacher, true);
@@ -933,7 +933,7 @@ class MailClient
 
 		if ($bUseListSubscribeStatus && !$this->oImapClient->hasCapability('LIST-EXTENDED')) {
 //			$this->logWrite('RFC5258 not supported, using LSUB');
-//			\SnappyMail\Log::warning('IMAP', 'RFC5258 not supported, using LSUB');
+//			\Tachyon\Util\Log::warning('IMAP', 'RFC5258 not supported, using LSUB');
 			try
 			{
 				$oSubscribedFolders = $this->oImapClient->FolderSubscribeList($sParent, $sListPattern);
@@ -944,7 +944,7 @@ class MailClient
 			}
 			catch (\Throwable $oException)
 			{
-				\SnappyMail\Log::error('IMAP', 'FolderSubscribeList: ' . $oException->getMessage());
+				\Tachyon\Util\Log::error('IMAP', 'FolderSubscribeList: ' . $oException->getMessage());
 				foreach ($oFolderCollection as /* @var $oImapFolder \MailSo\Imap\Folder */ $oImapFolder) {
 					$oImapFolder->setSubscribed();
 				}

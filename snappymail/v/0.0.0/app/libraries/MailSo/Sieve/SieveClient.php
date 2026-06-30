@@ -97,7 +97,7 @@ class SieveClient extends \MailSo\Net\NetClient
 		$type = '';
 		if ($this->hasCapability('SASL')) {
 			foreach ($oSettings->SASLMechanisms as $sasl_type) {
-				if (\in_array(\strtoupper($sasl_type), $this->aAuth) && \SnappyMail\SASL::isSupported($sasl_type)) {
+				if (\in_array(\strtoupper($sasl_type), $this->aAuth) && \Tachyon\Util\SASL::isSupported($sasl_type)) {
 					$type = $sasl_type;
 					break;
 				}
@@ -112,7 +112,7 @@ class SieveClient extends \MailSo\Net\NetClient
 			$this->writeLogException(new \MailSo\Sieve\Exceptions\LoginException, \LOG_ERR);
 		}
 
-		$SASL = \SnappyMail\SASL::factory($type);
+		$SASL = \Tachyon\Util\SASL::factory($type);
 
 		$bAuth = false;
 		try

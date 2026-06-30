@@ -1,12 +1,12 @@
 <?php
 
-class SendSaveInPlugin extends \RainLoop\Plugins\AbstractPlugin
+class SendSaveInPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 //	use \MailSo\Log\Inherit;
 
 	const
 		NAME     = 'Send Save In',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '0.1',
 		RELEASE  = '2024-10-08',

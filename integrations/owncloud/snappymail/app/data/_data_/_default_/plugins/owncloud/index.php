@@ -1,6 +1,6 @@
 <?php
 
-class OwnCloudPlugin extends \RainLoop\Plugins\AbstractPlugin
+class OwnCloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'OwnCloud',
@@ -49,7 +49,7 @@ class OwnCloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	// DoAttachmentsActions
-	public function DoAttachmentsActions(\SnappyMail\AttachmentsAction $data)
+	public function DoAttachmentsActions(\Tachyon\Util\AttachmentsAction $data)
 	{
 		if ('owncloud' === $data->action) {
 			if (static::IsOwnCloudLoggedIn() && \class_exists('OCP\Files')) {
@@ -142,7 +142,7 @@ class OwnCloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function FilterAppData($bAdmin, &$aResult)
 	{
 		if (!$bAdmin && \is_array($aResult) && static::IsOwnCloud()) {
-			$key = \array_search(\RainLoop\Enumerations\Capa::AUTOLOGOUT, $aResult['Capa']);
+			$key = \array_search(\Tachyon\Enumerations\Capa::AUTOLOGOUT, $aResult['Capa']);
 			if (false !== $key) {
 				unset($aResult['Capa'][$key]);
 			}
@@ -170,10 +170,10 @@ class OwnCloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('save_folder')->SetLabel('Save Folder')
+			\Tachyon\Plugins\Property::NewInstance('save_folder')->SetLabel('Save Folder')
 				->SetDefaultValue('Attachments'),
-			\RainLoop\Plugins\Property::NewInstance('suggestions')->SetLabel('Suggestions')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('suggestions')->SetLabel('Suggestions')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(true)
 		);
 	}

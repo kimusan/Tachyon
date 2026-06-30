@@ -1,10 +1,10 @@
 <?php
 
-class BackupPlugin extends \RainLoop\Plugins\AbstractPlugin
+class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Backup',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.2',
 		RELEASE  = '2024-03-18',
@@ -24,7 +24,7 @@ class BackupPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function JsonAdminBackupData()
 	{
-		if (!($this->Manager()->Actions() instanceof \RainLoop\ActionsAdmin)
+		if (!($this->Manager()->Actions() instanceof \Tachyon\ActionsAdmin)
 		 || !$this->Manager()->Actions()->IsAdminLoggined()
 		) {
 			return $this->jsonResponse(__FUNCTION__, false);
@@ -42,11 +42,11 @@ class BackupPlugin extends \RainLoop\Plugins\AbstractPlugin
 //				$oArchive->open($sFileName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
 //				$oArchive->setArchiveComment('SnappyMail/'.APP_VERSION);
 			}
-			$oArchive = new \SnappyMail\Stream\ZIP($sFileName);
+			$oArchive = new \Tachyon\Util\Stream\ZIP($sFileName);
 		} else {
 			$sType = 'application/x-gzip';
 			$sFileName .= '.tgz';
-			$oArchive = new \SnappyMail\Stream\TAR($sFileName);
+			$oArchive = new \Tachyon\Util\Stream\TAR($sFileName);
 		}
 
 //		$oArchive->addRecursive(APP_PRIVATE_DATA, '#/(cache.*)#');
@@ -71,7 +71,7 @@ class BackupPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function JsonAdminRestoreData()
 	{
-		if (!($this->Manager()->Actions() instanceof \RainLoop\ActionsAdmin)
+		if (!($this->Manager()->Actions() instanceof \Tachyon\ActionsAdmin)
 		 || empty($_FILES['backup'])
 		 || 'application/zip' !== $_FILES['backup']['type']
 		 || !\is_uploaded_file($_FILES['backup']['tmp_name'])

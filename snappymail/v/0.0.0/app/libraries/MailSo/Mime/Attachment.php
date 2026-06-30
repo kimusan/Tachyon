@@ -54,8 +54,8 @@ class Attachment
 		$this->aCustomContentTypeParams = $aCustomContentTypeParams;
 		$this->sContentLocation = $sContentLocation;
 		$this->sContentType = $sContentType
-			?: \SnappyMail\File\MimeType::fromStream($rResource, $sFileName)
-			?: \SnappyMail\File\MimeType::fromFilename($sFileName)
+			?: \Tachyon\Util\File\MimeType::fromStream($rResource, $sFileName)
+			?: \Tachyon\Util\File\MimeType::fromFilename($sFileName)
 			?: 'application/octet-stream';
 	}
 

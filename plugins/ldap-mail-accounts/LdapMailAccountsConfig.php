@@ -1,7 +1,7 @@
 <?php
 
 
-use RainLoop\Config\Plugin;
+use Tachyon\Config\Plugin;
 
 class LdapMailAccountsConfig
 {

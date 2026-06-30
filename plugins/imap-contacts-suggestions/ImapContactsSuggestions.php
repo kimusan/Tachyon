@@ -1,18 +1,18 @@
 <?php
 
-class ImapContactsSuggestions implements \RainLoop\Providers\Suggestions\ISuggestions
+class ImapContactsSuggestions implements \Tachyon\Providers\Suggestions\ISuggestions
 {
 	// TODO: make setting
 	public $sFolderName = 'INBOX';
 
-	public function Process(\RainLoop\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
+	public function Process(\Tachyon\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
 	{
 		$sQuery = \trim($sQuery);
 		if (2 > \strlen($sQuery)) {
 			return [];
 		}
 
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oMailClient = $oActions->MailClient();
 		if (!$oMailClient->IsLoggined()) {
 			$oAccount = $oActions->getAccountFromToken();

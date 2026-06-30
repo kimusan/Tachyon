@@ -1,6 +1,6 @@
 <?php
 
-class DemoAccountPlugin extends \RainLoop\Plugins\AbstractPlugin
+class DemoAccountPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Demo Account Extension',
@@ -29,11 +29,11 @@ class DemoAccountPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('email')->SetLabel('Demo Email')
+			\Tachyon\Plugins\Property::NewInstance('email')->SetLabel('Demo Email')
 				->SetDefaultValue('demo@domain.com'),
-			\RainLoop\Plugins\Property::NewInstance('password')->SetLabel('Demo Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD),
-			\RainLoop\Plugins\Property::NewInstance('recipient_delimiter')->SetLabel('recipient_delimiter')
+			\Tachyon\Plugins\Property::NewInstance('password')->SetLabel('Demo Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD),
+			\Tachyon\Plugins\Property::NewInstance('recipient_delimiter')->SetLabel('recipient_delimiter')
 				->SetDefaultValue(''),
 		);
 	}
@@ -65,16 +65,16 @@ class DemoAccountPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$latin = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $aActionParams['folder']);
 			if (false !== \strpos($latin, 'nigger')) {
 				\error_log("blocked {$sMethodName} {$aActionParams['folder']}");
-				throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoAccountError);
+				throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoAccountError);
 			}
 		}
 		else if ('DoFolderClear' === $sMethodName || 'DoMessageDelete' === $sMethodName) {
-			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoAccountError);
+			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoAccountError);
 		}
 	}
 
 	/**
-	 * @param \RainLoop\Model\Account $oAccount
+	 * @param \Tachyon\Model\Account $oAccount
 	 *
 	 * @return bool
 	 */
@@ -86,7 +86,7 @@ class DemoAccountPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function BeforeAccountSetup()
 	{
-		throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoAccountError);
+		throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoAccountError);
 	}
 
 	public function AfterAccountsAndIdentities(&$aResponse)
@@ -195,20 +195,20 @@ r7HREQ/4hof+B0bTZCma/l0n
 			}
 			foreach ($oMessage->GetTo() as $oEmail) {
 				if (!\preg_match($regex, $oEmail->GetEmail())) {
-					throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoSendMessageError);
+					throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoSendMessageError);
 				}
 			}
 			foreach ($oMessage->GetCc() ?: [] as $oEmail) {
 				if (!\preg_match($regex, $oEmail->GetEmail())) {
-					throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoSendMessageError);
+					throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoSendMessageError);
 				}
 			}
 			foreach ($oMessage->GetBcc() ?: [] as $oEmail) {
 				if (!\preg_match($regex, $oEmail->GetEmail())) {
-					throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoSendMessageError);
+					throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoSendMessageError);
 				}
 			}
-//			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::DemoSendMessageError);
+//			throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::DemoSendMessageError);
 		}
 	}
 

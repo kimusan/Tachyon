@@ -1,9 +1,9 @@
 <?php
 
-namespace OCA\SnappyMail\Controller;
+namespace OCA\Tachyon\Util\Controller;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
-use OCA\SnappyMail\ContentSecurityPolicy;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\ContentSecurityPolicy;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -21,7 +21,7 @@ class PageController extends Controller
 		$bAdmin = false;
 		if (!empty($_SERVER['QUERY_STRING'])) {
 			SnappyMailHelper::loadApp();
-			$bAdmin = \RainLoop\Api::Config()->Get('security', 'admin_panel_key', 'admin') == $_SERVER['QUERY_STRING'];
+			$bAdmin = \Tachyon\Api::Config()->Get('security', 'admin_panel_key', 'admin') == $_SERVER['QUERY_STRING'];
 			if (!$bAdmin) {
 				SnappyMailHelper::startApp(true);
 			}
@@ -47,10 +47,10 @@ class PageController extends Controller
 		\OCP\Util::addStyle('snappymail', 'embed');
 
 		SnappyMailHelper::startApp();
-		$oConfig = \RainLoop\Api::Config();
-		$oActions = $bAdmin ? new \RainLoop\ActionsAdmin() : \RainLoop\Api::Actions();
+		$oConfig = \Tachyon\Api::Config();
+		$oActions = $bAdmin ? new \Tachyon\ActionsAdmin() : \Tachyon\Api::Actions();
 		$oHttp = \MailSo\Base\Http::SingletonInstance();
-		$oServiceActions = new \RainLoop\ServiceActions($oHttp, $oActions);
+		$oServiceActions = new \Tachyon\ServiceActions($oHttp, $oActions);
 		$sAppJsMin = $oConfig->Get('debug', 'javascript', false) ? '' : '.min';
 		$sAppCssMin = $oConfig->Get('debug', 'css', false) ? '' : '.min';
 		$sLanguage = $oActions->GetLanguage(false);
@@ -61,7 +61,7 @@ class PageController extends Controller
 		$params = [
 			'Admin' => $bAdmin ? 1 : 0,
 			'LoadingDescriptionEsc' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'SnappyMail'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
-			'BaseTemplates' => \RainLoop\Utils::ClearHtmlOutput($oServiceActions->compileTemplates($bAdmin)),
+			'BaseTemplates' => \Tachyon\Utils::ClearHtmlOutput($oServiceActions->compileTemplates($bAdmin)),
 			'BaseAppBootScript' => \file_get_contents(APP_VERSION_ROOT_PATH.'static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin.'.js'),
 			'BaseAppBootScriptNonce' => $sNonce,
 			'BaseLanguage' => $oActions->compileLanguage($sLanguage, $bAdmin),
@@ -78,7 +78,7 @@ class PageController extends Controller
 
 		// ownCloud html encodes, so addHeader('style') is not possible
 //		\OCP\Util::addHeader('style', ['id'=>'app-boot-css'], \file_get_contents(APP_VERSION_ROOT_PATH.'static/css/boot'.$sAppCssMin.'.css'));
-		\OCP\Util::addHeader('link', ['type'=>'text/css','rel'=>'stylesheet','href'=>\RainLoop\Utils::WebStaticPath('css/'.($bAdmin?'admin':'app').$sAppCssMin.'.css')], '');
+		\OCP\Util::addHeader('link', ['type'=>'text/css','rel'=>'stylesheet','href'=>\Tachyon\Utils::WebStaticPath('css/'.($bAdmin?'admin':'app').$sAppCssMin.'.css')], '');
 //		\OCP\Util::addHeader('style', ['id'=>'app-theme-style','data-href'=>$params['BaseAppThemeCssLink']], $params['BaseAppThemeCss']);
 
 		$response = new TemplateResponse('snappymail', 'index_embed', $params);

@@ -15,7 +15,7 @@
 namespace MailSo\Smtp;
 
 use MailSo\Net\Enumerations\ConnectionSecurityType;
-use SnappyMail\IDN;
+use Tachyon\Util\IDN;
 
 /**
 	response codes:
@@ -145,7 +145,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 
 		$type = '';
 		foreach ($oSettings->SASLMechanisms as $sasl_type) {
-			if (\in_array(\strtoupper($sasl_type), $this->aAuthTypes) && \SnappyMail\SASL::isSupported($sasl_type)) {
+			if (\in_array(\strtoupper($sasl_type), $this->aAuthTypes) && \Tachyon\Util\SASL::isSupported($sasl_type)) {
 				$type = $sasl_type;
 				break;
 			}
@@ -159,9 +159,9 @@ class SmtpClient extends \MailSo\Net\NetClient
 			$this->writeLogException(new \MailSo\Smtp\Exceptions\LoginBadMethodException);
 		}
 
-		$SASL = \SnappyMail\SASL::factory($type);
+		$SASL = \Tachyon\Util\SASL::factory($type);
 
-		if ($this->Settings->authPlainLine && $SASL instanceof \SnappyMail\SASL\Plain) {
+		if ($this->Settings->authPlainLine && $SASL instanceof \Tachyon\Util\SASL\Plain) {
 			// https://github.com/the-djmaze/snappymail/issues/1038
 			try
 			{

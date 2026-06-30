@@ -1,11 +1,11 @@
 <?php
 
-use RainLoop\Providers\Storage\Enumerations\StorageType;
+use Tachyon\Providers\Storage\Enumerations\StorageType;
 
-class NextcloudStorage extends \RainLoop\Providers\Storage\FileStorage
+class NextcloudStorage extends \Tachyon\Providers\Storage\FileStorage
 {
 	/**
-	 * @param \RainLoop\Model\Account|string|null $mAccount
+	 * @param \Tachyon\Model\Account|string|null $mAccount
 	 */
 	public function GenerateFilePath($mAccount, int $iStorageType, bool $bMkDir = false) : string
 	{
@@ -14,7 +14,7 @@ class NextcloudStorage extends \RainLoop\Providers\Storage\FileStorage
 			$sUID = \OC::$server->getUserSession()->getUser()->getUID();
 			$sDataPath .= ".config/{$sUID}/";
 			if ($bMkDir && !\is_dir($sDataPath) && !\mkdir($sDataPath, 0700, true)) {
-				throw new \RainLoop\Exceptions\Exception('Can\'t make storage directory "'.$sDataPath.'"');
+				throw new \Tachyon\Exceptions\Exception('Can\'t make storage directory "'.$sDataPath.'"');
 			}
 		}
 		return $sDataPath;

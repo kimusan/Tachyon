@@ -1,6 +1,6 @@
 <?php
 
-class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
+class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Nextcloud',
@@ -13,7 +13,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function Init() : void
 	{
 		if (static::IsIntegrated()) {
-			\SnappyMail\Log::debug('Nextcloud', 'integrated');
+			\Tachyon\Util\Log::debug('Nextcloud', 'integrated');
 			$this->UseLangs(true);
 
 			$this->addHook('main.fabrica', 'MainFabrica');
@@ -42,13 +42,13 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$this->addHook('smtp.before-login', 'beforeLogin');
 			$this->addHook('sieve.before-login', 'beforeLogin');
 		} else {
-			\SnappyMail\Log::debug('Nextcloud', 'NOT integrated');
+			\Tachyon\Util\Log::debug('Nextcloud', 'NOT integrated');
 			// \OC::$server->getConfig()->getAppValue('snappymail', 'snappymail-no-embed');
 			$this->addHook('main.content-security-policy', 'ContentSecurityPolicy');
 		}
 	}
 
-	public function ContentSecurityPolicy(\SnappyMail\HTTP\CSP $CSP)
+	public function ContentSecurityPolicy(\Tachyon\Util\HTTP\CSP $CSP)
 	{
 		if (\method_exists($CSP, 'add')) {
 			$CSP->add('frame-ancestors', "'self'");
@@ -87,12 +87,12 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$sEmail = $ocUser->getEMailAddress() ?: $ocUser->getPrimaryEMailAddress() ?: $sEmail;
 	}
 
-	public function beforeLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
+	public function beforeLogin(\Tachyon\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
 		// Only login with OIDC access token if
 		// it is enabled in config, the user is currently logged in with OIDC,
 		// the current snappymail account is the OIDC account and no account defined explicitly
-		if ($oAccount instanceof \RainLoop\Model\MainAccount
+		if ($oAccount instanceof \Tachyon\Model\MainAccount
 		 && \OCA\SnappyMail\Util\SnappyMailHelper::isOIDCLogin()
 //		 && $oClient->supportsAuthType('OAUTHBEARER') // v2.28
 		 && \str_starts_with($oSettings->passphrase, 'oidc_login|')
@@ -117,7 +117,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$sFile = $this->jsonParam('file', '');
 		$oFiles = \OCP\Files::getStorage('files');
 		if ($oFiles && $oFiles->is_file($sFile) && $fp = $oFiles->fopen($sFile, 'rb')) {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			$oAccount = $oActions->getAccountFromToken();
 			if ($oAccount) {
 				$sSavedName = 'nextcloud-file-' . \sha1($sFile . \microtime());
@@ -135,7 +135,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function NextcloudSaveMsg() : array
 	{
 		$sSaveFolder = \ltrim($this->jsonParam('folder', ''), '/');
-//		$aValues = \RainLoop\Api::Actions()->decodeRawKey($this->jsonParam('msgHash', ''));
+//		$aValues = \Tachyon\Api::Actions()->decodeRawKey($this->jsonParam('msgHash', ''));
 		$msgHash = $this->jsonParam('msgHash', '');
 		$aValues = \json_decode(\MailSo\Base\Utils::UrlSafeBase64Decode($msgHash), true);
 		$aResult = [
@@ -144,7 +144,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 			'success' => false
 		];
 		if ($sSaveFolder && !empty($aValues['folder']) && !empty($aValues['uid'])) {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			$oMailClient = $oActions->MailClient();
 			if (!$oMailClient->IsLoggined()) {
 				$oAccount = $oActions->getAccountFromToken();
@@ -177,7 +177,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		return $this->jsonResponse(__FUNCTION__, $aResult);
 	}
 
-	public function DoAttachmentsActions(\SnappyMail\AttachmentsAction $data)
+	public function DoAttachmentsActions(\Tachyon\Util\AttachmentsAction $data)
 	{
 		if (static::isLoggedIn() && 'nextcloud' === $data->action) {
 			$oFiles = \OCP\Files::getStorage('files');
@@ -234,9 +234,9 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 				} else if ($config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
 					$sEmail = $config->getUserValue($sUID, 'settings', 'email', '');
 				} else {
-					\SnappyMail\Log::debug('Nextcloud', 'snappymail-autologin is off');
+					\Tachyon\Util\Log::debug('Nextcloud', 'snappymail-autologin is off');
 				}
-				// If the user has set credentials for SnappyMail in their personal
+				// If the user has set credentials for Tachyon in their personal
 				// settings, override everything before and use those instead.
 				$sCustomEmail = $config->getUserValue($sUID, 'snappymail', 'snappymail-email', '');
 				if ($sCustomEmail) {
@@ -252,10 +252,10 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 						$sEmail = "{$sUID}@nextcloud";
 						$aResult['DevPassword'] = \OC::$server->getSession()->get('oidc_access_token');
 					} else {
-						\SnappyMail\Log::debug('Nextcloud', 'Not an OIDC login');
+						\Tachyon\Util\Log::debug('Nextcloud', 'Not an OIDC login');
 					}
 				} else {
-					\SnappyMail\Log::debug('Nextcloud', 'OIDC is off');
+					\Tachyon\Util\Log::debug('Nextcloud', 'OIDC is off');
 				}
 */
 				$aResult['DevEmail'] = $sEmail ?: '';
@@ -271,14 +271,14 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 				}
 				$pass = \OC::$server->getSession()['snappymail-passphrase'];
 				if ($pass/* && empty($aResult['ContactsSync']['Password'])*/) {
-					$pass = \SnappyMail\Crypt::DecryptUrlSafe($pass, $sUID);
+					$pass = \Tachyon\Util\Crypt::DecryptUrlSafe($pass, $sUID);
 					if ($pass) {
 						$aResult['ContactsSync']['Password'] = $pass;
 						$bSave = true;
 					}
 				}
 				if ($bSave) {
-					$oActions = \RainLoop\Api::Actions();
+					$oActions = \Tachyon\Api::Actions();
 					$oActions->setContactsSyncData(
 						$oActions->getAccountFromToken(),
 						array(
@@ -295,8 +295,8 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function FilterLanguage(&$sLanguage, $bAdmin) : void
 	{
-		if (!\RainLoop\Api::Config()->Get('webmail', 'allow_languages_on_settings', true)) {
-			$aResultLang = \SnappyMail\L10n::getLanguages($bAdmin);
+		if (!\Tachyon\Api::Config()->Get('webmail', 'allow_languages_on_settings', true)) {
+			$aResultLang = \Tachyon\Util\L10n::getLanguages($bAdmin);
 			$userId = \OC::$server->getUserSession()->getUser()->getUID();
 			$userLang = \OC::$server->getConfig()->getUserValue($userId, 'core', 'lang', 'en');
 			$userLang = \strtr($userLang, '_', '-');
@@ -368,19 +368,19 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('suggestions')->SetLabel('Suggestions')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('suggestions')->SetLabel('Suggestions')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(true),
-			\RainLoop\Plugins\Property::NewInstance('ignoreSystemAddressbook')->SetLabel('Ignore system addressbook')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('ignoreSystemAddressbook')->SetLabel('Ignore system addressbook')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(true),
 /*
-			\RainLoop\Plugins\Property::NewInstance('storage')->SetLabel('Use Nextcloud user ID in config storage path')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('storage')->SetLabel('Use Nextcloud user ID in config storage path')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false)
 */
-			\RainLoop\Plugins\Property::NewInstance('calendar')->SetLabel('Enable "Put ICS in calendar"')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('calendar')->SetLabel('Enable "Put ICS in calendar"')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false)
 		);
 	}

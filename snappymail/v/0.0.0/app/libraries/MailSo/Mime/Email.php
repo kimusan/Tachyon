@@ -40,7 +40,7 @@ class Email implements \JsonSerializable
 			throw new \ValueError;
 		}
 
-		$this->sEmail = \SnappyMail\IDN::emailToAscii(Utils::Trim($sEmail));
+		$this->sEmail = \Tachyon\Util\IDN::emailToAscii(Utils::Trim($sEmail));
 
 		$this->sDisplayName = Utils::Trim($sDisplayName);
 	}
@@ -155,7 +155,7 @@ class Email implements \JsonSerializable
 
 	public function GetEmail(bool $bUtf8 = false) : string
 	{
-		return $bUtf8 ? \SnappyMail\IDN::emailToUtf8($this->sEmail) : $this->sEmail;
+		return $bUtf8 ? \Tachyon\Util\IDN::emailToUtf8($this->sEmail) : $this->sEmail;
 	}
 
 	public function GetDisplayName() : string

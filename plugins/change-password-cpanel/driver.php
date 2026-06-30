@@ -4,7 +4,7 @@
  * https://github.com/CpanelInc/xmlapi-php
  */
 
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 class ChangePasswordCPanelDriver
 {
@@ -12,11 +12,11 @@ class ChangePasswordCPanelDriver
 		NAME        = 'cPanel',
 		DESCRIPTION = 'Change passwords in cPanel.';
 
-	private \RainLoop\Config\Plugin $oConfig;
+	private \Tachyon\Config\Plugin $oConfig;
 
 	private \MailSo\Log\Logger $oLogger;
 
-	function __construct(\RainLoop\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
+	function __construct(\Tachyon\Config\Plugin $oConfig, \MailSo\Log\Logger $oLogger)
 	{
 		$this->oConfig = $oConfig;
 		$this->oLogger = $oLogger;
@@ -30,29 +30,29 @@ class ChangePasswordCPanelDriver
 	public static function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('cpanel_host')->SetLabel('cPanel Host')
+			\Tachyon\Plugins\Property::NewInstance('cpanel_host')->SetLabel('cPanel Host')
 				->SetDefaultValue('127.0.0.1'),
-			\RainLoop\Plugins\Property::NewInstance('cpanel_port')->SetLabel('cPanel Port')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::INT)
+			\Tachyon\Plugins\Property::NewInstance('cpanel_port')->SetLabel('cPanel Port')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::INT)
 				->SetDefaultValue(2087),
-			\RainLoop\Plugins\Property::NewInstance('cpanel_ssl')->SetLabel('Use SSL')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+			\Tachyon\Plugins\Property::NewInstance('cpanel_ssl')->SetLabel('Use SSL')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false),
-			\RainLoop\Plugins\Property::NewInstance('cpanel_user')->SetLabel('cPanel User')
+			\Tachyon\Plugins\Property::NewInstance('cpanel_user')->SetLabel('cPanel User')
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('cpanel_pass')->SetLabel('cPanel Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD)
+			\Tachyon\Plugins\Property::NewInstance('cpanel_pass')->SetLabel('cPanel Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('cpanel_allowed_emails')->SetLabel('Allowed emails')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING_TEXT)
+			\Tachyon\Plugins\Property::NewInstance('cpanel_allowed_emails')->SetLabel('Allowed emails')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING_TEXT)
 				->SetDescription('Allowed emails, space as delimiter, wildcard supported. Example: user1@domain1.net user2@domain1.net *@domain2.net')
 				->SetDefaultValue('*')
 		);
 	}
 
-	public function ChangePassword(\RainLoop\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
+	public function ChangePassword(\Tachyon\Model\Account $oAccount, SensitiveString $oPrevPassword, SensitiveString $oNewPassword) : bool
 	{
-		if (!\RainLoop\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'cpanel_allowed_emails', ''))) {
+		if (!\Tachyon\Plugins\Helper::ValidateWildcardValues($oAccount->Email(), $this->oConfig->Get('plugin', 'cpanel_allowed_emails', ''))) {
 			return false;
 		}
 

@@ -1,18 +1,18 @@
 <?php
 
-use RainLoop\Providers\Storage\Enumerations\StorageType;
+use Tachyon\Providers\Storage\Enumerations\StorageType;
 
-class DemoStorage extends \RainLoop\Providers\Storage\FileStorage
+class DemoStorage extends \Tachyon\Providers\Storage\FileStorage
 {
 	private static $gc_done;
 
 	/**
-	 * @param \RainLoop\Model\Account|string|null $mAccount
+	 * @param \Tachyon\Model\Account|string|null $mAccount
 	 */
 	public function GenerateFilePath($mAccount, int $iStorageType, bool $bMkDir = false) : string
 	{
 		$sEmail = '';
-		if ($mAccount instanceof \RainLoop\Model\MainAccount) {
+		if ($mAccount instanceof \Tachyon\Model\MainAccount) {
 			$sEmail = $mAccount->Email();
 		} else if (\is_string($mAccount)) {
 			$sEmail = $mAccount;
@@ -33,7 +33,7 @@ class DemoStorage extends \RainLoop\Providers\Storage\FileStorage
 
 		// $_COOKIE['smtoken']
 		if (empty($_COOKIE['smctoken'])) {
-			\SnappyMail\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
+			\Tachyon\Util\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
 		}
 		$sDataPath .= '/' . \MailSo\Base\Utils::SecureFileName($_COOKIE['smctoken']);
 		if (!\is_dir($sDataPath) && \mkdir($sDataPath, 0700, true)) {
@@ -64,7 +64,7 @@ class DemoStorage extends \RainLoop\Providers\Storage\FileStorage
 
 		if ($bMkDir && !\is_dir($sDataPath) && !\mkdir($sDataPath, 0700, true))
 		{
-			throw new \RainLoop\Exceptions\Exception('Can\'t make storage directory "'.$sDataPath.'"');
+			throw new \Tachyon\Exceptions\Exception('Can\'t make storage directory "'.$sDataPath.'"');
 		}
 
 		return $sDataPath . '/';

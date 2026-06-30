@@ -11,7 +11,7 @@
 
 namespace MailSo\Net;
 
-use SnappyMail\SensitiveString;
+use Tachyon\Util\SensitiveString;
 
 /**
  * @category MailSo
@@ -85,8 +85,8 @@ class ConnectSettings implements \JsonSerializable
 
 	public function fixUsername(string $value, bool $allowShorten = true) : string
 	{
-		$value = \SnappyMail\IDN::emailToAscii($value);
-//		$value = \SnappyMail\IDN::emailToAscii(\MailSo\Base\Utils::Trim($value));
+		$value = \Tachyon\Util\IDN::emailToAscii($value);
+//		$value = \Tachyon\Util\IDN::emailToAscii(\MailSo\Base\Utils::Trim($value));
 		// Strip the domain part
 		if ($this->shortLogin && $allowShorten) {
 			$value = \MailSo\Base\Utils::getEmailAddressLocalPart($value);

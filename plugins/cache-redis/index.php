@@ -1,6 +1,6 @@
 <?php
 
-class CacheRedisPlugin extends \RainLoop\Plugins\AbstractPlugin
+class CacheRedisPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 //	use \MailSo\Log\Inherit;
 
@@ -42,15 +42,15 @@ class CacheRedisPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('host')->SetLabel('Host')
+			\Tachyon\Plugins\Property::NewInstance('host')->SetLabel('Host')
 				->SetDescription('Hostname of the redis server')
 				->SetDefaultValue('127.0.0.1'),
-			\RainLoop\Plugins\Property::NewInstance('port')->SetLabel('Port')
+			\Tachyon\Plugins\Property::NewInstance('port')->SetLabel('Port')
 				->SetDescription('Port of the redis server')
 				->SetDefaultValue(6379)
 /*
-			,\RainLoop\Plugins\Property::NewInstance('password')->SetLabel('Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD)
+			,\Tachyon\Plugins\Property::NewInstance('password')->SetLabel('Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue('')
 */
 		);

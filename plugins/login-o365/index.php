@@ -12,10 +12,10 @@
  * Personal: redirect_uri=https://{DOMAIN}/LoginO365
  */
 
-use RainLoop\Model\MainAccount;
-use RainLoop\Providers\Storage\Enumerations\StorageType;
+use Tachyon\Model\MainAccount;
+use Tachyon\Providers\Storage\Enumerations\StorageType;
 
-class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginO365Plugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Office365/Outlook OAuth2',
@@ -54,7 +54,7 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 
 		if (!empty($aPaths[0]) && 'LoginO365' === $aPaths[0]) {
-			$oConfig = \RainLoop\Api::Config();
+			$oConfig = \Tachyon\Api::Config();
 			$oConfig->Set('security', 'secfetch_allow',
 				\trim($oConfig->Get('security', 'secfetch_allow', '') . ';site=cross-site', ';')
 			);
@@ -63,7 +63,7 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function ServiceLoginO365() : string
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oHttp = $oActions->Http();
 		$oHttp->ServerNoCache();
 
@@ -73,12 +73,12 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 				throw new \RuntimeException("{$_GET['error']}: {$_GET['error_description']}");
 			}
 			if (!isset($_GET['code']) || empty($_GET['state']) || 'o365' !== $_GET['state']) {
-				$oActions->Location(\RainLoop\Utils::WebPath());
+				$oActions->Location(\Tachyon\Utils::WebPath());
 				exit;
 			}
 			$oO365 = $this->o365Connector();
 			if (!$oO365) {
-				$oActions->Location(\RainLoop\Utils::WebPath());
+				$oActions->Location(\Tachyon\Utils::WebPath());
 				exit;
 			}
 
@@ -134,14 +134,14 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 				'expires' => $iExpires
 			];
 
-			$oPassword = new \SnappyMail\SensitiveString($aUserInfo['id']);
+			$oPassword = new \Tachyon\Util\SensitiveString($aUserInfo['id']);
 			$oAccount = $oActions->LoginProcess($aUserInfo['email'], $oPassword);
 //			$oAccount = MainAccount::NewInstanceFromCredentials($oActions, $aUserInfo['email'], $aUserInfo['email'], $oPassword, true);
 			if ($oAccount) {
 //				$oActions->SetMainAuthAccount($oAccount);
 //				$oActions->SetAuthToken($oAccount);
-				$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \RainLoop\Utils::GetSessionToken(),
-					\SnappyMail\Crypt::EncryptToJSON(static::$auth, $oAccount->CryptKey())
+				$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken(),
+					\Tachyon\Util\Crypt::EncryptToJSON(static::$auth, $oAccount->CryptKey())
 				);
 			}
 		}
@@ -149,45 +149,45 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 		{
 			$oActions->Logger()->WriteException($oException, \LOG_ERR);
 		}
-		$oActions->Location(\RainLoop\Utils::WebPath());
+		$oActions->Location(\Tachyon\Utils::WebPath());
 		exit;
 	}
 
 	public function configMapping() : array
 	{
 		return [
-			\RainLoop\Plugins\Property::NewInstance('personal')
+			\Tachyon\Plugins\Property::NewInstance('personal')
 				->SetLabel('Use with personal accounts')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(true)
 				->SetAllowedInJs()
 				->SetDescription('Sign in users with personal Microsoft accounts such as Outlook.com (Hotmail)'),
-			\RainLoop\Plugins\Property::NewInstance('client_id')
+			\Tachyon\Plugins\Property::NewInstance('client_id')
 				->SetLabel('Client ID')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetAllowedInJs()
 				->SetDescription('https://github.com/the-djmaze/snappymail/wiki/FAQ#o365'),
-			\RainLoop\Plugins\Property::NewInstance('client_secret')
+			\Tachyon\Plugins\Property::NewInstance('client_secret')
 				->SetLabel('Client Secret')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetEncrypted(),
-			\RainLoop\Plugins\Property::NewInstance('tenant_id')
+			\Tachyon\Plugins\Property::NewInstance('tenant_id')
 				->SetLabel('Tenant ID')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING),
-			\RainLoop\Plugins\Property::NewInstance('tenant')->SetLabel('Tenant')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::SELECTION)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING),
+			\Tachyon\Plugins\Property::NewInstance('tenant')->SetLabel('Tenant')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::SELECTION)
 				->SetDefaultValue(['common','consumers','organizations'])
 				->SetAllowedInJs()
 		];
 	}
 
-	public function clientLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
+	public function clientLogin(\Tachyon\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
 		if ($oAccount instanceof MainAccount && \str_ends_with($oAccount->Email(), '@hotmail.com')) {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			try {
-				$aData = static::$auth ?: \SnappyMail\Crypt::DecryptFromJSON(
-					$oActions->StorageProvider()->Get($oAccount, StorageType::SESSION, \RainLoop\Utils::GetSessionToken()),
+				$aData = static::$auth ?: \Tachyon\Util\Crypt::DecryptFromJSON(
+					$oActions->StorageProvider()->Get($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken()),
 					$oAccount->CryptKey()
 				);
 			} catch (\Throwable $oException) {
@@ -207,8 +207,8 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 						if (!empty($aRefreshTokenResponse['result']['access_token'])) {
 							$aData['access_token'] = $aRefreshTokenResponse['result']['access_token'];
 							$aResponse['expires'] = $iExpires + $aResponse['expires_in'];
-							$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \RainLoop\Utils::GetSessionToken(),
-								\SnappyMail\Crypt::EncryptToJSON($aData, $oAccount->CryptKey())
+							$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken(),
+								\Tachyon\Util\Crypt::EncryptToJSON($aData, $oAccount->CryptKey())
 							);
 						}
 					}
@@ -227,7 +227,7 @@ class LoginO365Plugin extends \RainLoop\Plugins\AbstractPlugin
 			try
 			{
 				$oO365 = new \OAuth2\Client($client_id, $client_secret);
-				$oActions = \RainLoop\Api::Actions();
+				$oActions = \Tachyon\Api::Actions();
 				$sProxy = $oActions->Config()->Get('labs', 'curl_proxy', '');
 				if (\strlen($sProxy)) {
 					$oO365->setCurlOption(CURLOPT_PROXY, $sProxy);

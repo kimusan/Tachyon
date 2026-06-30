@@ -413,7 +413,7 @@ class Message extends Part
 		}
 
 		if ($this->bAddDefaultXMailer && !isset($this->aHeadersValue[Enumerations\Header::X_MAILER])) {
-			$oRootPart->Headers->SetByName(Enumerations\Header::X_MAILER, 'SnappyMail/'.APP_VERSION, true);
+			$oRootPart->Headers->SetByName(Enumerations\Header::X_MAILER, 'Tachyon/'.APP_VERSION, true);
 		}
 
 		if (!isset($this->aHeadersValue[Enumerations\Header::MIME_VERSION])) {

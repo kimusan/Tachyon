@@ -1,6 +1,6 @@
 <?php
 
-namespace OCA\SnappyMail\Util;
+namespace OCA\Tachyon\Util\Util;
 
 class SnappyMailResponse extends \OCP\AppFramework\Http\Response
 {
@@ -47,24 +47,24 @@ class SnappyMailHelper
 	{
 		static::loadApp();
 
-		$oConfig = \RainLoop\Api::Config();
+		$oConfig = \Tachyon\Api::Config();
 
 		if (false !== \stripos(\php_sapi_name(), 'cli')) {
 			return;
 		}
 
 		try {
-			$oActions = \RainLoop\Api::Actions();
+			$oActions = \Tachyon\Api::Actions();
 			if (isset($_GET[$oConfig->Get('security', 'admin_panel_key', 'admin')])) {
 				if ($oConfig->Get('security', 'allow_admin_panel', true)
 				&& \OC_User::isAdminUser(\OC::$server->getUserSession()->getUser()->getUID())
 				&& !$oActions->IsAdminLoggined(false)
 				) {
 					$sRand = \MailSo\Base\Utils::Sha1Rand();
-					if ($oActions->Cacher(null, true)->Set(\RainLoop\KeyPathHelper::SessionAdminKey($sRand), \time())) {
-						$sToken = \RainLoop\Utils::EncodeKeyValuesQ(array('token', $sRand));
+					if ($oActions->Cacher(null, true)->Set(\Tachyon\KeyPathHelper::SessionAdminKey($sRand), \time())) {
+						$sToken = \Tachyon\Utils::EncodeKeyValuesQ(array('token', $sRand));
 //						$oActions->setAdminAuthToken($sToken);
-						\SnappyMail\Cookies::set('smadmin', $sToken);
+						\Tachyon\Util\Cookies::set('smadmin', $sToken);
 					}
 				}
 			} else {
@@ -95,7 +95,7 @@ class SnappyMailHelper
 						$ocSession = \OC::$server->getSession();
 						$oAccount = $oActions->LoginProcess($aCredentials[1], $aCredentials[2]);
 						if (!$isOIDC && $oAccount
-						 && $oConfig->Get('login', 'sign_me_auto', \RainLoop\Enumerations\SignMeType::DefaultOff) === \RainLoop\Enumerations\SignMeType::DefaultOn
+						 && $oConfig->Get('login', 'sign_me_auto', \Tachyon\Enumerations\SignMeType::DefaultOff) === \Tachyon\Enumerations\SignMeType::DefaultOn
 						) {
 							$oActions->SetSignMeToken($oAccount);
 						}
@@ -105,7 +105,7 @@ class SnappyMailHelper
 							$sUID = \OC::$server->getUserSession()->getUser()->getUID();
 							\OC::$server->getSession()['snappymail-passphrase'] = '';
 							\OC::$server->getConfig()->setUserValue($sUID, 'snappymail', 'passphrase', '');
-							\SnappyMail\Log::error('Nextcloud', $e->getMessage());
+							\Tachyon\Util\Log::error('Nextcloud', $e->getMessage());
 						}
 					}
 				}
@@ -113,7 +113,7 @@ class SnappyMailHelper
 
 			if ($handle) {
 				\header_remove('Content-Security-Policy');
-				\RainLoop\Service::Handle();
+				\Tachyon\Service::Handle();
 				// https://github.com/the-djmaze/snappymail/issues/1069
 				exit;
 //				return new SnappyMailResponse();
@@ -138,12 +138,12 @@ class SnappyMailHelper
 					if ($ocSession->get('oidc_access_token')) {
 						return true;
 					}
-					\SnappyMail\Log::debug('Nextcloud', 'OIDC access_token missing');
+					\Tachyon\Util\Log::debug('Nextcloud', 'OIDC access_token missing');
 				} else {
-					\SnappyMail\Log::debug('Nextcloud', 'No OIDC login');
+					\Tachyon\Util\Log::debug('Nextcloud', 'No OIDC login');
 				}
 			} else {
-				\SnappyMail\Log::debug('Nextcloud', 'OIDC login disabled');
+				\Tachyon\Util\Log::debug('Nextcloud', 'OIDC login disabled');
 			}
 		}
 		return false;
@@ -165,7 +165,7 @@ class SnappyMailHelper
 			if ($sPassword) {
 				return [$sUID, $sEmail, $sPassword];
 			} else {
-				\SnappyMail\Log::debug('Nextcloud', 'decodePassword failed for getUserValue');
+				\Tachyon\Util\Log::debug('Nextcloud', 'decodePassword failed for getUserValue');
 			}
 		}
 
@@ -190,13 +190,13 @@ class SnappyMailHelper
 				$sEmail = $config->getUserValue($sUID, 'settings', 'email');
 				$sPassword = $ocSession['snappymail-passphrase'];
 			} else {
-				\SnappyMail\Log::debug('Nextcloud', 'snappymail-autologin is off');
+				\Tachyon\Util\Log::debug('Nextcloud', 'snappymail-autologin is off');
 			}
 			if ($sPassword) {
 				return [$sUID, $sEmail, static::decodePassword($sPassword, $sUID)];
 			}
 		} else {
-			\SnappyMail\Log::debug('Nextcloud', "snappymail-nc-uid mismatch '{$ocSession['snappymail-nc-uid']}' != '{$sUID}'");
+			\Tachyon\Util\Log::debug('Nextcloud', "snappymail-nc-uid mismatch '{$ocSession['snappymail-nc-uid']}' != '{$sUID}'");
 		}
 
 		return [$sUID, '', ''];
@@ -220,13 +220,13 @@ class SnappyMailHelper
 	public static function encodePassword(string $sPassword, string $sSalt) : string
 	{
 		static::loadApp();
-		return \SnappyMail\Crypt::EncryptUrlSafe($sPassword, $sSalt);
+		return \Tachyon\Util\Crypt::EncryptUrlSafe($sPassword, $sSalt);
 	}
 
-	public static function decodePassword(string $sPassword, string $sSalt) : ?\SnappyMail\SensitiveString
+	public static function decodePassword(string $sPassword, string $sSalt) : ?\Tachyon\Util\SensitiveString
 	{
 		static::loadApp();
-		$result = \SnappyMail\Crypt::DecryptUrlSafe($sPassword, $sSalt);
-		return $result ? new \SnappyMail\SensitiveString($result) : null;
+		$result = \Tachyon\Util\Crypt::DecryptUrlSafe($sPassword, $sSalt);
+		return $result ? new \Tachyon\Util\SensitiveString($result) : null;
 	}
 }

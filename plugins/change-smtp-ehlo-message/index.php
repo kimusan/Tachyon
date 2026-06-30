@@ -1,6 +1,6 @@
 <?php
 
-class ChangeSmtpEhloMessagePlugin extends \RainLoop\Plugins\AbstractPlugin
+class ChangeSmtpEhloMessagePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Change SMTP EHLO Message',
@@ -13,10 +13,10 @@ class ChangeSmtpEhloMessagePlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	/**
-	 * @param \RainLoop\Model\Account $oAccount
+	 * @param \Tachyon\Model\Account $oAccount
 	 * @param array $aSmtpCredentials
 	 */
-	public function FilterSmtpCredentials(\RainLoop\Model\Account $oAccount,
+	public function FilterSmtpCredentials(\Tachyon\Model\Account $oAccount,
 		\MailSo\Smtp\SmtpClient $oSmtpClient,
 		array &$aSmtpCredentials)
 	{

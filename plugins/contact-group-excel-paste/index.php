@@ -1,6 +1,6 @@
 <?php
 
-class ContactGroupExcelPastePlugin extends \RainLoop\Plugins\AbstractPlugin
+class ContactGroupExcelPastePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = '',

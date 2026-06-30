@@ -1,6 +1,6 @@
 <?php
 
-class CompactComposerPlugin extends \RainLoop\Plugins\AbstractPlugin
+class CompactComposerPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Compact Composer',

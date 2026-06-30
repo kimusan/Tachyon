@@ -1,10 +1,10 @@
 <?php
 
-class LoginExternalSsoPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginExternalSsoPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login External SSO',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.0',
 		RELEASE  = '2022-11-11',
@@ -20,13 +20,13 @@ class LoginExternalSsoPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function ServiceExternalSso() : string
 	{
-		$oActions = \RainLoop\Api::Actions();
+		$oActions = \Tachyon\Api::Actions();
 		$oActions->Http()->ServerNoCache();
 		$sKey = $this->Config()->Get('plugin', 'key', '');
 		$sEmail = isset($_POST['Email']) ? $_POST['Email'] : '';
 		$sPassword = isset($_POST['Password']) ? $_POST['Password'] : '';
 		if ($sEmail && $sPassword && $sKey && isset($_POST['SsoKey']) && $_POST['SsoKey'] == $sKey) {
-			$sResult = \RainLoop\Api::CreateUserSsoHash($sEmail, $sPassword);
+			$sResult = \Tachyon\Api::CreateUserSsoHash($sEmail, $sPassword);
 			if (isset($_POST['Output']) && 'json' === \strtolower($_POST['Output'])) {
 				\header('Content-Type: application/json; charset=utf-8');
 				echo \json_encode(array(
@@ -48,7 +48,7 @@ class LoginExternalSsoPlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 		return array(
 			// Was application.ini external_sso_key
-			\RainLoop\Plugins\Property::NewInstance('key')->SetLabel('SSO key')
+			\Tachyon\Plugins\Property::NewInstance('key')->SetLabel('SSO key')
 				->SetDefaultValue(''),
 		);
 	}

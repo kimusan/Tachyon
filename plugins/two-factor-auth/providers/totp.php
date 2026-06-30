@@ -9,12 +9,12 @@ class TwoFactorAuthTotp implements TwoFactorAuthInterface
 
 	public function VerifyCode(string $sSecret, string $sCode) : bool
 	{
-		return \SnappyMail\TOTP::Verify($sSecret, $sCode);
+		return \Tachyon\Util\TOTP::Verify($sSecret, $sCode);
 	}
 
 	public function CreateSecret() : string
 	{
-		return \SnappyMail\TOTP::CreateSecret();
+		return \Tachyon\Util\TOTP::CreateSecret();
 	}
 
 }

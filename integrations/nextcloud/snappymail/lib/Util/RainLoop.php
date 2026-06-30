@@ -1,6 +1,6 @@
 <?php
 
-namespace OCA\SnappyMail\Util;
+namespace OCA\Tachyon\Util\Util;
 
 class RainLoop
 {
@@ -50,10 +50,10 @@ class RainLoop
 
 		// Attempt to install same plugins as RainLoop
 		if ($rainloop_plugins) {
-			foreach (\SnappyMail\Repository::getPackagesList()['List'] as $plugin) {
+			foreach (\Tachyon\Util\Repository::getPackagesList()['List'] as $plugin) {
 				if (\in_array($plugin['id'], $rainloop_plugins)) {
 					$result[] = "install plugin : {$plugin['id']}";
-					\SnappyMail\Repository::installPackage('plugin', $plugin['id']);
+					\Tachyon\Util\Repository::installPackage('plugin', $plugin['id']);
 					unset($rainloop_plugins[$plugin['id']]);
 				}
 			}
@@ -62,7 +62,7 @@ class RainLoop
 			}
 		}
 
-		$oConfig = \RainLoop\Api::Config();
+		$oConfig = \Tachyon\Api::Config();
 		$oConfig->Set('webmail', 'theme', 'NextcloudV25+');
 		$oConfig->Save();
 

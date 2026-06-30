@@ -1,8 +1,8 @@
 <?php
 
-use RainLoop\Enumerations\PluginPropertyType;
-use RainLoop\Plugins\AbstractPlugin;
-use RainLoop\Plugins\Property;
+use Tachyon\Enumerations\PluginPropertyType;
+use Tachyon\Plugins\AbstractPlugin;
+use Tachyon\Plugins\Property;
 
 class LDAPLoginMappingPlugin extends AbstractPlugin
 {
@@ -83,11 +83,11 @@ class LDAPLoginMappingPlugin extends AbstractPlugin
 	 * @param string $sPassword
 	 * @param string $sSmtpUser
 	 *
-	 * @throws \RainLoop\Exceptions\ClientException
+	 * @throws \Tachyon\Exceptions\ClientException
 	 */
 	public function FilterLoginСredentials(string &$sEmail, string &$sImapUser, string &$sPassword, string &$sSmtpUser)
 	{
-		$this->oLogger = \RainLoop\Api::Logger();
+		$this->oLogger = \Tachyon\Api::Logger();
 
 		$this->aDomains = explode(',', $this->Config()->Get('plugin', 'domains', ''));
 		$this->sSearchDomain = trim($this->Config()->Get('plugin', 'search_domain', ''));

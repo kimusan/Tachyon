@@ -1,6 +1,6 @@
 <?php
 
-class CacheMemcachePlugin extends \RainLoop\Plugins\AbstractPlugin
+class CacheMemcachePlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Cache Memcache',
@@ -38,15 +38,15 @@ class CacheMemcachePlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('host')->SetLabel('Host')
+			\Tachyon\Plugins\Property::NewInstance('host')->SetLabel('Host')
 				->SetDescription('Hostname of the memcache server')
 				->SetDefaultValue('127.0.0.1'),
-			\RainLoop\Plugins\Property::NewInstance('port')->SetLabel('Port')
+			\Tachyon\Plugins\Property::NewInstance('port')->SetLabel('Port')
 				->SetDescription('Port of the memcache server')
 				->SetDefaultValue(11211)
 /*
-			,\RainLoop\Plugins\Property::NewInstance('password')->SetLabel('Password')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::PASSWORD)
+			,\Tachyon\Plugins\Property::NewInstance('password')->SetLabel('Password')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue('')
 */
 		);

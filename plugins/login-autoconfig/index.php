@@ -5,11 +5,11 @@
 
 use MailSo\Net\Enumerations\ConnectionSecurityType;
 
-class LoginAutoconfigPlugin extends \RainLoop\Plugins\AbstractPlugin
+class LoginAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login Autoconfig',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '1.1',
 		RELEASE  = '2024-03-12',
@@ -30,7 +30,7 @@ class LoginAutoconfigPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$sDomain = \MailSo\Base\Utils::getEmailAddressDomain($sEmail);
 			$oDomain = $oProvider->Load($sDomain, false);
 			if (!$oDomain) {
-				$result = \RainLoop\Providers\Domain\Autoconfig::discover($sEmail);
+				$result = \Tachyon\Providers\Domain\Autoconfig::discover($sEmail);
 				if ($result) {
 					$typeIMAP = ConnectionSecurityType::AUTO_DETECT;
 					if ('STARTTLS' === $result['incomingServer'][0]['socketType']) {
@@ -44,7 +44,7 @@ class LoginAutoconfigPlugin extends \RainLoop\Plugins\AbstractPlugin
 					} else if ('SSL' === $result['outgoingServer'][0]['socketType']) {
 						$typeSMTP = ConnectionSecurityType::SSL;
 					}
-					$oDomain = \RainLoop\Model\Domain::fromArray($sDomain, [
+					$oDomain = \Tachyon\Model\Domain::fromArray($sDomain, [
 						'IMAP' => [
 							'host' => $result['incomingServer'][0]['hostname'],
 							'port' => $result['incomingServer'][0]['port'],
@@ -69,7 +69,7 @@ class LoginAutoconfigPlugin extends \RainLoop\Plugins\AbstractPlugin
 						'whiteList' => ''
 					]);
 					$oProvider->Save($oDomain);
-					\SnappyMail\Log::notice('Autoconfig', "Domain setup for '{$sDomain}' is created and active");
+					\Tachyon\Util\Log::notice('Autoconfig', "Domain setup for '{$sDomain}' is created and active");
 				}
 			}
 		}

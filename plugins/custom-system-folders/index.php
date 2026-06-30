@@ -1,6 +1,6 @@
 <?php
 
-class CustomSystemFoldersPlugin extends \RainLoop\Plugins\AbstractPlugin
+class CustomSystemFoldersPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Custom System Folders',
@@ -45,7 +45,7 @@ class CustomSystemFoldersPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	/**
-	 * @param \RainLoop\Model\Account $oAccount
+	 * @param \Tachyon\Model\Account $oAccount
 	 * @param array $aSystemTypes
 	 */
 	public function FilterFoldersSystemTypes($oAccount, &$aSystemTypes)
@@ -93,7 +93,7 @@ class CustomSystemFoldersPlugin extends \RainLoop\Plugins\AbstractPlugin
 	}
 
 	/**
-	 * @param \RainLoop\Model\Account $oAccount
+	 * @param \Tachyon\Model\Account $oAccount
 	 * @param array $aSystemFolderNames
 	 */
 	public function FilterSystemFoldersNames($oAccount, &$aSystemFolderNames)
@@ -129,15 +129,15 @@ class CustomSystemFoldersPlugin extends \RainLoop\Plugins\AbstractPlugin
 	protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('sent_folder')->SetLabel('Sent')
+			\Tachyon\Plugins\Property::NewInstance('sent_folder')->SetLabel('Sent')
 				->SetDefaultValue('Sent'),
-			\RainLoop\Plugins\Property::NewInstance('drafts_folder')->SetLabel('Drafts')
+			\Tachyon\Plugins\Property::NewInstance('drafts_folder')->SetLabel('Drafts')
 				->SetDefaultValue('Drafts'),
-			\RainLoop\Plugins\Property::NewInstance('spam_folder')->SetLabel('Spam')
+			\Tachyon\Plugins\Property::NewInstance('spam_folder')->SetLabel('Spam')
 				->SetDefaultValue('Spam'),
-			\RainLoop\Plugins\Property::NewInstance('trash_folder')->SetLabel('Trash')
+			\Tachyon\Plugins\Property::NewInstance('trash_folder')->SetLabel('Trash')
 				->SetDefaultValue('Trash'),
-			\RainLoop\Plugins\Property::NewInstance('archive_folder')->SetLabel('Archive')
+			\Tachyon\Plugins\Property::NewInstance('archive_folder')->SetLabel('Archive')
 				->SetDefaultValue('Archive')
 		);
 	}

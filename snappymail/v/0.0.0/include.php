@@ -3,7 +3,7 @@ if (defined('APP_VERSION_ROOT_PATH')) {
 	return;
 }
 
-// PHP 8
+// PHP 8 polyfill for servers still on PHP 7.x (will fail integrity check, but shows a readable error)
 if (PHP_VERSION_ID < 80000) {
 	require __DIR__ . '/app/libraries/polyfill/php8.php';
 }
@@ -19,8 +19,8 @@ if (!extension_loaded('intl')) {
 if (!defined('APP_VERSION')) {
 	define('APP_VERSION', basename(__DIR__));
 }
-if (!defined('SNAPPYMAIL_DEV')) {
-	define('SNAPPYMAIL_DEV', '0.0.0' === APP_VERSION);
+if (!defined('TACHYON_DEV')) {
+	define('TACHYON_DEV', '0.0.0' === APP_VERSION);
 }
 
 if (!defined('APP_INDEX_ROOT_PATH')) {
@@ -30,7 +30,6 @@ if (!defined('APP_INDEX_ROOT_PATH')) {
 // revoke permissions
 umask(0077);
 
-ini_set('register_globals', '0');
 ini_set('xdebug.max_nesting_level', '500');
 
 define('APP_VERSION_ROOT_PATH', __DIR__ . DIRECTORY_SEPARATOR);
@@ -74,20 +73,23 @@ define('APP_PLUGINS_PATH', APP_PRIVATE_DATA.'plugins/');
 ini_set('default_charset', 'UTF-8');
 ini_set('internal_encoding', 'UTF-8');
 
-if (!defined('SNAPPYMAIL_LIBRARIES_PATH')) {
-	define('SNAPPYMAIL_LIBRARIES_PATH', rtrim(realpath(__DIR__), '\\/').'/app/libraries/');
+if (!defined('TACHYON_LIBRARIES_PATH')) {
+	define('TACHYON_LIBRARIES_PATH', rtrim(realpath(__DIR__), '\\/').'/app/libraries/');
 
-	if (false === set_include_path(SNAPPYMAIL_LIBRARIES_PATH . PATH_SEPARATOR . get_include_path())) {
+	if (false === set_include_path(TACHYON_LIBRARIES_PATH . PATH_SEPARATOR . get_include_path())) {
 		exit('set_include_path() failed. Probably due to Apache config using php_admin_value instead of php_value');
 	}
 
 	spl_autoload_extensions('.php');
-	/** lowercase autoloader */
-	spl_autoload_register();
-	/** case-sensitive autoloader */
+	/** custom autoloader */
 	spl_autoload_register(function($sClassName){
-		$file = SNAPPYMAIL_LIBRARIES_PATH . strtr($sClassName, '\\', DIRECTORY_SEPARATOR) . '.php';
-//		if ($file = stream_resolve_include_path(strtr($sClassName, '\\', DIRECTORY_SEPARATOR) . '.php')) {
+		if (strpos($sClassName, 'Tachyon\\Util\\') === 0) {
+			// Tachyon\Util\ -> lowercase mapping to tachyon_util/
+			$file = TACHYON_LIBRARIES_PATH . 'tachyon_util' . DIRECTORY_SEPARATOR . strtolower(str_replace('\\', DIRECTORY_SEPARATOR, substr($sClassName, 13))) . '.php';
+		} else {
+			// Everything else -> case-sensitive
+			$file = TACHYON_LIBRARIES_PATH . strtr($sClassName, '\\', DIRECTORY_SEPARATOR) . '.php';
+		}
 		if (is_file($file)) {
 			include_once $file;
 		}
@@ -128,11 +130,19 @@ if (isset($_SERVER['HTTPS']) && !headers_sent()) {
 	header('Strict-Transport-Security: max-age=31536000');
 }
 
+// Accept both old and new env var names for upgrade compatibility
+if (empty($_ENV['TACHYON_INCLUDE_AS_API']) && !empty($_ENV['SNAPPYMAIL_INCLUDE_AS_API'])) {
+	$_ENV['TACHYON_INCLUDE_AS_API'] = $_ENV['SNAPPYMAIL_INCLUDE_AS_API'];
+}
+if (empty($_ENV['TACHYON_UPDATE_PLUGINS']) && !empty($_ENV['SNAPPYMAIL_UPDATE_PLUGINS'])) {
+	$_ENV['TACHYON_UPDATE_PLUGINS'] = $_ENV['SNAPPYMAIL_UPDATE_PLUGINS'];
+}
+
 // cPanel https://github.com/the-djmaze/snappymail/issues/697
 if (!empty($_ENV['CPANEL']) && !is_dir(APP_PLUGINS_PATH.'login-remote')) {
 	require __DIR__ . '/cpanel.php';
 }
 
-if (empty($_ENV['SNAPPYMAIL_INCLUDE_AS_API'])) {
-	RainLoop\Service::Handle();
+if (empty($_ENV['TACHYON_INCLUDE_AS_API'])) {
+	Tachyon\Service::Handle();
 }

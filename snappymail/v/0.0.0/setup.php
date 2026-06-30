@@ -2,13 +2,13 @@
 
 require_once __DIR__ . '/app/libraries/snappymail/integrity.php';
 
-$result = \SnappyMail\Integrity::phpVersion();
+$result = \Tachyon\Util\Integrity::phpVersion();
 if ($result) {
 	echo '<p style="color: red">[301] ' . $result . '</p>';
 	exit(301);
 }
 
-$result = \SnappyMail\Integrity::phpExtensions();
+$result = \Tachyon\Util\Integrity::phpExtensions();
 if ($result) {
 	echo '<p>[302] The following PHP extensions are not available in your PHP configuration!</p>';
 	echo '<ul><li>' . \implode('</li>li><li>', $result) . '</li></ul>';
@@ -119,15 +119,15 @@ if (defined('APP_VERSION')) {
 		}
 	}
 
-	if (defined('SNAPPYMAIL_UPDATE_PLUGINS')) {
+	if (defined('TACHYON_UPDATE_PLUGINS')) {
 		// Update plugins
-		$asApi = !empty($_ENV['SNAPPYMAIL_INCLUDE_AS_API']);
-		$_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = true;
-		$aList = \SnappyMail\Repository::getEnabledPackagesNames();
+		$asApi = !empty($_ENV['TACHYON_INCLUDE_AS_API']);
+		$_ENV['TACHYON_INCLUDE_AS_API'] = true;
+		$aList = \Tachyon\Util\Repository::getEnabledPackagesNames();
 		foreach ($aList as $sId) {
-			\SnappyMail\Repository::installPackage('plugin', $sId);
+			\Tachyon\Util\Repository::installPackage('plugin', $sId);
 		}
-		$_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = $asApi;
+		$_ENV['TACHYON_INCLUDE_AS_API'] = $asApi;
 	}
 
 }

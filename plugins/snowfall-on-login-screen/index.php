@@ -1,6 +1,6 @@
 <?php
 
-class SnowfallOnLoginScreenPlugin extends \RainLoop\Plugins\AbstractPlugin
+class SnowfallOnLoginScreenPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Snowfall on login screen',

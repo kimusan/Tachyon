@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\SnappyMail\Command;
+namespace OCA\Tachyon\Util\Command;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
 use OC\Core\Command\Base;
 use OCP\IConfig;
 use OCP\IUserManager;

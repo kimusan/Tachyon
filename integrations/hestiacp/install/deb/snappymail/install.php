@@ -3,7 +3,7 @@
 $_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = true;
 require_once '/var/lib/snappymail/index.php';
 
-	$oConfig = \RainLoop\Api::Config();
+	$oConfig = \Tachyon\Api::Config();
 
 	// Change default login data / key
 	$oConfig->Set('security', 'admin_login', $argv[1]);
@@ -21,8 +21,8 @@ require_once '/var/lib/snappymail/index.php';
 	// Plugins
 	$oConfig->Set('plugins', 'enable', 'On');
 
-	\SnappyMail\Repository::installPackage('plugin', 'change-password');
-	\SnappyMail\Repository::installPackage('plugin', 'change-password-hestia');
+	\Tachyon\Util\Repository::installPackage('plugin', 'change-password');
+	\Tachyon\Util\Repository::installPackage('plugin', 'change-password-hestia');
 	$sFile = APP_PRIVATE_DATA.'configs/plugin-change-password.json';
 	if (!file_exists($sFile)) {
 		file_put_contents('', json_encode([
@@ -36,10 +36,10 @@ require_once '/var/lib/snappymail/index.php';
 			]
 		], JSON_PRETTY_PRINT));
 	}
-	\SnappyMail\Repository::enablePackage('change-password');
+	\Tachyon\Util\Repository::enablePackage('change-password');
 
-	\SnappyMail\Repository::installPackage('plugin', 'add-x-originating-ip-header');
-	\SnappyMail\Repository::enablePackage('add-x-originating-ip-header');
+	\Tachyon\Util\Repository::installPackage('plugin', 'add-x-originating-ip-header');
+	\Tachyon\Util\Repository::enablePackage('add-x-originating-ip-header');
 	$sFile = APP_PRIVATE_DATA.'configs/plugin-add-x-originating-ip-header.json';
 	if (!file_exists($sFile)) {
 		file_put_contents('', json_encode([

@@ -3,16 +3,16 @@
  * https://haveibeenpwned.com/API/v3
  */
 
-use SnappyMail\Hibp;
-use SnappyMail\SensitiveString;
+use Tachyon\Util\Hibp;
+use Tachyon\Util\SensitiveString;
 
-class HaveibeenpwnedPlugin extends \RainLoop\Plugins\AbstractPlugin
+class HaveibeenpwnedPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 //	use \MailSo\Log\Inherit;
 
 	const
 		NAME     = 'Have i been pwned',
-		AUTHOR   = 'SnappyMail',
+		AUTHOR   = 'Tachyon',
 		URL      = 'https://snappymail.eu/',
 		VERSION  = '0.1',
 		RELEASE  = '2024-04-22',
@@ -32,7 +32,7 @@ class HaveibeenpwnedPlugin extends \RainLoop\Plugins\AbstractPlugin
 	{
 //		$oAccount = $this->Manager()->Actions()->GetAccount();
 		$oAccount = $this->Manager()->Actions()->getAccountFromToken();
-//		$oAccount = \RainLoop\Api::Actions()->getAccountFromToken();
+//		$oAccount = \Tachyon\Api::Actions()->getAccountFromToken();
 
 		$api_key = \trim($this->Config()->Get('plugin', 'hibp-api-key', ''));
 		$breaches = $api_key ? Hibp::account($api_key, $oAccount->Email()) : null;
@@ -48,10 +48,10 @@ class HaveibeenpwnedPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function configMapping() : array
 	{
 		return [
-			\RainLoop\Plugins\Property::NewInstance("hibp-api-key")
+			\Tachyon\Plugins\Property::NewInstance("hibp-api-key")
 				->SetLabel('API key')
 				->SetDescription('https://haveibeenpwned.com/API/Key')
-				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
 		];
 	}
 }

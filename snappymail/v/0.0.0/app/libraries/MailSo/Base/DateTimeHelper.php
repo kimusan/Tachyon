@@ -37,7 +37,7 @@ abstract class DateTimeHelper
 	{
 		$sDateTime = \trim($sDateTime);
 		if (empty($sDateTime)) {
-			\SnappyMail\Log::info('', "No RFC 2822 date to parse");
+			\Tachyon\Util\Log::info('', "No RFC 2822 date to parse");
 			return 0;
 		}
 
@@ -60,14 +60,14 @@ abstract class DateTimeHelper
 
 			// 398045302 is 1982-08-13 00:08:22, the date RFC 822 was created
 			if (398045302 > $timestamp) {
-				\SnappyMail\Log::notice('', "Failed to parse RFC 2822 date '{$sDateTime}'");
+				\Tachyon\Util\Log::notice('', "Failed to parse RFC 2822 date '{$sDateTime}'");
 				return 0;
 			}
 
 			return $timestamp;
 		} catch (\Throwable $error) {
 			// Catch integer overflow or other fatal errors
-			\SnappyMail\Log::notice('', "Failed to parse RFC 2822 date '{$sDateTime}'. {$error->getMessage()}");
+			\Tachyon\Util\Log::notice('', "Failed to parse RFC 2822 date '{$sDateTime}'. {$error->getMessage()}");
 			return 0;
 		}
 	}

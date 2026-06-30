@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\SnappyMail\Controller;
+namespace OCA\Tachyon\Util\Controller;
 
-use OCA\SnappyMail\Util\SnappyMailHelper;
+use OCA\Tachyon\Util\Util\SnappyMailHelper;
 
 use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
@@ -69,7 +69,7 @@ class FetchController extends Controller {
 
 			SnappyMailHelper::loadApp();
 			$debug = !empty($_POST['snappymail-debug']);
-			$oConfig = \RainLoop\Api::Config();
+			$oConfig = \Tachyon\Api::Config();
 			if ($debug != $oConfig->Get('debug', 'enable', false)) {
 				$oConfig->Set('debug', 'enable', $debug);
 				$oConfig->Save();
