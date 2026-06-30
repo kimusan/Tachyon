@@ -739,9 +739,9 @@ class Actions
 				}
 
 				$aResult['signMe'] = [
-					SignMeType::DefaultOff => 0,
-					SignMeType::DefaultOn => 1,
-					SignMeType::Unused => 2
+					SignMeType::DefaultOff->value => 0,
+					SignMeType::DefaultOn->value => 1,
+					SignMeType::Unused->value => 2
 				][(string) $oConfig->Get('login', 'sign_me_auto', SignMeType::DefaultOff->value)];
 			}
 		}
