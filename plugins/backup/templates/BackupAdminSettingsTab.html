@@ -1,0 +1,31 @@
+<div>
+	<div class="form-horizontal">
+		<div class="legend">
+			Backup
+			&nbsp;&nbsp;&nbsp;
+			<i class="icon-spinner animated" data-bind="visible: loading"></i>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Download backup</label>
+			<div class="controls">
+				<button class="btn" data-bind="click: backup, disable: loading">
+					<i class="icon-download-alt"></i> Backup
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="form-horizontal" style="margin-top: 20px">
+		<div class="legend">Restore</div>
+		<div class="control-group">
+			<label class="control-label">Restore from backup</label>
+			<div class="controls">
+				<form data-bind="submit: submitForm">
+					<input type="file" name="backup" accept=".zip" required>
+					<button type="submit" class="btn btn-warning" style="margin-left: 10px">
+						<i class="icon-upload-alt"></i> Restore
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
