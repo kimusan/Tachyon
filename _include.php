@@ -17,8 +17,8 @@
 /**
  * Custom 'data' folder path
  */
-//define('APP_DATA_FOLDER_PATH', dirname(__DIR__) . '/snappymail-data/');
-//define('APP_DATA_FOLDER_PATH', '/var/external-snappymail-data-folder/');
+//define('APP_DATA_FOLDER_PATH', dirname(__DIR__) . '/tachyon-data/');
+//define('APP_DATA_FOLDER_PATH', '/var/external-tachyon-data-folder/');
 
 /**
  * Additional configuration file name
@@ -28,4 +28,4 @@
 /**
  * Also update extensions on upgrade
  */
-//define('SNAPPYMAIL_UPDATE_PLUGINS', 1);
+//define('TACHYON_UPDATE_PLUGINS', 1);

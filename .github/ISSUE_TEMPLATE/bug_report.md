@@ -24,14 +24,14 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Please complete the following information:**
-- Browser: [e.g. chromium 100, firefox 100, safari 14, mobile]
+- Browser: [e.g. Chrome 120, Firefox 115, Safari 17, mobile]
 - IMAP daemon: [e.g. courier, dovecot]
 - PHP version:
-- SnappyMail Version:
+- Tachyon Version:
 - Mode: [e.g. standalone, nextcloud, cyberpanel, docker]
 
 **Debug/logging information**
-[Read here how to log](https://github.com/the-djmaze/snappymail/wiki/FAQ#how-do-i-enable-logging)
+Enable logging in `data/_data_/_default_/configs/application.ini` by setting `[logs] enable` to `On`.
 - [ ] I've placed them here (few lines) or as attachments (many lines)
 
 **Additional context**

@@ -1,3 +1,16 @@
+## 3.0.0 – 2026-06-30
+### Changed
+- Project renamed from SnappyMail to Tachyon
+- PHP 8.2 minimum requirement (dropped 7.4, 8.0, 8.1)
+- Namespaces `RainLoop\` and `SnappyMail\` merged into `Tachyon\`
+- Build toolchain: rollup upgraded to v4, ESLint to v9, removed deprecated `rollup-plugin-terser`
+- CSP: replaced deprecated `report-uri` with `report-to`
+- Removed dead code: `ini_set('register_globals', ...)`, PHP 7.x polyfill guards
+- Bumped minimum browser targets to Chrome/Edge 90+, Firefox 115+, Safari 15.4+
+- Upgrade path from SnappyMail 2.x preserved; on-disk data format unchanged
+
+---
+
 ## 2.38.2 – 2024-10-09
 ### Fixed
 - error '$index is not defined' in Settings > Accounts
