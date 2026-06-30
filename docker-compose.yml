@@ -90,10 +90,10 @@ services:
           update-ca-certificates
           exec supervisord -c /etc/supervisor/supervisord.conf
 
-  # Snappymail: http://localhost:8888
+  # Tachyon: http://localhost:8888
   # Admin panel: http://localhost:8888/?admin
-  # Get the Admin Panel password: docker exec -it $( docker-compose ps -q snappymail ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
-  snappymail:
+  # Get the Admin Panel password: docker exec -it $( docker-compose ps -q tachyon ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
+  tachyon:
     build:
       dockerfile: ./.docker/release/Dockerfile
       context: .
@@ -103,7 +103,7 @@ services:
       - certs:/certs:ro
       - ./snappymail:/snappymail/snappymail:ro
       - ./index.php:/snappymail/index.php:ro
-      - snappymail:/var/lib/snappymail
+      - tachyon:/var/lib/snappymail
     ports:
       - 8888:8888
     networks:
@@ -130,9 +130,9 @@ services:
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=snappymail
-      - MYSQL_PASSWORD=snappymail
-      - MYSQL_DATABASE=snappymail
+      - MYSQL_USER=tachyon
+      - MYSQL_PASSWORD=tachyon
+      - MYSQL_DATABASE=tachyon
     volumes:
       - mysql:/var/lib/mysql
     networks:
@@ -144,7 +144,7 @@ volumes:
   dms-mail-state:
   dms-mail-logs:
   dms-config:
-  snappymail:
+  tachyon:
   mysql:
 
 networks:

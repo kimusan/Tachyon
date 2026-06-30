@@ -22,10 +22,10 @@ RUN set -eux; \
     # Remove unneeded files
     rm -v /snappymail/README.md /snappymail/_include.php
 
-# Inspired by the original Rainloop dockerfile from youtous on GitLab
+# Inspired by the original RainLoop dockerfile from youtous on GitLab
 FROM php:8.2-fpm-alpine AS final
 
-LABEL org.label-schema.description="SnappyMail webmail client image using nginx, php-fpm on Alpine"
+LABEL org.label-schema.description="Tachyon webmail client image using nginx, php-fpm on Alpine"
 
 # Install dependencies such as nginx
 RUN apk add --no-cache ca-certificates nginx supervisor bash
@@ -163,10 +163,10 @@ RUN set -eux; \
     docker-php-ext-install zip; \
     apk del .deps
 
-# Install snappymail
+# Install Tachyon
 # The 'www-data' user/group in alpine is 82:82. The 'nginx' user/group in alpine is 101:101, and is part of www-data group
 COPY --chown=www-data:www-data --from=builder /snappymail /snappymail
-# Use a custom snappymail data folder
+# Use a custom Tachyon data folder
 RUN mv -v /snappymail/data /var/lib/snappymail;
 # Setup configs
 COPY --chown=root:root .docker/release/files /
