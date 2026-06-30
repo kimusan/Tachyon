@@ -1,18 +1,12 @@
 <div align="center">
-  <h1>Tachyon</h1>
+  <img src="docs/logo.png" alt="Tachyon" width="480">
   <p><em>Named after the theoretical particle that moves faster than light.</em></p>
-  <br>
-  <p>
-    Fast, secure, modern web-based email client.
-  </p>
+  <p>Fast, secure, modern web-based email client.</p>
   <p>
     A fork of <a href="https://github.com/the-djmaze/snappymail">SnappyMail</a>,
     which itself forked <a href="https://github.com/RainLoop/rainloop-webmail">RainLoop Webmail Community edition</a>.
   </p>
-  <p>
-    Existing SnappyMail installations can upgrade directly to Tachyon.
-  </p>
-  <h2></h2>
+  <p>Existing SnappyMail installations can upgrade directly to Tachyon.</p>
   <br>
 </div>
 
