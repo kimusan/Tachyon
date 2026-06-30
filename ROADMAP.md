@@ -113,8 +113,8 @@ Tasks:
 ### 2.3 PHP 8.x deprecated/removed functions (partial: 2026-06-30)
 - [x] `openssl_pkey_free()` - confirmed resolved in prior commit `dea7f4d1d`
 - [x] `register_globals` ini_set removed
-- [ ] Audit for `FILTER_SANITIZE_STRING` usage (deprecated PHP 8.1)
-- [ ] Audit for implicit null param passing to non-nullable typed params (deprecated PHP 8.1)
+- [x] `FILTER_SANITIZE_STRING` — audit completed 2026-06-30, zero usages found
+- [x] Implicit null param audit — completed 2026-06-30, all params already use `?type` or untyped `$mDefault`
 - [ ] `declare(strict_types=1)` audit for new and modified files
 
 ### 2.4 Modern PHP typing
@@ -124,7 +124,7 @@ Tasks:
 - [ ] Use match expressions instead of complex switch blocks (PHP 8.0+)
 - [ ] Use constructor property promotion where it simplifies code (PHP 8.0+)
 - [ ] Use Fibers for any future async work (PHP 8.1+)
-- [ ] Use enum for state constants (PHP 8.1+)
+- [x] Use enum for state constants (PHP 8.1+) — done 2026-06-30 (Phase 5: ResponseType, StoreAction, MessagePriority, SignMeType, Layout)
 - [ ] Use readonly properties (PHP 8.1+)
 
 ### 2.5 Security hardening in PHP
@@ -198,22 +198,22 @@ Tasks:
 ### Upstream PR Findings (reviewed 2026-06-30)
 
 **Integrate immediately (security + critical bugs):**
-- [ ] PR #2039 — FIX non-compliant Autocrypt Header (removes spaces from armored PGP keys)
-- [ ] PR #2037 — Fix Mime/Parser header detection (PGP inline decrypt for plain-text messages)
-- [ ] PR #2007 — Fix OIDC login: SensitiveString type mismatch causing SSO regression
-- [ ] PR #2024 — Fix login-remote plugin password handling (SensitiveString compat)
-- [ ] PR #2019 — Fix Search Filters plugin crash on keyword filters (IMAP error handling)
-- [ ] PR #2012 — Fix typo in imapsync.php: `RainLoop\API` → `RainLoop\Api` (already fixed in our rename)
-- [ ] PR #2011 — Fix typo in SSLContext.php: same class reference typo (check if our rename covers it)
-- [ ] PR #1981 — Fix JS error when forwarding emails as attachments (`t.decrypt undefined`)
-- [ ] PR #1974 — Fix docker command syntax in cli/release.php
-- [ ] PR #1973 — Add pdo_sqlite to Docker image
-- [ ] PR #1922 — Fix nginx IPv6 listening in IPv4-only environments (containerized deployments)
+- [x] PR #2039 — FIX non-compliant Autocrypt Header (removes spaces from armored PGP keys)
+- [x] PR #2037 — Fix Mime/Parser header detection (PGP inline decrypt) + `Mime/Utils.js` fix
+- [x] PR #2007 — Fix OIDC login: SensitiveString type mismatch causing SSO regression
+- [x] PR #2024 — Fix login-remote plugin password handling (SensitiveString compat)
+- [x] PR #2019 — Fix Search Filters plugin crash on keyword filters (IMAP error handling)
+- [x] PR #2012 — Fix typo in imapsync.php: covered by our namespace rename
+- [x] PR #2011 — Fix typo in SSLContext.php: covered by our namespace rename
+- [x] PR #1981 — Fix JS error when forwarding emails as attachments (`t.decrypt undefined`)
+- [x] PR #1974 — Fix docker command syntax in cli/release.php (N/A: we use our own Docker setup)
+- [x] PR #1973 — Add pdo_sqlite to Docker image (deferred: update when CI/CD Docker image is built)
+- [x] PR #1922 — Fix nginx IPv6 listening in IPv4-only environments (containerized deployments)
 
 **Evaluate and integrate:**
-- [ ] PR #2035 — Add HTTP-based SSO plugin for Apache Basic Auth integration
-- [ ] PR #1882 — Use LDAP login mapping for SMTP too (after IMAP mapping was added)
-- [ ] PR #2052 — Basque language update (translation)
+- [x] PR #2035 — Add HTTP-based SSO plugin for Apache Basic Auth integration (added `plugins/login-http/`)
+- [x] PR #1882 — LDAP login mapping now sets `$sSmtpUser` alongside `$sImapUser`
+- [x] PR #2052 — Basque language update (translation)
 
 **Skip for now:**
 - PR #2034 — Nextcloud webDAV API update (review after Phase 1.5 is stable)
@@ -230,7 +230,7 @@ Tasks:
 **Reviewed: 2026-06-30**
 
 **Worth integrating:**
-- [ ] **`php81` branch** (7 commits ahead): PHP 8.1 modernization converting state constants to PHP enums (SignMeType, ResponseType, StoreAction, MessagePriority, etc.). Last activity Feb 2024. Cherry-pick enum conversions that don't conflict with our Phase 2 work.
+- [x] **`php81` branch** (7 commits ahead): PHP 8.1 modernization converting state constants to PHP enums (SignMeType, ResponseType, StoreAction, MessagePriority, etc.). Applied 2026-06-30 in commit `165d74d29`.
 
 **Skip:**
 - **`sieve-gui`** (20 commits ahead): Experimental Sieve GUI, WIP as of Sept 2024. Wait for completion upstream or build our own in Phase 6.
@@ -356,50 +356,59 @@ is not currently abstracted, and the JS store model assumes a single active acco
 
 ## Integrated PRs from Upstream
 
-_Populated during Phase 4_
+Applied 2026-06-30 in commit `3e1886903` (and `ab337c05a`):
+- #2039 Autocrypt header fix
+- #2037 MIME parser fix + Mime/Utils.js headRaw check
+- #2007 OIDC SensitiveString fix
+- #2024 login-remote SensitiveString fix
+- #2019 Search Filters crash fix
+- #1981 JS forward-as-attachment fix
+- #1922 nginx IPv6 fix
+- #2052 Basque (eu) translations
+- #1882 LDAP mapping now covers SMTP user
+- #2035 New `plugins/login-http/` Apache HTTP Basic Auth SSO
 
 ---
 
 ## Integrated Branch Content from Upstream
 
-_Populated during Phase 5_
+Applied 2026-06-30 in commit `165d74d29`:
+- `php81` branch: 5 enum conversions (ResponseType, StoreAction, MessagePriority, SignMeType, Layout) + 9 caller files updated
 
 ---
 
 ## Next Actions (for next agent session)
 
-### Priority 1 — Integrate critical upstream bug fixes (Phase 4)
-The upstream PR review identified 11 security/critical bug PRs to integrate. Start with the ones that touch
-actual bugs (not just typos our namespace rename already fixed):
-- PR #2039: Autocrypt header fix (`MailSo/Mime/Header/Autocrypt.php` — remove spaces from armored keys)
-- PR #2037: MIME parser header detection fix (PGP inline decrypt)
-- PR #2007: OIDC SensitiveString type fix
-- PR #2024: login-remote plugin SensitiveString fix
-- PR #2019: Search Filters plugin crash
-- PR #1981: JS forward-as-attachment error (`t.decrypt undefined`)
-- PR #1922: nginx IPv6 fix
+### Priority 1 — Phase 2 remaining PHP modernization
+- `declare(strict_types=1)` audit — add to new/modified files (non-breaking change)
+- Readonly properties: scan for `private $x` that are set once in constructor → `readonly`
+- Start Phase 2.4: match expressions, constructor property promotion
 
-For each: `gh pr view N --repo the-djmaze/snappymail` to get the diff, then apply manually.
+### Priority 2 — Phase 3.2 Vendor library updates
+- **marked**: v14 (bundled) → latest v18.0.5. Check if API is compatible.
+- **OpenPGP.js v5**: check if v6 was released (v5.11.1 is current in vendors/)
+- **turndown**: check bundled version vs 7.2.4 latest
+- **Squire2**: custom fork, check for security commits in upstream neil jenkins/squire
 
-### Priority 2 — Cherry-pick php81 branch enums (Phase 5)
-The `php81` branch has PHP enum conversions for state constants. Review with:
-`gh api repos/the-djmaze/snappymail/compare/master...php81 --jq '.commits[].commit.message'`
-Then cherry-pick relevant enum files.
+### Priority 3 — Phase 3.1 rollup.config.js
+- Already removed in `a136968fb`. Nothing to do.
 
-### Priority 3 — Phase 2 remaining PHP modernization
-- `grep -rn "FILTER_SANITIZE_STRING" snappymail/` (deprecated PHP 8.1)
-- Implicit null param audit
-- Start adding `declare(strict_types=1)` to new files
+### Priority 4 — Phase 1.4 (config migration shim + Docker cleanup)
+- `docker-compose.yml` and `.docker/` image names/labels may still say SnappyMail
+- Add upgrade migration shim for config key changes (if any)
 
-### Priority 4 — Delete legacy rollup.config.js
-The root-level `rollup.config.js` uses deprecated plugins and is not used by the build pipeline.
-Safe to delete: `git rm rollup.config.js`
+### Priority 5 — Phase 6 feature investigation
+- Begin Phase 6.7 unified inbox feasibility audit
+- Phase 6.1 responsive layout: audit current mobile CSS breakpoints
 
-### Git log (commits on master)
-1. `8750ac7` rebrand: rename project to Tachyon (metadata and docs)
-2. `854e850` rebrand: rename SnappyMail -> Tachyon in JS, LESS, and static JSON
-3. `02ac9e0` rebrand: rename PHP namespaces and modernize PHP floor
-4. `9536bde` roadmap: update status after Phase 1 and 2 initial work
-5. `835c079` rebrand: rename integration packages to Tachyon (Phase 1.5)
-6. `b1081f9` rebrand: fix Nextcloud/OwnCloud app ID, session keys, and file rename
+### Git log (commits on master as of 2026-06-30)
+1. `ab337c05a` upstream: apply PRs #2052, #1882, #2035
+2. `84c56c6e7` rebrand: rename SnappyMail references in Docker entrypoint.sh
+3. `165d74d29` php: convert abstract enum classes to PHP 8.1 native enums (Phase 5)
+4. `3e1886903` upstream: apply critical bug fixes from PRs #2039, #2037, #2024, #2019, #2007, #1981, #1922
+5. `a136968fb` build: remove legacy rollup.config.js
+6. `40fc8e2` roadmap: mark Phases 1.5, 3 done; add upstream PR/branch findings
 7. `435399f` build: upgrade to Rollup v4, ESLint v9 flat config, fix JS lint errors
+8. `b1081f97` rebrand: fix Nextcloud/OwnCloud app ID, session keys, and file rename
+9. `835c079` rebrand: rename integration packages to Tachyon (Phase 1.5)
+10. `02ac9e0` rebrand: rename PHP namespaces and modernize PHP floor
