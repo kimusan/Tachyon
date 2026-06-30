@@ -29,7 +29,7 @@ class Email implements \JsonSerializable
 	 */
 	private string $sEmail;
 
-	private string $sDkimStatus = Enumerations\DkimStatus::NONE;
+	private Enumerations\DkimStatus $sDkimStatus = Enumerations\DkimStatus::NONE;
 
 	/**
 	 * @throws \ValueError
@@ -207,7 +207,7 @@ class Email implements \JsonSerializable
 			'@Object' => 'Object/Email',
 			'name' => Utils::Utf8Clear($this->sDisplayName),
 			'email' => Utils::Utf8Clear($this->GetEmail(true)),
-			'dkimStatus' => $this->sDkimStatus
+			'dkimStatus' => $this->sDkimStatus->value
 		);
 	}
 }
