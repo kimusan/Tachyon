@@ -78,7 +78,7 @@ class Socket extends \Tachyon\Util\HTTP\Request
 
 		$sock = \stream_socket_client("{$parts['host']}:{$parts['port']}", $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $context);
 		if (false === $sock) {
-			throw new \RuntimeException($errstr);
+			throw new \RuntimeException($errstr ?: "Connection failed (errno {$errno})");
 		}
 
 		\stream_set_timeout($sock, $this->timeout);
