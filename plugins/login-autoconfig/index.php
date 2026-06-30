@@ -10,7 +10,7 @@ class LoginAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Login Autoconfig',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.1',
 		RELEASE  = '2024-03-12',
 		REQUIRED = '2.35.3',

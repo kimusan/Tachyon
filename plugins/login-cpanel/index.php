@@ -5,7 +5,7 @@ class LogincPanelPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Login cPanel',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.4',
 		RELEASE  = '2024-03-27',
 		REQUIRED = '2.36.1',

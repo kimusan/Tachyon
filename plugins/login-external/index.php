@@ -5,7 +5,7 @@ class LoginExternalPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Login External',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.4',
 		RELEASE  = '2024-07-01',
 		REQUIRED = '2.36.1',

@@ -5,7 +5,7 @@ class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Backup',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.2',
 		RELEASE  = '2024-03-18',
 		REQUIRED = '2.30.0',

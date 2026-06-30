@@ -4,7 +4,7 @@ RUN mkdir -p /app/code
 WORKDIR /app/code
 
 # TODO: update URL to Tachyon release once CI/CD publishes releases
-VERSION=3.0.0
+VERSION=3.0.1
 RUN wget https://github.com/YOUR_ORG/tachyon/releases/download/v${VERSION}/tachyon-${VERSION}.zip -O /tmp/tachyon.zip && \
     unzip /tmp/tachyon.zip -d /app/code && \
     rm /tmp/tachyon.zip && \

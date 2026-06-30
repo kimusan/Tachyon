@@ -7,7 +7,7 @@ abstract class AbstractPlugin
 	const
 		NAME     = '',
 		AUTHOR   = 'SnappyMail',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '0.0',
 		RELEASE  = '2020-11-01',
 		REQUIRED = '2.0.0',

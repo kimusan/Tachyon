@@ -3,10 +3,10 @@
 /*
 https://imapsync.lamiral.info/README
 imapsync.php \
-  --host1 test1.snappymail.eu \
+  --host1 test1.example.com \
   --user1 test1               \
   --password1 "secret1"       \
-  --host2 test2.snappymail.eu \
+  --host2 test2.example.com \
   --user2 test2               \
   --password2 "secret2"
 */

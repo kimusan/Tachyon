@@ -8,7 +8,7 @@ class MailboxDetectPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'MailboxDetect',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '2.6',
 		RELEASE  = '2023-03-13',
 		REQUIRED = '2.27.0',

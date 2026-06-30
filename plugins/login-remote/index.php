@@ -5,7 +5,7 @@ class LoginRemotePlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Login Remote',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.5',
 		RELEASE  = '2024-09-20',
 		REQUIRED = '2.36.1',

@@ -7,7 +7,7 @@ class SendSaveInPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Send Save In',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '0.1',
 		RELEASE  = '2024-10-08',
 		REQUIRED = '2.38.1',

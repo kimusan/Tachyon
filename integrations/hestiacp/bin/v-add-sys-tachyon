@@ -27,7 +27,7 @@ SM_FILE="tachyon-latest.tar.gz"
 SM_EXTRACT_MAIN="snappymail"
 
 # TODO: update URL when Tachyon releases are published
-SM_URL="https://snappymail.eu/repository/latest.tar.gz"
+SM_URL="https://github.com/kimusan/Tachyon/releases/latest/download/tachyon-latest.tar.gz"
 
 # Folder paths
 SM_INSTALL_DIR="/var/lib/tachyon"

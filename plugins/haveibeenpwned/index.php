@@ -13,7 +13,7 @@ class HaveibeenpwnedPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Have i been pwned',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '0.1',
 		RELEASE  = '2024-04-22',
 		REQUIRED = '2.36.1',

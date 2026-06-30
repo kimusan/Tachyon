@@ -5,7 +5,7 @@ class LoginExternalSsoPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Login External SSO',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.0',
 		RELEASE  = '2022-11-11',
 		REQUIRED = '2.21.0',

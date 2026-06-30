@@ -1,6 +1,6 @@
 # snappymail-owncloud
 
-snappymail-owncloud is a plugin for ownCloud to use the excellent SnappyMail webmail (https://snappymail.eu/).
+Tachyon is a plugin for ownCloud to use the Tachyon webmail (https://github.com/kimusan/Tachyon).
 
 Thank you to all contributors to SnappyMail for ownCloud:
 - RainLoop Team, who initiated it

@@ -215,7 +215,7 @@ class Utils
 /*
 	public static function QrCode(string $sVcfData) : string
 	{
-		MECARD:N:djmaze;ORG:SnappyMail;TEL:+31012345678;URL:https\://snappymail.eu;EMAIL:info@snappymail.eu;ADR:address line;;
+		MECARD:N:djmaze;ORG:SnappyMail;TEL:+31012345678;URL:https://github.com/kimusan/Tachyon;EMAIL:kim@schulz.dk;ADR:address line;;
 		VCARD
 	}
 */

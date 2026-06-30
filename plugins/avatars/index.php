@@ -9,7 +9,7 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Avatars',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '1.22',
 		RELEASE  = '2025-03-10',
 		REQUIRED = '2.33.0',

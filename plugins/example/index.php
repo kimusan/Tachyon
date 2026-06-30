@@ -16,7 +16,7 @@ class ExamplePlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'Example',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '0.0',
 		RELEASE  = '2022-03-29',
 		REQUIRED = '2.14.0',
@@ -163,10 +163,10 @@ class ExamplePlugin extends \Tachyon\Plugins\AbstractPlugin
 	{
 		// Your custom php logic
 		// You may change login credentials
-		if ('demo@snappymail.eu' === $sEmail)
+		if ('demo@example.com' === $sEmail)
 		{
-			$sEmail = 'user@snappymail.eu';
-			$sLogin = 'user@snappymail.eu';
+			$sEmail = 'user@example.com';
+			$sLogin = 'user@example.com';
 			$sPassword = 'super-duper-password';
 		}
 		else

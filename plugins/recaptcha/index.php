@@ -5,7 +5,7 @@ class RecaptchaPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME     = 'reCaptcha',
 		AUTHOR   = 'Tachyon',
-		URL      = 'https://snappymail.eu/',
+		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '2.16',
 		RELEASE  = '2024-03-12',
 		REQUIRED = '2.35.3',

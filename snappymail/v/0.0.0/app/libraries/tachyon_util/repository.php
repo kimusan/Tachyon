@@ -5,7 +5,6 @@ namespace Tachyon\Util;
 abstract class Repository
 {
 	const PACKAGES_URL = 'https://raw.githubusercontent.com/kimusan/Tachyon/master/';
-	const SNAPPYMAIL_PACKAGES_URL = 'https://snappymail.eu/repository/v2/';
 	const CORE_API_URL = 'https://api.github.com/repos/kimusan/Tachyon/releases/latest';
 
 	private static function httpGet(string $url, array $headers = []) : ?string
@@ -93,23 +92,10 @@ abstract class Repository
 		$bReal = false;
 		$oCache = \Tachyon\Api::Actions()->Cacher();
 
-		// Tachyon-native packages (takes precedence)
-		$aTachyon = static::fetchPackages(static::PACKAGES_URL . 'packages.json', $oCache) ?? [];
+		$aPackages = static::fetchPackages(static::PACKAGES_URL . 'packages.json', $oCache) ?? [];
 
-		// SnappyMail packages as fallback for migrating users (graceful on failure)
-		$aSnappyMail = static::fetchPackages(static::SNAPPYMAIL_PACKAGES_URL . 'packages.json', $oCache) ?? [];
-
-		// Make SnappyMail file paths absolute before merging
-		foreach ($aSnappyMail as $oItem) {
-			if ($oItem && isset($oItem->file)
-			 && !\str_starts_with($oItem->file, 'http://') && !\str_starts_with($oItem->file, 'https://')) {
-				$oItem->file = static::SNAPPYMAIL_PACKAGES_URL . $oItem->file;
-			}
-		}
-
-		// Merge: index by id, Tachyon entries override SnappyMail entries
 		$aById = [];
-		foreach (\array_merge($aSnappyMail, $aTachyon) as $oItem) {
+		foreach ($aPackages as $oItem) {
 			if ($oItem && !empty($oItem->id)) {
 				$aById[$oItem->id] = $oItem;
 			}

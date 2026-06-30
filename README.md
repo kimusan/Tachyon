@@ -89,7 +89,7 @@ Copyright (c) 2013 - 2022 RainLoop
 - [Fetch Metadata Request Headers](https://www.w3.org/TR/fetch-metadata/) checks
 - Reduced DOM size
 - Kolab groupware support
-- Extended [IMAP RFC support](https://snappymail.eu/comparison#IMAP)
+- Extended IMAP RFC support (CONDSTORE, QRESYNC, METADATA, NOTIFY, and more)
 - Sodium and OpenSSL encryption support
 - PGP: OpenPGP.js v5, GnuPG, Mailvelope; ECDSA and EDDSA key support
 
