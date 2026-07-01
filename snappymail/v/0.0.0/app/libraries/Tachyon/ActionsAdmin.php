@@ -110,10 +110,18 @@ class ActionsAdmin extends Actions
 	public function DoAdminUploadLogo(): array
 	{
 		if (empty($_FILES['logo']['tmp_name'])) {
+			$this->logWrite('UploadLogo: no file in $_FILES[logo]', \LOG_WARNING);
 			return $this->FalseResponse(__FUNCTION__);
 		}
 		$tmp = $_FILES['logo']['tmp_name'];
-		$mime = \mime_content_type($tmp);
+		$mime = \Tachyon\Util\File\MimeType::fromFile($tmp);
+		// SVG detection fallback: finfo and mime_content_type often misidentify SVGs as text/xml or text/html
+		if (!$mime || \in_array($mime, ['text/xml', 'text/html', 'application/xml'])) {
+			$ext = \strtolower(\pathinfo($_FILES['logo']['name'] ?? '', PATHINFO_EXTENSION));
+			if ('svg' === $ext) {
+				$mime = 'image/svg+xml';
+			}
+		}
 		$extMap = [
 			'image/png'     => 'png',
 			'image/jpeg'    => 'jpg',
@@ -122,17 +130,20 @@ class ActionsAdmin extends Actions
 			'image/webp'    => 'webp',
 		];
 		if (!isset($extMap[$mime])) {
+			$this->logWrite("UploadLogo: rejected mime '{$mime}'", \LOG_WARNING);
 			return $this->FalseResponse(__FUNCTION__);
 		}
 		$dir = APP_PRIVATE_DATA . 'branding/';
-		if (!\is_dir($dir)) {
-			\mkdir($dir, 0755, true);
+		if (!\is_dir($dir) && !\mkdir($dir, 0755, true)) {
+			$this->logWrite("UploadLogo: cannot create directory {$dir}", \LOG_ERR);
+			return $this->FalseResponse(__FUNCTION__);
 		}
 		foreach (\glob($dir . 'logo.*') ?: [] as $old) {
 			\unlink($old);
 		}
 		$filename = 'logo.' . $extMap[$mime];
 		if (!\move_uploaded_file($tmp, $dir . $filename)) {
+			$this->logWrite("UploadLogo: move_uploaded_file failed to {$dir}{$filename}", \LOG_ERR);
 			return $this->FalseResponse(__FUNCTION__);
 		}
 		$oConfig = $this->Config();
