@@ -105,7 +105,7 @@ abstract class Service
 		if ($bAdmin && !$oConfig->Get('security', 'allow_admin_panel', true)) {
 			\MailSo\Base\Http::StatusHeader(403);
 			echo $oServiceActions->ErrorTemplates('Access Denied.',
-				'Access to the SnappyMail Admin Panel is not allowed!');
+				'Access to the Tachyon Admin Panel is not allowed!');
 
 			return false;
 		}
@@ -153,7 +153,7 @@ abstract class Service
 			if (!\is_dir(APP_DATA_FOLDER_PATH) || !\is_writable(APP_DATA_FOLDER_PATH)) {
 				echo $oServiceActions->ErrorTemplates(
 					'Permission denied!',
-					'SnappyMail can not access the data folder "'.APP_DATA_FOLDER_PATH.'"'
+					'Tachyon can not access the data folder "'.APP_DATA_FOLDER_PATH.'"'
 				);
 				return false;
 			}
@@ -179,7 +179,7 @@ abstract class Service
 				'{{BaseAppFaviconTouchLinkTag}}' => $sAppleTouchLink ? '<link type="image/png" rel="apple-touch-icon" href="'.$sAppleTouchLink.'">' : '',
 				'{{BaseAppManifestLink}}' => Utils::WebStaticPath('manifest.json'),
 				'{{BaseFavIconSvg}}' => $sFaviconUrl ? '' : Utils::WebStaticPath('favicon.svg'),
-				'{{LoadingDescriptionEsc}}' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'SnappyMail'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
+				'{{LoadingDescriptionEsc}}' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'Tachyon'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
 				'{{BaseAppAdmin}}' => $bAdmin ? 1 : 0
 			);
 

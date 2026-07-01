@@ -10,7 +10,7 @@ $cpanel_tar = new PharData($cpanel_destination);
 
 $cpanel_tar->buildFromDirectory('./integrations/cpanel', "@integrations/cpanel/@");
 
-$cpanel_path = '/usr/local/cpanel/base/3rdparty/snappymail/';
+$cpanel_path = '/usr/local/cpanel/base/3rdparty/tachyon/';
 
 $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('snappymail/v'), RecursiveIteratorIterator::SELF_FIRST);
 foreach ($files as $file) {

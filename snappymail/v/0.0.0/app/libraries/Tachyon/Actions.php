@@ -371,7 +371,7 @@ class Actions
 		}
 
 		if (!\strlen($sFileName)) {
-			$sFileName = 'snappymail-log.txt';
+			$sFileName = 'tachyon-log.txt';
 		}
 
 		return $sFileName;
@@ -543,7 +543,7 @@ class Actions
 			$this->oLoggerAuth->Write($this->compileLogParams($sLine, $oAccount, $aAdditionalParams), \LOG_WARNING);
 		}
 		if (($this->oConfig->Get('logs', 'auth_logging', false) || $this->oConfig->Get('logs', 'auth_syslog', false))
-		 && \openlog('snappymail', 0, \LOG_AUTHPRIV)) {
+		 && \openlog('tachyon', 0, \LOG_AUTHPRIV)) {
 			\syslog(\LOG_ERR, $this->compileLogParams(
 				$admin ? 'Admin Auth failed: ip={request:ip} user={user:login}' : 'Auth failed: ip={request:ip} user={imap:login}',
 				$oAccount, $aAdditionalParams
@@ -559,8 +559,8 @@ class Actions
 
 		$aResult = array(
 			'Auth' => false,
-			'title' => $oConfig->Get('webmail', 'title', 'SnappyMail Webmail'),
-			'loadingDescription' => $oConfig->Get('webmail', 'loading_description', 'SnappyMail'),
+			'title' => $oConfig->Get('webmail', 'title', 'Tachyon Webmail'),
+			'loadingDescription' => $oConfig->Get('webmail', 'loading_description', 'Tachyon'),
 			'Plugins' => array(),
 			'System' => array(
 				'version' => APP_VERSION,

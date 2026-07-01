@@ -11,16 +11,16 @@ $nc_destination = "{$destPath}tachyon-{$package->version}-nextcloud.tar";
 $nc_tar = new PharData($nc_destination);
 $hashes = [];
 
-file_put_contents(ROOT_DIR . '/integrations/nextcloud/snappymail/VERSION', $package->version);
-$file = ROOT_DIR . '/integrations/nextcloud/snappymail/appinfo/info.xml';
+file_put_contents(ROOT_DIR . '/integrations/nextcloud/tachyon/VERSION', $package->version);
+$file = ROOT_DIR . '/integrations/nextcloud/tachyon/appinfo/info.xml';
 file_put_contents($file, preg_replace('/<version>[^<]*</', "<version>{$package->version}<", file_get_contents($file)));
 
-$nc_tar->buildFromDirectory('./integrations/nextcloud', "@integrations/nextcloud/snappymail/@");
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('integrations/nextcloud/snappymail'));
+$nc_tar->buildFromDirectory('./integrations/nextcloud', "@integrations/nextcloud/tachyon/@");
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('integrations/nextcloud/tachyon'));
 foreach ($files as $file) {
 	if (is_file($file)) {
 		$name = str_replace('\\', '/', $file);
-		$name = str_replace('integrations/nextcloud/snappymail/', '', $name);
+		$name = str_replace('integrations/nextcloud/tachyon/', '', $name);
 		$hashes[$name] = hash_file('sha512', $file);
 	}
 }
@@ -30,34 +30,27 @@ foreach ($files as $file) {
 	if (is_file($file)) {
 		$newFile = str_replace('\\', '/', $file);
 		$newName = str_replace('/.htaccess', '/_htaccess', $newFile);
-		$nc_tar->addFile($file, "snappymail/app/{$newName}");
+		$nc_tar->addFile($file, "tachyon/app/{$newName}");
 		$hashes["app/{$newFile}"] = hash_file('sha512', $file);
 	}
 }
 
-/*
-$nc_tar->addFile('data/.htaccess');
-$nc_tar->addFromString('data/VERSION', $package->version);
-$nc_tar->addFile('data/README.md');
-$nc_tar->addFile('_include.php', 'snappymail/app/_include.php');
-*/
-$nc_tar->addFile('.htaccess', 'snappymail/app/_htaccess');
+$nc_tar->addFile('.htaccess', 'tachyon/app/_htaccess');
 $hashes['app/.htaccess'] = hash_file('sha512', '.htaccess');
 
 $index = file_get_contents('index.php');
 $index = str_replace('0.0.0', $package->version, $index);
-//$index = str_replace('snappymail/v/', '', $index);
-$nc_tar->addFromString('snappymail/app/index.php', $index);
+$nc_tar->addFromString('tachyon/app/index.php', $index);
 $hashes['app/index.php'] = hash('sha512', $index);
 
-$nc_tar->addFile('README.md', 'snappymail/app/README.md');
+$nc_tar->addFile('README.md', 'tachyon/app/README.md');
 $hashes['app/README.md'] = hash_file('sha512', 'README.md');
 
-$nc_tar->addFile('CHANGELOG.md', 'snappymail/CHANGELOG.md');
+$nc_tar->addFile('CHANGELOG.md', 'tachyon/CHANGELOG.md');
 $hashes['CHANGELOG.md'] = hash_file('sha512', 'CHANGELOG.md');
 
 $data = file_get_contents('dev/serviceworker.js');
-$nc_tar->addFromString('snappymail/app/serviceworker.js', $data);
+$nc_tar->addFromString('tachyon/app/serviceworker.js', $data);
 $hashes['app/serviceworker.js'] = hash('sha512', $data);
 
 spl_autoload_register(function($name){
@@ -66,9 +59,9 @@ spl_autoload_register(function($name){
 });
 
 ksort($hashes);
-$cert = file_get_contents($cert_dir.'/snappymail.crt');
+$cert = file_get_contents($cert_dir.'/tachyon.crt');
 $rsa = new \phpseclib\Crypt\RSA();
-$rsa->loadKey(file_get_contents($cert_dir.'/snappymail.key'));
+$rsa->loadKey(file_get_contents($cert_dir.'/tachyon.key'));
 $x509 = new \phpseclib\File\X509();
 $x509->loadX509($cert);
 $x509->setPrivateKey($rsa);
@@ -76,7 +69,7 @@ $rsa->setSignatureMode(\phpseclib\Crypt\RSA::SIGNATURE_PSS);
 $rsa->setMGFHash('sha512');
 $rsa->setSaltLength(0);
 $signature = $rsa->sign(json_encode($hashes));
-$nc_tar->addFromString('snappymail/appinfo/signature.json', json_encode([
+$nc_tar->addFromString('tachyon/appinfo/signature.json', json_encode([
 	'hashes' => $hashes,
 	'signature' => base64_encode($signature),
 	'certificate' => $cert
@@ -86,7 +79,7 @@ $nc_tar->compress(Phar::GZ);
 unlink($nc_destination);
 $nc_destination .= '.gz';
 
-$signature = shell_exec("openssl dgst -sha512 -sign {$cert_dir}/snappymail.key {$nc_destination} | openssl base64");
+$signature = shell_exec("openssl dgst -sha512 -sign {$cert_dir}/tachyon.key {$nc_destination} | openssl base64");
 file_put_contents($nc_destination.'.sig', $signature);
 
 echo "{$nc_destination} created\n";
