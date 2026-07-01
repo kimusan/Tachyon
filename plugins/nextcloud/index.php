@@ -4,8 +4,9 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Nextcloud',
-		VERSION = '2.38.1',
-		RELEASE  = '2024-10-08',
+		// Keep upstream metadata if you prefer; this is not functional.
+		VERSION = '2.38.2',
+		RELEASE  = '2026-02-06',
 		CATEGORY = 'Integrations',
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
 		REQUIRED = '2.38.0';
@@ -36,14 +37,13 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 			$this->addTemplate('templates/PopupsNextcloudFiles.html');
 			$this->addTemplate('templates/PopupsNextcloudCalendars.html');
 
-//			$this->addHook('login.credentials.step-2', 'loginCredentials2');
-//			$this->addHook('login.credentials', 'loginCredentials');
+			// $this->addHook('login.credentials.step-2', 'loginCredentials2');
+			// $this->addHook('login.credentials', 'loginCredentials');
 			$this->addHook('imap.before-login', 'beforeLogin');
 			$this->addHook('smtp.before-login', 'beforeLogin');
 			$this->addHook('sieve.before-login', 'beforeLogin');
 		} else {
 			\Tachyon\Util\Log::debug('Nextcloud', 'NOT integrated');
-			// \OC::$server->getConfig()->getAppValue('snappymail', 'snappymail-no-embed');
 			$this->addHook('main.content-security-policy', 'ContentSecurityPolicy');
 		}
 	}
@@ -72,13 +72,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 	public function loginCredentials(string &$sEmail, string &$sLogin, ?string &$sPassword = null) : void
 	{
-		/**
-		 * This has an issue.
-		 * When user changes email address, all settings are gone as the new
-		 * _data_/_default_/storage/{domain}/{local-part} is used
-		 */
-//		$ocUser = \OC::$server->getUserSession()->getUser();
-//		$sEmail = $ocUser->getEMailAddress() ?: $ocUser->getPrimaryEMailAddress() ?: $sEmail;
+		// left intentionally as upstream (commented in upstream)
 	}
 
 	public function loginCredentials2(string &$sEmail, ?string &$sPassword = null) : void
@@ -89,46 +83,80 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 	public function beforeLogin(\Tachyon\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
-		// Only login with OIDC access token if
-		// it is enabled in config, the user is currently logged in with OIDC,
-		// the current snappymail account is the OIDC account and no account defined explicitly
 		if ($oAccount instanceof \Tachyon\Model\MainAccount
-		 && \OCA\Tachyon\Util\TachyonHelper::isOIDCLogin()
-//		 && $oClient->supportsAuthType('OAUTHBEARER') // v2.28
-		 && \str_starts_with($oSettings->passphrase, 'oidc_login|')
+			&& \OCA\Tachyon\Util\TachyonHelper::isOIDCLogin()
+			&& \str_starts_with($oSettings->passphrase, 'oidc_login|')
 		) {
-//			$oSettings->passphrase = \OC::$server->getSession()->get('snappymail-passphrase');
-			$oSettings->passphrase = \OC::$server->getSession()->get('oidc_access_token');
+			$oSettings->passphrase = (string) \OC::$server->getSession()->get('oidc_access_token');
 			\array_unshift($oSettings->SASLMechanisms, 'OAUTHBEARER');
 		}
 	}
 
-	/*
-	\OC::$server->getCalendarManager();
-	\OC::$server->getLDAPProvider();
-	*/
-
+	/**
+	 * Attach a Nextcloud file into Tachyon temp storage (for composing).
+	 */
 	public function NextcloudAttachFile() : array
 	{
 		$aResult = [
 			'success' => false,
 			'tempName' => ''
 		];
-		$sFile = $this->jsonParam('file', '');
-		$oFiles = \OCP\Files::getStorage('files');
-		if ($oFiles && $oFiles->is_file($sFile) && $fp = $oFiles->fopen($sFile, 'rb')) {
+
+		$sFile = (string) $this->jsonParam('file', '');
+
+		try {
 			$oActions = \Tachyon\Api::Actions();
 			$oAccount = $oActions->getAccountFromToken();
-			if ($oAccount) {
-				$sSavedName = 'nextcloud-file-' . \sha1($sFile . \microtime());
-				if (!$oActions->FilesProvider()->PutFile($oAccount, $sSavedName, $fp)) {
-					$aResult['error'] = 'failed';
-				} else {
-					$aResult['tempName'] = $sSavedName;
-					$aResult['success'] = true;
-				}
+			if (!$oAccount) {
+				$aResult['error'] = 'no-account';
+				return $this->jsonResponse(__FUNCTION__, $aResult);
 			}
+
+			$user = \OC::$server->getUserSession()->getUser();
+			if (!$user) {
+				$aResult['error'] = 'no-user';
+				return $this->jsonResponse(__FUNCTION__, $aResult);
+			}
+
+			/** @var \OCP\Files\IRootFolder $root */
+			$root = \OC::$server->get(\OCP\Files\IRootFolder::class);
+			$userFolder = $root->getUserFolder($user->getUID());
+
+			// Tachyon sends "/Documents/app.svg" style paths; userFolder expects relative.
+			$relPath = \ltrim($sFile, '/');
+
+			if ($relPath === '') {
+				$aResult['error'] = 'empty-path';
+				return $this->jsonResponse(__FUNCTION__, $aResult);
+			}
+
+			$node = $userFolder->get($relPath);
+			if (!($node instanceof \OCP\Files\File)) {
+				$aResult['error'] = 'not-a-file';
+				return $this->jsonResponse(__FUNCTION__, $aResult);
+			}
+
+			$fp = $node->fopen('rb');
+			if (!$fp) {
+				$aResult['error'] = 'open-failed';
+				return $this->jsonResponse(__FUNCTION__, $aResult);
+			}
+
+			$sSavedName = 'nextcloud-file-' . \sha1($sFile . \microtime(true));
+			$ok = $oActions->FilesProvider()->PutFile($oAccount, $sSavedName, $fp);
+			@\fclose($fp);
+
+			if (!$ok) {
+				$aResult['error'] = 'failed';
+			} else {
+				$aResult['tempName'] = $sSavedName;
+				$aResult['success'] = true;
+			}
+		} catch (\Throwable $e) {
+			$aResult['error'] = 'exception';
+			$aResult['errorMessage'] = $e->getMessage();
 		}
+
 		return $this->jsonResponse(__FUNCTION__, $aResult);
 	}
 

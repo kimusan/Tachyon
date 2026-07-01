@@ -10,17 +10,21 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IRequest;
+use OCP\IUserSession;
+use Exception;
 
 class FetchController extends Controller {
 	private IConfig $config;
 	private IAppManager $appManager;
 	private IL10N $l;
+	private IUserSession $userSession;
 
-	public function __construct(string $appName, IRequest $request, IAppManager $appManager, IConfig $config, IL10N $l) {
+	public function __construct(string $appName, IRequest $request, IAppManager $appManager, IConfig $config, IL10N $l, IUserSession $userSession) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->appManager = $appManager;
 		$this->l = $l;
+		$this->userSession = $userSession;
 	}
 
 	public function upgrade(): JSONResponse {
@@ -104,15 +108,18 @@ class FetchController extends Controller {
 		try {
 			$sEmail = '';
 			if (isset($_POST['appname'], $_POST['tachyon-password'], $_POST['tachyon-email']) && 'tachyon' === $_POST['appname']) {
-				$sUser =  \OC::$server->getUserSession()->getUser()->getUID();
+				$user = $this->userSession->getUser();
+				$sUser = $user ? $user->getUID() : '';
 
-				$sEmail = $_POST['tachyon-email'];
-				$this->config->setUserValue($sUser, 'tachyon', 'tachyon-email', $sEmail);
+				if ($sUser) {
+					$sEmail = $_POST['tachyon-email'];
+					$this->config->setUserValue($sUser, 'tachyon', 'tachyon-email', $sEmail);
 
-				$sPass = $_POST['tachyon-password'];
-				if ('******' !== $sPass) {
-					$this->config->setUserValue($sUser, 'tachyon', 'passphrase',
-						$sPass ? TachyonHelper::encodePassword($sPass, \md5($sEmail)) : '');
+					$sPass = $_POST['tachyon-password'];
+					if ('******' !== $sPass) {
+						$this->config->setUserValue($sUser, 'tachyon', 'passphrase',
+							$sPass ? TachyonHelper::encodePassword($sPass, \md5($sEmail)) : '');
+					}
 				}
 			} else {
 				return new JSONResponse([
