@@ -360,18 +360,28 @@ body, button, input, select, textarea {
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 34px;
+	padding: 7px 18px;
 	font-weight: 600;
 	font-size: 13px;
 	letter-spacing: 0.1px;
 	text-transform: none;
 	box-shadow: none;
 	text-shadow: none;
-	line-height: 1;
-	padding: 7px 16px;
-	vertical-align: middle;
+	line-height: 1.2;
+	text-decoration: none;
 }
 
-.btn:hover   { filter: brightness(0.9); }
+/* block buttons need flex too so text stays centred */
+.btn-block { display: flex; }
+
+/* thin icon buttons: keep horizontal padding narrow but same height */
+.btn.btn-thin { padding: 7px 10px; }
+
+.btn:hover, .btn:focus { text-decoration: none; filter: brightness(0.9); }
 .btn:active  { filter: brightness(0.78); }
 
 /* ── Inputs ─────────────────────────────────────────────────────────────── */
@@ -564,6 +574,7 @@ input:focus, textarea:focus, select:focus {
 /* ── Links / Checkboxes ─────────────────────────────────────────────────── */
 a { color: var(--link-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
+a.btn:hover, a.btn:focus { text-decoration: none; }
 
 input[type="checkbox"],
 input[type="radio"] {
