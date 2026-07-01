@@ -7,17 +7,27 @@ use OCA\Tachyon\Util\ContentSecurityPolicy;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\INavigationManager;
+use OCP\IConfig;
+use OCP\IRequest;
 
 class PageController extends Controller
 {
+	private IConfig $config;
+	private INavigationManager $navigationManager;
+
+	public function __construct($appName, IRequest $request, IConfig $config, INavigationManager $navigationManager) {
+		parent::__construct($appName, $request);
+		$this->config = $config;
+		$this->navigationManager = $navigationManager;
+	}
+
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
 	public function index()
 	{
-		$config = \OC::$server->getConfig();
-
 		$bAdmin = false;
 		if (!empty($_SERVER['QUERY_STRING'])) {
 			TachyonHelper::loadApp();
@@ -27,10 +37,8 @@ class PageController extends Controller
 			}
 		}
 
-		if (!$bAdmin && $config->getAppValue('tachyon', 'tachyon-no-embed')) {
-			\OC::$server->getNavigationManager()->setActiveEntry('tachyon');
-			\OCP\Util::addScript('tachyon', 'tachyon');
-			\OCP\Util::addStyle('tachyon', 'style');
+		if (!$bAdmin && $this->config->getAppValue('tachyon', 'tachyon-no-embed')) {
+			$this->navigationManager->setActiveEntry('tachyon');
 			TachyonHelper::startApp();
 			$response = new TemplateResponse('tachyon', 'index', [
 				'tachyon-iframe-url' => TachyonHelper::normalizeUrl(TachyonHelper::getAppUrl())
@@ -43,9 +51,7 @@ class PageController extends Controller
 			return $response;
 		}
 
-		\OC::$server->getNavigationManager()->setActiveEntry('tachyon');
-
-		\OCP\Util::addStyle('tachyon', 'embed');
+		$this->navigationManager->setActiveEntry('tachyon');
 
 		TachyonHelper::startApp();
 		$oConfig = \Tachyon\Api::Config();
@@ -59,6 +65,8 @@ class PageController extends Controller
 		$csp = new ContentSecurityPolicy();
 		$sNonce = $csp->getSnappyMailNonce();
 
+		$cssLink = \Tachyon\Utils::WebStaticPath('css/'.($bAdmin?'admin':'app').$sAppCssMin.'.css');
+
 		$params = [
 			'Admin' => $bAdmin ? 1 : 0,
 			'LoadingDescriptionEsc' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'SnappyMail'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
@@ -71,15 +79,9 @@ class PageController extends Controller
 				'/\\s*([:;{},]+)\\s*/s',
 				'$1',
 				$oActions->compileCss($oActions->GetTheme($bAdmin), $bAdmin)
-			)
+			),
+			'CssLink' => $cssLink
 		];
-
-//		\OCP\Util::addScript('tachyon', '../app/snappymail/v/'.APP_VERSION.'/static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin);
-
-		// Nextcloud html encodes, so addHeader('style') is not possible
-//		\OCP\Util::addHeader('style', ['id'=>'app-boot-css'], \file_get_contents(APP_VERSION_ROOT_PATH.'static/css/boot'.$sAppCssMin.'.css'));
-		\OCP\Util::addHeader('link', ['type'=>'text/css','rel'=>'stylesheet','href'=>\Tachyon\Utils::WebStaticPath('css/'.($bAdmin?'admin':'app').$sAppCssMin.'.css')], '');
-//		\OCP\Util::addHeader('style', ['id'=>'app-theme-style','data-href'=>$params['BaseAppThemeCssLink']], $params['BaseAppThemeCss']);
 
 		$response = new TemplateResponse('tachyon', 'index_embed', $params);
 

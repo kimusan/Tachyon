@@ -1,3 +1,4 @@
+<?php script('tachyon', 'tachyon'); ?>
 <div class="section">
 	<form class="snappymail" action="admin.php" method="post">
 		<input type="hidden" name="requesttoken" value="<?php echo $_['requesttoken'] ?>" id="requesttoken">

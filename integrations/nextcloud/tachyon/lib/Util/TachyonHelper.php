@@ -2,6 +2,14 @@
 
 namespace OCA\Tachyon\Util;
 
+use OCP\Server;
+use OCP\IUserSession;
+use OCP\IConfig;
+use OCP\IURLGenerator;
+use OCP\App\IAppManager;
+use OCP\ISession;
+use OCP\IGroupManager;
+
 class TachyonResponse extends \OCP\AppFramework\Http\Response
 {
 	public function render(): string
@@ -56,8 +64,10 @@ class TachyonHelper
 		try {
 			$oActions = \Tachyon\Api::Actions();
 			if (isset($_GET[$oConfig->Get('security', 'admin_panel_key', 'admin')])) {
+				$user = Server::get(IUserSession::class)->getUser();
 				if ($oConfig->Get('security', 'allow_admin_panel', true)
-				&& \OC_User::isAdminUser(\OC::$server->getUserSession()->getUser()->getUID())
+				&& $user
+				&& Server::get(IGroupManager::class)->isAdmin($user->getUID())
 				&& !$oActions->IsAdminLoggined(false)
 				) {
 					$sRand = \MailSo\Base\Utils::Sha1Rand();
@@ -79,7 +89,7 @@ class TachyonHelper
 //				file_get_contents(\OC::$SERVERROOT . 'config/config.php');
 //				$CONFIG['version']
 				if (24 < $OC_Version[0]) {
-					$ocSession = \OC::$server->getSession();
+					$ocSession = Server::get(ISession::class);
 					$ocSession->reopen();
 					if (!$doLogin && $ocSession['tachyon-uid'] && $ocSession['tachyon-uid'] != $aCredentials[0]) {
 						// UID changed, Impersonate plugin probably active
@@ -92,7 +102,7 @@ class TachyonHelper
 				if ($doLogin && $aCredentials[1] && $aCredentials[2]) {
 					$isOIDC = \str_starts_with($aCredentials[2], 'oidc_login|');
 					try {
-						$ocSession = \OC::$server->getSession();
+						$ocSession = Server::get(ISession::class);
 						$oAccount = $oActions->LoginProcess($aCredentials[1], $aCredentials[2]);
 						if (!$isOIDC && $oAccount
 						 && $oConfig->Get('login', 'sign_me_auto', \Tachyon\Enumerations\SignMeType::DefaultOff->value) === \Tachyon\Enumerations\SignMeType::DefaultOn->value
@@ -102,10 +112,14 @@ class TachyonHelper
 					} catch (\Throwable $e) {
 						// Login failure, reset password to prevent more attempts
 						if (!$isOIDC) {
-							$sUID = \OC::$server->getUserSession()->getUser()->getUID();
-							\OC::$server->getSession()['tachyon-passphrase'] = '';
-							\OC::$server->getConfig()->setUserValue($sUID, 'tachyon', 'passphrase', '');
-							\Tachyon\Util\Log::error('Nextcloud', $e->getMessage());
+							$user = Server::get(IUserSession::class)->getUser();
+							$sUID = $user ? $user->getUID() : null;
+							if ($sUID) {
+								$session = Server::get(ISession::class);
+								$session['tachyon-passphrase'] = '';
+								Server::get(IConfig::class)->setUserValue($sUID, 'tachyon', 'passphrase', '');
+								\Tachyon\Util\Log::error('Nextcloud', $e->getMessage());
+							}
 						}
 					}
 				}
@@ -127,12 +141,12 @@ class TachyonHelper
 	// https://apps.nextcloud.com/apps/oidc_login
 	public static function isOIDCLogin() : bool
 	{
-		$config = \OC::$server->getConfig();
+		$config = Server::get(IConfig::class);
 		if ($config->getAppValue('tachyon', 'tachyon-autologin-oidc', false)) {
 			// Check if the OIDC Login app is enabled
-			if (\OC::$server->getAppManager()->isEnabledForUser('oidc_login')) {
+			if (Server::get(IAppManager::class)->isEnabledForUser('oidc_login')) {
 				// Check if session is an OIDC Login
-				$ocSession = \OC::$server->getSession();
+				$ocSession = Server::get(ISession::class);
 				if ($ocSession->get('is_oidc')) {
 					// IToken->getPassword() ???
 					if ($ocSession->get('oidc_access_token')) {
@@ -151,9 +165,14 @@ class TachyonHelper
 
 	private static function getLoginCredentials() : array
 	{
-		$sUID = \OC::$server->getUserSession()->getUser()->getUID();
-		$config = \OC::$server->getConfig();
-		$ocSession = \OC::$server->getSession();
+		$user = Server::get(IUserSession::class)->getUser();
+		$sUID = $user ? $user->getUID() : '';
+		$config = Server::get(IConfig::class);
+		$ocSession = Server::get(ISession::class);
+
+		if (!$sUID) {
+			return ['', '', ''];
+		}
 
 		// If the user has set credentials for Tachyon in their personal settings,
 		// this has the first priority.
@@ -171,13 +190,13 @@ class TachyonHelper
 
 		// If the current user ID is identical to login ID (not valid when using account switching),
 		// this has the second priority.
+		// Note: $ocSession array access is supported but deprecated? ISession implements ArrayAccess.
 		if ($ocSession['tachyon-nc-uid'] == $sUID) {
 
 			// If OpenID Connect (OIDC) is enabled and used for login, use this.
 			if (static::isOIDCLogin()) {
 				$sEmail = $config->getUserValue($sUID, 'settings', 'email');
-				$pwd = new \Tachyon\Util\SensitiveString("oidc_login|{$sUID}");
-				return [$sUID, $sEmail, $pwd];
+				return [$sUID, $sEmail, "oidc_login|{$sUID}"];
 			}
 
 			// Only use the user's password in the current session if they have
@@ -205,7 +224,7 @@ class TachyonHelper
 
 	public static function getAppUrl() : string
 	{
-		return \OC::$server->getURLGenerator()->linkToRoute('tachyon.page.appGet');
+		return Server::get(IURLGenerator::class)->linkToRoute('tachyon.page.appGet');
 	}
 
 	public static function normalizeUrl(string $sUrl) : string
