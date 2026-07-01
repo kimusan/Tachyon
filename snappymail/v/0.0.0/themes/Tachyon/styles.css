@@ -1,6 +1,3 @@
-/* Inter — closest open-source match to Apple's SF Pro */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
 /* Color scheme overrides (light/dark mode toggle) */
 [data-color-scheme="light"] :root {
 	color-scheme: light;
@@ -171,7 +168,7 @@
 :root {
 	color-scheme: light;
 
-	--main-font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+	--main-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", sans-serif;
 	--main-font-size: 14px;
 
 	/* MAIN */
