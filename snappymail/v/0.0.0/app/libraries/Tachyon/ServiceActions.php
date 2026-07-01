@@ -261,6 +261,21 @@ class ServiceActions
 		return $sResult;
 	}
 
+	public function ServiceLogo() : void
+	{
+		$filename = $this->Config()->Get('webmail', 'logo_file', '');
+		$path = $filename ? APP_PRIVATE_DATA . 'branding/' . \basename($filename) : '';
+		if (!$path || !\is_file($path)) {
+			\MailSo\Base\Http::StatusHeader(404);
+			return;
+		}
+		$mime = \mime_content_type($path) ?: 'application/octet-stream';
+		\header('Content-Type: ' . $mime);
+		\header('Cache-Control: public, max-age=86400');
+		\header('Content-Length: ' . \filesize($path));
+		\readfile($path);
+	}
+
 	public function ServiceUpload() : string
 	{
 		return $this->privateUpload('Upload');

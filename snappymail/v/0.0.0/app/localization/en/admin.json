@@ -59,7 +59,12 @@
 		"LEGEND_BRANDING": "Branding",
 		"LABEL_PAGE_TITLE": "Page Title",
 		"LABEL_LOADING_DESCRIPTION": "Loading Description",
-		"LABEL_FAVICON_URL": "Favicon"
+		"LABEL_FAVICON_URL": "Favicon",
+		"LEGEND_LOGO": "Login Logo",
+		"LABEL_LOGIN_LOGO": "Logo",
+		"LABEL_NO_LOGO": "No logo set",
+		"BUTTON_UPLOAD_LOGO": "Upload logo",
+		"BUTTON_DELETE_LOGO": "Remove logo"
 	},
 	"TAB_CONTACTS": {
 		"LEGEND_CONTACTS": "Contacts",

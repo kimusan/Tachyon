@@ -107,6 +107,53 @@ class ActionsAdmin extends Actions
 		return $this->DefaultResponse($oConfig->Save());
 	}
 
+	public function DoAdminUploadLogo(): array
+	{
+		if (empty($_FILES['logo']['tmp_name'])) {
+			return $this->FalseResponse(__FUNCTION__);
+		}
+		$tmp = $_FILES['logo']['tmp_name'];
+		$mime = \mime_content_type($tmp);
+		$extMap = [
+			'image/png'     => 'png',
+			'image/jpeg'    => 'jpg',
+			'image/gif'     => 'gif',
+			'image/svg+xml' => 'svg',
+			'image/webp'    => 'webp',
+		];
+		if (!isset($extMap[$mime])) {
+			return $this->FalseResponse(__FUNCTION__);
+		}
+		$dir = APP_PRIVATE_DATA . 'branding/';
+		if (!\is_dir($dir)) {
+			\mkdir($dir, 0755, true);
+		}
+		foreach (\glob($dir . 'logo.*') ?: [] as $old) {
+			\unlink($old);
+		}
+		$filename = 'logo.' . $extMap[$mime];
+		if (!\move_uploaded_file($tmp, $dir . $filename)) {
+			return $this->FalseResponse(__FUNCTION__);
+		}
+		$oConfig = $this->Config();
+		$oConfig->Set('webmail', 'logo_file', $filename);
+		$oConfig->Save();
+		return $this->DefaultResponse($filename);
+	}
+
+	public function DoAdminDeleteLogo(): array
+	{
+		$oConfig = $this->Config();
+		$filename = $oConfig->Get('webmail', 'logo_file', '');
+		if ($filename) {
+			$path = APP_PRIVATE_DATA . 'branding/' . \basename($filename);
+			\is_file($path) && \unlink($path);
+			$oConfig->Set('webmail', 'logo_file', '');
+			$oConfig->Save();
+		}
+		return $this->DefaultResponse(true);
+	}
+
 	/**
 	 * @throws \MailSo\RuntimeException
 	 */
@@ -450,6 +497,7 @@ class ActionsAdmin extends Actions
 			$aResult['contactsSuggestionsLimit'] = (int)$oConfig->Get('contacts', 'suggestions_limit', 20);
 
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
+			$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');
 
 			$aResult['weakPassword'] = \is_file(APP_PRIVATE_DATA.'admin_password.txt');
 
