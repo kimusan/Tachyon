@@ -365,6 +365,10 @@ body, button, input, select, textarea {
 	letter-spacing: 0.1px;
 	text-transform: none;
 	box-shadow: none;
+	text-shadow: none;
+	line-height: 1;
+	padding: 7px 16px;
+	vertical-align: middle;
 }
 
 .btn:hover   { filter: brightness(0.9); }

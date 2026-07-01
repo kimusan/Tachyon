@@ -11282,26 +11282,8 @@ body > * {
 	const STORAGE_KEY = 'tachyon_color_scheme';
 	const ATTR_NAME = 'data-color-scheme';
 
-	// ko is a global in this codebase — no import needed
 	const colorSchemeMode = ko.observable('');
 
-	/**
-	 * Initialize color scheme toggle.
-	 * Applies stored preference on load and sets up click handlers.
-	 */
-	function initColorSchemeToggle() {
-		// Read stored preference on init
-		const stored = localStorage.getItem(STORAGE_KEY);
-		if (stored) {
-			colorSchemeMode(stored);
-			applyColorScheme(stored);
-		}
-	}
-
-	/**
-	 * Apply a color scheme mode to the document.
-	 * @param {string} mode - 'light', 'dark', or '' for system
-	 */
 	function applyColorScheme(mode) {
 		if (mode) {
 			document.documentElement.setAttribute(ATTR_NAME, mode);
@@ -11312,26 +11294,35 @@ body > * {
 		colorSchemeMode(mode);
 	}
 
-	/**
-	 * Toggle to light mode.
-	 */
-	function setLightMode() {
-		applyColorScheme('light');
+	// When the theme CSS changes dynamically (user switches theme in Settings),
+	// re-set the attribute to force the browser to re-evaluate [data-color-scheme]
+	// selectors in the newly loaded theme stylesheet.
+	function watchThemeChanges() {
+		const themeStyle = document.getElementById('app-theme-style');
+		if (!themeStyle) return;
+		new MutationObserver(() => {
+			const mode = colorSchemeMode();
+			if (mode) {
+				document.documentElement.removeAttribute(ATTR_NAME);
+				requestAnimationFrame(() =>
+					document.documentElement.setAttribute(ATTR_NAME, mode)
+				);
+			}
+		}).observe(themeStyle, { childList: true, characterData: true, subtree: true });
 	}
 
-	/**
-	 * Toggle to dark mode.
-	 */
-	function setDarkMode() {
-		applyColorScheme('dark');
+	function initColorSchemeToggle() {
+		const stored = localStorage.getItem(STORAGE_KEY);
+		if (stored) {
+			colorSchemeMode(stored);
+			applyColorScheme(stored);
+		}
+		watchThemeChanges();
 	}
 
-	/**
-	 * Toggle to system mode (respects prefers-color-scheme).
-	 */
-	function setSystemMode() {
-		applyColorScheme('');
-	}
+	function setLightMode()  { applyColorScheme('light'); }
+	function setDarkMode()   { applyColorScheme('dark'); }
+	function setSystemMode() { applyColorScheme(''); }
 
 	class SystemDropDownUserView extends AbstractViewRight {
 		constructor() {

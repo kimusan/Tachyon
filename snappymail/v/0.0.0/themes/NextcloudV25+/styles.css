@@ -2596,3 +2596,79 @@ html.rl-mobile #rl-app #V-AdminPane>.b-toolbar {
 		transform: scale(1)
 	}
 }
+
+/* ── Tachyon color-scheme toggle support ────────────────────────────────── */
+/* These mirror the @media (prefers-color-scheme: dark) block above so the
+   ☀/⊙/☾ toggle works even when the OS preference doesn't match. */
+
+html[data-color-scheme="dark"] :not([data-themes~="light"]) {
+	--nc-color-main-background: var(--color-main-background, #171717);
+	--nc-color-main-background-rgb: var(--color-main-background-rgb, 23, 23, 23);
+	--nc-color-main-background-blur: var(--color-main-background-blur, rgba(var(--nc-color-main-background-rgb), .8));
+	--nc-filter-background-blur: var(--filter-background-blur, blur(25px));
+	--nc-color-background-hover: var(--color-background-hover, #212121);
+	--nc-color-background-dark: var(--color-background-dark, #292929);
+	--nc-color-background-darker: var(--color-background-darker, #3b3b3b);
+	--nc-color-placeholder-light: var(--color-placeholder-light, #313131);
+	--nc-color-placeholder-dark: var(--color-placeholder-dark, #4a4a4a);
+	--nc-color-main-text: var(--color-main-text, #D8D8D8);
+	--nc-color-text-light: var(--color-text-light, #bfbfbf);
+	--nc-color-text-lighter: var(--color-text-lighter, #a5a5a5);
+	--nc-color-text-maxcontrast: var(--color-text-maxcontrast, #8c8c8c);
+	--nc-color-scrollbar: var(--color-scrollbar, #3d3d3d);
+	--nc-color-error: var(--color-error, #e9322d);
+	--nc-color-warning: var(--color-warning, #eca700);
+	--nc-color-success: var(--color-success, #46ba61);
+	--nc-color-loading-light: var(--color-loading-light, #777);
+	--nc-color-loading-dark: var(--color-loading-dark, #CCC);
+	--nc-color-box-shadow: var(--color-box-shadow, #000000);
+	--nc-color-border: var(--color-border, #292929);
+	--nc-color-border-dark: var(--color-border-dark, #3b3b3b);
+	--nc-color-border-maxcontrast: var(--color-border-maxcontrast, #646464);
+	--nc-color-primary: var(--color-primary, #00639a);
+	--nc-color-primary-default: var(--color-primary-default, #0082c9);
+	--nc-color-primary-text: var(--color-primary-text, #ffffff);
+	--nc-color-primary-hover: var(--color-primary-hover, #04537f);
+	--nc-color-primary-light: var(--color-primary-light, #141e24);
+	--nc-color-primary-light-text: var(--color-primary-light-text, #99c0d6);
+	--nc-color-primary-light-hover: var(--color-primary-light-hover, #1d272d);
+	--nc-color-primary-element: var(--color-primary-element, #00639a);
+	--nc-color-primary-element-text: var(--color-primary-element-text, #ffffff);
+	--nc-color-primary-element-hover: var(--color-primary-element-hover, #04537f);
+	--nc-color-primary-element-light: var(--color-primary-element-light, #141e24);
+	--nc-color-primary-element-light-text: var(--color-primary-element-light-text, #99c0d6);
+	--nc-color-primary-element-light-hover: var(--color-primary-element-light-hover, #1d272d);
+}
+
+html[data-color-scheme="light"] :not([data-themes~="dark"]) {
+	--nc-color-main-background: var(--color-main-background, #ffffff);
+	--nc-color-main-background-rgb: var(--color-main-background-rgb, 255, 255, 255);
+	--nc-color-background-hover: var(--color-background-hover, #f5f5f5);
+	--nc-color-background-dark: var(--color-background-dark, #ededed);
+	--nc-color-background-darker: var(--color-background-darker, #dbdbdb);
+	--nc-color-placeholder-light: var(--color-placeholder-light, #e6e6e6);
+	--nc-color-placeholder-dark: var(--color-placeholder-dark, #cccccc);
+	--nc-color-main-text: var(--color-main-text, #222222);
+	--nc-color-text-light: var(--color-text-light, #222222);
+	--nc-color-text-lighter: var(--color-text-lighter, #767676);
+	--nc-color-text-maxcontrast: var(--color-text-maxcontrast, #767676);
+	--nc-color-scrollbar: var(--color-scrollbar, rgba(34, 34, 34, .15));
+	--nc-color-error: var(--color-error, #e9322d);
+	--nc-color-warning: var(--color-warning, #eca700);
+	--nc-color-success: var(--color-success, #46ba61);
+	--nc-color-loading-light: var(--color-loading-light, #cccccc);
+	--nc-color-loading-dark: var(--color-loading-dark, #444444);
+	--nc-color-box-shadow: var(--color-box-shadow, rgba(77,77,77, 0.5));
+	--nc-color-border: var(--color-border, #ededed);
+	--nc-color-border-dark: var(--color-border-dark, #dbdbdb);
+	--nc-color-border-maxcontrast: var(--color-border-maxcontrast, #949494);
+	--nc-color-primary: var(--color-primary, #00639a);
+	--nc-color-primary-default: var(--color-primary-default, #0082c9);
+	--nc-color-primary-text: var(--color-primary-text, #ffffff);
+	--nc-color-primary-hover: var(--color-primary-hover, #3282ae);
+	--nc-color-primary-light: var(--color-primary-light, #e5eff4);
+	--nc-color-primary-light-text: var(--color-primary-light-text, #00273d);
+	--nc-color-primary-element: var(--color-primary-element, #00639a);
+	--nc-color-primary-element-text: var(--color-primary-element-text, #ffffff);
+	--nc-color-primary-element-hover: var(--color-primary-element-hover, #3282ae);
+}
