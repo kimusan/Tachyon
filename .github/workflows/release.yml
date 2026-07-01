@@ -24,6 +24,9 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, zip, phar
 
+      - name: Install dpkg tools
+        run: sudo apt-get install -y dpkg-dev
+
       - name: Install npm dependencies
         run: npm ci
 
@@ -38,7 +41,7 @@ jobs:
           echo "Version: $PKG_VERSION"
 
       - name: Build release (JS/CSS + PHP archive + plugins)
-        run: PATH="$PATH:node_modules/.bin" php cli/release.php
+        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian
 
       - name: Commit updated packages.json
         run: |
@@ -54,5 +57,6 @@ jobs:
           files: |
             build/dist/releases/webmail/*/tachyon-*.tar.gz
             build/dist/releases/webmail/*/tachyon-*.zip
+            build/dist/releases/webmail/*/tachyon_*.deb
             build/dist/releases/plugins/*.tgz
             packages.json
