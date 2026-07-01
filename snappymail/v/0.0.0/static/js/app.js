@@ -792,8 +792,8 @@
 
 	// functions
 
-	ko.observable.fn.askDeleteHelper = function() {
-		return this.extend({ falseTimeout: 3000, toggleSubscribeProperty: [this, 'askDelete'] });
+	ko.observable.fn.askDeleteHelper = function(prop='askDelete') {
+		return this.extend({ falseTimeout: 3000, toggleSubscribeProperty: [this, prop] });
 	};
 
 	/* eslint key-spacing: 0 */
@@ -5187,9 +5187,13 @@
 				askUsername: false,
 				passphrase: '',
 				askPass: false,
-				remember: true,
-				askRemeber: false
+				remember: true, // remember for session
+				askRemeber: false,
+				rememberPermanent: false,
+				askRememberPermanent: false,
 			});
+
+			this.rememberPermanent.subscribe(value => value && this.remember(true));
 
 			this.fYesAction = null;
 			this.fNoAction = null;
@@ -5220,10 +5224,12 @@
 			this.askDesc(sAskDesc || '');
 			this.askUsername(ask & 2);
 			this.askPass(ask & 1);
-			this.askRemeber(ask & 4);
+			this.askRemeber(ask & 4); // 0b0100
+			this.askRememberPermanent(ask & 0b1000);
 			this.username('');
 			this.passphrase('');
 			this.remember(true);
+			this.rememberPermanent(false);
 			this.yesButton(i18n(btnText || 'GLOBAL/YES'));
 			this.noButton(i18n(ask ? 'GLOBAL/CANCEL' : 'GLOBAL/NO'));
 			this.fYesAction = fYesFunc;
@@ -5260,21 +5266,153 @@
 
 	const Passphrases = new WeakMap();
 
-	Passphrases.ask = async (key, sAskDesc, btnText) =>
-		Passphrases.has(key)
-			? {password:Passphrases.handle(key)/*, remember:false*/}
-			: await AskPopupView.password(sAskDesc, btnText, 5);
+	Passphrases.ask = async (key, sAskDesc, btnText) => {
+		if (Passphrases.has(key)) {
+			return { password: Passphrases.handle(key)/*, remember:false*/ };
+		} else if (Passphrases.hasInLocalStorage(key)) {
+			return { password: await getFromLocalStorage(key) };
+		} else {
+			const pass = await AskPopupView.password(sAskDesc, btnText,
+				window.crypto.subtle && canUseLocalStorage(key) ? 0b1101 : 0b0101);
+			pass.rememberPermanent && await saveToLocalStorage(key, pass.password);
+			return pass;
+		}
+	};
+
+	Passphrases._deleteFromSession = Passphrases.delete;
 
 	const timeouts = {};
 	// get/set accessor to control deletion after N minutes of inactivity
 	Passphrases.handle = (key, pass) => {
 		const timeout = SettingsUserStore.keyPassForget();
 		if (timeout && !timeouts[key]) {
-			timeouts[key] = (()=>Passphrases.delete(key)).debounce(timeout * 1000);
+			timeouts[key] = (() => Passphrases._deleteFromSession(key)).debounce(timeout * 60 * 1000);
 		}
 		pass && Passphrases.set(key, pass);
 		timeout && timeouts[key]();
 		return Passphrases.get(key);
+	};
+
+	const deleteFromLocalStorage = (key) => {
+		const keyId = getKeyId(key);
+		if (keyId) {
+			localStorage.removeItem(keyId);
+		}
+	};
+	Passphrases.delete = (key) => {
+		deleteFromLocalStorage(key);
+		return Passphrases._deleteFromSession(key);
+	};
+
+	Passphrases.hasInLocalStorage = (key) => {
+		const keyId = getKeyId(key);
+		return keyId && localStorage.getItem(keyId) !== null;
+	};
+
+	const saveToLocalStorage = async (key, pass) => {
+		const keyId = getKeyId(key);
+		if (!keyId) {
+			return;
+		}
+
+		if (!pass) {
+			localStorage.removeItem(keyId);
+			return;
+		}
+
+		try {
+			const salt = window.crypto.getRandomValues(new Uint8Array(16));
+			const derivedKey = await deriveKeyFromHash(SettingsGet('accountHash'), salt);
+
+			const iv = window.crypto.getRandomValues(new Uint8Array(12));
+			const encrypted = await window.crypto.subtle.encrypt(
+				{ name: 'AES-GCM', iv: iv },
+				derivedKey,
+				new TextEncoder().encode(pass)
+			);
+			localStorage.setItem(keyId, JSON.stringify([
+				btoa(String.fromCharCode.apply(null, salt)),
+				btoa(String.fromCharCode.apply(null, iv)),
+				btoa(String.fromCharCode.apply(null, new Uint8Array(encrypted)))
+			]));
+		} catch (e) {
+			console.error('Passphrases.saveToLocalStorage failed', e);
+		}
+	};
+
+	const getFromLocalStorage = async (key) => {
+		const keyId = getKeyId(key);
+		if (!keyId) {
+			return undefined;
+		}
+
+		const jsonData = localStorage.getItem(keyId);
+		if (!jsonData) {
+			console.error('Passphrases.getFromLocalStorage failed: no data found');
+			return undefined;
+		}
+
+		try {
+			const saltIvData = JSON.parse(jsonData);
+			if (!saltIvData || !isArray(saltIvData) || saltIvData.length !== 3) {
+				// noinspection ExceptionCaughtLocallyJS
+				throw new Error('invalid passphrase data');
+			}
+			const toUint8 = (str) => new Uint8Array(atob(str).split('').map(c => c.charCodeAt(0)));
+
+			const derivedKey = await deriveKeyFromHash(SettingsGet('accountHash'), toUint8(saltIvData[0]));
+			const decrypted = await window.crypto.subtle.decrypt(
+				{
+					name: 'AES-GCM',
+					iv: toUint8(saltIvData[1])
+				},
+				derivedKey,
+				toUint8(saltIvData[2])
+			);
+			return String.fromCharCode.apply(null, new Uint8Array(decrypted));
+		} catch (e) {
+			localStorage.removeItem(keyId);
+			console.error('Passphrases.getFromLocalStorage failed', e);
+			return undefined;
+		}
+	};
+
+	const canUseLocalStorage = (key) => getKeyId(key) !== undefined;
+
+	const getKeyId = (key) => {
+		if (key && typeof key.id === 'string' && key.id.length > 4 && typeof key.forgetPass === 'function') {
+			// only deal with keys that we can forget (OpenPGB, GnuPG)
+			return key.id + '_local_key';
+		} else {
+			console.info('Passphrases.getKeyId: unsupported key type');
+			return undefined;
+		}
+	};
+
+	const deriveKeyFromHash = async (hash, salt) => {
+		if (!hash) {
+			throw new Error('empty accountHash');
+		}
+		return window.crypto.subtle.importKey(
+			'raw',
+			new TextEncoder().encode(hash),
+			{ 'name': 'PBKDF2' },
+			false,
+			['deriveKey']
+		).then(keyMaterial => {
+			return window.crypto.subtle.deriveKey(
+				{
+					'name': 'PBKDF2',
+					'salt': salt,
+					'iterations': 512,
+					'hash': 'SHA-256'
+				},
+				keyMaterial,
+				{ 'name': 'AES-GCM', 'length': 256 },
+				false,
+				['encrypt', 'decrypt']
+			);
+		});
 	};
 
 	const
@@ -5314,6 +5452,13 @@
 							key.for = email => aEmails.includes(IDN.toASCII(email));
 							key.askDelete = ko.observable(false);
 							key.openForDeletion = ko.observable(null).askDeleteHelper();
+							key.askForgetPass = ko.observable(false);
+							key.openForPassForget = ko.observable(null).askDeleteHelper('askForgetPass');
+							key.forgetPass = () => {
+								Passphrases.delete(key);
+								key.hasStoredPass(false);
+							};
+							key.hasStoredPass = ko.observable(Passphrases.hasInLocalStorage(key));
 							key.remove = () => {
 								if (key.askDelete()) {
 									Remote.request('GnupgDeleteKey',
@@ -5333,6 +5478,7 @@
 										}
 									);
 								}
+										isPrivate && key.forgetPass();
 							};
 							if (isPrivate) {
 								key.password = async btnTxt => {
@@ -5578,6 +5724,9 @@
 			this.armor = armor;
 			this.askDelete = ko.observable(false);
 			this.openForDeletion = ko.observable(null).askDeleteHelper();
+			this.hasStoredPass = ko.observable(Passphrases.hasInLocalStorage(this));
+			this.askForgetPass = ko.observable(false);
+			this.openForPassForget = ko.observable(null).askDeleteHelper('askForgetPass');
 	//		key.getUserIDs()
 	//		key.getPrimaryUser()
 		}
@@ -5603,11 +5752,28 @@
 				if (this.key.isPrivate()) {
 					OpenPGPUserStore.privateKeys.remove(this);
 					storeOpenPgpKeys(OpenPGPUserStore.privateKeys, privateKeysItem);
+					this.forgetPass();
 				} else {
 					OpenPGPUserStore.publicKeys.remove(this);
 					storeOpenPgpKeys(OpenPGPUserStore.publicKeys, publicKeysItem);
 				}
+				Remote.request('DeletePGPKey',
+					(iError, oData) => {
+						if (oData) {
+							if (iError || oData.Result === false) {
+								alert(oData.message || getNotification(iError));
+							}
+						}
+					}, {
+						key: this.armor
+					}
+				);
 			}
+		}
+
+		forgetPass() {
+			Passphrases.delete(this);
+			this.hasStoredPass(false);
 		}
 	/*
 		toJSON() {
@@ -13237,6 +13403,7 @@ body > * {
 	*/
 							break;
 						} catch (e) {
+							Passphrases.delete(signOptions[i][1]);
 							console.error(e);
 						}
 					} else if ('GnuPG' == signOptions[i][0]) {
@@ -16813,7 +16980,8 @@ body > * {
 				view => resolve({
 					password:view.passphrase(),
 					username:/*ask & 2 ? */view.username(),
-					remember:/*ask & 4 ? */view.remember()
+					remember:/*ask & 4 ? */view.remember(),
+					rememberPermanent: view.rememberPermanent(),
 				}),
 				() => resolve(null),
 				true,
