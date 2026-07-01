@@ -13,6 +13,14 @@
 		</a>
 		<menu class="dropdown-menu right-edge" tabindex="-1" role="menu" aria-labelledby="top-system-dropdown-id">
 
+			<li class="color-scheme-toggle" role="presentation">
+				<div class="color-scheme-buttons">
+					<button type="button" class="color-scheme-btn" data-bind="click: lightModeClick, css: { active: 'light' === colorSchemeMode() }, attr: { title: 'Light mode', 'aria-pressed': 'light' === colorSchemeMode() }" aria-label="Light mode">☀</button>
+					<button type="button" class="color-scheme-btn" data-bind="click: systemModeClick, css: { active: '' === colorSchemeMode() }, attr: { title: 'System mode', 'aria-pressed': '' === colorSchemeMode() }" aria-label="System mode">⊙</button>
+					<button type="button" class="color-scheme-btn" data-bind="click: darkModeClick, css: { active: 'dark' === colorSchemeMode() }, attr: { title: 'Dark mode', 'aria-pressed': 'dark' === colorSchemeMode() }" aria-label="Dark mode">☾</button>
+				</div>
+			</li>
+
 			<!-- ko foreach: accounts -->
 			<li role="presentation">
 				<a class="email-title" href="#" data-bind="click: $root.accountClick, text: label(),

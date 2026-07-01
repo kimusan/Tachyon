@@ -18,6 +18,8 @@ import Remote from 'Remote/User/Fetch';
 import { getNotification } from 'Common/Translator';
 import { koComputable, addObservablesTo } from 'External/ko';
 
+import { colorSchemeMode, initColorSchemeToggle, setLightMode, setDarkMode, setSystemMode } from 'Settings/User/ColorSchemeToggle';
+
 export class SystemDropDownUserView extends AbstractViewRight {
 	constructor() {
 		super();
@@ -39,6 +41,8 @@ export class SystemDropDownUserView extends AbstractViewRight {
 		});
 
 		this.allowContacts = AppUserStore.allowContacts();
+
+		this.colorSchemeMode = colorSchemeMode;
 
 		addEventListener('audio.stop', () => this.currentAudio(''));
 		addEventListener('audio.start', e => this.currentAudio(e.detail));
@@ -109,7 +113,20 @@ export class SystemDropDownUserView extends AbstractViewRight {
 		rl.app.logout();
 	}
 
+	lightModeClick() {
+		setLightMode();
+	}
+
+	darkModeClick() {
+		setDarkMode();
+	}
+
+	systemModeClick() {
+		setSystemMode();
+	}
+
 	onBuild() {
+		initColorSchemeToggle();
 		registerShortcut('m', '', [ScopeMessageList, ScopeMessageView, ScopeSettings], () => {
 			if (!this.viewModelDom.hidden) {
 //				exitFullscreen();

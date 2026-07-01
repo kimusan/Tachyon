@@ -1,0 +1,570 @@
+/* Inter — closest open-source match to Apple's SF Pro */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* Color scheme overrides (light/dark mode toggle) */
+[data-color-scheme="light"] :root {
+	color-scheme: light;
+
+	--main-color: #1d1d1f;
+	--main-bg-color: #f5f5f7;
+	--link-color: #005dc2;
+	--border-color: #d2d2d7;
+	--hr-color: #d2d2d7;
+	--panel-bg-clr: #ffffff;
+
+	--loading-color: #1d1d1f;
+	--spinner-color: #005dc2;
+
+	--login-color: #1d1d1f;
+	--login-bg-color: rgba(255,255,255,0.9);
+	--login-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	--login-border: 1px solid #d2d2d7;
+	--login-border-radius: 14px;
+
+	--dropdown-menu-color: #1d1d1f;
+	--dropdown-menu-bg-color: rgba(255,255,255,0.96);
+	--dropdown-menu-hover-bg-color: rgba(0, 93, 194, 0.08);
+	--dropdown-menu-hover-color: #005dc2;
+	--dropdown-menu-disable-color: #86868b;
+	--dropdown-menu-border-clr: rgba(0,0,0,0.10);
+
+	--folders-color: #1d1d1f;
+	--folders-disabled-color: #86868b;
+	--folders-selected-color: #005dc2;
+	--folders-selected-bg-color: rgba(0,93,194,0.08);
+	--folders-focused-color: #005dc2;
+	--folders-focused-bg-color: rgba(0,93,194,0.12);
+	--folders-hover-color: #1d1d1f;
+	--folders-hover-bg-color: rgba(0,0,0,0.04);
+	--folders-drop-color: #005dc2;
+	--folders-drop-bg-color: rgba(0,93,194,0.10);
+	--unread-count-color: #fff;
+	--unread-count-bg-color: #005dc2;
+
+	--settings-menu-color: #1d1d1f;
+	--settings-menu-selected-color: #005dc2;
+	--settings-menu-selected-bg-color: rgba(0,93,194,0.08);
+	--settings-menu-hover-color: #1d1d1f;
+	--settings-menu-hover-bg-color: rgba(0,0,0,0.04);
+
+	--message-list-toolbar-bg-color: #f5f5f7;
+	--message-header-bg-clr: #f5f5f7;
+
+	--dialog-clr: #1d1d1f;
+	--dialog-bg-clr: #ffffff;
+	--dialog-border-clr: #d2d2d7;
+	--dialog-border-radius: 14px;
+
+	--btn-clr: #ffffff;
+	--btn-bg-clr: #005dc2;
+	--btn-border-clr: #005dc2;
+	--btn-border-radius: 20px;
+	--btn-success-bg-clr: #1a8f3c;
+	--btn-danger-bg-clr: #c0202a;
+
+	--input-clr: #1d1d1f;
+	--input-bg-clr: #ffffff;
+	--input-border-clr: #c7c7cc;
+	--input-border-radius: 8px;
+	--input-focus-border-clr: #005dc2;
+
+	--tr-hover-bg-clr: rgba(0,0,0,0.03);
+	--tr-odd-bg-clr: rgba(0,0,0,0.015);
+
+	--tab-active-bg-clr: #ffffff;
+	--tab-hover-border-clr: #d2d2d7;
+
+	--warning-clr: #92400e;
+	--warning-bg-clr: #fef3c7;
+	--warning-border-clr: #fde68a;
+	--error-clr: #991b1b;
+	--error-bg-clr: #fee2e2;
+	--error-border-clr: #fecaca;
+	--info-clr: #005dc2;
+	--info-bg-clr: #eff6ff;
+	--info-border-clr: #bfdbfe;
+}
+
+[data-color-scheme="dark"] :root {
+	color-scheme: dark;
+
+	--main-color: #f5f5f7;
+	--main-bg-color: #1c1c1e;
+	--link-color: #4da3ff;
+	--border-color: #38383a;
+	--hr-color: #38383a;
+	--panel-bg-clr: #2c2c2e;
+
+	--loading-color: #f5f5f7;
+	--spinner-color: #4da3ff;
+
+	--login-color: #f5f5f7;
+	--login-bg-color: rgba(44,44,46,0.95);
+	--login-box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+	--login-border: 1px solid #48484a;
+	--login-border-radius: 14px;
+
+	--dropdown-menu-color: #f5f5f7;
+	--dropdown-menu-bg-color: rgba(44,44,46,0.97);
+	--dropdown-menu-hover-bg-color: rgba(77,163,255,0.12);
+	--dropdown-menu-hover-color: #4da3ff;
+	--dropdown-menu-disable-color: #636366;
+	--dropdown-menu-border-clr: rgba(255,255,255,0.10);
+
+	--folders-color: #f5f5f7;
+	--folders-disabled-color: #636366;
+	--folders-selected-color: #4da3ff;
+	--folders-selected-bg-color: rgba(77,163,255,0.12);
+	--folders-focused-color: #4da3ff;
+	--folders-focused-bg-color: rgba(77,163,255,0.16);
+	--folders-hover-color: #f5f5f7;
+	--folders-hover-bg-color: rgba(255,255,255,0.06);
+	--folders-drop-color: #4da3ff;
+	--folders-drop-bg-color: rgba(77,163,255,0.15);
+	--unread-count-bg-color: #4da3ff;
+	--unread-count-color: #000;
+
+	--settings-menu-color: #f5f5f7;
+	--settings-menu-selected-color: #4da3ff;
+	--settings-menu-selected-bg-color: rgba(77,163,255,0.12);
+	--settings-menu-hover-color: #f5f5f7;
+	--settings-menu-hover-bg-color: rgba(255,255,255,0.06);
+
+	--message-list-toolbar-bg-color: #2c2c2e;
+	--message-header-bg-clr: #1c1c1e;
+
+	--dialog-clr: #f5f5f7;
+	--dialog-bg-clr: #2c2c2e;
+	--dialog-border-clr: #48484a;
+	--dialog-border-radius: 14px;
+
+	--btn-clr: #000000;
+	--btn-bg-clr: #4da3ff;
+	--btn-border-clr: #4da3ff;
+	--btn-border-radius: 20px;
+	--btn-success-bg-clr: #32d74b;
+	--btn-danger-bg-clr: #ff453a;
+
+	--input-clr: #f5f5f7;
+	--input-bg-clr: #3a3a3c;
+	--input-border-clr: #48484a;
+	--input-border-radius: 8px;
+	--input-focus-border-clr: #4da3ff;
+
+	--tr-hover-bg-clr: rgba(255,255,255,0.05);
+	--tr-odd-bg-clr: rgba(255,255,255,0.025);
+
+	--tab-active-bg-clr: #2c2c2e;
+	--tab-hover-border-clr: #48484a;
+
+	--warning-clr: #fbbf24;
+	--warning-bg-clr: #2d1f00;
+	--warning-border-clr: #78480f;
+	--error-clr: #f87171;
+	--error-bg-clr: #2d0000;
+	--error-border-clr: #7f1d1d;
+	--info-clr: #4da3ff;
+	--info-bg-clr: rgba(77,163,255,0.10);
+	--info-border-clr: rgba(77,163,255,0.25);
+}
+
+:root {
+	color-scheme: light;
+
+	--main-font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+	--main-font-size: 14px;
+
+	/* MAIN */
+	--main-color: #1d1d1f;
+	--main-bg-color: #f5f5f7;
+	--main-bg-image: none;
+	--main-bg-size: auto;
+	--main-bg-repeat: repeat;
+	--link-color: #005dc2;
+	--border-color: #d2d2d7;
+	--hr-color: #d2d2d7;
+	--panel-bg-clr: #ffffff;
+
+	/* LOADING */
+	--loading-color: #1d1d1f;
+	--loading-text-shadow: none;
+	--spinner-color: #005dc2;
+
+	/* LOGIN */
+	--login-color: #1d1d1f;
+	--login-bg-color: rgba(255,255,255,0.9);
+	--login-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	--login-border: 1px solid #d2d2d7;
+	--login-border-radius: 14px;
+
+	/* MENU */
+	--dropdown-menu-color: #1d1d1f;
+	--dropdown-menu-bg-color: rgba(255,255,255,0.96);
+	--dropdown-menu-hover-bg-color: rgba(0, 93, 194, 0.08);
+	--dropdown-menu-hover-color: #005dc2;
+	--dropdown-menu-disable-color: #86868b;
+	--dropdown-menu-border-clr: rgba(0,0,0,0.10);
+
+	/* FOLDERS */
+	--folders-color: #1d1d1f;
+	--folders-disabled-color: #86868b;
+	--folders-selected-color: #005dc2;
+	--folders-selected-bg-color: rgba(0,93,194,0.08);
+	--folders-focused-color: #005dc2;
+	--folders-focused-bg-color: rgba(0,93,194,0.12);
+	--folders-hover-color: #1d1d1f;
+	--folders-hover-bg-color: rgba(0,0,0,0.04);
+	--folders-drop-color: #005dc2;
+	--folders-drop-bg-color: rgba(0,93,194,0.10);
+	--unread-count-color: #fff;
+	--unread-count-bg-color: #005dc2;
+
+	/* SETTINGS */
+	--settings-menu-color: #1d1d1f;
+	--settings-menu-selected-color: #005dc2;
+	--settings-menu-selected-bg-color: rgba(0,93,194,0.08);
+	--settings-menu-hover-color: #1d1d1f;
+	--settings-menu-hover-bg-color: rgba(0,0,0,0.04);
+
+	/* MESSAGES */
+	--message-list-toolbar-bg-color: #f5f5f7;
+	--message-header-bg-clr: #f5f5f7;
+
+	/* DIALOGS */
+	--dialog-clr: #1d1d1f;
+	--dialog-bg-clr: #ffffff;
+	--dialog-border-clr: #d2d2d7;
+	--dialog-border-radius: 14px;
+
+	/* FORMS */
+	--btn-clr: #ffffff;
+	--btn-bg-clr: #005dc2;
+	--btn-border-clr: #005dc2;
+	--btn-border-radius: 20px;
+	--btn-success-bg-clr: #1a8f3c;
+	--btn-danger-bg-clr: #c0202a;
+
+	--input-clr: #1d1d1f;
+	--input-bg-clr: #ffffff;
+	--input-border-clr: #c7c7cc;
+	--input-border-radius: 8px;
+	--input-focus-border-clr: #005dc2;
+
+	/* TABLES */
+	--tr-hover-bg-clr: rgba(0,0,0,0.03);
+	--tr-odd-bg-clr: rgba(0,0,0,0.015);
+
+	/* TABS */
+	--tab-active-bg-clr: #ffffff;
+	--tab-hover-border-clr: #d2d2d7;
+
+	/* ALERTS */
+	--warning-clr: #92400e;
+	--warning-bg-clr: #fef3c7;
+	--warning-border-clr: #fde68a;
+	--error-clr: #991b1b;
+	--error-bg-clr: #fee2e2;
+	--error-border-clr: #fecaca;
+	--info-clr: #005dc2;
+	--info-bg-clr: #eff6ff;
+	--info-border-clr: #bfdbfe;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		color-scheme: dark;
+
+		--main-color: #f5f5f7;
+		--main-bg-color: #1c1c1e;
+		--link-color: #4da3ff;
+		--border-color: #38383a;
+		--hr-color: #38383a;
+		--panel-bg-clr: #2c2c2e;
+
+		--loading-color: #f5f5f7;
+		--spinner-color: #4da3ff;
+
+		--login-color: #f5f5f7;
+		--login-bg-color: rgba(44,44,46,0.95);
+		--login-box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+		--login-border: 1px solid #48484a;
+		--login-border-radius: 14px;
+
+		--dropdown-menu-color: #f5f5f7;
+		--dropdown-menu-bg-color: rgba(44,44,46,0.97);
+		--dropdown-menu-hover-bg-color: rgba(77,163,255,0.12);
+		--dropdown-menu-hover-color: #4da3ff;
+		--dropdown-menu-disable-color: #636366;
+		--dropdown-menu-border-clr: rgba(255,255,255,0.10);
+
+		--folders-color: #f5f5f7;
+		--folders-disabled-color: #636366;
+		--folders-selected-color: #4da3ff;
+		--folders-selected-bg-color: rgba(77,163,255,0.12);
+		--folders-focused-color: #4da3ff;
+		--folders-focused-bg-color: rgba(77,163,255,0.16);
+		--folders-hover-color: #f5f5f7;
+		--folders-hover-bg-color: rgba(255,255,255,0.06);
+		--folders-drop-color: #4da3ff;
+		--folders-drop-bg-color: rgba(77,163,255,0.15);
+		--unread-count-bg-color: #4da3ff;
+		--unread-count-color: #000;
+
+		--settings-menu-color: #f5f5f7;
+		--settings-menu-selected-color: #4da3ff;
+		--settings-menu-selected-bg-color: rgba(77,163,255,0.12);
+		--settings-menu-hover-color: #f5f5f7;
+		--settings-menu-hover-bg-color: rgba(255,255,255,0.06);
+
+		--message-list-toolbar-bg-color: #2c2c2e;
+		--message-header-bg-clr: #1c1c1e;
+
+		--dialog-clr: #f5f5f7;
+		--dialog-bg-clr: #2c2c2e;
+		--dialog-border-clr: #48484a;
+		--dialog-border-radius: 14px;
+
+		/* Dark mode buttons: black text on the lighter blue for WCAG contrast */
+		--btn-clr: #000000;
+		--btn-bg-clr: #4da3ff;
+		--btn-border-clr: #4da3ff;
+		--btn-border-radius: 20px;
+		--btn-success-bg-clr: #32d74b;
+		--btn-danger-bg-clr: #ff453a;
+
+		--input-clr: #f5f5f7;
+		--input-bg-clr: #3a3a3c;
+		--input-border-clr: #48484a;
+		--input-border-radius: 8px;
+		--input-focus-border-clr: #4da3ff;
+
+		--tr-hover-bg-clr: rgba(255,255,255,0.05);
+		--tr-odd-bg-clr: rgba(255,255,255,0.025);
+
+		--tab-active-bg-clr: #2c2c2e;
+		--tab-hover-border-clr: #48484a;
+
+		--warning-clr: #fbbf24;
+		--warning-bg-clr: #2d1f00;
+		--warning-border-clr: #78480f;
+		--error-clr: #f87171;
+		--error-bg-clr: #2d0000;
+		--error-border-clr: #7f1d1d;
+		--info-clr: #4da3ff;
+		--info-bg-clr: rgba(77,163,255,0.10);
+		--info-border-clr: rgba(77,163,255,0.25);
+	}
+}
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+body, button, input, select, textarea {
+	font-family: var(--main-font-family);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+	font-weight: 600;
+	font-size: 13px;
+	letter-spacing: 0.1px;
+	text-transform: none;
+	box-shadow: none;
+}
+
+.btn:hover   { filter: brightness(0.9); }
+.btn:active  { filter: brightness(0.78); }
+
+/* ── Inputs ─────────────────────────────────────────────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+	border-radius: var(--input-border-radius);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+	outline: none;
+	border-color: var(--input-focus-border-clr);
+	box-shadow: 0 0 0 3px rgba(0, 93, 194, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+	input:focus, textarea:focus, select:focus {
+		box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.22);
+	}
+}
+
+/* ── Dropdown menu ──────────────────────────────────────────────────────── */
+/*
+ * Do NOT set overflow:hidden here — the base already has overflow:auto
+ * which enables scrolling. overflow:hidden would clip items and break
+ * the scrollability of tall menus.
+ */
+.dropdown-menu {
+	border-radius: 10px;
+	box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+	border: none;
+	padding: 4px;
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
+
+@media (prefers-color-scheme: dark) {
+	.dropdown-menu {
+		box-shadow: 0 4px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08);
+	}
+}
+
+.dropdown-menu a {
+	border-radius: 6px;
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	transition: background-color 0.10s ease, color 0.10s ease;
+}
+
+.dropdown-menu .dividerbar {
+	margin: 4px;
+}
+
+/* ── Color scheme toggle ────────────────────────────────────────────────── */
+.color-scheme-toggle {
+	padding: 6px 4px;
+	margin: 4px;
+	display: flex;
+	justify-content: center;
+}
+
+.color-scheme-buttons {
+	display: flex;
+	gap: 2px;
+	background-color: rgba(0, 0, 0, 0.05);
+	border-radius: 6px;
+	padding: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+	.color-scheme-buttons {
+		background-color: rgba(255, 255, 255, 0.06);
+	}
+}
+
+.color-scheme-btn {
+	background: none;
+	border: none;
+	padding: 4px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+	transition: background-color 0.10s ease, color 0.10s ease;
+	color: var(--dropdown-menu-color);
+}
+
+.color-scheme-btn:hover {
+	background-color: var(--dropdown-menu-hover-bg-color);
+	color: var(--dropdown-menu-hover-color);
+}
+
+.color-scheme-btn.active {
+	background-color: var(--link-color);
+	color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+	.color-scheme-btn.active {
+		background-color: #4da3ff;
+		color: #000000;
+	}
+}
+
+/* ── Message list ───────────────────────────────────────────────────────── */
+/* Unseen messages: warm amber tint (subtle in both modes, not harsh) */
+.messageListItem [data-unseen] {
+	background-color: rgba(255, 175, 0, 0.07);
+	border-color: rgba(200, 130, 0, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+	.messageListItem [data-unseen] {
+		background-color: rgba(255, 200, 50, 0.06);
+		border-color: rgba(180, 140, 0, 0.20);
+	}
+}
+
+/* Selected message */
+.messageListItem.selected {
+	background-color: rgba(0, 93, 194, 0.09);
+	border-left-color: #005dc2;
+	border-right-color: #005dc2 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+	.messageListItem.selected {
+		background-color: rgba(77, 163, 255, 0.11);
+		border-left-color: #4da3ff;
+		border-right-color: #4da3ff !important;
+	}
+}
+
+/* ── Panels & dialogs ───────────────────────────────────────────────────── */
+.panel, .dialog {
+	border-radius: var(--dialog-border-radius);
+	box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+
+@media (prefers-color-scheme: dark) {
+	.panel, .dialog {
+		box-shadow: 0 2px 16px rgba(0,0,0,0.35);
+	}
+}
+
+/* ── Scrollbars (WebKit) ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+	background: rgba(0,0,0,0.18);
+	border-radius: 4px;
+	border: 2px solid transparent;
+	background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(0,0,0,0.30);
+	background-clip: padding-box;
+}
+
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar-thumb {
+		background: rgba(255,255,255,0.18);
+		background-clip: padding-box;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: rgba(255,255,255,0.30);
+		background-clip: padding-box;
+	}
+}
+
+/* ── Alerts ─────────────────────────────────────────────────────────────── */
+.alert {
+	border-radius: 8px;
+	border: 1px solid;
+	padding: 10px 14px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+.alert-warning { background-color: var(--warning-bg-clr); color: var(--warning-clr); border-color: var(--warning-border-clr); }
+.alert-danger, .alert-error { background-color: var(--error-bg-clr); color: var(--error-clr); border-color: var(--error-border-clr); }
+.alert-info { background-color: var(--info-bg-clr); color: var(--info-clr); border-color: var(--info-border-clr); }
+
+/* ── Links / Checkboxes ─────────────────────────────────────────────────── */
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+input[type="checkbox"],
+input[type="radio"] {
+	accent-color: var(--link-color);
+}
