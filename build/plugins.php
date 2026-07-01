@@ -116,4 +116,4 @@ file_put_contents(dirname(PLUGINS_DEST_DIR) . '/packages.json', $json . "\n");
 file_put_contents(ROOT_DIR . '/packages.json', $json . "\n");
 echo "packages.json written (" . count($manifest) . " plugins)\n";
 
-exit;
+return;
