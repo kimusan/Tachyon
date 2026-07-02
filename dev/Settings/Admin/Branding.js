@@ -17,7 +17,7 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 		});
 
 		addComputablesTo(this, {
-			logoUrl: () => this.logoFile() ? ('?/Logo&_=' + encodeURIComponent(this.logoFile())) : ''
+			logoUrl: () => this.logoFile() ? ('?/Logo/' + encodeURIComponent(this.logoFile())) : ''
 		});
 	}
 

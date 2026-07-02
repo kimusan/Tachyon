@@ -25,7 +25,7 @@ export class LoginUserView extends AbstractViewLogin {
 		super();
 
 		const logoFile = SettingsGet('logoFile');
-		this.logoUrl = logoFile ? ('?/Logo&_=' + encodeURIComponent(logoFile)) : '';
+		this.logoUrl = logoFile ? ('?/Logo/' + encodeURIComponent(logoFile)) : '';
 
 		addObservablesTo(this, {
 			loadingDesc: SettingsGet('loadingDescription'),
