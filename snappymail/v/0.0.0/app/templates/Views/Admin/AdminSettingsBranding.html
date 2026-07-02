@@ -17,28 +17,18 @@
 	<div class="control-group">
 		<label data-i18n="TAB_BRANDING/LABEL_LOGIN_LOGO"></label>
 		<div>
-			<!-- ko if: logoFile() -->
-			<div style="margin-bottom: 8px;">
+			<div data-bind="visible: logoFile()" style="display:none; margin-bottom: 8px;">
 				<img data-bind="attr: { src: logoUrl }" alt="Logo" style="max-height: 80px; max-width: 300px; display: block; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff;">
 				<a href="#" class="btn btn-danger btn-small" data-bind="click: deleteLogo" data-i18n="TAB_BRANDING/BUTTON_DELETE_LOGO"></a>
 			</div>
-			<!-- /ko -->
-			<!-- ko ifnot: logoFile() -->
-			<p style="color: #999; margin-bottom: 8px;" data-i18n="TAB_BRANDING/LABEL_NO_LOGO"></p>
-			<!-- /ko -->
+			<p data-bind="visible: !logoFile()" style="color: #999; margin-bottom: 8px;" data-i18n="TAB_BRANDING/LABEL_NO_LOGO"></p>
 			<label class="btn btn-small" data-bind="css: { disabled: logoUploading() }">
 				<input type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" style="display:none"
 					data-bind="event: { change: uploadLogo }, disable: logoUploading">
-				<!-- ko if: logoUploading() -->
-				<span data-i18n="GLOBAL/LOADING"></span>
-				<!-- /ko -->
-				<!-- ko ifnot: logoUploading() -->
-				<span data-i18n="TAB_BRANDING/BUTTON_UPLOAD_LOGO"></span>
-				<!-- /ko -->
+				<span data-bind="visible: logoUploading()" data-i18n="GLOBAL/LOADING" style="display:none"></span>
+				<span data-bind="visible: !logoUploading()" data-i18n="TAB_BRANDING/BUTTON_UPLOAD_LOGO"></span>
 			</label>
-			<!-- ko if: logoError() -->
-			<p class="text-error" style="margin-top: 6px;" data-bind="text: logoError"></p>
-			<!-- /ko -->
+			<p class="text-error" style="display:none; margin-top: 6px;" data-bind="visible: logoError(), text: logoError"></p>
 		</div>
 	</div>
 </div>
