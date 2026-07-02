@@ -6,7 +6,7 @@ class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'Backup',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '1.2',
+		VERSION  = '1.3',
 		RELEASE  = '2024-03-18',
 		REQUIRED = '2.30.0',
 		CATEGORY = 'General',
