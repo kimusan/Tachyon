@@ -7,17 +7,6 @@
 			this.error = ko.observable('');
 		}
 
-		backup()
-		{
-			this.error('');
-			// Direct URL download — avoids async user-gesture expiry and base64 memory overhead
-			const a = document.createElement('a');
-			a.href = '?/admin/Backup';
-			document.body.append(a);
-			a.click();
-			a.remove();
-		}
-
 		submitForm(form)
 		{
 			this.error('');
