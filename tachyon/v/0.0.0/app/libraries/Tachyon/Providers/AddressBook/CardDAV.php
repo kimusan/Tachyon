@@ -88,8 +88,8 @@ trait CardDAV
 	{
 		\MailSo\Base\Utils::ResetTimeLimit();
 
-		$this->logWrite($sCmd.' '.$sUrl.(('PUT' === $sCmd || 'POST' === $sCmd) && null !== $mData ? ' ('.\strlen($mData).')' : ''),
-			\LOG_INFO, 'DAV');
+		$sLogLine = $sCmd.' '.$sUrl.(('PUT' === $sCmd || 'POST' === $sCmd) && null !== $mData ? ' ('.\strlen($mData).')' : '');
+		$this->logWrite($sLogLine, \LOG_INFO, 'DAV');
 
 		try
 		{
@@ -99,13 +99,10 @@ trait CardDAV
 				));
 			}
 			return $oClient->request($sCmd, $sUrl);
-//			if ('GET' === $sCmd) {
-//				$this->oLogger->WriteDump($aResponse, \LOG_INFO, 'DAV');
-//			}
 		}
 		catch (\Throwable $oException)
 		{
-			$this->logException($oException);
+			$this->logWrite($sLogLine.' failed: '.$oException->getMessage(), \LOG_WARNING, 'DAV');
 		}
 
 		return null;
