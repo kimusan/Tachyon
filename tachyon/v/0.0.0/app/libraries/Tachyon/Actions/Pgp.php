@@ -71,7 +71,7 @@ trait Pgp
 		if (80 < \strlen($homedir)) {
 			\clearstatcache();
 			// First try a symbolic link
-			$tmpdir = \sys_get_temp_dir() . '/snappymail';
+			$tmpdir = \sys_get_temp_dir() . '/tachyon';
 //			if (\Tachyon\Utils::inOpenBasedir($tmpdir) &&
 			\is_dir($tmpdir) || \mkdir($tmpdir, 0700);
 			if (\is_dir($tmpdir) && \is_writable($tmpdir)) {

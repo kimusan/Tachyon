@@ -8,7 +8,7 @@ class Temporary
 
 	function __construct(string $name, bool $prefix = true)
 	{
-		$tmpdir = \sys_get_temp_dir() . '/snappymail';
+		$tmpdir = \sys_get_temp_dir() . '/tachyon';
 //		if (\Tachyon\Utils::inOpenBasedir($tmpdir) &&
 		\MailSo\Base\Utils::mkdir($tmpdir);
 		if ($prefix) {

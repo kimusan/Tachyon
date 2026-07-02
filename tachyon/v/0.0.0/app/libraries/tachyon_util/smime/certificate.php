@@ -123,9 +123,9 @@ class Certificate
 			'encrypt_key_cipher' => $this->cipher,
 			// v3_ca    = Extensions to use when signing a CA
 			// usr_cert = Extensions for when we sign normal certs (specified as default)
-			'x509_extensions'    => 'snappymail_ca', // v3_ca | usr_cert
+			'x509_extensions'    => 'tachyon_ca', // v3_ca | usr_cert
 			// Extensions to add to a certificate request
-			'req_extensions'     => 'snappymail_req', // v3_req
+			'req_extensions'     => 'tachyon_req', // v3_req
 		);
 
 		$dn = $this->distinguishedName;
@@ -144,8 +144,8 @@ class Certificate
 		if ($csr) {
 			$this->x509 = \openssl_csr_sign(
 				$csr,
-				\file_get_contents(__DIR__ . '/snappymail.crt'),
-				\file_get_contents(__DIR__ . '/snappymail.key'),
+				\file_get_contents(__DIR__ . '/tachyon.crt'),
+				\file_get_contents(__DIR__ . '/tachyon.key'),
 				$this->days,
 				$options
 			);

@@ -1,6 +1,6 @@
 <?php
 /**
- * SnappyMail login-o365 plugin
+ * Tachyon login-o365 plugin
  * You need to register an app in Azure portal and add
  * a secret, redirect URIs and the following API permissions:
  *     https://outlook.office.com/IMAP.AccessAsUser.All
@@ -195,7 +195,7 @@ class LoginO365Plugin extends \Tachyon\Plugins\AbstractPlugin
 				// This is later used by imap/smtp/sieve.before-login for *additional* accounts.
 				$this->storeAccountTokens($oMainAccount, $email, $tokenBundle);
 
-				// Create/validate an AdditionalAccount entry exactly like SnappyMail expects in "additionalaccounts".
+				// Create/validate an AdditionalAccount entry exactly like Tachyon expects in "additionalaccounts".
 				// We set the "password" to the OAuth subject (sub) as an opaque secret; the plugin will inject XOAUTH2.
 				$oPassword = new \Tachyon\Util\SensitiveString($sub);
 				$oAdditional = $oActions->LoginProcess($email, $oPassword, false);
@@ -233,7 +233,7 @@ class LoginO365Plugin extends \Tachyon\Plugins\AbstractPlugin
 			// Default: "login" flow (preserve existing behavior)
 			static::$auth[\strtolower($email)] = $tokenBundle;
 
-			// SnappyMail uses password as opaque string; plugin injects XOAUTH2 later.
+			// Tachyon uses password as opaque string; plugin injects XOAUTH2 later.
 			$oPassword = new \Tachyon\Util\SensitiveString($sub);
 			$oAccount = $oActions->LoginProcess($email, $oPassword);
 

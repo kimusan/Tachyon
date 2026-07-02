@@ -68,7 +68,7 @@ trait Attachments
 					if (\class_exists('ZipArchive')) {
 						$oZip = new \ZipArchive();
 						$oZip->open($sZipFileName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
-						$oZip->setArchiveComment('SnappyMail/'.APP_VERSION);
+						$oZip->setArchiveComment('Tachyon/'.APP_VERSION);
 						foreach ($aData as $aItem) {
 							$sFileName = ($mUIDs ? "{$aItem['uid']}/" : ($sFolder ? "{$aItem['uid']}-" : '')) . $aItem['fileName'];
 							if (isset($aItem['data'])) {
@@ -92,7 +92,7 @@ trait Attachments
 					} else {
 						@\unlink($sZipFileName);
 						$oZip = new \Tachyon\Util\Stream\ZIP($sZipFileName);
-//						$oZip->setArchiveComment('SnappyMail/'.APP_VERSION);
+//						$oZip->setArchiveComment('Tachyon/'.APP_VERSION);
 						foreach ($aData as $aItem) {
 							if ($aItem['fileHash']) {
 								$sFullFileNameHash = $oFilesProvider->GetFileName($oAccount, $aItem['fileHash']);

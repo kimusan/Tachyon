@@ -139,13 +139,13 @@ oldcert = $insta::certout
 cmd = rr
 oldcert = $insta::certout
 
-[ snappymail_req ]
+[ tachyon_req ]
 basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, emailProtection
 subjectAltName = email:copy
 
-[ snappymail_ca ]
+[ tachyon_ca ]
 basicConstraints = critical,CA:true
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, emailProtection

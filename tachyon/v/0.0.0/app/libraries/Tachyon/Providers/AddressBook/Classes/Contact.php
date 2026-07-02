@@ -54,7 +54,7 @@ class Contact implements \JsonSerializable
 			$oVCard = $oVCard->convert(VCard::VCARD40);
 		}
 
-		// KDE KAddressBook entry and used by SnappyMail
+		// KDE KAddressBook entry and used by Tachyon
 		// https://github.com/sabre-io/vobject/issues/589
 		$oVCard->select('X-CRYPTO')
 		|| $oVCard->add('X-CRYPTO', '', [

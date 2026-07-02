@@ -47,7 +47,7 @@ abstract class Log
 				$log_level = \max(3, \Tachyon\Api::Config()->Get('logs', 'level', \LOG_WARNING));
 			}
 			if ($level <= $log_level) {
-				if (\Tachyon\Api::Config()->Get('logs', 'syslog') && \openlog('snappymail', \LOG_ODELAY, \LOG_USER)) {
+				if (\Tachyon\Api::Config()->Get('logs', 'syslog') && \openlog('tachyon', \LOG_ODELAY, \LOG_USER)) {
 					\syslog($level, "{$prefix} {$msg}");
 					\closelog();
 				}

@@ -542,7 +542,7 @@ class PdoAddressBook
 										$oVCard = new VCard;
 //										$oVCard = $oVCard->convert(VCard::VCARD40);
 										$oVCard->VERSION = '4.0';
-										$oVCard->PRODID = 'SnappyMail-'.APP_VERSION;
+										$oVCard->PRODID = 'Tachyon-'.APP_VERSION;
 										$aVCards[$iId] = $oVCard;
 									}
 									$oVCard = $aVCards[$iId];

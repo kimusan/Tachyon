@@ -265,7 +265,7 @@
 		"ERROR_EMPTY_BODY": "Inhalt der Nachricht ist leer"
 	},
 	"POPUPS_ASK": {
-		"EXIT_ARE_YOU_SURE": "Sind Sie sicher, dass Sie SnappyMail beenden möchten?",
+		"EXIT_ARE_YOU_SURE": "Sind Sie sicher, dass Sie Tachyon beenden möchten?",
 		"DESC_WANT_CLOSE_THIS_WINDOW": "Sind Sie sicher, dass Sie dieses Fenster schließen möchten?",
 		"DESC_WANT_DELETE_MESSAGES": "Sind Sie sicher, dass Sie diese Nachricht(en) löschen möchten?"
 	},

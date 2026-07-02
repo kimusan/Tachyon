@@ -75,7 +75,7 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 	}
 
 	/**
-	 * Defines the content of the plugin configuration page inside the Admin Panel of SnappyMail
+	 * Defines the content of the plugin configuration page inside the Admin Panel of Tachyon
 	 */
 	protected function configMapping(): array
 	{
@@ -89,7 +89,7 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 				->SetLabel("Mail address field for main account")
 				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The ldap field containing the mail address to use on the Tachyon main account.
-					\nThe value found inside ldap will overwrite the mail address of the Tachyon main account (the account the user logged in at SnappyMail)
+					\nThe value found inside ldap will overwrite the mail address of the Tachyon main account (the account the user logged in at Tachyon)
 					\nThe mail address used at login will still be used to login to the servers.")
 				->SetDefaultValue("mail"),
 		]);
@@ -129,13 +129,13 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_OBJECTCLASS)
 				->SetLabel("Object class")
 				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
-				->SetDescription("The object class to use when searching for additional mail accounts of the logged in SnappyMail user")
+				->SetDescription("The object class to use when searching for additional mail accounts of the logged in Tachyon user")
 				->SetDefaultValue("user"),
 
 			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_BASE)
 				->SetLabel("Base DN")
 				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
-				->SetDescription("The base DN to search in for additional mail accounts of the logged in SnappyMail user"),
+				->SetDescription("The base DN to search in for additional mail accounts of the logged in Tachyon user"),
 
 			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_SEARCH)
 				->SetLabel("Search field")
@@ -147,7 +147,7 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 				->SetLabel("LDAP search string")
 				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The search string used to find ldap objects of mail accounts the user has access to.
-					\nPossible placeholers:\n#USERNAME# - replaced with the username of the actual SnappyMail user
+					\nPossible placeholers:\n#USERNAME# - replaced with the username of the actual Tachyon user
 					\n#BASE_DN# - replaced with the value inside the field 'User base DN'.")
 				->SetDefaultValue("uid=#USERNAME#"),
 
@@ -157,16 +157,16 @@ class LdapMailAccountsPlugin extends AbstractPlugin
 				->SetDescription("Used when searching for additional accounts or when overwriting the mail address of the main account.
 					\nThe field containing the username of the mail account.
 					\nWhen looking up additional accounts:
-					\nIf this field contains an email address, only the local-part before the @ is used. The domain part is retrieved configuring the field below. This username gets used by SnappyMail to login to the additional mail account
+					\nIf this field contains an email address, only the local-part before the @ is used. The domain part is retrieved configuring the field below. This username gets used by Tachyon to login to the additional mail account
 					\nWhen overwriting the main account mail address:
-					\nThe username from SnappyMail login gets used to search an LDAP entry containig a field with the same username.")
+					\nThe username from Tachyon login gets used to search an LDAP entry containig a field with the same username.")
 				->SetDefaultValue("uid"),
 
 			\Tachyon\Plugins\Property::NewInstance(LdapMailAccountsConfig::CONFIG_FIELD_MAIL_DOMAIN)
 				->SetLabel("Domain name field of additional account")
 				->SetType(Tachyon\Enumerations\PluginPropertyType::STRING)
 				->SetDescription("The field containing the domain name of the found additional mail account.
-					\nThis domain gets looked up by SnappyMail to choose the right connection parameters at logging in to the additional mail account.
+					\nThis domain gets looked up by Tachyon to choose the right connection parameters at logging in to the additional mail account.
 					\nIf this field contains an email address, only the domain-part after the @ is used.")
 				->SetDefaultValue("mail"),
 

@@ -33,7 +33,7 @@ class ChangePasswordDriverPDO
 	{
 		return array(
 			\Tachyon\Plugins\Property::NewInstance('pdo_dsn')->SetLabel('DSN')
-				->SetDefaultValue('mysql:host=localhost;dbname=snappymail;charset=utf8'),
+				->SetDefaultValue('mysql:host=localhost;dbname=tachyon;charset=utf8'),
 			\Tachyon\Plugins\Property::NewInstance('pdo_user')->SetLabel('User'),
 			\Tachyon\Plugins\Property::NewInstance('pdo_password')->SetLabel('Password')
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD),

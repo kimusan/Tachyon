@@ -8,8 +8,8 @@ if (defined('APP_PLUGINS_PATH') && !empty($_ENV['CPANEL']) && !is_dir(APP_PLUGIN
 	$oConfig = \Tachyon\Api::Config();
 	$oConfig->Set('plugins', 'enable', true);
 	$oConfig->Set('login', 'default_domain', 'cpanel');
-	$oConfig->Set('logs', 'path', $_ENV['HOME'] . '/logs/snappymail');
-	$oConfig->Set('cache', 'path', $_ENV['TMPDIR'] . '/snappymail');
+	$oConfig->Set('logs', 'path', $_ENV['HOME'] . '/logs/tachyon');
+	$oConfig->Set('cache', 'path', $_ENV['TMPDIR'] . '/tachyon');
 
 	\Tachyon\Util\Repository::installPackage('plugin', 'login-cpanel');
 	\Tachyon\Util\Repository::enablePackage('login-cpanel');

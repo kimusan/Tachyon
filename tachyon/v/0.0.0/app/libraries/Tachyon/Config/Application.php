@@ -9,7 +9,7 @@ class Application extends \Tachyon\Config\AbstractConfig
 	public function __construct()
 	{
 		parent::__construct('application.ini',
-			'; SnappyMail configuration file
+			'; Tachyon configuration file
 ; Please don\'t add custom parameters here, those will be overwritten',
 			APP_CONFIGURATION_NAME);
 	}
@@ -214,7 +214,7 @@ Warning: only enable when server does not do this, else double compression error
 				'allow_sync'        => array(false),
 				'sync_interval'     => array(20),
 				'type'              => array('sqlite'),
-				'pdo_dsn'           => array('host=127.0.0.1;port=3306;dbname=snappymail'),
+				'pdo_dsn'           => array('host=127.0.0.1;port=3306;dbname=tachyon'),
 				'pdo_user'          => array('root'),
 				'pdo_password'      => array(''),
 				'mysql_ssl_ca'      => array('', 'PEM format certificate'),
@@ -225,7 +225,7 @@ Warning: only enable when server does not do this, else double compression error
 			),
 
 			'security' => array(
-				'custom_server_signature' => array('SnappyMail'),
+				'custom_server_signature' => array('Tachyon'),
 				'x_xss_protection_header' => array('1; mode=block'),
 
 				'gnupg'                   => array(true),
@@ -242,7 +242,7 @@ Warning: only enable when server does not do this, else double compression error
 				'hide_x_mailer_header'    => array(true),
 				'max_sys_getloadavg'      => array(0.0, 'https://en.m.wikipedia.org/wiki/Load_(computing)'),
 				'content_security_policy' => array('', 'For example to allow all images use "img-src https:". More info at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives'),
-				'csp_report'              => array(false, 'Report CSP errors to PHP and/or SnappyMail Log'),
+				'csp_report'              => array(false, 'Report CSP errors to PHP and/or Tachyon Log'),
 				'encrypt_cipher'          => array('aes-256-cbc-hmac-sha1', 'A valid cipher method from https://php.net/openssl_get_cipher_methods'),
 				'cookie_samesite'         => array('Strict', 'Strict, Lax or None'),
 				'secfetch_allow'          => array('', 'Additional allowed Sec-Fetch combinations separated by ";".

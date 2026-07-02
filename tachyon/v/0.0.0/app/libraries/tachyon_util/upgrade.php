@@ -196,7 +196,7 @@ abstract class Upgrade
 
 				$sTmp = Repository::downloadCore();
 				if (!$sTmp) {
-					throw new \Exception('Failed to download latest SnappyMail');
+					throw new \Exception('Failed to download latest Tachyon');
 				}
 
 				if (\class_exists('PharData')) {
@@ -209,7 +209,7 @@ abstract class Upgrade
 				\umask(0022);
 				\error_log('Extract to ' . $target);
 //				$bResult = $oArchive->extractTo($target, null, true);
-				$bResult = $oArchive->extractTo($target, 'snappymail/')
+				$bResult = $oArchive->extractTo($target, 'tachyon/')
 					&& $oArchive->extractTo($target, 'index.php', true);
 				if (!$bResult) {
 					throw new \Exception('Extract core files failed');
@@ -235,7 +235,7 @@ abstract class Upgrade
 		\umask(0022);
 		$target = \rtrim(APP_INDEX_ROOT_PATH, '\\/');
 		// Prevent Apache access error due to directories being 0700
-		foreach (\glob("{$target}/snappymail/v/*", \GLOB_ONLYDIR) as $dir) {
+		foreach (\glob("{$target}/tachyon/v/*", \GLOB_ONLYDIR) as $dir) {
 			\chmod($dir, 0755);
 			foreach (['static','themes'] as $folder) {
 				\chmod("{$dir}/{$folder}", 0755);

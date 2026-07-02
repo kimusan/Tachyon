@@ -44,7 +44,7 @@
 		"LABEL_ATTACHMENT_SIZE_LIMIT": "Maksimal størrelse på vedlegg",
 		"LABEL_ALLOW_ADDITIONAL_ACCOUNTS": "Tillat bruk av flere kontoer",
 		"LABEL_ALLOW_IDENTITIES": "Tillat bruk av flere identiteter",
-		"ALERT_DATA_ACCESS": "SnappyMail-datamappa di er offentlig tiljgengelig. Sett opp webtjeneren slik at den ikke viser datamappa. Les mer her:",
+		"ALERT_DATA_ACCESS": "Tachyon-datamappa di er offentlig tiljgengelig. Sett opp webtjeneren slik at den ikke viser datamappa. Les mer her:",
 		"ALERT_WARNING": "Advarsel!",
 		"HTML_ALERT_WEAK_PASSWORD": "Du bruker forvalgt admin-passord.\n<br>\nAv sikkerhetshensyn bør du\n<strong><a href=\"#\/security\">endre<\/a><\/strong>\npassordet umiddelbart."
 	},
@@ -108,7 +108,7 @@
 		"LABEL_TAG_HINT": "Rask, enkel, moderne og web-basert e-postklient",
 		"LABEL_ALL_RIGHTS_RESERVED": "Alle rettigheter reservert.",
 		"HINT_READ_CHANGE_LOG": "Les endringslogg før du oppdaterer.",
-		"HINT_IS_UP_TO_DATE": "SnappyMail er oppdatert.",
+		"HINT_IS_UP_TO_DATE": "Tachyon er oppdatert.",
 		"HTML_NEW_VERSION": "Versjon <b>%VERSION%<\/b> er nå tilgjengelig.",
 		"LABEL_UPDATING": "Oppdaterer",
 		"LABEL_CHECKING": "Ser etter oppdateringer",
