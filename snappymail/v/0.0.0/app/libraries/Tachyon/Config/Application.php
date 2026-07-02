@@ -176,9 +176,10 @@ class Application extends \Tachyon\Config\AbstractConfig
 
 			'webmail' => array(
 
-				'title'                       => array('SnappyMail Webmail', 'Text displayed as page title'),
-				'loading_description'         => array('SnappyMail', 'Text displayed on startup'),
+				'title'                       => array('Tachyon Webmail', 'Text displayed as page title'),
+				'loading_description'         => array('Tachyon', 'Text displayed on startup'),
 				'favicon_url'                 => array(''),
+				'logo_file'                   => array(''),
 				'app_path'                    => array(''),
 
 				'theme'                       => array('Default', 'Theme used by default'),
