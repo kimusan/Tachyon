@@ -45,7 +45,7 @@ package() {
     "$pkgdir/var/lib/tachyon"
 
   # application files
-  cp -r "$srcdir/build/snappymail" "$pkgdir/usr/share/tachyon"
+  cp -r "$srcdir/build/tachyon" "$pkgdir/usr/share/tachyon"
   install -Dm644 -t "$pkgdir/usr/share/tachyon" "$srcdir/build/index.php"
 
   # data files
