@@ -1,3 +1,17 @@
+## 3.1.0 – 2026-07-02
+
+### Added
+- Admin branding panel: upload a custom logo (PNG, JPG, GIF, SVG, WebP) that displays on the login page
+- Login page renders the uploaded logo above the sign-in form, centered by default
+- Logo position and size are themeable via CSS variables (`--login-logo-max-height`, `--login-logo-max-width`)
+- `.deb` package included in release artifacts
+
+### Changed
+- App directory renamed from `snappymail/v/` to `tachyon/v/` — public asset URLs change accordingly; existing installations upgrade cleanly by extracting over the top
+- Tachyon theme is now the default for new installations (was `Default`)
+
+---
+
 ## 3.0.0 – 2026-06-30
 ### Changed
 - Project renamed from SnappyMail to Tachyon
