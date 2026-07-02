@@ -1,7 +1,7 @@
 # Maintainer: Kim Schulz <kim@schulz.dk>
 
 pkgname=tachyon
-pkgver=3.1.1
+pkgver=3.1.2
 pkgrel=1
 pkgdesc="Fast, secure, modern PHP webmail client — fork of SnappyMail"
 arch=('any')
