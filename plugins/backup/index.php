@@ -17,47 +17,8 @@ class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 	{
 		// Admin Settings tab
 		$this->addJs('js/BackupAdminSettings.js', true); // add js file
-		$this->addJsonHook('JsonAdminBackupData');
 		$this->addJsonHook('JsonAdminRestoreData');
 		$this->addTemplate('templates/BackupAdminSettingsTab.html', true);
-	}
-
-	public function JsonAdminBackupData()
-	{
-		if (!($this->Manager()->Actions() instanceof \Tachyon\ActionsAdmin)
-		 || !$this->Manager()->Actions()->IsAdminLoggined()
-		) {
-			return $this->jsonResponse(__FUNCTION__, false);
-		}
-
-		try {
-			$sFileName = APP_PRIVATE_DATA . \MailSo\Base\Utils::Sha1Rand() . '.zip';
-			$sType = 'application/zip';
-
-			$oArchive = new \Tachyon\Util\Stream\ZIP($sFileName);
-
-			foreach (['configs', 'domains', 'plugins', 'storage'] as $dir) {
-				$sDir = APP_PRIVATE_DATA . $dir;
-				if (\is_dir($sDir)) {
-					$oArchive->addRecursive($sDir, $dir);
-				}
-			}
-			if (\is_readable(APP_PRIVATE_DATA.'AddressBook.sqlite')) {
-				$oArchive->addFile(APP_PRIVATE_DATA.'AddressBook.sqlite');
-			}
-			$oArchive->close();
-
-			$data = \base64_encode(\file_get_contents($sFileName));
-			\unlink($sFileName);
-
-			return $this->jsonResponse(__FUNCTION__, array(
-				'name' => \basename($sFileName),
-				'data' => "data:{$sType};base64,{$data}"
-			));
-		} catch (\Throwable $e) {
-			\error_log('Tachyon backup error: ' . $e->getMessage());
-			return $this->jsonResponse(__FUNCTION__, false);
-		}
 	}
 
 	public function JsonAdminRestoreData()

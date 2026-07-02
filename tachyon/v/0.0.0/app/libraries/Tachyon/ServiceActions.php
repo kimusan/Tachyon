@@ -60,7 +60,6 @@ class ServiceActions
 		return $this;
 	}
 
-/*
 	public function ServiceBackup() : void
 	{
 		if (\method_exists($this->oActions, 'DoAdminBackup')) {
@@ -68,7 +67,6 @@ class ServiceActions
 		}
 		exit;
 	}
-*/
 
 	public function ServiceJson() : string
 	{
