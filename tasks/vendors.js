@@ -5,12 +5,12 @@ const { config } = require('./config');
 const { del } = require('./common');
 
 // fontastic
-const fontasticFontsClear = () => del('snappymail/v/' + config.devVersion + '/static/css/fonts/snappymail.*');
+const fontasticFontsClear = () => del('tachyon/v/' + config.devVersion + '/static/css/fonts/snappymail.*');
 
 const fontasticFontsCopy = () =>
 	gulp
 		.src('vendors/fontastic/fonts/snappymail.*', { encoding: false })
-		.pipe(gulp.dest('snappymail/v/' + config.devVersion + '/static/css/fonts'));
+		.pipe(gulp.dest('tachyon/v/' + config.devVersion + '/static/css/fonts'));
 
 const fontastic = gulp.series(fontasticFontsClear, fontasticFontsCopy);
 

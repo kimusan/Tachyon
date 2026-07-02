@@ -86,7 +86,7 @@ const jsMin = () =>
 				showTotal: false
 			})
 		)
-		.pipe(replace(/"snappymail\/v\/([^/]+)\/static\/js\/"/g, '"snappymail/v/$1/static/js/min/"'))
+		.pipe(replace(/"tachyon\/v\/([^/]+)\/static\/js\/"/g, '"tachyon/v/$1/static/js/min/"'))
 		.pipe(rename({ suffix: '.min' }))
 		.pipe(
 			terser({

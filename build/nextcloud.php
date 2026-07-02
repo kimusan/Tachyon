@@ -25,7 +25,7 @@ foreach ($files as $file) {
 	}
 }
 
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('snappymail/v'), RecursiveIteratorIterator::SELF_FIRST);
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('tachyon/v'), RecursiveIteratorIterator::SELF_FIRST);
 foreach ($files as $file) {
 	if (is_file($file)) {
 		$newFile = str_replace('\\', '/', $file);

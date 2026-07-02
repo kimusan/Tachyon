@@ -122,7 +122,7 @@ class Utils
 
 	public static function WebVersionPath() : string
 	{
-		return self::WebPath() . 'snappymail/v/' . APP_VERSION . '/';
+		return self::WebPath() . 'tachyon/v/' . APP_VERSION . '/';
 		/**
 		 * TODO: solve this to support other paths.
 		 * https://github.com/the-djmaze/snappymail/issues/685

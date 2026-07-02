@@ -14,9 +14,9 @@ const config = {
 };
 
 config.paths.globjs = 'dev/**/*.js';
-config.paths.staticJS = 'snappymail/v/' + config.devVersion + '/static/js/';
-config.paths.staticMinJS = 'snappymail/v/' + config.devVersion + '/static/js/min/';
-config.paths.staticCSS = 'snappymail/v/' + config.devVersion + '/static/css/';
+config.paths.staticJS = 'tachyon/v/' + config.devVersion + '/static/js/';
+config.paths.staticMinJS = 'tachyon/v/' + config.devVersion + '/static/js/min/';
+config.paths.staticCSS = 'tachyon/v/' + config.devVersion + '/static/css/';
 
 config.paths.less = {
 	main: {

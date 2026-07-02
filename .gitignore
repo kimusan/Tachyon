@@ -2,7 +2,7 @@
 *.old
 /api.php
 /*.log
-/snappymail/v/0.0.0/static/*
+/tachyon/v/0.0.0/static/*
 /node_modules
 /build/local
 /build/dist
@@ -12,7 +12,7 @@
 /.docker/dev/mail/config
 /.docker/dev/nginx/ssl/*
 !/.docker/dev/nginx/ssl/.gitempty
-/.docker/release/snappymail-*.zip
+/.docker/release/tachyon-*.zip
 /dist
 /data
 /MULTIPLY

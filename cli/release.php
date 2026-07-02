@@ -54,7 +54,7 @@ if (!isset($options['skip-gulp'])) {
 		exit("gulp failed with error code {$return_var}\n");
 	}
 
-	$cmddir = escapeshellcmd(ROOT_DIR) . '/snappymail/v/0.0.0/static';
+	$cmddir = escapeshellcmd(ROOT_DIR) . '/tachyon/v/0.0.0/static';
 
 	if ($gzip = trim(`which gzip`)) {
 		echo "\x1b[33;1m === Gzip *.js and *.css === \x1b[0m\n";
@@ -62,8 +62,8 @@ if (!isset($options['skip-gulp'])) {
 		passthru("{$gzip} -k --best {$cmddir}/js/min/*.js");
 		passthru("{$gzip} -k --best {$cmddir}/css/admin*.css");
 		passthru("{$gzip} -k --best {$cmddir}/css/app*.css");
-		unlink(ROOT_DIR . '/snappymail/v/0.0.0/static/js/boot.js.gz');
-		unlink(ROOT_DIR . '/snappymail/v/0.0.0/static/js/min/boot.min.js.gz');
+		unlink(ROOT_DIR . '/tachyon/v/0.0.0/static/js/boot.js.gz');
+		unlink(ROOT_DIR . '/tachyon/v/0.0.0/static/js/min/boot.min.js.gz');
 	}
 
 	if ($brotli = trim(`which brotli`)) {
@@ -72,19 +72,19 @@ if (!isset($options['skip-gulp'])) {
 		passthru("{$brotli} -k --best {$cmddir}/js/min/*.js");
 		passthru("{$brotli} -k --best {$cmddir}/css/admin*.css");
 		passthru("{$brotli} -k --best {$cmddir}/css/app*.css");
-		unlink(ROOT_DIR . '/snappymail/v/0.0.0/static/js/boot.js.br');
-		unlink(ROOT_DIR . '/snappymail/v/0.0.0/static/js/min/boot.min.js.br');
+		unlink(ROOT_DIR . '/tachyon/v/0.0.0/static/js/boot.js.br');
+		unlink(ROOT_DIR . '/tachyon/v/0.0.0/static/js/min/boot.min.js.br');
 	}
 }
 
 // Temporary rename folder to speed up PharData
-//if (!rename('snappymail/v/0.0.0', "snappymail/v/{$package->version}")){
-if (!rename('snappymail/v/0.0.0', "snappymail/v/{$package->version}")) {
-	exit('Failed to temporary rename snappymail/v/0.0.0');
+//if (!rename('tachyon/v/0.0.0', "tachyon/v/{$package->version}")){
+if (!rename('tachyon/v/0.0.0', "tachyon/v/{$package->version}")) {
+	exit('Failed to temporary rename tachyon/v/0.0.0');
 }
 register_shutdown_function(function(){
 	// Rename folder back to original
-	@rename("snappymail/v/{$GLOBALS['package']->version}", 'snappymail/v/0.0.0');
+	@rename("tachyon/v/{$GLOBALS['package']->version}", 'tachyon/v/0.0.0');
 });
 
 echo "\x1b[33;1m === Zip/Tar === \x1b[0m\n";
@@ -96,7 +96,7 @@ if (!$zip->open($zip_destination, ZIPARCHIVE::CREATE)) {
 
 $tar = new PharData($tar_destination);
 
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('snappymail/v'), RecursiveIteratorIterator::SELF_FIRST);
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('tachyon/v'), RecursiveIteratorIterator::SELF_FIRST);
 foreach ($files as $file) {
 	$file = str_replace('\\', '/', $file);
 	//echo "{$file}\n";
@@ -111,9 +111,9 @@ foreach ($files as $file) {
 }
 
 if ($options['docker']) {
-	$tar->buildFromDirectory('./snappymail/', "@v/{$package->version}@");
+	$tar->buildFromDirectory('./tachyon/', "@v/{$package->version}@");
 } else {
-	$tar->buildFromDirectory('./', "@snappymail/v/{$package->version}@");
+	$tar->buildFromDirectory('./', "@tachyon/v/{$package->version}@");
 }
 
 //$zip->addFile('cli/upgrade.sh');
@@ -132,7 +132,7 @@ if ($options['aur']) {
 	$data = '<?php
 function __get_custom_data_full_path()
 {
-	return \'/var/lib/snappymail\';
+	return \'/var/lib/tachyon\';
 }
 ';
 	$zip->addFromString('include.php', $data);
@@ -173,7 +173,7 @@ if (isset($options['cpanel'])) {
 	require(ROOT_DIR . '/build/cpanel.php');
 }
 
-rename("snappymail/v/{$package->version}", 'snappymail/v/0.0.0');
+rename("tachyon/v/{$package->version}", 'tachyon/v/0.0.0');
 
 echo "\x1b[33;1m === Plugins === \x1b[0m\n";
 $options['release-tag'] = "v{$package->version}";

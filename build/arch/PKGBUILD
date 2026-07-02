@@ -1,7 +1,7 @@
 # Maintainer: Kim Schulz <kim@schulz.dk>
 
 pkgname=tachyon
-pkgver=3.0.11
+pkgver=3.0.12
 pkgrel=1
 pkgdesc="Fast, secure, modern PHP webmail client — fork of SnappyMail"
 arch=('any')
@@ -20,7 +20,7 @@ b2sums=('SKIP'
         'SKIP')
 
 prepare() {
-  sed -i "s/\$sCustomDataPath = '';/\$sCustomDataPath = '\/var\/lib\/$pkgname';/" "$pkgname-$pkgver/snappymail/v/0.0.0/include.php"
+  sed -i "s/\$sCustomDataPath = '';/\$sCustomDataPath = '\/var\/lib\/$pkgname';/" "$pkgname-$pkgver/tachyon/v/0.0.0/include.php"
 
   # create folder for build output
   mkdir -p build

@@ -23,7 +23,7 @@ jobs:
 
     - name: Check PHP syntax
       run: |
-        find snappymail/v/0.0.0/app/libraries integrations \
+        find tachyon/v/0.0.0/app/libraries integrations \
           -name "*.php" -print0 \
           | xargs -0 -P4 php -l \
           | grep -v "^No syntax errors" && exit 1 || true

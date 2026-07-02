@@ -30,7 +30,7 @@ function sri(done) {
 		}
 	}
 
-	const outPath = path.join('snappymail/v/' + config.devVersion, 'static/sri.json');
+	const outPath = path.join('tachyon/v/' + config.devVersion, 'static/sri.json');
 	fs.writeFileSync(outPath, JSON.stringify(hashes, null, '\t') + '\n');
 	console.log('[sri] wrote ' + outPath);
 	done();

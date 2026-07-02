@@ -12,7 +12,7 @@ $cpanel_tar->buildFromDirectory('./integrations/cpanel', "@integrations/cpanel/@
 
 $cpanel_path = '/usr/local/cpanel/base/3rdparty/tachyon/';
 
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('snappymail/v'), RecursiveIteratorIterator::SELF_FIRST);
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('tachyon/v'), RecursiveIteratorIterator::SELF_FIRST);
 foreach ($files as $file) {
 	if (is_file($file)) {
 		$newFile = str_replace('\\', '/', $file);

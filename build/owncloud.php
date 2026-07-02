@@ -25,7 +25,7 @@ foreach ($files as $file) {
 	}
 }
 
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('snappymail/v'), RecursiveIteratorIterator::SELF_FIRST);
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('tachyon/v'), RecursiveIteratorIterator::SELF_FIRST);
 foreach ($files as $file) {
 	if (is_file($file)) {
 		$newFile = str_replace('\\', '/', $file);
@@ -35,9 +35,9 @@ foreach ($files as $file) {
 	}
 }
 $nc_tar->delete("snappymail/app/snappymail/v/{$package->version}/app/.htaccess");
-$nc_tar->addFile("snappymail/v/{$package->version}/app/.htaccess", "snappymail/app/snappymail/v/{$package->version}/app/_htaccess");
+$nc_tar->addFile("tachyon/v/{$package->version}/app/.htaccess", "snappymail/app/snappymail/v/{$package->version}/app/_htaccess");
 $nc_tar->delete("snappymail/app/snappymail/v/{$package->version}/static/.htaccess");
-$nc_tar->addFile("snappymail/v/{$package->version}/static/.htaccess", "snappymail/app/snappymail/v/{$package->version}/static/_htaccess");
+$nc_tar->addFile("tachyon/v/{$package->version}/static/.htaccess", "snappymail/app/snappymail/v/{$package->version}/static/_htaccess");
 
 /*
 $nc_tar->addFile('data/.htaccess');

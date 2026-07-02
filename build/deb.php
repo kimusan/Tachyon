@@ -28,9 +28,9 @@ copy('README.md', "{$dir}/README.md");
 // Move files into package directory
 $dir = DEB_DEST_DIR . '/usr/share/tachyon';
 mkdir($dir, 0755, true);
-passthru('cp -r "' . dirname(__DIR__) . '/snappymail" "' . $dir . '"');
+passthru('cp -r "' . dirname(__DIR__) . '/tachyon" "' . $dir . '"');
 
-rename("{$dir}/snappymail/v/0.0.0", "{$dir}/snappymail/v/{$package->version}");
+rename("{$dir}/tachyon/v/0.0.0", "{$dir}/tachyon/v/{$package->version}");
 
 $data = file_get_contents('index.php');
 file_put_contents("{$dir}/index.php", str_replace('0.0.0', $package->version, $data));

@@ -21,12 +21,12 @@ $githubBase = $releaseTag
 $manifest = [];
 
 // Load AbstractPlugin so plugin classes can extend it
-if (is_file(ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/Tachyon/Plugins/AbstractPlugin.php')) {
-	require ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/Tachyon/Plugins/AbstractPlugin.php';
+if (is_file(ROOT_DIR . '/tachyon/v/0.0.0/app/libraries/Tachyon/Plugins/AbstractPlugin.php')) {
+	require ROOT_DIR . '/tachyon/v/0.0.0/app/libraries/Tachyon/Plugins/AbstractPlugin.php';
 	// Alias for plugins that still use the RainLoop namespace
 	class_alias(\Tachyon\Plugins\AbstractPlugin::class, \RainLoop\Plugins\AbstractPlugin::class);
 } else {
-	require ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/RainLoop/Plugins/AbstractPlugin.php';
+	require ROOT_DIR . '/tachyon/v/0.0.0/app/libraries/RainLoop/Plugins/AbstractPlugin.php';
 }
 
 $keys = [

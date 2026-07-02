@@ -2,6 +2,6 @@
 	"libs.min.js": "sha384-g40NRNt2fI38aiFJi2qOAb9Wa5D519427oayJG5MHpvJpPztHIzWgtllNSEohqGP",
 	"app.min.js": "sha384-COdc9ISQOXx72e0s5exqoQUguxSaf0JEbFXlrjqOqJtGkhhsFzDnvthb9OGWy84O",
 	"admin.min.js": "sha384-SDPCNgffvt99fhcuotP+1Rg/IWiaW4O6Wd0tutq81a0hAXqUckoZDNgXQydimweL",
-	"app.min.css": "sha384-TemIk4/la7oJ+8w0G2+DKqBa+kBC1UKcJuxNi5bbm5k5Yziy2o8xdZviyoUxAlcd",
-	"admin.min.css": "sha384-e4IkF2rCRbRhyCA7wI8RjD3Qy+7/kQGxkSmPKsgtzk8Zaa8dYza1V0RJrsM2AQMt"
+	"app.min.css": "sha384-KgzIuwlb/u3FZaXa4tGY8R0MuJW172TzmkewkONDj44gAQAZj3/ixO/CbxgldVrN",
+	"admin.min.css": "sha384-krNZAtzEPt0X+zhPgjEUiINBGJ4PO3ZfbF2jpKR8fNvu1bPCnD8cDz8387+Kl38A"
 }
