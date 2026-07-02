@@ -1,5 +1,5 @@
 <!-- ko if: logoUrl -->
-<div class="login-logo"><img data-bind="attr: { src: logoUrl, alt: loadingDesc }" style="max-height: 100px; max-width: 280px;"></div>
+<div class="login-logo"><img data-bind="attr: { src: logoUrl, alt: loadingDesc }"></div>
 <!-- /ko -->
 <div class="descWrapper" data-bind="visible: !logoUrl && '' !== loadingDesc, text: loadingDesc"></div>
 <div class="alert" data-bind="hidden: !submitError()" hidden="">
