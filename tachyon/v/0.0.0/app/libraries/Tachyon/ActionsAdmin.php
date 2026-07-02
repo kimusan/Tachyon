@@ -275,14 +275,19 @@ class ActionsAdmin extends Actions
 	{
 		try {
 			$this->IsAdminLoggined();
-			$file = \Tachyon\Util\Upgrade::backup();
-			\header('Content-Type: application/gzip');
-			\MailSo\Base\Http::setContentDisposition('attachment', ['filename' => \basename($file)]);
-			\header('Content-Transfer-Encoding: binary');
-			\header('Content-Length: ' . \filesize($file));
-			$fp = \fopen($file, 'rb');
-			\fpassthru($fp);
-			\unlink($file);
+			$name = 'tachyon-backup-' . \date('YmdHis');
+			$zip = new \Tachyon\Util\Stream\ZIP('php://output');
+			$zip->pushHttpHeaders($name);
+			foreach (['configs', 'domains', 'plugins', 'storage'] as $dir) {
+				$sDir = APP_PRIVATE_DATA . $dir;
+				if (\is_dir($sDir)) {
+					$zip->addRecursive($sDir, $dir);
+				}
+			}
+			if (\is_readable(APP_PRIVATE_DATA . 'AddressBook.sqlite')) {
+				$zip->addFile(APP_PRIVATE_DATA . 'AddressBook.sqlite', 'AddressBook.sqlite');
+			}
+			$zip->close();
 		} catch (\Throwable $e) {
 			if (102 == $e->getCode()) {
 				\MailSo\Base\Http::StatusHeader(403);

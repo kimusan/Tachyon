@@ -34,11 +34,10 @@ class BackupPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$result = false;
 		if (\class_exists('ZipArchive')) {
 			$oArchive = new \ZipArchive();
-			$oArchive->open($_FILES['backup']['tmp_name'], \ZIPARCHIVE::CREATE);
-			$result = $oArchive->extractTo(APP_PRIVATE_DATA);
-		} else if (\class_exists('PharData')) {
-			$oArchive = new \PharData($sTmp, 0, null, \Phar::GZ);
-			$result = $oArchive->extractTo(APP_PRIVATE_DATA);
+			if (\ZipArchive::ER_OK === $oArchive->open($_FILES['backup']['tmp_name'])) {
+				$result = $oArchive->extractTo(APP_PRIVATE_DATA);
+				$oArchive->close();
+			}
 		}
 
 		return $this->jsonResponse(__FUNCTION__, $result);
