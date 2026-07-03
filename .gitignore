@@ -1,3 +1,4 @@
+.claude/
 *.bak
 *.old
 /api.php
