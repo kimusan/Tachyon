@@ -32,7 +32,7 @@ if (class_exists('OC')) {
 } else {
 	http_response_code(400);
 	header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request', true, 400);
-	error_log("SnappyMail outside Nextcloud {$_SERVER['REQUEST_URI']}");
+	error_log("Tachyon outside Nextcloud {$_SERVER['REQUEST_URI']}");
 	exit('Not inside Nextcloud');
 //	define('APP_DATA_FOLDER_PATH', dirname(__DIR__) . '/snappymail-data/');
 //	define('APP_DATA_FOLDER_PATH', '/var/external-snappymail-data-folder/');
@@ -46,4 +46,4 @@ if (class_exists('OC')) {
 /**
  * Also update extensions on upgrade
  */
-define('SNAPPYMAIL_UPDATE_PLUGINS', 1);
+define('TACHYON_UPDATE_PLUGINS', 1);
