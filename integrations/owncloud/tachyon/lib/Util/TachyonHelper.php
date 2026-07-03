@@ -177,7 +177,7 @@ class TachyonHelper
 			}
 		}
 
-		// If the user has set credentials for SnappyMail in their personal
+		// If the user has set credentials for Tachyon in their personal
 		// settings, override everything before and use those instead.
 		$sCustomEmail = $config->getUserValue($sUID, 'tachyon', 'tachyon-email', '');
 		if ($sCustomEmail) {

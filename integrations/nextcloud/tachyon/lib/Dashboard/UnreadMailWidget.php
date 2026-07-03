@@ -38,7 +38,7 @@ class UnreadMailWidget implements IAPIWidget, IIconWidget/*, IOptionWidget*/
 	 */
 	public function getId(): string
 	{
-		return 'snappymail-unread';
+		return 'tachyon-unread';
 	}
 
 	/**
@@ -74,7 +74,7 @@ class UnreadMailWidget implements IAPIWidget, IIconWidget/*, IOptionWidget*/
 	 */
 	public function getUrl(): ?string
 	{
-		return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->linkToRoute('snappymail.page.index'));
+		return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->linkToRoute('tachyon.page.index'));
 	}
 
 	/**
@@ -122,7 +122,7 @@ class UnreadMailWidget implements IAPIWidget, IIconWidget/*, IOptionWidget*/
 			// instanceof \MailSo\Mail\MessageCollection
 			$MessageCollection = $oMailClient->MessageList($oParams);
 
-			$baseURL = $this->urlGenerator->linkToRoute('snappymail.page.index') . '#';
+			$baseURL = $this->urlGenerator->linkToRoute('tachyon.page.index') . '#';
 
 			foreach ($MessageCollection as $Message) {
 				$result[] = new WidgetItem(

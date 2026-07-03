@@ -27,13 +27,13 @@ class OwnCloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 			$sAppPath = '';
 			if (\class_exists('OC_App')) {
-				$sAppPath = \rtrim(\trim(\OC_App::getAppWebPath('snappymail')), '\\/').'/app/';
+				$sAppPath = \rtrim(\trim(\OC_App::getAppWebPath('tachyon')), '\\/').'/app/';
 			}
 			if (!$sAppPath) {
 				$sUrl = \MailSo\Base\Http::SingletonInstance()->GetUrl();
-				if ($sUrl && \preg_match('/\/index\.php\/apps\/snappymail/', $sUrl)) {
-					$sAppPath = \preg_replace('/\/index\.php\/apps\/snappymail.+$/',
-						'/apps/snappymail/app/', $sUrl);
+				if ($sUrl && \preg_match('/\/index\.php\/apps\/tachyon/', $sUrl)) {
+					$sAppPath = \preg_replace('/\/index\.php\/apps\/tachyon.+$/',
+						'/apps/tachyon/app/', $sUrl);
 				}
 			}
 			$_SERVER['SCRIPT_NAME'] = $sAppPath;
@@ -99,9 +99,9 @@ class OwnCloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$this->oHttp->ServerNoCache();
 
 		if (!static::IsOwnCloud() ||
-			!isset($_ENV['___snappymail_owncloud_email']) ||
-			!isset($_ENV['___snappymail_owncloud_password']) ||
-			empty($_ENV['___snappymail_owncloud_email'])
+			!isset($_ENV['___tachyon_owncloud_email']) ||
+			!isset($_ENV['___tachyon_owncloud_password']) ||
+			empty($_ENV['___tachyon_owncloud_email'])
 		)
 		{
 			$this->oActions->SetAuthLogoutToken();
@@ -111,15 +111,15 @@ class OwnCloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 		$bLogout = true;
 
-		$sEmail = $_ENV['___snappymail_owncloud_email'];
-		$sPassword = $_ENV['___snappymail_owncloud_password'];
+		$sEmail = $_ENV['___tachyon_owncloud_email'];
+		$sPassword = $_ENV['___tachyon_owncloud_password'];
 
 		try
 		{
 			$oAccount = $this->oActions->LoginProcess($sEmail, $sPassword);
 			$this->oActions->AuthToken($oAccount);
 
-			$bLogout = !($oAccount instanceof \snappymail\Model\Account);
+			$bLogout = !($oAccount instanceof \Tachyon\Model\Account);
 		}
 		catch (\Exception $oException)
 		{

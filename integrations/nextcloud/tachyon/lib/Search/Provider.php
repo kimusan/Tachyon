@@ -39,7 +39,7 @@ class Provider implements IProvider
 
 	public function getName(): string
 	{
-		return 'SnappyMail';
+		return 'Tachyon';
 //		return $this->l10n->t('Mails');
 	}
 
@@ -90,7 +90,7 @@ class Provider implements IProvider
 			// instanceof \MailSo\Mail\MessageCollection
 			$MessageCollection = $oMailClient->MessageList($oParams);
 
-			$baseURL = $this->urlGenerator->linkToRoute('snappymail.page.index');
+			$baseURL = $this->urlGenerator->linkToRoute('tachyon.page.index');
 //			$config = \OC::$server->getConfig();
 //			if ($config->getAppValue('tachyon', 'tachyon-no-embed')) {
 //				$baseURL .= '?target=';
@@ -118,7 +118,7 @@ class Provider implements IProvider
 				);
 			}
 		} else {
-			\error_log('SnappyMail not logged in to use unified search');
+			\error_log('Tachyon not logged in to use unified search');
 		}
 
 		if ($iLimit > \count($result)) {

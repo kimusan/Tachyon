@@ -53,10 +53,10 @@ class AdminSettings implements ISettings
 		$uid = $user ? $user->getUID() : null;
 
 		if ($uid && $this->groupManager->isAdmin($uid)) {
-//			$parameters['snappymail-admin-panel-link'] = TachyonHelper::getAppUrl().'?admin';
+//			$parameters['tachyon-admin-panel-link'] = TachyonHelper::getAppUrl().'?admin';
 			TachyonHelper::loadApp();
-			$parameters['snappymail-admin-panel-link'] =
-				$this->urlGenerator->linkToRoute('snappymail.page.index')
+			$parameters['tachyon-admin-panel-link'] =
+				$this->urlGenerator->linkToRoute('tachyon.page.index')
 				. '?' . \Tachyon\Api::Config()->Get('security', 'admin_panel_key', 'admin');
 		}
 
@@ -65,9 +65,9 @@ class AdminSettings implements ISettings
 		$sPassword = '';
 		if (\is_file($passfile)) {
 			$sPassword = \file_get_contents($passfile);
-			$parameters['snappymail-admin-panel-link'] .= '#/security';
+			$parameters['tachyon-admin-panel-link'] .= '#/security';
 		}
-		$parameters['snappymail-admin-password'] = $sPassword;
+		$parameters['tachyon-admin-password'] = $sPassword;
 
 		$parameters['can-import-rainloop'] = $sPassword && \is_dir(
 			\rtrim(\trim($this->config->getSystemValue('datadirectory', '')), '\\/')

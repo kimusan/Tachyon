@@ -23,7 +23,7 @@ class Settings extends Command
 
 	protected function configure() {
 		$this
-			->setName('snappymail:settings')
+			->setName('tachyon:settings')
 			->setDescription('modifies configuration')
 			->addArgument(
 				'uid',

@@ -41,7 +41,7 @@ jobs:
           echo "Version: $PKG_VERSION"
 
       - name: Build release (JS/CSS + PHP archive + plugins)
-        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian
+        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian --nextcloud --owncloud
 
       - name: Commit updated packages.json
         run: |
@@ -58,5 +58,7 @@ jobs:
             build/dist/releases/webmail/*/tachyon-*.tar.gz
             build/dist/releases/webmail/*/tachyon-*.zip
             build/dist/releases/webmail/*/tachyon_*.deb
+            build/dist/releases/webmail/*/tachyon-*-nextcloud.tar.gz
+            build/dist/releases/webmail/*/tachyon-*-owncloud.tar.gz
             build/dist/releases/plugins/*.tgz
             packages.json

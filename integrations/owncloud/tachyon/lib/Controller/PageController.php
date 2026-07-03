@@ -33,7 +33,7 @@ class PageController extends Controller
 			\OCP\Util::addStyle('tachyon', 'style');
 			TachyonHelper::startApp();
 			$response = new TemplateResponse('tachyon', 'index', [
-				'snappymail-iframe-url' => TachyonHelper::normalizeUrl(TachyonHelper::getAppUrl())
+				'tachyon-iframe-url' => TachyonHelper::normalizeUrl(TachyonHelper::getAppUrl())
 					. (empty($_GET['target']) ? '' : "#{$_GET['target']}")
 			]);
 			$csp = new ContentSecurityPolicy();
@@ -56,11 +56,11 @@ class PageController extends Controller
 		$sLanguage = $oActions->GetLanguage(false);
 
 		$csp = new ContentSecurityPolicy();
-		$sNonce = $csp->getSnappyMailNonce();
+		$sNonce = $csp->getTachyonNonce();
 
 		$params = [
 			'Admin' => $bAdmin ? 1 : 0,
-			'LoadingDescriptionEsc' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'SnappyMail'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
+			'LoadingDescriptionEsc' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'Tachyon'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
 			'BaseTemplates' => \Tachyon\Utils::ClearHtmlOutput($oServiceActions->compileTemplates($bAdmin)),
 			'BaseAppBootScript' => \file_get_contents(APP_VERSION_ROOT_PATH.'static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin.'.js'),
 			'BaseAppBootScriptNonce' => $sNonce,

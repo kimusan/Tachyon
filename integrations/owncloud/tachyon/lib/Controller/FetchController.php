@@ -101,13 +101,13 @@ class FetchController extends Controller {
 
 				$sPass = $_POST['tachyon-password'];
 				if ('******' !== $sPass) {
-					require_once $this->appManager->getAppPath('snappymail').'/lib/Util/TachyonHelper.php';
+					require_once $this->appManager->getAppPath('tachyon').'/lib/Util/TachyonHelper.php';
 
 					$this->config->setUserValue($sUser, 'tachyon', 'tachyon-password',
 						$sPass ? TachyonHelper::encodePassword($sPass, \md5($sPostEmail)) : '');
 				}
 
-				$sEmail = $this->config->getUserValue($sUser, 'snappymail', 'tachyon-email', '');
+				$sEmail = $this->config->getUserValue($sUser, 'tachyon', 'tachyon-email', '');
 			} else {
 				return new JSONResponse([
 					'status' => 'error',

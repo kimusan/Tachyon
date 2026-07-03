@@ -1,7 +1,7 @@
 <?php
 
-$_ENV['SNAPPYMAIL_INCLUDE_AS_API'] = true;
-require_once '/var/lib/snappymail/index.php';
+$_ENV['TACHYON_INCLUDE_AS_API'] = true;
+require_once '/var/lib/tachyon/index.php';
 
 	$oConfig = \Tachyon\Api::Config();
 
@@ -14,8 +14,8 @@ require_once '/var/lib/snappymail/index.php';
 	$oConfig->Set('contacts', 'enable', 'On');
 	$oConfig->Set('contacts', 'allow_sync', 'On');
 	$oConfig->Set('contacts', 'type', 'mysql');
-	$oConfig->Set('contacts', 'pdo_dsn', 'mysql:host=127.0.0.1;port=3306;dbname=snappymail');
-	$oConfig->Set('contacts', 'pdo_user', 'snappymail');
+	$oConfig->Set('contacts', 'pdo_dsn', 'mysql:host=127.0.0.1;port=3306;dbname=tachyon');
+	$oConfig->Set('contacts', 'pdo_user', 'tachyon');
 	$oConfig->Set('contacts', 'pdo_password', $argv[3]);
 
 	// Plugins

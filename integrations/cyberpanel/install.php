@@ -4,7 +4,7 @@
  * Alternative to cyberpanel/install/install.py
  * https://github.com/usmannasir/cyberpanel/blob/f7e4f5d91cb2b40473ae6ceb4ca473493ab3bb0c/install/install.py#L1255
  */
-define('TACHYON_PUBLIC_DIR', '/usr/local/CyberCP/public/snappymail');
+define('TACHYON_PUBLIC_DIR', '/usr/local/CyberCP/public/tachyon');
 
 if (PHP_SAPI !== 'cli' && false === stripos(php_sapi_name(), 'cli')) {
 	exit('not cli');

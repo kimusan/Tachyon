@@ -22,18 +22,18 @@ There, click on the link to go to the Tachyon admin panel.
 	]]></description>
 	<namespace>Tachyon</namespace>
 	<documentation>
-		<user>https://github.com/the-djmaze/snappymail/blob/master/integrations/owncloud/snappymail/README.md</user>
-		<website>https://github.com/the-djmaze/snappymail/wiki</website>
+		<user>https://github.com/kimusan/Tachyon/blob/master/integrations/owncloud/tachyon/README.md</user>
+		<website>https://github.com/kimusan/Tachyon/wiki</website>
 	</documentation>
 	<category>integration</category>
 	<category>office</category>
 	<category>search</category>
 	<category>social</category>
-	<screenshot>https://raw.githubusercontent.com/the-djmaze/snappymail/master/integrations/owncloud/screenshots/inbox.jpg</screenshot>
+	<screenshot>https://raw.githubusercontent.com/kimusan/Tachyon/master/integrations/owncloud/screenshots/inbox.jpg</screenshot>
 	<website>https://github.com/kimusan/Tachyon</website>
-	<discussion>https://github.com/the-djmaze/snappymail/discussions</discussion>
-	<repository>https://github.com/the-djmaze/snappymail/tree/master/integrations/owncloud</repository>
-	<bugs>https://github.com/the-djmaze/snappymail/issues</bugs>
+	<discussion>https://github.com/kimusan/Tachyon/discussions</discussion>
+	<repository>https://github.com/kimusan/Tachyon/tree/master/integrations/owncloud</repository>
+	<bugs>https://github.com/kimusan/Tachyon/issues</bugs>
 	<dependencies>
 		<php min-version="7.4" min-int-size="64" />
 		<lib>mbstring</lib>
@@ -68,7 +68,7 @@ There, click on the link to go to the Tachyon admin panel.
 	<navigations>
 		<navigation>
 			<name>Email</name>
-			<route>snappymail.page.index</route>
+			<route>tachyon.page.index</route>
 			<icon>logo-white-64x64.png</icon>
 			<order>4</order>
 		</navigation>

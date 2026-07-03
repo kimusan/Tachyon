@@ -37,7 +37,7 @@ class ContentSecurityPolicy extends \OCP\AppFramework\Http\ContentSecurityPolicy
 		$this->reportTo = \array_unique(\array_merge($this->reportTo, $CSP->report_to));
 	}
 
-	public function getSnappyMailNonce() {
+	public function getTachyonNonce() {
 		static $sNonce;
 		if (!$sNonce) {
 			$cspManager = Server::get(IContentSecurityPolicyNonceManager::class);

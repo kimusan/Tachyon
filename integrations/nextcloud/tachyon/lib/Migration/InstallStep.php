@@ -27,7 +27,7 @@ class InstallStep implements IRepairStep
 	}
 
 	public function getName() {
-		return 'Setup SnappyMail';
+		return 'Setup Tachyon';
 	}
 
 	public function run(IOutput $output) {
