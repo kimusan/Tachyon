@@ -75,6 +75,8 @@ ini_set('internal_encoding', 'UTF-8');
 
 if (!defined('TACHYON_LIBRARIES_PATH')) {
 	define('TACHYON_LIBRARIES_PATH', rtrim(realpath(__DIR__), '\\/').'/app/libraries/');
+	// Backward compat alias for Nextcloud SnappyMail app integration
+	define('SNAPPYMAIL_LIBRARIES_PATH', TACHYON_LIBRARIES_PATH);
 
 	if (false === set_include_path(TACHYON_LIBRARIES_PATH . PATH_SEPARATOR . get_include_path())) {
 		exit('set_include_path() failed. Probably due to Apache config using php_admin_value instead of php_value');
