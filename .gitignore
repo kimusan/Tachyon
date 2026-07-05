@@ -3,7 +3,9 @@
 *.old
 /api.php
 /*.log
-/tachyon/v/0.0.0/static/*
+/tachyon/v/0.0.0/static/js/
+/tachyon/v/0.0.0/static/css/
+/tachyon/v/0.0.0/static/sri.json
 /node_modules
 /build/local
 /build/dist
