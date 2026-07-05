@@ -1,6 +1,6 @@
 [
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "General",
         "description": "Adds X-Originating-IP header to outgoing message, containing sender's IP address.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/add-x-originating-ip-header-2.0.tgz",
@@ -28,7 +28,7 @@
         "version": "0.1"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "General",
         "description": "Sets the IMAP/SMTP host based on the user's login",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/auto-domain-grab-2.9.tgz",
@@ -70,7 +70,7 @@
         "version": "1.3"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Simple blacklist extension (with wildcard and exceptions functionality).",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/black-list-2.2.tgz",
@@ -84,7 +84,7 @@
         "version": "2.2"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Cache",
         "description": "Cache handler using PHP APCu",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/cache-apcu-2.36.tgz",
@@ -98,7 +98,7 @@
         "version": "2.36"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Cache",
         "description": "Cache handler using PHP Memcache or PHP Memcached",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/cache-memcache-2.37.tgz",
@@ -112,7 +112,7 @@
         "version": "2.37"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Cache",
         "description": "Cache handler using Redis",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/cache-redis-2.36.2.tgz",
@@ -126,7 +126,7 @@
         "version": "2.36.2"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Security",
         "description": "Extension to allow users to change their passwords",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/change-password-2.38.tgz",
@@ -140,7 +140,7 @@
         "version": "2.38"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Security",
         "description": "Extension to allow users to change their passwords through cPanel",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/change-password-cpanel-2.36.tgz",
@@ -182,7 +182,7 @@
         "version": "2.36"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Security",
         "description": "Extension to allow users to change their passwords through hMailServer",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/change-password-hmailserver-2.36.tgz",
@@ -196,7 +196,7 @@
         "version": "2.36"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Security",
         "description": "Extension to allow users to change their passwords through ISPConfig",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/change-password-ispconfig-2.36.tgz",
@@ -224,7 +224,7 @@
         "version": "2.36"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Security",
         "description": "Extension to allow users to change their passwords through Poppassd",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/change-password-poppassd-2.36.tgz",
@@ -252,7 +252,7 @@
         "version": "1.0.6"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Enables custom usernames by email address.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/custom-login-mapping-2.3.tgz",
@@ -294,7 +294,7 @@
         "version": "1.0"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Contacts",
         "description": "Get contacts suggestions from IMAP INBOX folder.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/imap-contacts-suggestions-2.36.tgz",
@@ -308,7 +308,7 @@
         "version": "2.36"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Contacts",
         "description": "Use an Address Book of Kolab.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/kolab-2.37.tgz",
@@ -322,7 +322,7 @@
         "version": "2.37"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Contacts",
         "description": "Get contacts suggestions from LDAP.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/ldap-contacts-suggestions-2.14.tgz",
@@ -434,7 +434,7 @@
         "version": "1.0"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "GMail IMAP, Sieve & SMTP login using RFC 7628 OAuth2",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/login-gmail-2.37.tgz",
@@ -462,7 +462,7 @@
         "version": "1.0"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Office365/Outlook IMAP, Sieve & SMTP login using RFC 7628 OAuth2",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/login-o365-0.4.tgz",
@@ -476,7 +476,7 @@
         "version": "0.4"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "IMAP, Sieve & SMTP login using RFC 7628 OAuth2",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/login-oauth2-1.3.tgz",
@@ -490,7 +490,7 @@
         "version": "1.3"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Filters",
         "description": "Override IMAP/SMTP login credentials for specific users.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/login-override-2.4.tgz",
@@ -504,7 +504,7 @@
         "version": "2.4"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "IMAP login using PROXYAUTH",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/login-proxyauth-example-1.0.tgz",
@@ -518,7 +518,7 @@
         "version": "1.0"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Links on login screen for registration and forgotten password",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/login-register-2.2.tgz",
@@ -574,7 +574,7 @@
         "version": "2.6"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Integrations",
         "description": "Integrate with Nextcloud v20+",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/nextcloud-2.38.2.tgz",
@@ -588,7 +588,7 @@
         "version": "2.38.2"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Filters",
         "description": "Override SMTP credentials for specific users.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/override-smtp-credentials-2.5.tgz",
@@ -658,7 +658,7 @@
         "version": "0.1"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "General",
         "description": "Sets the $_SERVER['REMOTE_ADDR'] value from HTTP_CLIENT_IP/HTTP_X_FORWARDED_FOR",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/set-remote-addr-2.0.tgz",
@@ -686,7 +686,7 @@
         "version": "1.1"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Fun",
         "description": "Snowfall on login screen (just for fun).",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/snowfall-on-login-screen-2.1.tgz",
@@ -700,7 +700,7 @@
         "version": "2.1"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Provides support for TOTP 2FA",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/two-factor-auth-2.19.0.tgz",
@@ -714,7 +714,7 @@
         "version": "2.19.0"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Play a simple video on the login screen.",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/video-on-login-screen-0.1.tgz",
@@ -728,7 +728,7 @@
         "version": "0.1"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Messages",
         "description": "Display ICS attachment or JSON-LD details",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/view-ics-2.2.tgz",
@@ -742,7 +742,7 @@
         "version": "2.2"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "Login",
         "description": "Simple login whitelist (with wildcard and exceptions functionality).",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/white-list-2.2.tgz",
@@ -756,7 +756,7 @@
         "version": "2.2"
     },
     {
-        "author": "SnappyMail",
+        "author": "Tachyon",
         "category": "General",
         "description": "Add Example as WYSIWYG editor option",
         "file": "https://github.com/kimusan/Tachyon/releases/latest/download/wysiwyg-example-1.0.tgz",
