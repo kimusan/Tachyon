@@ -8,7 +8,7 @@ WORKDIR /source
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# Patch release.php with hotfix from: https://github.com/xgbstar1/tachyon-docker/blob/main/Dockerfile, so that release.php doesn't fail with error
+# Patch release.php with hotfix from: https://github.com/xgbstar1/snappymail-docker/blob/main/Dockerfile, so that release.php doesn't fail with error
 RUN sed -i 's_^if.*rename.*tachyon.v.0.0.0.*$_if (!!system("mv tachyon/v/0.0.0 tachyon/v/{$package->version}")) {_' cli/release.php  || true
 RUN php release.php
 RUN set -eux; \
