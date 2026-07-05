@@ -1571,8 +1571,6 @@
         const text = block.textContent?.trimEnd().replace(ZWS, "");
         if (text === "*" || text === "1.") {
           event.preventDefault();
-          self.insertPlainText(" ", false);
-          self._docWasChanged();
           self.saveUndoState(range);
           const walker = createTreeWalker(block, SHOW_TEXT);
           let textNode;
