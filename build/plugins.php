@@ -12,10 +12,10 @@ foreach ($files as $fileinfo) {
 
 $terser = ROOT_DIR . '/node_modules/terser/bin/terser';
 
-// --release-tag v3.0.1 → use absolute GitHub download URLs in packages.json
+// Use /releases/latest/download/ so packages.json never has stale version-pinned URLs
 $releaseTag = $options['release-tag'] ?? null;
 $githubBase = $releaseTag
-	? "https://github.com/kimusan/Tachyon/releases/download/{$releaseTag}/"
+	? "https://github.com/kimusan/Tachyon/releases/latest/download/"
 	: null;
 
 $manifest = [];
