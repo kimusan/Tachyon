@@ -29,22 +29,22 @@ if [ "${SECURE_COOKIES}" = 'true' ]; then
         } > /usr/local/etc/php/conf.d/cookies.ini;
 fi
 
-echo "[INFO] Tachyon version: $( ls /snappymail/snappymail/v )"
+echo "[INFO] Tachyon version: $( ls /tachyon/tachyon/v )"
 
 # Set permissions on tachyon data
-echo "[INFO] Setting permissions on /var/lib/snappymail"
-chown -R www-data:www-data /var/lib/snappymail/
-chmod 550 /var/lib/snappymail/
-find /var/lib/snappymail/ -type d -exec chmod 750 {} \;
+echo "[INFO] Setting permissions on /var/lib/tachyon"
+chown -R www-data:www-data /var/lib/tachyon/
+chmod 550 /var/lib/tachyon/
+find /var/lib/tachyon/ -type d -exec chmod 750 {} \;
 
 # Create tachyon default config if absent
-TACHYON_CONFIG_FILE=/var/lib/snappymail/_data_/_default_/configs/application.ini
+TACHYON_CONFIG_FILE=/var/lib/tachyon/_data_/_default_/configs/application.ini
 if [ ! -f "$TACHYON_CONFIG_FILE" ]; then
     echo "[INFO] Creating default Tachyon configuration: $TACHYON_CONFIG_FILE"
     # Run tachyon and exit. This populates the data directory and generates the config file
     # On error, print php exception and exit
     EXITCODE=
-    su - www-data -s /bin/sh -c 'php /snappymail/index.php' > /tmp/out || EXITCODE=$?
+    su - www-data -s /bin/sh -c 'php /tachyon/index.php' > /tmp/out || EXITCODE=$?
     if [ -n "$EXITCODE" ]; then
         cat /tmp/out
         exit "$EXITCODE"
@@ -71,7 +71,7 @@ sed 's/^auth_syslog = .*/auth_syslog = Off/' -i $TACHYON_CONFIG_FILE
     while ! nc -vz -w 1 127.0.0.1 8888 > /dev/null 2>&1; do echo "[INFO] Checking whether nginx is alive"; sleep 1; done
     while ! nc -vz -w 1 127.0.0.1 9000 > /dev/null 2>&1; do echo "[INFO] Checking whether php-fpm is alive"; sleep 1; done
     # Create tachyon admin password if absent
-    TACHYON_ADMIN_PASSWORD_FILE=/var/lib/snappymail/_data_/_default_/admin_password.txt
+    TACHYON_ADMIN_PASSWORD_FILE=/var/lib/tachyon/_data_/_default_/admin_password.txt
     if [ ! -f "$TACHYON_ADMIN_PASSWORD_FILE" ]; then
         echo "[INFO] Creating Tachyon admin password file: $TACHYON_ADMIN_PASSWORD_FILE"
         wget -T 1 -qO- 'http://127.0.0.1:8888/?/AdminAppData/0/12345/' > /dev/null

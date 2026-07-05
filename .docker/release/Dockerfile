@@ -8,19 +8,19 @@ WORKDIR /source
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# Patch release.php with hotfix from: https://github.com/xgbstar1/snappymail-docker/blob/main/Dockerfile, so that release.php doesn't fail with error
+# Patch release.php with hotfix from: https://github.com/xgbstar1/tachyon-docker/blob/main/Dockerfile, so that release.php doesn't fail with error
 RUN sed -i 's_^if.*rename.*tachyon.v.0.0.0.*$_if (!!system("mv tachyon/v/0.0.0 tachyon/v/{$package->version}")) {_' cli/release.php  || true
 RUN php release.php
 RUN set -eux; \
     VERSION=$( ls build/dist/releases/webmail ); \
     ls -al build/dist/releases/webmail/$VERSION/tachyon-$VERSION.tar.gz; \
-    mkdir -p /snappymail; \
-    tar -zxvf build/dist/releases/webmail/$VERSION/tachyon-$VERSION.tar.gz -C /snappymail; \
-    find /snappymail -type d -exec chmod 550 {} \; ; \
-    find /snappymail -type f -exec chmod 440 {} \; ; \
-    find /snappymail/data -type d -exec chmod 750 {} \; ; \
+    mkdir -p /tachyon; \
+    tar -zxvf build/dist/releases/webmail/$VERSION/tachyon-$VERSION.tar.gz -C /tachyon; \
+    find /tachyon -type d -exec chmod 550 {} \; ; \
+    find /tachyon -type f -exec chmod 440 {} \; ; \
+    find /tachyon/data -type d -exec chmod 750 {} \; ; \
     # Remove unneeded files
-    rm -v /snappymail/README.md /snappymail/_include.php
+    rm -v /tachyon/README.md /tachyon/_include.php
 
 # Inspired by the original RainLoop dockerfile from youtous on GitLab
 FROM php:8.2-fpm-alpine AS final
@@ -165,14 +165,14 @@ RUN set -eux; \
 
 # Install Tachyon
 # The 'www-data' user/group in alpine is 82:82. The 'nginx' user/group in alpine is 101:101, and is part of www-data group
-COPY --chown=www-data:www-data --from=builder /snappymail /snappymail
+COPY --chown=www-data:www-data --from=builder /tachyon /tachyon
 # Use a custom Tachyon data folder
-RUN mv -v /snappymail/data /var/lib/snappymail;
+RUN mv -v /tachyon/data /var/lib/tachyon;
 # Setup configs
 COPY --chown=root:root .docker/release/files /
 RUN set -eux; \
-    chown www-data:www-data /snappymail/include.php; \
-    chmod 440 /snappymail/include.php; \
+    chown www-data:www-data /tachyon/include.php; \
+    chmod 440 /tachyon/include.php; \
     chmod +x /entrypoint.sh; \
     # Disable the built-in php-fpm configs, since we're using our own config
     mv -v /usr/local/etc/php-fpm.d/docker.conf /usr/local/etc/php-fpm.d/docker.conf.disabled; \
@@ -180,8 +180,8 @@ RUN set -eux; \
     mv -v /usr/local/etc/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf.disabled;
 
 USER root
-WORKDIR /snappymail
-VOLUME /var/lib/snappymail
+WORKDIR /tachyon
+VOLUME /var/lib/tachyon
 EXPOSE 8888
 EXPOSE 9000
 ENTRYPOINT []
