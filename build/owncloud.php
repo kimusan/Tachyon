@@ -29,15 +29,11 @@ $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('tachyon/v
 foreach ($files as $file) {
 	if (is_file($file)) {
 		$newFile = str_replace('\\', '/', $file);
-//		$newFile = str_replace("'tachyon/v/'.", '', $newFile);
-		$nc_tar->addFile($file, "tachyon/app/{$newFile}");
+		$newName = str_replace('/.htaccess', '/_htaccess', $newFile);
+		$nc_tar->addFile($file, "tachyon/app/{$newName}");
 		$hashes["app/{$newFile}"] = hash_file('sha512', $file);
 	}
 }
-$nc_tar->delete("tachyon/app/tachyon/v/{$package->version}/app/.htaccess");
-$nc_tar->addFile("tachyon/v/{$package->version}/app/.htaccess", "tachyon/app/tachyon/v/{$package->version}/app/_htaccess");
-$nc_tar->delete("tachyon/app/tachyon/v/{$package->version}/static/.htaccess");
-$nc_tar->addFile("tachyon/v/{$package->version}/static/.htaccess", "tachyon/app/tachyon/v/{$package->version}/static/_htaccess");
 
 /*
 $nc_tar->addFile('data/.htaccess');
