@@ -3,13 +3,13 @@
 FROM alpine:3.18.5 AS builder
 RUN apk add --no-cache php82 php82-json php-phar php-zip
 RUN apk add --no-cache npm
-RUN npm install -g gulp yarn
+RUN npm install -g gulp
 WORKDIR /source
-COPY package.json yarn.lock ./
-RUN yarn install
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
 # Patch release.php with hotfix from: https://github.com/xgbstar1/snappymail-docker/blob/main/Dockerfile, so that release.php doesn't fail with error
-RUN sed -i 's_^if.*rename.*snappymail.v.0.0.0.*$_if (!!system("mv snappymail/v/0.0.0 snappymail/v/{$package->version}")) {_' cli/release.php  || true
+RUN sed -i 's_^if.*rename.*tachyon.v.0.0.0.*$_if (!!system("mv tachyon/v/0.0.0 tachyon/v/{$package->version}")) {_' cli/release.php  || true
 RUN php release.php
 RUN set -eux; \
     VERSION=$( ls build/dist/releases/webmail ); \
