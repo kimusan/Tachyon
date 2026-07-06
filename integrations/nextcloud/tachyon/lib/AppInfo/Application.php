@@ -80,9 +80,11 @@ class Application extends App implements IBootstrap
 	public function boot(IBootContext $context): void
 	{
 		$config = $context->getServerContainer()->get(\OCP\IConfig::class);
-		if (!\is_dir(\rtrim(\trim($config->getSystemValue('datadirectory', '')), '\\/') . '/appdata_tachyon')) {
+		$_dataDir = \rtrim(\trim($config->getSystemValue('datadirectory', '')), '\\/');
+		if (!\is_dir($_dataDir . '/appdata_tachyon') && !\is_dir($_dataDir . '/appdata_snappymail')) {
 			return;
 		}
+		unset($_dataDir);
 
 		$dispatcher = $context->getAppContainer()->query('OCP\EventDispatcher\IEventDispatcher');
 		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) use ($context) {

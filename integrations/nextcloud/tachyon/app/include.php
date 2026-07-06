@@ -28,7 +28,10 @@
  * Custom 'data' folder path
  */
 if (class_exists('OC')) {
-	define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/').'/appdata_snappymail/');
+	$_dataDir = \rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/');
+	$_legacyPath = $_dataDir . '/appdata_snappymail/';
+	define('APP_DATA_FOLDER_PATH', \is_dir($_legacyPath) ? $_legacyPath : $_dataDir . '/appdata_tachyon/');
+	unset($_dataDir, $_legacyPath);
 } else {
 	http_response_code(400);
 	header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request', true, 400);
