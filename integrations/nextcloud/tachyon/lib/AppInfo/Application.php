@@ -54,7 +54,7 @@ class Application extends App implements IBootstrap
 					$c->query('AppName'),
 					$c->query('Request'),
 					$c->query('ServerContainer')->getAppManager(),
-					$c->query('ServerContainer')->getConfig(),
+					$c->query('ServerContainer')->get(\OCP\IConfig::class),
 					$c->query(IL10N::class),
 					$c->query(IUserSession::class)
 				);
@@ -79,7 +79,7 @@ class Application extends App implements IBootstrap
 
 	public function boot(IBootContext $context): void
 	{
-		$config = $context->getServerContainer()->getConfig();
+		$config = $context->getServerContainer()->get(\OCP\IConfig::class);
 		if (!\is_dir(\rtrim(\trim($config->getSystemValue('datadirectory', '')), '\\/') . '/appdata_tachyon')) {
 			return;
 		}
@@ -87,7 +87,7 @@ class Application extends App implements IBootstrap
 		$dispatcher = $context->getAppContainer()->query('OCP\EventDispatcher\IEventDispatcher');
 		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) use ($context) {
 /*
-			$config = $context->getServerContainer()->getConfig();
+			$config = $context->getServerContainer()->get(\OCP\IConfig::class);
 			// Only store the user's password in the current session if they have
 			// enabled auto-login using Nextcloud username or email address.
 			if ($config->getAppValue('tachyon', 'tachyon-autologin', false)

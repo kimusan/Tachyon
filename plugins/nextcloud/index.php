@@ -67,7 +67,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 	public static function IsLoggedIn()
 	{
-		return static::IsIntegrated() && \OC::$server->getUserSession()->isLoggedIn();
+		return static::IsIntegrated() && \OC::$server->get(\OCP\IUserSession::class)->isLoggedIn();
 	}
 
 	public function loginCredentials(string &$sEmail, string &$sLogin, ?string &$sPassword = null) : void
@@ -77,7 +77,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 	public function loginCredentials2(string &$sEmail, ?string &$sPassword = null) : void
 	{
-		$ocUser = \OC::$server->getUserSession()->getUser();
+		$ocUser = \OC::$server->get(\OCP\IUserSession::class)->getUser();
 		$sEmail = $ocUser->getEMailAddress() ?: $ocUser->getPrimaryEMailAddress() ?: $sEmail;
 	}
 
@@ -112,7 +112,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 				return $this->jsonResponse(__FUNCTION__, $aResult);
 			}
 
-			$user = \OC::$server->getUserSession()->getUser();
+			$user = \OC::$server->get(\OCP\IUserSession::class)->getUser();
 			if (!$user) {
 				$aResult['error'] = 'no-user';
 				return $this->jsonResponse(__FUNCTION__, $aResult);
@@ -241,9 +241,9 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 	public function FilterAppData($bAdmin, &$aResult) : void
 	{
 		if (!$bAdmin && \is_array($aResult)) {
-			$ocUser = \OC::$server->getUserSession()->getUser();
+			$ocUser = \OC::$server->get(\OCP\IUserSession::class)->getUser();
 			$sUID = $ocUser->getUID();
-			$oUrlGen = \OC::$server->getURLGenerator();
+			$oUrlGen = \OC::$server->get(\OCP\IURLGenerator::class);
 			$sWebDAV = $oUrlGen->getAbsoluteURL($oUrlGen->linkTo('', 'remote.php') . '/dav');
 //			$sWebDAV = \OCP\Util::linkToRemote('dav');
 			$aResult['Nextcloud'] = [
@@ -253,7 +253,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 //				'WebDAV_files' => $sWebDAV . '/files/' . $sUID
 			];
 			if (empty($aResult['Auth'])) {
-				$config = \OC::$server->getConfig();
+				$config = \OC::$server->get(\OCP\IConfig::class);
 				$sEmail = '';
 				// Only store the user's password in the current session if they have
 				// enabled auto-login using Nextcloud username or email address.
@@ -325,8 +325,8 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 	{
 		if (!\Tachyon\Api::Config()->Get('webmail', 'allow_languages_on_settings', true)) {
 			$aResultLang = \Tachyon\Util\L10n::getLanguages($bAdmin);
-			$userId = \OC::$server->getUserSession()->getUser()->getUID();
-			$userLang = \OC::$server->getConfig()->getUserValue($userId, 'core', 'lang', 'en');
+			$userId = \OC::$server->get(\OCP\IUserSession::class)->getUser()->getUID();
+			$userLang = \OC::$server->get(\OCP\IConfig::class)->getUserValue($userId, 'core', 'lang', 'en');
 			$userLang = \strtr($userLang, '_', '-');
 			$sLanguage = $this->determineLocale($userLang, $aResultLang);
 			// Check if $sLanguage is null

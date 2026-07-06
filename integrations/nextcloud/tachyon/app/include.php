@@ -28,7 +28,7 @@
  * Custom 'data' folder path
  */
 if (class_exists('OC')) {
-	define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_snappymail/');
+	define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/').'/appdata_snappymail/');
 } else {
 	http_response_code(400);
 	header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request', true, 400);
