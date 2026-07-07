@@ -3,15 +3,14 @@ FROM cloudron/base:3.0.0@sha256:455c70428723e3a823198c57472785437eb6eab082e79b3f
 RUN mkdir -p /app/code
 WORKDIR /app/code
 
-# TODO: update URL to Tachyon release once CI/CD publishes releases
-VERSION=3.1.3
-RUN wget https://github.com/YOUR_ORG/tachyon/releases/download/v${VERSION}/tachyon-${VERSION}.zip -O /tmp/tachyon.zip && \
+VERSION=3.2.0
+RUN wget https://github.com/kimusan/Tachyon/releases/download/v${VERSION}/tachyon-${VERSION}.zip -O /tmp/tachyon.zip && \
     unzip /tmp/tachyon.zip -d /app/code && \
     rm /tmp/tachyon.zip && \
-    find /app/code/snappymail -type d -exec chmod 755 {} \; && \
-    find /app/code/snappymail -type f -exec chmod 644 {} \; && \
+    find /app/code/tachyon -type d -exec chmod 755 {} \; && \
+    find /app/code/tachyon -type f -exec chmod 644 {} \; && \
     rm -rf /app/code/data && ln -s /app/data /app/code/data && \
-    chown -R www-data:www-data /app/code/snappymail
+    chown -R www-data:www-data /app/code/tachyon
 
 # configure apache
 RUN rm /etc/apache2/sites-enabled/*

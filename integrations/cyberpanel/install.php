@@ -22,8 +22,8 @@ spl_autoload_register(function($sClassName){
 file_put_contents(
 	TACHYON_PUBLIC_DIR . '/include.php',
 	str_replace(
-		'//define(\'APP_DATA_FOLDER_PATH\', dirname(__DIR__) . \'/snappymail-data/\')',
-		'define(\'APP_DATA_FOLDER_PATH\', \'/usr/local/lscp/cyberpanel/rainloop/data/\')',
+		'//define(\'APP_DATA_FOLDER_PATH\', dirname(__DIR__) . \'/tachyon-data/\')',
+		'define(\'APP_DATA_FOLDER_PATH\', \'/usr/local/lscp/cyberpanel/tachyon/data/\')',
 		file_get_contents(TACHYON_PUBLIC_DIR . '/_include.php')
 	)
 );

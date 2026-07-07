@@ -155,7 +155,7 @@ class UnreadMailWidget implements IAPIWidget, IIconWidget/*, IOptionWidget*/
 	{
 		TachyonHelper::loadApp();
 //		return $this->urlGenerator->getAbsoluteURL(
-		return \Tachyon\Utils::WebStaticPath('images/snappymail-logo.png');
+		return \Tachyon\Utils::WebStaticPath('images/tachyon-logo.png');
 	}
 
 	// IOptionWidget

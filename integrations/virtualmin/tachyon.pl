@@ -153,7 +153,7 @@ sub script_tachyon_files
 local ($d, $ver, $opts, $upgrade) = @_;
 local @files = ( { 'name' => "source",
 	           'file' => "tachyon-$ver.tar.gz",
-	           'url' => "https://github.com/YOUR_ORG/tachyon/releases/download/v${ver}/tachyon-${ver}.tar.gz" },
+	           'url' => "https://github.com/kimusan/Tachyon/releases/download/v${ver}/tachyon-${ver}.tar.gz" },
 	    );
 return @files;
 }
@@ -388,13 +388,13 @@ return (1, "Tachyon directory and tables deleted.");
 sub script_tachyon_latest
 {
 local ($ver) = @_;
-return ( "https://github.com/YOUR_ORG/tachyon/releases/",
+return ( "https://github.com/kimusan/Tachyon/releases/",
          "tachyon-([0-9\\.]+).tar.gz" );
 }
 
 sub script_tachyon_site
 {
-return 'https://github.com/YOUR_ORG/tachyon/';
+return 'https://github.com/kimusan/Tachyon/';
 }
 
 sub script_tachyon_gpl

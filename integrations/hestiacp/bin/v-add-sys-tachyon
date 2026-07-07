@@ -24,9 +24,7 @@ UPDATE="no"
 # Version to be moved to upgrade script
 SM_FILE="tachyon-latest.tar.gz"
 # For removal of folder
-SM_EXTRACT_MAIN="snappymail"
-
-# TODO: update URL when Tachyon releases are published
+SM_EXTRACT_MAIN="tachyon"
 SM_URL="https://github.com/kimusan/Tachyon/releases/latest/download/tachyon-latest.tar.gz"
 
 # Folder paths

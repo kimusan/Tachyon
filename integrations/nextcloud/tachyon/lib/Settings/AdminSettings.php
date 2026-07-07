@@ -83,7 +83,7 @@ class AdminSettings implements ISettings
 			}
 		}
 
-		// Prevent "Failed loading /nextcloud/snappymail/v/2.N.N/static/js/min/libs.min.js"
+		// Prevent "Failed loading /nextcloud/tachyon/v/N.N.N/static/js/min/libs.min.js"
 		$app_path = $oConfig->Get('webmail', 'app_path');
 		if (!$app_path) {
 			$app_path = $this->appManager->getAppWebPath('tachyon') . '/app/';
