@@ -14,16 +14,16 @@ commandTests:
           pidof supervisord
           pidof nginx
           pidof php-fpm
-          ls -al /var/lib/snappymail/_data_/_default_/configs/application.ini
-          ls -al /var/lib/snappymail/_data_/_default_/admin_password.txt
+          ls -al /var/lib/tachyon/_data_/_default_/configs/application.ini
+          ls -al /var/lib/tachyon/_data_/_default_/admin_password.txt
           nc -vz 127.0.0.1 8888
           nc -vz 127.0.0.1 9000
           wget -S -T 3 -O /dev/null http://127.0.0.1:8888
           kill `pidof supervisord`
 metadataTest:
   exposedPorts: ["8888", "9000"]
-  volumes: ["/var/lib/snappymail"]
+  volumes: ["/var/lib/tachyon"]
   entrypoint: []
   cmd: ["/entrypoint.sh"]
-  workdir: /snappymail
+  workdir: /tachyon
   user: root

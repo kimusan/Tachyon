@@ -1,35 +1,35 @@
 version: '2'
 services:
-  snappymail:
-    image: djmaze/snappymail:latest
+  tachyon:
+    image: ghcr.io/kimusan/tachyon:latest
     ports:
       - 8888:8888
     environment:
       - DEBUG=true
     volumes:
-      - snappymail:/var/lib/snappymail
+      - tachyon:/var/lib/tachyon
     networks:
       - default
       - db-network
       - redis-network
     restart: unless-stopped
 
-  # This provides prometheus metrics for snappymail's php-fpm
+  # This provides prometheus metrics for tachyon's php-fpm
   php-fpm-exporter:
     image: hipages/php-fpm_exporter:2.2.0
     ports:
       - 9253:9253
     environment:
-      - PHP_FPM_SCRAPE_URI=tcp://snappymail:9000/status
+      - PHP_FPM_SCRAPE_URI=tcp://tachyon:9000/status
     networks:
       - default
 
   db:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_USER=snappymail
-      - POSTGRES_PASSWORD=snappymail
-      - POSTGRES_DB=snappymail
+      - POSTGRES_USER=tachyon
+      - POSTGRES_PASSWORD=tachyon
+      - POSTGRES_DB=tachyon
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
@@ -52,5 +52,5 @@ networks:
 volumes:
   postgres:
     driver: local
-  snappymail:
+  tachyon:
     driver: local

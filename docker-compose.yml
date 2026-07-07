@@ -1,5 +1,5 @@
 #
-# Note: Before starting, ensure you run gulp once, to generate static assets in ./snappymail/v/0.0.0/static/css and ./snappymail/v/0.0.0/static/js
+# Note: Before starting, ensure you run gulp once, to generate static assets in ./tachyon/v/0.0.0/static/css and ./tachyon/v/0.0.0/static/js
 #
 version: '3.0'
 services:
@@ -92,7 +92,7 @@ services:
 
   # Tachyon: http://localhost:8888
   # Admin panel: http://localhost:8888/?admin
-  # Get the Admin Panel password: docker exec -it $( docker-compose ps -q tachyon ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
+  # Get the Admin Panel password: docker exec -it $( docker-compose ps -q tachyon ) cat /var/lib/tachyon/_data_/_default_/admin_password.txt
   tachyon:
     build:
       dockerfile: ./.docker/release/Dockerfile
@@ -101,9 +101,9 @@ services:
     #   - DEBUG=true
     volumes:
       - certs:/certs:ro
-      - ./snappymail:/snappymail/snappymail:ro
-      - ./index.php:/snappymail/index.php:ro
-      - tachyon:/var/lib/snappymail
+      - ./tachyon:/tachyon/tachyon:ro
+      - ./index.php:/tachyon/index.php:ro
+      - tachyon:/var/lib/tachyon
     ports:
       - 8888:8888
     networks:

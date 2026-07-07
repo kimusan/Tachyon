@@ -36,41 +36,41 @@ services:
       - --certificatesresolvers.myresolver.acme.email=postmaster@example.com
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
 
-  # snappymail will be available at: https://snappymail.example.com
-  snappymail:
-    image: djmaze/snappymail:latest
+  # tachyon will be available at: https://tachyon.example.com
+  tachyon:
+    image: ghcr.io/kimusan/tachyon:latest
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-network"
       # traefik v2
       # http
-      - "traefik.http.routers.snappymail-http.entrypoints=web"
-      - "traefik.http.routers.snappymail-http.rule=Host(`snappymail.example.com`)"
-      - "traefik.http.routers.snappymail-http.middlewares=snappymail-http-myRedirectScheme" # Redirect http to https
-      - "traefik.http.middlewares.snappymail-http-myRedirectScheme.redirectScheme.scheme=https" # Redirect http to https
+      - "traefik.http.routers.tachyon-http.entrypoints=web"
+      - "traefik.http.routers.tachyon-http.rule=Host(`tachyon.example.com`)"
+      - "traefik.http.routers.tachyon-http.middlewares=tachyon-http-myRedirectScheme" # Redirect http to https
+      - "traefik.http.middlewares.tachyon-http-myRedirectScheme.redirectScheme.scheme=https" # Redirect http to https
       # https
-      - "traefik.http.routers.snappymail.entrypoints=websecure"
-      - "traefik.http.routers.snappymail.tls"
-      - "traefik.http.routers.snappymail.rule=Host(`snappymail.example.com`)"
-      - "traefik.http.services.snappymail.loadbalancer.server.port=8888"
+      - "traefik.http.routers.tachyon.entrypoints=websecure"
+      - "traefik.http.routers.tachyon.tls"
+      - "traefik.http.routers.tachyon.rule=Host(`tachyon.example.com`)"
+      - "traefik.http.services.tachyon.loadbalancer.server.port=8888"
     expose:
       - 8888
     environment:
       - DEBUG=true
     volumes:
-      - snappymail:/var/lib/snappymail
+      - tachyon:/var/lib/tachyon
     networks:
       - default
       - traefik-network
     restart: unless-stopped
 
-  # This provides prometheus metrics for snappymail's php-fpm
+  # This provides prometheus metrics for tachyon's php-fpm
   php-fpm-exporter:
     image: hipages/php-fpm_exporter:2.2.0
     ports:
       - 9253:9253
     environment:
-      - PHP_FPM_SCRAPE_URI=tcp://snappymail:9000/status
+      - PHP_FPM_SCRAPE_URI=tcp://tachyon:9000/status
     networks:
       - default
 
@@ -82,5 +82,5 @@ networks:
 volumes:
   acme-volume:
     driver: local
-  snappymail:
+  tachyon:
     driver: local

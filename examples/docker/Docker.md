@@ -4,7 +4,7 @@ Here are some [`docker-compose`] examples.
 
 ## `docker-compose.simple.yml`
 
-This runs `snappymail`, using [SQLite](https://www.sqlite.org/index.html) as the database.
+This runs Tachyon, using [SQLite](https://www.sqlite.org/index.html) as the database.
 
 Start the stack:
 
@@ -15,16 +15,16 @@ docker-compose -f docker-compose.simple.yml up
 Get the Admin Panel password:
 
 ```sh
-docker exec -it $( docker-compose -f docker-compose.simple.yml ps -q snappymail ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
+docker exec -it $( docker-compose -f docker-compose.simple.yml ps -q tachyon ) cat /var/lib/tachyon/_data_/_default_/admin_password.txt
 ```
 
 Now, login to [http://localhost:8888/?admin](http://localhost:8888/?admin) with user `admin` and the admin password.
 
 ## `docker-compose.mysql.yml`
 
-This runs `snappymail`, using [MariaDB](https://mariadb.org/) (a fork of [MYSQL](https://www.mysql.com/)) as the database.
+This runs Tachyon, using [MariaDB](https://mariadb.org/) (a fork of [MYSQL](https://www.mysql.com/)) as the database.
 
-Start `snappymail` and `mysql`:
+Start Tachyon and MySQL:
 
 ```sh
 docker-compose -f docker-compose.mysql.yml up
@@ -33,7 +33,7 @@ docker-compose -f docker-compose.mysql.yml up
 Get the Admin Panel password:
 
 ```sh
-docker exec -it $( docker-compose -f docker-compose.mysql.yml ps -q snappymail ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
+docker exec -it $( docker-compose -f docker-compose.mysql.yml ps -q tachyon ) cat /var/lib/tachyon/_data_/_default_/admin_password.txt
 ```
 
 Now, login to [http://localhost:8888/?admin](http://localhost:8888/?admin) with user `admin` and the admin password.
@@ -41,9 +41,9 @@ Now, login to [http://localhost:8888/?admin](http://localhost:8888/?admin) with 
 To setup MySQL as the DB, in Admin Panel, click `Contacts`, check `Enable contacts` and , and under `Storage (PDO)` choose the following:
 
 - Type: `MySQL`
-- Data Source Name (DSN): `host=mysql;port=3306;dbname=snappymail`
-- User `snappymail`
-- Password `snappymail`
+- Data Source Name (DSN): `host=mysql;port=3306;dbname=tachyon`
+- User `tachyon`
+- Password `tachyon`
 
 Click the `Test` button. If it turns green, MySQL is ready to be used for contacts.
 
@@ -58,9 +58,9 @@ Redis caching is now enabled.
 
 ## `docker-compose.postgres.yml`
 
-This runs `snappymail`, using [PostgreSQL](https://hub.docker.com/_/postgres) as the database.
+This runs Tachyon, using [PostgreSQL](https://hub.docker.com/_/postgres) as the database.
 
-Start `snappymail` and `postgres`:
+Start Tachyon and PostgreSQL:
 
 ```sh
 docker-compose -f docker-compose.postgres.yml up
@@ -69,7 +69,7 @@ docker-compose -f docker-compose.postgres.yml up
 Get the Admin Panel password:
 
 ```sh
-docker exec -it $( docker-compose -f docker-compose.postgres.yml ps -q snappymail ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
+docker exec -it $( docker-compose -f docker-compose.postgres.yml ps -q tachyon ) cat /var/lib/tachyon/_data_/_default_/admin_password.txt
 ```
 
 Now, login to [http://localhost:8888/?admin](http://localhost:8888/?admin) with user `admin` and the admin password.
@@ -77,9 +77,9 @@ Now, login to [http://localhost:8888/?admin](http://localhost:8888/?admin) with 
 To use PostgreSQL as the DB, in Admin Panel, click `Contacts`, check `Enable contacts` and , and under `Storage (PDO)` choose the following:
 
 - Type: `PostgresSQL`
-- Data Source Name (DSN): `host=postgres;port=5432;dbname=snappymail`
-- User `snappymail`
-- Password `snappymail`
+- Data Source Name (DSN): `host=postgres;port=5432;dbname=tachyon`
+- User `tachyon`
+- Password `tachyon`
 
 Click the `Test` button. If it turns green, PostgreSQL is ready to be used for contacts.
 
@@ -94,9 +94,9 @@ Redis caching is now enabled.
 
 ## `docker-compose.traefik.yml`
 
-This runs `snappymail`, using [SQLite](https://www.sqlite.org/index.html) as the database, with `traefik` as the TLS reverse proxy and loadbalancer.
+This runs Tachyon, using [SQLite](https://www.sqlite.org/index.html) as the database, with `traefik` as the TLS reverse proxy and loadbalancer.
 
-In this example, it is assumed the domain name is `snappymail.example.com`. It is assumed you have an [OVHcloud](https://www.ovh.com/auth/) account to obtain LetsEncrypt TLS certs via `ACME` using DNS challenge for the domain `snappymail.example.com`. If you are using another DNS provider, see [here](https://doc.traefik.io/traefik/https/acme/#providers).
+In this example, it is assumed the domain name is `tachyon.example.com`. It is assumed you have an [OVHcloud](https://www.ovh.com/auth/) account to obtain LetsEncrypt TLS certs via `ACME` using DNS challenge for the domain `tachyon.example.com`. If you are using another DNS provider, see [here](https://doc.traefik.io/traefik/https/acme/#providers).
 
 To begin, edit the `OVH_*` environment variables in [`docker-compose.traefik.yml`](docker-compose.traefik.yml) accordingly:
 
@@ -104,20 +104,20 @@ To begin, edit the `OVH_*` environment variables in [`docker-compose.traefik.yml
 nano docker-compose.traefik.yml
 ```
 
-Start `snappymail` and `traefik`:
+Start Tachyon and traefik:
 
 ```sh
 docker-compose -f docker-compose.traefik.yml up
 ```
 
-`traefik` should now begin requesting a TLS cert for `snappymail.example.com`. The process may take a few minutes. If all goes well, https://snappymail.example.com should now be ready.
+`traefik` should now begin requesting a TLS cert for `tachyon.example.com`. The process may take a few minutes. If all goes well, https://tachyon.example.com should now be ready.
 
-> You may still visit https://snappymail.example.com while waiting for `traefik` to be issued a TLS certificate. `traefik` simply serves a self-signed TLS cert.
+> You may still visit https://tachyon.example.com while waiting for `traefik` to be issued a TLS certificate. `traefik` simply serves a self-signed TLS cert.
 
 Get the Admin Panel password:
 
 ```sh
-docker exec -it $( docker-compose -f docker-compose.traefik.yml ps -q snappymail ) cat /var/lib/snappymail/_data_/_default_/admin_password.txt
+docker exec -it $( docker-compose -f docker-compose.traefik.yml ps -q tachyon ) cat /var/lib/tachyon/_data_/_default_/admin_password.txt
 ```
 
-Now, login to [https://snappymail.example.com/?admin](https://snappymail.example.com/?admin) with user `admin` and the admin password.
+Now, login to [https://tachyon.example.com/?admin](https://tachyon.example.com/?admin) with user `admin` and the admin password.
