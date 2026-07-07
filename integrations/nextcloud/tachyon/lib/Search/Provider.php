@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\Tachyon\Util\Search;
+namespace OCA\Tachyon\Search;
 
-use OCA\Tachyon\Util\AppInfo\Application;
-use OCA\Tachyon\Util\Util\TachyonHelper;
+use OCA\Tachyon\AppInfo\Application;
+use OCA\Tachyon\Util\TachyonHelper;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
 use OCP\IURLGenerator;

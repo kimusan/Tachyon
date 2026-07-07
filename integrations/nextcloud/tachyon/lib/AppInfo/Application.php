@@ -1,13 +1,13 @@
 <?php
 
-namespace OCA\Tachyon\Util\AppInfo;
+namespace OCA\Tachyon\AppInfo;
 
-use OCA\Tachyon\Util\Util\TachyonHelper;
-use OCA\Tachyon\Util\Controller\FetchController;
-use OCA\Tachyon\Util\Controller\PageController;
-use OCA\Tachyon\Util\Dashboard\UnreadMailWidget;
-use OCA\Tachyon\Util\Search\Provider;
-use OCA\Tachyon\Util\Listeners\AccessTokenUpdatedListener;
+use OCA\Tachyon\Util\TachyonHelper;
+use OCA\Tachyon\Controller\FetchController;
+use OCA\Tachyon\Controller\PageController;
+use OCA\Tachyon\Dashboard\UnreadMailWidget;
+use OCA\Tachyon\Search\Provider;
+use OCA\Tachyon\Listeners\AccessTokenUpdatedListener;
 
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;

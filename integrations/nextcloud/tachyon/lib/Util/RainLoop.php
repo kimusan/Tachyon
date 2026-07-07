@@ -1,6 +1,6 @@
 <?php
 
-namespace OCA\Tachyon\Util\Util;
+namespace OCA\Tachyon\Util;
 
 class RainLoop
 {

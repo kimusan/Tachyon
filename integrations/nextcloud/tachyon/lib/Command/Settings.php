@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\Tachyon\Util\Command;
+namespace OCA\Tachyon\Command;
 
-use OCA\Tachyon\Util\Util\TachyonHelper;
+use OCA\Tachyon\Util\TachyonHelper;
 use OCP\IConfig;
 use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;

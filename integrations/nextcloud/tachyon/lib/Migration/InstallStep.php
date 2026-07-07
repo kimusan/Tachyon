@@ -1,8 +1,8 @@
 <?php
 // https://docs.nextcloud.com/server/19/developer_manual/app/repair.html
-namespace OCA\Tachyon\Util\Migration;
+namespace OCA\Tachyon\Migration;
 
-use OCA\Tachyon\Util\AppInfo\Application;
+use OCA\Tachyon\AppInfo\Application;
 use OCP\IConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
@@ -40,7 +40,7 @@ class InstallStep implements IRepairStep
 		\is_callable('opcache_reset') && \opcache_reset();
 
 		$output->info('Load App');
-		\OCA\Tachyon\Util\Util\TachyonHelper::loadApp();
+		\OCA\Tachyon\Util\TachyonHelper::loadApp();
 
 		$output->info('Fix permissions');
 		\Tachyon\Util\Upgrade::fixPermissions();

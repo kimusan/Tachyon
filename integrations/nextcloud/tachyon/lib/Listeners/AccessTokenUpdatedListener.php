@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\Tachyon\Util\Listeners;
+namespace OCA\Tachyon\Listeners;
 
 use OCA\OIDCLogin\Events\AccessTokenUpdatedEvent;
 use OCP\App\IAppManager;

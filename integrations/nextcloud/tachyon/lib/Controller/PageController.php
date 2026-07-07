@@ -1,9 +1,9 @@
 <?php
 
-namespace OCA\Tachyon\Util\Controller;
+namespace OCA\Tachyon\Controller;
 
-use OCA\Tachyon\Util\Util\TachyonHelper;
-use OCA\Tachyon\Util\ContentSecurityPolicy;
+use OCA\Tachyon\Util\TachyonHelper;
+use OCA\Tachyon\ContentSecurityPolicy;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;

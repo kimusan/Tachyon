@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\Tachyon\Util\Dashboard;
+namespace OCA\Tachyon\Dashboard;
 
-use OCA\Tachyon\Util\Util\TachyonHelper;
+use OCA\Tachyon\Util\TachyonHelper;
 
 use OCP\AppFramework\Services\IInitialState;
 use OCP\Dashboard\IAPIWidget;

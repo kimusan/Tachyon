@@ -1,5 +1,5 @@
 <?php
-namespace OCA\Tachyon\Util\Settings;
+namespace OCA\Tachyon\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;

@@ -1,7 +1,7 @@
 <?php
-namespace OCA\Tachyon\Util\Settings;
+namespace OCA\Tachyon\Settings;
 
-use OCA\Tachyon\Util\Util\TachyonHelper;
+use OCA\Tachyon\Util\TachyonHelper;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
@@ -35,7 +35,7 @@ class AdminSettings implements ISettings
 
 	public function getForm()
 	{
-		\OCA\Tachyon\Util\Util\TachyonHelper::loadApp();
+		\OCA\Tachyon\Util\TachyonHelper::loadApp();
 
 		$keys = [
 			'tachyon-autologin',

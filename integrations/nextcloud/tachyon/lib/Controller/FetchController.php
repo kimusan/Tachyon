@@ -1,8 +1,8 @@
 <?php
 
-namespace OCA\Tachyon\Util\Controller;
+namespace OCA\Tachyon\Controller;
 
-use OCA\Tachyon\Util\Util\TachyonHelper;
+use OCA\Tachyon\Util\TachyonHelper;
 
 use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
@@ -78,7 +78,7 @@ class FetchController extends Controller {
 			if (!empty($_POST['import-rainloop'])) {
 				return new JSONResponse([
 					'status' => 'success',
-					'Message' => \implode("\n", \OCA\Tachyon\Util\Util\RainLoop::import())
+					'Message' => \implode("\n", \OCA\Tachyon\Util\RainLoop::import())
 				]);
 			}
 
