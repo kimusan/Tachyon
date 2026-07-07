@@ -40,7 +40,7 @@ There, click on the link to go to the Tachyon admin panel.
 	<repository>https://github.com/kimusan/Tachyon</repository>
 	<bugs>https://github.com/kimusan/Tachyon/issues</bugs>
 	<dependencies>
-		<php min-version="7.4" min-int-size="32" />
+		<php min-version="8.2" min-int-size="32" />
 		<lib>mbstring</lib>
 		<lib>zlib</lib>
 <!--
