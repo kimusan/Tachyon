@@ -13,6 +13,7 @@ mkdir($dir, 0755, true);
 file_put_contents("{$dir}/control", $data);
 copy(DEB_SOURCE_DIR . '/DEBIAN/postinst', $dir . '/postinst');
 chmod($dir . '/postinst', 0755);
+copy(DEB_SOURCE_DIR . '/DEBIAN/conffiles', $dir . '/conffiles');
 
 $dir = DEB_DEST_DIR . '/var/lib/tachyon';
 mkdir($dir, 0755, true);
@@ -36,7 +37,7 @@ $data = file_get_contents('index.php');
 file_put_contents("{$dir}/index.php", str_replace('0.0.0', $package->version, $data));
 
 $data = file_get_contents('_include.php');
-file_put_contents("{$dir}/include.php", preg_replace('@(external-snappymail-data-folder/\'\);)@', "\$1\ndefine('APP_DATA_FOLDER_PATH', '/var/lib/tachyon/');", $data));
+file_put_contents("{$dir}/include.php", preg_replace('@(external-tachyon-data-folder/\'\);)@', "\$1\ndefine('APP_DATA_FOLDER_PATH', '/var/lib/tachyon/');", $data));
 
 passthru('dpkg --build ' . escapeshellarg(DEB_DEST_DIR));
 

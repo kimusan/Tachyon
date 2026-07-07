@@ -905,7 +905,7 @@ export class ComposePopupView extends AbstractViewPopup {
 		if (!identity
 			&& oLastMessage && (ComposeType.Reply === options.mode || ComposeType.ReplyAll === options.mode)
 			&& 1 === oLastMessage.to.length
-//			&& mEmail.includes(oLastMessage.to[0].domain)
+			&& !oLastMessage.replyTo.some(r => r.email === oLastMessage.to[0].email)
 		) {
 			identity = new IdentityModel;
 			identity.name = oLastMessage.to[0].name;
