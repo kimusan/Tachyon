@@ -3,7 +3,7 @@ FROM cloudron/base:3.0.0@sha256:455c70428723e3a823198c57472785437eb6eab082e79b3f
 RUN mkdir -p /app/code
 WORKDIR /app/code
 
-VERSION=3.2.1
+VERSION=3.2.2
 RUN wget https://github.com/kimusan/Tachyon/releases/download/v${VERSION}/tachyon-${VERSION}.zip -O /tmp/tachyon.zip && \
     unzip /tmp/tachyon.zip -d /app/code && \
     rm /tmp/tachyon.zip && \

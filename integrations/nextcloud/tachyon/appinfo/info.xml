@@ -3,7 +3,7 @@
 	<id>tachyon</id>
 	<name>Tachyon</name>
 	<summary>Tachyon Webmail</summary>
-	<version>3.0.0</version>
+	<version>3.2.2</version>
 	<licence>agpl</licence>
 	<author>Tachyon, RainLoop Team, Nextgen-Networks, Tab Fitts, Nathan Kinkade, Pierre-Alain Bandinelli</author>
 	<description><![CDATA[**Lightweight & fast email client.**
