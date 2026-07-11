@@ -901,16 +901,6 @@ export class ComposePopupView extends AbstractViewPopup {
 //				case ComposeType.Empty:
 			}
 		}
-		// Set from custom email
-		if (!identity
-			&& oLastMessage && (ComposeType.Reply === options.mode || ComposeType.ReplyAll === options.mode)
-			&& 1 === oLastMessage.to.length
-			&& !oLastMessage.replyTo.some(r => r.email === oLastMessage.to[0].email)
-		) {
-			identity = new IdentityModel;
-			identity.name = oLastMessage.to[0].name;
-			identity.email = oLastMessage.to[0].email;
-		}
 		identity = identity || IdentityUserStore()[0];
 		if (identity) {
 //			excludeEmail.add(identity.email);
