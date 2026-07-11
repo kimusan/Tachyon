@@ -96,9 +96,9 @@ class Application extends App implements IBootstrap
 			 || $config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 */
 				$sUID = $Event->getUser()->getUID();
-				$session = $context->getServerContainer()->getSession();
-				$session['tachyon-nc-uid'] = $sUID;
-				$session['tachyon-passphrase'] = TachyonHelper::encodePassword($Event->getPassword(), $sUID);
+				$session = $context->getServerContainer()->get(\OCP\ISession::class);
+				$session->set('tachyon-nc-uid', $sUID);
+				$session->set('tachyon-passphrase', TachyonHelper::encodePassword($Event->getPassword(), $sUID));
 /*
 			}
 */
@@ -117,12 +117,12 @@ class Application extends App implements IBootstrap
 		$class = 'OCA\Impersonate\Events\BeginImpersonateEvent';
 		if (\class_exists($class)) {
 			$dispatcher->addListener($class, function ($Event) use ($context) {
-				$context->getServerContainer()->getSession()['tachyon-passphrase'] = '';
+				$context->getServerContainer()->get(\OCP\ISession::class)->set('tachyon-passphrase', '');
 				TachyonHelper::loadApp();
 				\Tachyon\Api::Actions()->Logout(true);
 			});
 			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) use ($context) {
-				$context->getServerContainer()->getSession()['tachyon-passphrase'] = '';
+				$context->getServerContainer()->get(\OCP\ISession::class)->set('tachyon-passphrase', '');
 				TachyonHelper::loadApp();
 				\Tachyon\Api::Actions()->Logout(true);
 			});

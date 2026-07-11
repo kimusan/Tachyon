@@ -3,20 +3,23 @@ namespace OCA\Tachyon\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
+use OCP\IUserSession;
 use OCP\Settings\ISettings;
 
 class PersonalSettings implements ISettings
 {
 	private $config;
+	private $userSession;
 
-	public function __construct(IConfig $config)
+	public function __construct(IConfig $config, IUserSession $userSession)
 	{
 		$this->config = $config;
+		$this->userSession = $userSession;
 	}
 
 	public function getForm()
 	{
-		$uid = \OC::$server->getUserSession()->getUser()->getUID();
+		$uid = $this->userSession->getUser()->getUID();
 		$sEmail = $this->config->getUserValue($uid, 'tachyon', 'tachyon-email');
 		if ($sPass = $this->config->getUserValue($uid, 'tachyon', 'tachyon-password')) {
 			$this->config->deleteUserValue($uid, 'tachyon', 'tachyon-password');

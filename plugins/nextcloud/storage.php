@@ -11,7 +11,7 @@ class NextcloudStorage extends \Tachyon\Providers\Storage\FileStorage
 	{
 		$sDataPath = parent::GenerateFilePath($mAccount, $iStorageType, $bMkDir);
 		if (StorageType::CONFIG === $iStorageType) {
-			$sUID = \OC::$server->getUserSession()->getUser()->getUID();
+			$sUID = \OC::$server->get(\OCP\IUserSession::class)->getUser()->getUID();
 			$sDataPath .= ".config/{$sUID}/";
 			if ($bMkDir && !\is_dir($sDataPath) && !\mkdir($sDataPath, 0700, true)) {
 				throw new \Tachyon\Exceptions\Exception('Can\'t make storage directory "'.$sDataPath.'"');

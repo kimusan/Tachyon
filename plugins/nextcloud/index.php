@@ -87,7 +87,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 			&& \OCA\Tachyon\Util\TachyonHelper::isOIDCLogin()
 			&& \str_starts_with($oSettings->passphrase, 'oidc_login|')
 		) {
-			$oSettings->passphrase = (string) \OC::$server->getSession()->get('oidc_access_token');
+			$oSettings->passphrase = (string) \OC::$server->get(\OCP\ISession::class)->get('oidc_access_token');
 			\array_unshift($oSettings->SASLMechanisms, 'OAUTHBEARER');
 		}
 	}
@@ -297,7 +297,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 					$aResult['ContactsSync']['User'] = $sUID;
 					$bSave = true;
 				}
-				$pass = \OC::$server->getSession()['snappymail-passphrase'];
+				$pass = \OC::$server->get(\OCP\ISession::class)->get('tachyon-passphrase');
 				if ($pass/* && empty($aResult['ContactsSync']['Password'])*/) {
 					$pass = \Tachyon\Util\Crypt::DecryptUrlSafe($pass, $sUID);
 					if ($pass) {
