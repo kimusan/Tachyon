@@ -44,7 +44,6 @@ import Remote from 'Remote/User/Fetch';
 
 import { ComposeAttachmentModel } from 'Model/ComposeAttachment';
 import { EmailModel } from 'Model/Email';
-import { IdentityModel } from 'Model/Identity';
 import { MimeHeaderAutocryptModel } from 'Model/MimeHeaderAutocrypt';
 import { addressparser } from 'Mime/Address';
 
