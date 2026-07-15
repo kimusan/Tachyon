@@ -21,7 +21,7 @@ file_put_contents($file, preg_replace('/VERSION=[0-9.]+/', "VERSION={$package->v
 $file = ROOT_DIR . '/integrations/cloudron/DESCRIPTION.md';
 file_put_contents($file, preg_replace('/<upstream>[^<]*</', "<upstream>{$package->version}<", file_get_contents($file)));
 // virtualmin
-$file = ROOT_DIR . '/integrations/virtualmin/snappymail.pl';
+$file = ROOT_DIR . '/integrations/virtualmin/tachyon.pl';
 file_put_contents($file, preg_replace('/return \\( "[0-9]+\\.[0-9]+\\.[0-9]+" \\)/', "return ( \"{$package->version}\" )", file_get_contents($file)));
 
 // Arch User Repository
