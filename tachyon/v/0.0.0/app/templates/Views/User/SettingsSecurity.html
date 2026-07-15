@@ -40,7 +40,8 @@
 <summary style="font-size:larger;font-weight:bold">GnuPG</summary>
 <table class="table table-hover list-table">
 	<tbody><tr><th colspan="4" data-i18n="SETTINGS_OPENPGP/TITLE_PRIVATE">Private keys</th></tr></tbody>
-	<tbody data-bind="foreach: gnupgPrivateKeys, i18nUpdate: gnupgPrivateKeys">
+	<!-- ko foreach: gnupgPrivateKeys -->
+	<tbody>
 		<tr>
 			<td data-bind="click: view">
 				<span data-bind="visible: can_sign" class="fontastic" data-i18n="[title]CRYPTO/SIGN">✍</span>
@@ -58,7 +59,9 @@
 				<span class="delete-key fontastic" data-bind="visible: !askDelete(), click: openForDeletion">🗑</span>
 			</td>
 		</tr>
-	<tbody data-bind="visible: hasStoredPass">
+	</tbody>
+	<!-- ko if: hasStoredPass() -->
+	<tbody>
 		<tr>
 			<td>
 				<span class="fontastic" data-i18n="[title]SETTINGS_OPENPGP/TITLE_PRIVATE">🔒</span>
@@ -74,7 +77,8 @@
 			</td>
 		</tr>
 	</tbody>
-	</tbody>
+	<!-- /ko -->
+	<!-- /ko -->
 	<tbody><tr><th colspan="4" data-i18n="SETTINGS_OPENPGP/TITLE_PUBLIC">Public keys</th></tr></tbody>
 	<tbody data-bind="foreach: gnupgPublicKeys, i18nUpdate: gnupgPublicKeys">
 		<tr>
@@ -104,7 +108,8 @@
 <summary style="font-size:larger;font-weight:bold">OpenPGP.js</summary>
 <table class="table table-hover list-table">
 	<tbody><tr><th colspan="4" data-i18n="SETTINGS_OPENPGP/TITLE_PRIVATE">Private keys</th></tr></tbody>
-	<tbody data-bind="foreach: openpgpkeysPrivate, i18nUpdate: openpgpkeysPrivate">
+	<!-- ko foreach: openpgpkeysPrivate -->
+	<tbody>
 		<tr>
 			<td data-bind="click: view">
 				<span class="fontastic" data-i18n="[title]SETTINGS_OPENPGP/TITLE_PRIVATE">🔒</span>
@@ -122,7 +127,8 @@
 			</td>
 		</tr>
 	</tbody>
-	<tbody data-bind="visible: hasStoredPass">
+	<!-- ko if: hasStoredPass() -->
+	<tbody>
 		<tr>
 			<td>
 				<span class="fontastic" data-i18n="[title]SETTINGS_OPENPGP/TITLE_PRIVATE">🔒</span>
@@ -138,6 +144,8 @@
 			</td>
 		</tr>
 	</tbody>
+	<!-- /ko -->
+	<!-- /ko -->
 	<tbody><tr><th colspan="4" data-i18n="SETTINGS_OPENPGP/TITLE_PUBLIC">Public keys</th></tr></tbody>
 	<tbody data-bind="foreach: openpgpkeysPublic, i18nUpdate: openpgpkeysPublic">
 		<tr>
