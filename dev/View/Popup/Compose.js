@@ -215,6 +215,7 @@ export class ComposePopupView extends AbstractViewPopup {
 		// Maps group display string → category name, populated each time Suggestions returns a group sentinel.
 		// Used by emailsSource to detect group chip selection and trigger expansion.
 		this._groupSuggestions = new Map();
+		this.emailsSource = this.emailsSource.bind(this);
 
 		this.allowContacts = AppUserStore.allowContacts();
 		this.allowIdentities = SettingsCapa('Identities');
