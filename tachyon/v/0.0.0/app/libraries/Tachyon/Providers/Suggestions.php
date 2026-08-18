@@ -30,14 +30,21 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 		$iLimit = \max(5, (int) $iLimit);
 		$aResult = [];
 
-		// Address Book
+		// Address Book — normal suggestions + group expansion
 		try
 		{
 			$oAddressBookProvider = \Tachyon\Api::Actions()->AddressBookProvider($oAccount);
 			if ($oAddressBookProvider && $oAddressBookProvider->IsActive()) {
 				$aSuggestions = $oAddressBookProvider->GetSuggestions($sQuery, $iLimit);
 				foreach ($aSuggestions as $aItem) {
-					// Unique email address
+					$sLine = \mb_strtolower($aItem[0]);
+					if (!isset($aResult[$sLine])) {
+						$aResult[$sLine] = $aItem;
+					}
+				}
+
+				// Group expansion: try exact category name match and expand members.
+				foreach ($oAddressBookProvider->GetGroup($sQuery, $iLimit) as $aItem) {
 					$sLine = \mb_strtolower($aItem[0]);
 					if (!isset($aResult[$sLine])) {
 						$aResult[$sLine] = $aItem;
@@ -50,13 +57,12 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 			$this->logException($oException);
 		}
 
-		// Extensions/Plugins
+		// Extensions/Plugins — normal suggestions + group expansion
 		foreach ($this->aDrivers as $oDriver) {
 			if ($oDriver) try {
 				$aSuggestions = $oDriver->Process($oAccount, $sQuery, $iLimit);
 				if ($aSuggestions) {
 					foreach ($aSuggestions as $aItem) {
-						// Unique email address
 						$sLine = \mb_strtolower($aItem[0]);
 						if (!isset($aResult[$sLine])) {
 							$aResult[$sLine] = $aItem;
@@ -64,6 +70,16 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 					}
 					if ($iLimit < \count($aResult)) {
 						break;
+					}
+				}
+
+				if ($oDriver instanceof \Tachyon\Providers\Suggestions\IGroupSuggestions) {
+					$aGroupMembers = $oDriver->GetGroup($sQuery, $iLimit);
+					foreach ($aGroupMembers as $aItem) {
+						$sLine = \mb_strtolower($aItem[0]);
+						if (!isset($aResult[$sLine])) {
+							$aResult[$sLine] = $aItem;
+						}
 					}
 				}
 			} catch (\Throwable $oException) {

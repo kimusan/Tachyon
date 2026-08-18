@@ -127,11 +127,12 @@ trait Contacts
 	{
 		$oAccount = $this->getAccountFromToken();
 
-		$sSearch = \trim($this->GetActionParam('Search', ''));
-		$iOffset = (int) $this->GetActionParam('Offset', 0);
-		$iLimit = (int) $this->GetActionParam('Limit', 20);
-		$iOffset = 0 > $iOffset ? 0 : $iOffset;
-		$iLimit = 0 > $iLimit ? 20 : $iLimit;
+		$sSearch   = \trim($this->GetActionParam('Search', ''));
+		$sCategory = \trim($this->GetActionParam('Category', ''));
+		$iOffset   = (int) $this->GetActionParam('Offset', 0);
+		$iLimit    = (int) $this->GetActionParam('Limit', 20);
+		$iOffset   = 0 > $iOffset ? 0 : $iOffset;
+		$iLimit    = 0 > $iLimit ? 20 : $iLimit;
 
 		$iResultCount = 0;
 		$mResult = array();
@@ -139,16 +140,30 @@ trait Contacts
 		$oAbp = $this->AddressBookProvider($oAccount);
 		if ($oAbp->IsActive()) {
 			$iResultCount = 0;
-			$mResult = $oAbp->GetContacts($iOffset, $iLimit, $sSearch, $iResultCount);
+			$mResult = $oAbp->GetContacts($iOffset, $iLimit, $sSearch, $iResultCount, $sCategory);
 		}
 
 		return $this->DefaultResponse(array(
-			'Offset' => $iOffset,
-			'Limit' => $iLimit,
-			'Count' => $iResultCount,
-			'Search' => $sSearch,
-			'List' => $mResult
+			'Offset'   => $iOffset,
+			'Limit'    => $iLimit,
+			'Count'    => $iResultCount,
+			'Search'   => $sSearch,
+			'Category' => $sCategory,
+			'List'     => $mResult
 		));
+	}
+
+	public function DoContactsCategories() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+
+		$aCategories = [];
+		$oAbp = $this->AddressBookProvider($oAccount);
+		if ($oAbp->IsActive()) {
+			$aCategories = $oAbp->GetCategories();
+		}
+
+		return $this->DefaultResponse(['List' => $aCategories]);
 	}
 
 	public function DoContactsDelete() : array

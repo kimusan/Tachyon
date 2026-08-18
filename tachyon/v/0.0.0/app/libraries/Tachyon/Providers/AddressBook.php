@@ -47,14 +47,28 @@ class AddressBook extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->DeleteAllContacts($sEmail) : false;
 	}
 
-	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0) : array
+	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '') : array
 	{
 		return $this->IsActive() ? $this->oDriver->GetContacts(
 			\max(0, $iOffset),
 			0 < $iLimit ? $iLimit : 20,
 			\trim($sSearch),
-			$iResultCount
+			$iResultCount,
+			\trim($sCategory)
 		) : array();
+	}
+
+	public function GetCategories() : array
+	{
+		return $this->IsActive() ? $this->oDriver->GetCategories() : [];
+	}
+
+	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array
+	{
+		if ($this->IsActive() && $this->oDriver instanceof \Tachyon\Providers\Suggestions\IGroupSuggestions) {
+			return $this->oDriver->GetGroup($sCategoryName, $iLimit);
+		}
+		return [];
 	}
 
 	public function GetContactByEmail(string $sEmail) : ?AddressBook\Classes\Contact

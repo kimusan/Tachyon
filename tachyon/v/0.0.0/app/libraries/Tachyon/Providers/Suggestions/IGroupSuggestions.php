@@ -1,0 +1,21 @@
+<?php
+
+namespace Tachyon\Providers\Suggestions;
+
+/**
+ * Optional interface for suggestion drivers that can expand a named contact
+ * group (vCard CATEGORIES) into individual email addresses.
+ *
+ * Implement this alongside ISuggestions to enable group expansion in the
+ * compose autocomplete: typing an exact category name returns all members.
+ */
+interface IGroupSuggestions
+{
+	/**
+	 * Return [email, displayName] pairs for contacts in the named category.
+	 * Return [] if the category is unknown or the driver can't support it.
+	 *
+	 * @return array  Array of [string $email, string $name]
+	 */
+	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array;
+}

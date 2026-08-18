@@ -10,7 +10,7 @@ use
 
 class PdoAddressBook
 	extends \Tachyon\Pdo\Base
-	implements AddressBookInterface
+	implements AddressBookInterface, \Tachyon\Providers\Suggestions\IGroupSuggestions
 {
 	use CardDAV;
 
@@ -630,13 +630,36 @@ class PdoAddressBook
 		return [];
 	}
 
-	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0) : array
+	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '') : array
 	{
 		if (1 > $this->iUserID) {
 			return [];
 		}
 
 		$aSearchIds = array();
+
+		// When a category filter is active, pre-compute matching contact IDs
+		$aCategoryIds = null;
+		if (\strlen($sCategory)) {
+			$sLowerCategory = \mb_strtolower($sCategory, 'UTF-8');
+			$oStmt = $this->prepareAndExecute(
+				'SELECT DISTINCT id_contact FROM rainloop_ab_properties '.
+				'WHERE id_user = :id_user AND prop_type = :prop_type AND prop_value_lower = :category',
+				[
+					':id_user'   => array($this->iUserID, \PDO::PARAM_INT),
+					':prop_type' => array(PropertyType::CATEGORIES, \PDO::PARAM_INT),
+					':category'  => array($sLowerCategory, \PDO::PARAM_STR)
+				]
+			);
+			$aCategoryIds = [];
+			if ($oStmt) {
+				while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
+					if (0 < $aItem[0]) {
+						$aCategoryIds[] = (int) $aItem[0];
+					}
+				}
+			}
+		}
 
 		if (\strlen($sSearch)) {
 			$sLowerSearch = $this->specialConvertSearchValueLower($sSearch, '=');
@@ -666,11 +689,20 @@ class PdoAddressBook
 						$aSearchIds[] = (int) $aItem[0];
 					}
 				}
-				$iResultCount = \count($aSearchIds);
 			}
+
+			// Intersect search results with category filter
+			if (null !== $aCategoryIds) {
+				$aSearchIds = \array_values(\array_intersect($aSearchIds, $aCategoryIds));
+			}
+			$iResultCount = \count($aSearchIds);
+		} elseif (null !== $aCategoryIds) {
+			// Category filter only — use category IDs as the result set
+			$aSearchIds = $aCategoryIds;
+			$iResultCount = \count($aSearchIds);
 		} else {
 			$oStmt = $this->prepareAndExecute(
-				'SELECT COUNT(*) FROM rainloop_ab_contacts WHERE id_user = :id_user',
+				'SELECT COUNT(*) FROM rainloop_ab_contacts WHERE id_user = :id_user AND deleted = 0',
 				[':id_user' => array($this->iUserID, \PDO::PARAM_INT)]
 			);
 			if ($oStmt && $aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
@@ -707,6 +739,105 @@ class PdoAddressBook
 		}
 
 		return [];
+	}
+
+	public function GetCategories() : array
+	{
+		if (1 > $this->iUserID) {
+			return [];
+		}
+
+		$oStmt = $this->prepareAndExecute(
+			'SELECT DISTINCT prop_value FROM rainloop_ab_properties '.
+			'WHERE id_user = :id_user AND prop_type = :prop_type '.
+			'ORDER BY prop_value ASC',
+			[
+				':id_user'   => array($this->iUserID, \PDO::PARAM_INT),
+				':prop_type' => array(PropertyType::CATEGORIES, \PDO::PARAM_INT)
+			]
+		);
+
+		$aResult = [];
+		if ($oStmt) {
+			while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
+				if (!empty($aItem[0])) {
+					$aResult[] = (string) $aItem[0];
+				}
+			}
+		}
+		return $aResult;
+	}
+
+	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array
+	{
+		if (1 > $this->iUserID || !\strlen($sCategoryName)) {
+			return [];
+		}
+
+		$sLowerCategory = \mb_strtolower($sCategoryName, 'UTF-8');
+
+		// Get contact IDs that have this category
+		$oStmt = $this->prepareAndExecute(
+			'SELECT DISTINCT id_contact FROM rainloop_ab_properties '.
+			'WHERE id_user = :id_user AND prop_type = :prop_type AND prop_value_lower = :category',
+			[
+				':id_user'   => array($this->iUserID, \PDO::PARAM_INT),
+				':prop_type' => array(PropertyType::CATEGORIES, \PDO::PARAM_INT),
+				':category'  => array($sLowerCategory, \PDO::PARAM_STR)
+			]
+		);
+
+		$aContactIds = [];
+		if ($oStmt) {
+			while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
+				if (0 < $aItem[0]) {
+					$aContactIds[] = (int) $aItem[0];
+				}
+			}
+		}
+
+		if (!\count($aContactIds)) {
+			return [];
+		}
+
+		$sIds = \implode(',', $aContactIds);
+		$sTypes = \implode(',', [PropertyType::EMAIl, PropertyType::FIRST_NAME, PropertyType::LAST_NAME]);
+
+		$oStmt = $this->prepareAndExecute(
+			'SELECT id_contact, prop_type, prop_value FROM rainloop_ab_properties '.
+			'WHERE id_contact IN ('.$sIds.') AND prop_type IN ('.$sTypes.')'
+		);
+
+		$aNames  = [];
+		$aEmails = [];
+
+		if ($oStmt) {
+			foreach ($oStmt->fetchAll(\PDO::FETCH_ASSOC) as $aItem) {
+				$iId   = (int) $aItem['id_contact'];
+				$iType = (int) $aItem['prop_type'];
+				$sVal  = (string) $aItem['prop_value'];
+				if (PropertyType::EMAIl === $iType) {
+					if (!isset($aEmails[$iId])) {
+						$aEmails[$iId] = $sVal;
+					}
+				} elseif (PropertyType::FIRST_NAME === $iType) {
+					$aNames[$iId][0] = $sVal;
+				} elseif (PropertyType::LAST_NAME === $iType) {
+					$aNames[$iId][1] = $sVal;
+				}
+			}
+		}
+
+		$aResult = [];
+		foreach ($aEmails as $iId => $sEmail) {
+			if ($iLimit <= \count($aResult)) {
+				break;
+			}
+			$sFirst = $aNames[$iId][0] ?? '';
+			$sLast  = $aNames[$iId][1] ?? '';
+			$aResult[] = [$sEmail, \trim($sFirst . ' ' . $sLast)];
+		}
+		return $aResult;
 	}
 
 	/**

@@ -18,7 +18,9 @@ interface AddressBookInterface
 
 	public function DeleteAllContacts(string $sEmail) : bool;
 
-	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0) : array;
+	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '') : array;
+
+	public function GetCategories() : array;
 
 	public function GetContactByEmail(string $sEmail) : ?Classes\Contact;
 
