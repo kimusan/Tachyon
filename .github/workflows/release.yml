@@ -11,6 +11,8 @@ jobs:
   build:
     name: Build and attach release artifacts
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -67,11 +69,18 @@ jobs:
             build/dist/releases/plugins/*.tgz
             packages.json
 
+  publish-appstore:
+    name: Publish to Nextcloud App Store
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ !github.event.release.prerelease || needs.build.result == 'success' }}
+
+    steps:
       - name: Publish to Nextcloud App Store
         uses: R0Wi/nextcloud-appstore-push-action@v1
         with:
           app_name: tachyon
-          download_url: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/tachyon-${{ steps.version.outputs.version }}-nextcloud.tar.gz
+          download_url: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/tachyon-${{ needs.build.outputs.version }}-nextcloud.tar.gz
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
           appstore_token: ${{ secrets.APPSTORE_TOKEN }}
           nightly: ${{ github.event.release.prerelease }}
