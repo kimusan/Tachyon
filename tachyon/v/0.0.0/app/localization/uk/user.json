@@ -237,6 +237,7 @@
     "ADD_MENU_BIRTHDAY": "День народження",
     "ADD_MENU_TAGS": "Теги",
 		"CATEGORY_ALL": "All categories",
+		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group."
     "BUTTON_SHARE_ALL": "Всім",
     "BUTTON_SYNC": "Синхронизація (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Надіслати на всі контактні email"

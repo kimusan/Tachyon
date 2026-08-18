@@ -732,6 +732,13 @@ export class ComposePopupView extends AbstractViewPopup {
 		if (catName !== undefined) {
 			fResponse([]); // clear datalist immediately
 			const field = this.sLastFocusedField;
+			// Clear the input right now so that any blur/force-parse that follows
+			// cannot commit the group label as a plain email chip.
+			const comp = this[`_${field}Component`];
+			if (comp) {
+				comp.input.value = '';
+				comp._resizeInput();
+			}
 			Remote.request('ContactsGroupSuggestions',
 				(iError, data) => {
 					if (!iError && isArray(data.Result) && data.Result.length) {
@@ -741,12 +748,6 @@ export class ComposePopupView extends AbstractViewPopup {
 							.join(',');
 						const existing = this[field]().trim();
 						this[field](existing ? existing + ',' + emails : emails);
-						// Clear the partial typed text still visible in the input
-						const comp = this[`_${field}Component`];
-						if (comp) {
-							comp.input.value = '';
-							comp._resizeInput();
-						}
 					}
 				},
 				{ Group: catName }

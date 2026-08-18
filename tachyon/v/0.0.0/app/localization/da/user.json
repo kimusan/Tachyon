@@ -237,6 +237,7 @@
     "ADD_MENU_BIRTHDAY": "Fødselsdag",
     "ADD_MENU_TAGS": "Mærkater",
 		"CATEGORY_ALL": "All categories",
+		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group."
     "BUTTON_SHARE_ALL": "Alle",
     "BUTTON_SYNC": "Synkronisering (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"

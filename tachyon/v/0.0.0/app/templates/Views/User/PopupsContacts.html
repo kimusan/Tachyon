@@ -205,6 +205,7 @@
 					<div class="control-group">
 						<label class="fontastic iconsize24" data-i18n="[title]CONTACTS/ADD_MENU_TAGS">🏷</label>
 						<div>
+							<p class="tags-hint" data-bind="visible: !readOnly()" data-i18n="CONTACTS/TAGS_HINT"></p>
 							<div data-bind="foreach: categories">
 								<div class="property-line">
 									<span data-bind="text: value"></span>

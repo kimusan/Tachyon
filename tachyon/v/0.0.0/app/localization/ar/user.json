@@ -237,6 +237,7 @@
     "ADD_MENU_BIRTHDAY": "تاريخ الميلاد",
     "ADD_MENU_TAGS": "Tags",
 		"CATEGORY_ALL": "All categories",
+		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group."
     "BUTTON_SHARE_ALL": "الجميع",
     "BUTTON_SYNC": "المزامنة (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"
