@@ -834,7 +834,7 @@ class PdoAddressBook
 		);
 
 		$aNames  = [];
-		$aEmails = [];
+		$aEmails = []; // id_contact → string[]
 
 		if ($oStmt) {
 			foreach ($oStmt->fetchAll(\PDO::FETCH_ASSOC) as $aItem) {
@@ -842,9 +842,7 @@ class PdoAddressBook
 				$iType = (int) $aItem['prop_type'];
 				$sVal  = (string) $aItem['prop_value'];
 				if (PropertyType::EMAIl === $iType) {
-					if (!isset($aEmails[$iId])) {
-						$aEmails[$iId] = $sVal;
-					}
+					$aEmails[$iId][] = $sVal; // collect ALL addresses per contact
 				} elseif (PropertyType::FIRST_NAME === $iType) {
 					$aNames[$iId][0] = $sVal;
 				} elseif (PropertyType::LAST_NAME === $iType) {
@@ -854,13 +852,16 @@ class PdoAddressBook
 		}
 
 		$aResult = [];
-		foreach ($aEmails as $iId => $sEmail) {
-			if ($iLimit <= \count($aResult)) {
-				break;
-			}
+		foreach ($aEmails as $iId => $aContactEmails) {
 			$sFirst = $aNames[$iId][0] ?? '';
 			$sLast  = $aNames[$iId][1] ?? '';
-			$aResult[] = [$sEmail, \trim($sFirst . ' ' . $sLast)];
+			$sName  = \trim($sFirst . ' ' . $sLast);
+			foreach ($aContactEmails as $sEmail) {
+				if ($iLimit <= \count($aResult)) {
+					break 2;
+				}
+				$aResult[] = [$sEmail, $sName];
+			}
 		}
 		return $aResult;
 	}
