@@ -135,6 +135,7 @@
 								<input type="text"
 									autocomplete="off" autocorrect="off" autocapitalize="off"
 									data-bind="textInput: nickname" data-i18n="[placeholder]CONTACTS/NICK_NAME">
+								<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: removeNickname">✖</a>
 							</div>
 						</div>
 					</div>
@@ -155,6 +156,7 @@
 									<input type="text"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
+									<a href="#" class="btn fontastic" data-bind="visible: !$parent.readOnly(), click: $parent.removeEmail.bind($parent, $data)">✖</a>
 								</div>
 							</div>
 							<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: addEmail">✚</a>
@@ -169,6 +171,7 @@
 									<input type="text"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
+									<a href="#" class="btn fontastic" data-bind="visible: !$parent.readOnly(), click: $parent.removeTel.bind($parent, $data)">✖</a>
 								</div>
 							</div>
 							<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: addTel">✚</a>
@@ -183,6 +186,7 @@
 									<input type="text" placeholder="https://"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
+									<a href="#" class="btn fontastic" data-bind="visible: !$parent.readOnly(), click: $parent.removeUrl.bind($parent, $data)">✖</a>
 								</div>
 							</div>
 							<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: addUrl">✚</a>
@@ -195,9 +199,10 @@
 							<input type="text"
 								autocomplete="off" autocorrect="off" autocapitalize="off"
 								data-bind="textInput: note">
+							<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: removeNote">✖</a>
 						</div>
 					</div>
-					<div class="control-group" data-bind="visible: categories().length">
+					<div class="control-group">
 						<label class="fontastic iconsize24" data-i18n="[title]CONTACTS/ADD_MENU_TAGS">🏷</label>
 						<div>
 							<div data-bind="foreach: categories">
@@ -206,6 +211,7 @@
 									<input type="text"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
+									<a href="#" class="btn fontastic" data-bind="visible: !$parent.readOnly(), click: $parent.removeCategory.bind($parent, $data)">✖</a>
 								</div>
 							</div>
 							<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: addCategory">✚</a>

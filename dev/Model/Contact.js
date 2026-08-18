@@ -242,6 +242,13 @@ export class ContactModel extends AbstractModel {
 		this.categories.push({ value: ko.observable('') });
 	}
 
+	removeEmail(item)    { this.email.remove(item); }
+	removeTel(item)      { this.tel.remove(item); }
+	removeUrl(item)      { this.url.remove(item); }
+	removeCategory(item) { this.categories.remove(item); }
+	removeNickname()     { this.nickname(null); }
+	removeNote()         { this.note(null); }
+
 	hasChanges()
 	{
 		return this.email().filter(v => v.length).length && this.toJSON().jCard != JSON.stringify(this.jCard);
