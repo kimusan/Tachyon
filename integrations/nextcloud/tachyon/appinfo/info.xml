@@ -5,7 +5,12 @@
 	<summary>Tachyon Webmail</summary>
 	<version>3.2.3</version>
 	<licence>agpl</licence>
-	<author>Tachyon, RainLoop Team, Nextgen-Networks, Tab Fitts, Nathan Kinkade, Pierre-Alain Bandinelli</author>
+	<author mail="kim@schulz.dk" homepage="https://github.com/kimusan">Kim Schulz</author>
+	<author>RainLoop Team</author>
+	<author>Nextgen-Networks</author>
+	<author>Tab Fitts</author>
+	<author>Nathan Kinkade</author>
+	<author>Pierre-Alain Bandinelli</author>
 	<description><![CDATA[**Lightweight & fast email client.**
 
 - **Dark mode**
@@ -64,7 +69,7 @@ There, click on the link to go to the Tachyon admin panel.
 		<lib>xxtea</lib>
 		<lib>zip</lib>
 	-->
-		<nextcloud min-version="25" max-version="34" />
+		<nextcloud min-version="26" max-version="34" />
 	</dependencies>
 	<settings>
 		<admin>OCA\Tachyon\Settings\AdminSettings</admin>

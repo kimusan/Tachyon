@@ -5,7 +5,12 @@
 	<summary>Tachyon Webmail</summary>
 	<version>3.0.0</version>
 	<licence>agpl</licence>
-	<author>Tachyon, RainLoop Team, Nextgen-Networks, Tab Fitts, Nathan Kinkade, Pierre-Alain Bandinelli</author>
+	<author>Kim Schulz</author>
+	<author>RainLoop Team</author>
+	<author>Nextgen-Networks</author>
+	<author>Tab Fitts</author>
+	<author>Nathan Kinkade</author>
+	<author>Pierre-Alain Bandinelli</author>
 	<description><![CDATA[**Simple, modern, lightweight & fast web-based email client.**
 
 - **Dark mode**

@@ -6,7 +6,8 @@
   "version": "3.2.3",
   "homepage": "https://github.com/kimusan/Tachyon",
   "author": {
-    "name": "Kim Schulz"
+    "name": "Kim Schulz",
+    "email": "kim@schulz.dk"
   },
   "repository": {
     "type": "git",
