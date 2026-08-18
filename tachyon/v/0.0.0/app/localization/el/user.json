@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Διεύθυνση",
     "ADD_MENU_BIRTHDAY": "Γενέθλια",
     "ADD_MENU_TAGS": "Ετικέτες",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Όλοι",
     "BUTTON_SYNC": "Συγχρονισμός (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"

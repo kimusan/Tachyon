@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "地址",
     "ADD_MENU_BIRTHDAY": "生日",
     "ADD_MENU_TAGS": "标签",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "所有人",
     "BUTTON_SYNC": "同步 (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "发送到所有联系人邮箱"

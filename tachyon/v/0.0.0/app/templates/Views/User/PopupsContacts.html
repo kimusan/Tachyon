@@ -46,6 +46,14 @@
 	<div class="left">
 		<div class="b-list-toolbar">
 			<input type="search" class="e-search" placeholder="Search" autofocus="" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n="[placeholder]GLOBAL/SEARCH" data-bind="value: search">
+			<!-- ko if: availableCategories().length -->
+			<select class="e-category-filter" data-i18n="[title]CONTACTS/ADD_MENU_TAGS" data-bind="value: categoryFilter, visible: availableCategories().length">
+				<option value="" data-i18n="CONTACTS/CATEGORY_ALL"></option>
+				<!-- ko foreach: availableCategories -->
+				<option data-bind="value: $data, text: $data"></option>
+				<!-- /ko -->
+			</select>
+			<!-- /ko -->
 		</div>
 		<div class="b-list-content g-ui-user-select-none" data-bind="css: {'hideContactListCheckbox': !useCheckboxesInList()}">
 			<div class="content">

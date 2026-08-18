@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Adres",
     "ADD_MENU_BIRTHDAY": "Geboortedatum",
     "ADD_MENU_TAGS": "Labels",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Iedereen",
     "BUTTON_SYNC": "Synchroniseren (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Verzend naar alle e-mailadressen"

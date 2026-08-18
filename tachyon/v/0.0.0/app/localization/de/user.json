@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Adresse",
     "ADD_MENU_BIRTHDAY": "Geburtstag",
     "ADD_MENU_TAGS": "Schlagwörter",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Jeder",
     "BUTTON_SYNC": "Synchronisierung (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "An alle E-Mail-Adressen schreiben"

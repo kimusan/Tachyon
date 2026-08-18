@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Địa chỉ",
     "ADD_MENU_BIRTHDAY": "Ngày sinh",
     "ADD_MENU_TAGS": "Thẻ",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Tất cả mọi người",
     "BUTTON_SYNC": "Đồng bộ hóa (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"

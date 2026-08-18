@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Cím",
     "ADD_MENU_BIRTHDAY": "Születésnap",
     "ADD_MENU_TAGS": "Címkék",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Mindenki",
     "BUTTON_SYNC": "Szinkronizálás (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"

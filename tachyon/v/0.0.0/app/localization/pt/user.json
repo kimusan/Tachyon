@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Morada",
     "ADD_MENU_BIRTHDAY": "Aniversário",
     "ADD_MENU_TAGS": "Marcadores",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Todos",
     "BUTTON_SYNC": "Sincronização (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Enviar para todos os contactos"

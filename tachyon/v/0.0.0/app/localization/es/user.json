@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Dirección",
     "ADD_MENU_BIRTHDAY": "Cumpleaños",
     "ADD_MENU_TAGS": "Etiquetas",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Todos",
     "BUTTON_SYNC": "Sincronización (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Enviar a todos los correos de contactos"

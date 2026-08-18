@@ -35,6 +35,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 		addObservablesTo(this, {
 			search: '',
+			categoryFilter: '',
 			contactsCount: 0,
 
 			selectorContact: null,
@@ -47,6 +48,8 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 			contact: null
 		});
+
+		this.availableCategories = ko.observableArray();
 
 		this.contacts = ContactUserStore;
 
@@ -83,6 +86,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 		});
 
 		this.search.subscribe(() => this.reloadContactList());
+		this.categoryFilter.subscribe(() => this.reloadContactList(true));
 
 		this.saveCommand = this.saveCommand.bind(this);
 
@@ -168,6 +172,15 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 	clearSearch() {
 		this.search('');
+		this.categoryFilter('');
+	}
+
+	loadCategories() {
+		Remote.request('ContactsCategories', (iError, data) => {
+			if (!iError && data?.Result?.List) {
+				this.availableCategories(data.Result.List);
+			}
+		});
 	}
 
 	saveCommand() {
@@ -263,7 +276,8 @@ export class ContactsPopupView extends AbstractViewPopup {
 			{
 				Offset: offset,
 				Limit: CONTACTS_PER_PAGE,
-				Search: this.search()
+				Search: this.search(),
+				Category: this.categoryFilter()
 			}
 		);
 	}
@@ -329,6 +343,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 	onShow(bBackToCompose, sRecipientsField) {
 		bOpenCompose = !!bBackToCompose;
 		sComposeRecipientsField = ['to','cc','bcc'].includes(sRecipientsField) ? sRecipientsField : 'to';
+		this.loadCategories();
 		this.reloadContactList(true);
 	}
 
@@ -336,6 +351,8 @@ export class ContactsPopupView extends AbstractViewPopup {
 		this.contact(null);
 		this.selectorContact(null);
 		this.search('');
+		this.categoryFilter('');
+		this.availableCategories([]);
 		this.contactsCount(0);
 
 		ContactUserStore([]);

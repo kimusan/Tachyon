@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Adresas",
     "ADD_MENU_BIRTHDAY": "Gimtadienis",
     "ADD_MENU_TAGS": "Žymos",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Visiems",
     "BUTTON_SYNC": "Sinchronizavimas (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"

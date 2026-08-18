@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Heimilisfang",
     "ADD_MENU_BIRTHDAY": "Afmælisdagur",
     "ADD_MENU_TAGS": "Merki",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Allir",
     "BUTTON_SYNC": "Samstilling (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"

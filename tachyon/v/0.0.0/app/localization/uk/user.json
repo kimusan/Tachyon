@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Адреса",
     "ADD_MENU_BIRTHDAY": "День народження",
     "ADD_MENU_TAGS": "Теги",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Всім",
     "BUTTON_SYNC": "Синхронизація (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Надіслати на всі контактні email"

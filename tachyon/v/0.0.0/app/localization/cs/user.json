@@ -236,6 +236,7 @@
     "ADD_MENU_ADDRESS": "Adresa",
     "ADD_MENU_BIRTHDAY": "Narozeniny",
     "ADD_MENU_TAGS": "Tagy",
+		"CATEGORY_ALL": "All categories",
     "BUTTON_SHARE_ALL": "Vše",
     "BUTTON_SYNC": "Synchronizace (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Poslat na všechny emailové adresy kontaktu"
