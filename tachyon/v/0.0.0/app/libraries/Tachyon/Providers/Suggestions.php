@@ -44,10 +44,16 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 				}
 
 				// Group expansion: try exact category name match and expand members.
-				foreach ($oAddressBookProvider->GetGroup($sQuery, $iLimit) as $aItem) {
-					$sLine = \mb_strtolower($aItem[0]);
-					if (!isset($aResult[$sLine])) {
-						$aResult[$sLine] = $aItem;
+				$aGroupMembers = $oAddressBookProvider->GetGroup($sQuery, $iLimit);
+				if ($aGroupMembers) {
+					// Prepend a sentinel entry so the client can render a group chip.
+					// Key uses '{group}' prefix — never a valid email address.
+					$aResult['{group}' . $sQuery] = ['{group}' . $sQuery, (string) \count($aGroupMembers)];
+					foreach ($aGroupMembers as $aItem) {
+						$sLine = \mb_strtolower($aItem[0]);
+						if (!isset($aResult[$sLine])) {
+							$aResult[$sLine] = $aItem;
+						}
 					}
 				}
 			}

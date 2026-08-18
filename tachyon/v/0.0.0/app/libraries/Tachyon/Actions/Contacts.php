@@ -166,6 +166,24 @@ trait Contacts
 		return $this->DefaultResponse(['List' => $aCategories]);
 	}
 
+	public function DoContactsGroupSuggestions() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$sGroup = \trim($this->GetActionParam('Group', ''));
+
+		if (!\strlen($sGroup)) {
+			return $this->DefaultResponse([]);
+		}
+
+		$aResult = [];
+		$oAbp = $this->AddressBookProvider($oAccount);
+		if ($oAbp->IsActive()) {
+			$aResult = $oAbp->GetGroup($sGroup, 100);
+		}
+
+		return $this->DefaultResponse($aResult);
+	}
+
 	public function DoContactsDelete() : array
 	{
 		$oAccount = $this->getAccountFromToken();

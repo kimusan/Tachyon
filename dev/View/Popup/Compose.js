@@ -212,6 +212,10 @@ export class ComposePopupView extends AbstractViewPopup {
 
 		this.sLastFocusedField = 'to';
 
+		// Maps group display string → category name, populated each time Suggestions returns a group sentinel.
+		// Used by emailsSource to detect group chip selection and trigger expansion.
+		this._groupSuggestions = new Map();
+
 		this.allowContacts = AppUserStore.allowContacts();
 		this.allowIdentities = SettingsCapa('Identities');
 		this.allowSpellcheck = SettingsUserStore.allowSpellcheck;
@@ -722,11 +726,49 @@ export class ComposePopupView extends AbstractViewPopup {
 
 	// getAutocomplete
 	emailsSource(value, fResponse) {
+		// Detect if the user selected a group chip from the datalist
+		const catName = this._groupSuggestions.get(value);
+		if (catName !== undefined) {
+			fResponse([]); // clear datalist immediately
+			const field = this.sLastFocusedField;
+			Remote.request('ContactsGroupSuggestions',
+				(iError, data) => {
+					if (!iError && isArray(data.Result) && data.Result.length) {
+						const emails = data.Result
+							.filter(item => item?.[0])
+							.map(item => (new EmailModel(item[0], item[1])).toLine())
+							.join(',');
+						const existing = this[field]().trim();
+						this[field](existing ? existing + ',' + emails : emails);
+						// Clear the partial typed text still visible in the input
+						const comp = this[`_${field}Component`];
+						if (comp) {
+							comp.input.value = '';
+							comp._resizeInput();
+						}
+					}
+				},
+				{ Group: catName }
+			);
+			return;
+		}
+
 		Remote.abort('Suggestions').request('Suggestions',
 			(iError, data) => {
+				this._groupSuggestions.clear();
 				if (!iError && isArray(data.Result)) {
 					fResponse(
-						data.Result.map(item => (item?.[0] ? (new EmailModel(item[0], item[1])).toLine() : null))
+						data.Result.map(item => {
+							if (!item?.[0]) return null;
+							if (item[0].startsWith('{group}')) {
+								const name = item[0].slice(7),
+									count = item[1],
+									display = '🏷 ' + name + ' (' + count + ')';
+								this._groupSuggestions.set(display, name);
+								return display;
+							}
+							return (new EmailModel(item[0], item[1])).toLine();
+						})
 						.filter(v => v)
 					);
 				} else if (Notifications.RequestAborted !== iError) {
@@ -1115,6 +1157,14 @@ export class ComposePopupView extends AbstractViewPopup {
 	}
 
 	onBuild(dom) {
+		// Store EmailAddressesComponent refs for group chip expansion (input clearing)
+		['to', 'cc', 'bcc'].forEach(name => {
+			const el = dom.querySelector(`[data-bind*="emailsTags: ${name}"]`);
+			if (el?.addresses) {
+				this[`_${name}Component`] = el.addresses;
+			}
+		});
+
 		// initUploader
 		const oJua = new Jua({
 				action: serverRequest('Upload'),
