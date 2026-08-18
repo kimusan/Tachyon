@@ -189,6 +189,20 @@
 								data-bind="textInput: note">
 						</div>
 					</div>
+					<div class="control-group" data-bind="visible: categories().length">
+						<label class="fontastic iconsize24" data-i18n="[title]CONTACTS/ADD_MENU_TAGS">🏷</label>
+						<div>
+							<div data-bind="foreach: categories">
+								<div class="property-line">
+									<span data-bind="text: value"></span>
+									<input type="text"
+										autocomplete="off" autocorrect="off" autocapitalize="off"
+										data-bind="textInput: value">
+								</div>
+							</div>
+							<a href="#" class="btn fontastic" data-bind="visible: !readOnly(), click: addCategory">✚</a>
+						</div>
+					</div>
 				</div>
 <!--
 				<input type="radio" name="contacttabs" id="tab-contact-locations">
@@ -315,6 +329,12 @@
 						<a href="#" data-bind="click: addNote">
 							<i class="fontastic">🖉</i>
 							<span data-i18n="CONTACTS/ADD_MENU_NOTE"></span>
+						</a>
+					</li>
+					<li role="presentation">
+						<a href="#" data-bind="click: addCategory">
+							<i class="fontastic">🏷</i>
+							<span data-i18n="CONTACTS/ADD_MENU_TAGS"></span>
 						</a>
 					</li>
 <!--

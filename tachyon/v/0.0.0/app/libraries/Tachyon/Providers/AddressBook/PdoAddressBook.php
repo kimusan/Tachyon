@@ -595,6 +595,16 @@ class PdoAddressBook
 										case PropertyType::PHONE:
 											$oVCard->add('TEL', $sPropValue, \is_array($aTypes) && \count($aTypes) ? array('TYPE' => $aTypes) : null);
 											break;
+
+										case PropertyType::CATEGORIES:
+											if (!isset($oVCard->CATEGORIES)) {
+												$oVCard->CATEGORIES = $sPropValue;
+											} else {
+												$aParts = $oVCard->CATEGORIES->getParts();
+												$aParts[] = $sPropValue;
+												$oVCard->CATEGORIES->setParts($aParts);
+											}
+											break;
 									}
 								}
 							}

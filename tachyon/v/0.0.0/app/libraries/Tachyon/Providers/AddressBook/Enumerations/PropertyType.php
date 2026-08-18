@@ -31,6 +31,8 @@ abstract class PropertyType
 
 	const NOTE = 110;
 
+	const CATEGORIES = 120;
+
 	const CUSTOM = 250;
 
 	const JCARD = 251;

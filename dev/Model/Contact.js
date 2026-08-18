@@ -110,10 +110,11 @@ export class ContactModel extends AbstractModel {
 			signpref: ''
 		});
 //		this.email = koArrayWithDestroy();
-		this.email = ko.observableArray();
-		this.tel   = ko.observableArray();
-		this.url   = ko.observableArray();
-		this.adr   = ko.observableArray();
+		this.email      = ko.observableArray();
+		this.tel        = ko.observableArray();
+		this.url        = ko.observableArray();
+		this.adr        = ko.observableArray();
+		this.categories = ko.observableArray();
 
 		addComputablesTo(this, {
 			fullName: () => [this.namePrefix(), this.givenName(), this.middleName(), this.surName()].join(' ').trim(),
@@ -184,6 +185,13 @@ export class ContactModel extends AbstractModel {
 				});
 			});
 
+			props = jCard.getOne('categories');
+			if (props?.value) {
+				(Array.isArray(props.value) ? props.value : [props.value])
+					.filter(Boolean)
+					.forEach(cat => contact.categories.push({ value: ko.observable(cat) }));
+			}
+
 			props = jCard.getOne('x-crypto');
 			contact.signpref(props?.params.signpref || 'Ask');
 			contact.encryptpref(props?.params.encryptpref || 'Ask');
@@ -228,6 +236,10 @@ export class ContactModel extends AbstractModel {
 
 	addNote() {
 		this.note() || this.note('');
+	}
+
+	addCategory() {
+		this.categories.push({ value: ko.observable('') });
 	}
 
 	hasChanges()
@@ -280,6 +292,9 @@ export class ContactModel extends AbstractModel {
 			signpref: this.signpref(),
 			encryptpref: this.encryptpref()
 		}, 'x-crypto');
+
+		const cats = this.categories.map(c => c.value()).filter(Boolean);
+		cats.length ? jCard.set('categories', cats) : jCard.remove('categories');
 
 		// Done by server
 //		jCard.set('rev', '2022-05-21T10:59:52Z')

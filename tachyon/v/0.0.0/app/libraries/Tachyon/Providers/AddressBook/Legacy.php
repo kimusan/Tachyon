@@ -105,5 +105,14 @@ class Legacy
 		if (isset($oVCard->TEL)) {
 			yield from static::yieldPropertyHelper($oVCard->TEL, PropertyType::PHONE);
 		}
+
+		if (isset($oVCard->CATEGORIES)) {
+			foreach ($oVCard->CATEGORIES->getParts() as $sCategory) {
+				$sCategory = \trim($sCategory);
+				if (\strlen($sCategory)) {
+					yield new Property(PropertyType::CATEGORIES, $sCategory);
+				}
+			}
+		}
 	}
 }
