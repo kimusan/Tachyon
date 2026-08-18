@@ -11,6 +11,8 @@ Thank you to all contributors to SnappyMail for Nextcloud, from which this integ
 
 ## How to Install
 
+Tachyon is available on the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon). The easiest way to install is directly from within Nextcloud.
+
 Start within Nextcloud as user with administrator rights and click on the "+ Apps" button in the upper-right corner dropdown menu:
 
 ![Image1](https://raw.githubusercontent.com/kimusan/Tachyon/master/integrations/nextcloud/screenshots/help_a1.png)

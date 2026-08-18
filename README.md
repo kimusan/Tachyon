@@ -10,6 +10,13 @@
   <br>
 </div>
 
+## Integrations
+
+- **Nextcloud** — install directly from the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon), or see `integrations/nextcloud/`
+- **ownCloud** — see `integrations/owncloud/`
+- **Cloudron** — see `integrations/cloudron/`
+- **Docker** — see `examples/docker/`
+
 ## Requirements
 
 - PHP 8.2+
