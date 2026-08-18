@@ -730,17 +730,9 @@ export class ComposePopupView extends AbstractViewPopup {
 		// Detect if the user selected a group chip from the datalist
 		const catName = this._groupSuggestions.get(value);
 		if (catName !== undefined) {
-			fResponse([]); // clear datalist
-			const field = this.sLastFocusedField;
-			const comp = this[`_${field}Component`];
-			if (comp && comp.input.value.trim()) {
-				// Blur hasn't fired yet — force-commit the group chip now, then
-				// clear the input so the eventual blur sees nothing.
-				comp._parseInput(true);
-				comp.input.value = '';
-				comp._resizeInput();
-			}
-			// Group chip stays as-is in the field; expansion happens on send.
+			// Group chip: the immediate 'input' listener in onBuild already committed
+			// it as a chip (or blur will). Just clear the datalist and bail.
+			fResponse([]);
 			return;
 		}
 
@@ -754,7 +746,7 @@ export class ComposePopupView extends AbstractViewPopup {
 							if (item[0].startsWith('{group}')) {
 								const name = item[0].slice(7),
 									count = item[1],
-									display = '🏷 ' + name + ' (' + count + ')';
+									display = '🏷 ' + name + ' [' + count + ']';
 								this._groupSuggestions.set(display, name);
 								return display;
 							}
@@ -1148,11 +1140,22 @@ export class ComposePopupView extends AbstractViewPopup {
 	}
 
 	onBuild(dom) {
-		// Store EmailAddressesComponent refs for group chip expansion (input clearing)
+		// Store EmailAddressesComponent refs and attach immediate group-chip listener.
+		// When the user selects a group chip from the datalist, commit it as a chip
+		// right on the 'input' event — don't wait for the 500ms autocomplete throttle.
 		['to', 'cc', 'bcc'].forEach(name => {
 			const el = dom.querySelector(`[data-bind*="emailsTags: ${name}"]`);
 			if (el?.addresses) {
-				this[`_${name}Component`] = el.addresses;
+				const comp = el.addresses;
+				this[`_${name}Component`] = comp;
+				comp.input.addEventListener('input', () => {
+					const val = comp.input.value.trim();
+					if (val && this._groupSuggestions.has(val)) {
+						comp._parseInput(true);
+						comp.input.value = '';
+						comp._resizeInput();
+					}
+				});
 			}
 		});
 
@@ -1515,11 +1518,11 @@ export class ComposePopupView extends AbstractViewPopup {
 	_expandGroupChips(fieldValue) {
 		if (!fieldValue) return Promise.resolve(fieldValue);
 		const parts = fieldValue.split(',').map(s => s.trim()).filter(Boolean);
-		if (!parts.some(p => /^🏷 .+ \(\d+\)$/.test(p))) {
+		if (!parts.some(p => /^🏷 .+ \[\d+\]$/.test(p))) {
 			return Promise.resolve(fieldValue);
 		}
 		return Promise.all(parts.map(part => {
-			const m = part.match(/^🏷 (.+) \(\d+\)$/);
+			const m = part.match(/^🏷 (.+) \[\d+\]$/);
 			if (!m) return Promise.resolve([part]);
 			return new Promise(resolve => {
 				Remote.request('ContactsGroupSuggestions',
