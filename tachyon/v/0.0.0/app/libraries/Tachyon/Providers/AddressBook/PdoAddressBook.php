@@ -768,6 +768,31 @@ class PdoAddressBook
 		return $aResult;
 	}
 
+	public function HasCategory(string $sCategoryName) : int
+	{
+		if (1 > $this->iUserID || !\strlen($sCategoryName)) {
+			return 0;
+		}
+
+		$sLowerCategory = \mb_strtolower($sCategoryName, 'UTF-8');
+
+		$oStmt = $this->prepareAndExecute(
+			'SELECT COUNT(DISTINCT id_contact) FROM rainloop_ab_properties '.
+			'WHERE id_user = :id_user AND prop_type = :prop_type AND prop_value_lower = :category',
+			[
+				':id_user'   => array($this->iUserID, \PDO::PARAM_INT),
+				':prop_type' => array(PropertyType::CATEGORIES, \PDO::PARAM_INT),
+				':category'  => array($sLowerCategory, \PDO::PARAM_STR)
+			]
+		);
+
+		if ($oStmt) {
+			$aRow = $oStmt->fetch(\PDO::FETCH_NUM);
+			return $aRow ? (int) $aRow[0] : 0;
+		}
+		return 0;
+	}
+
 	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array
 	{
 		if (1 > $this->iUserID || !\strlen($sCategoryName)) {

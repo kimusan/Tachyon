@@ -730,28 +730,17 @@ export class ComposePopupView extends AbstractViewPopup {
 		// Detect if the user selected a group chip from the datalist
 		const catName = this._groupSuggestions.get(value);
 		if (catName !== undefined) {
-			fResponse([]); // clear datalist immediately
+			fResponse([]); // clear datalist
 			const field = this.sLastFocusedField;
-			// Clear the input right now so that any blur/force-parse that follows
-			// cannot commit the group label as a plain email chip.
 			const comp = this[`_${field}Component`];
-			if (comp) {
+			if (comp && comp.input.value.trim()) {
+				// Blur hasn't fired yet — force-commit the group chip now, then
+				// clear the input so the eventual blur sees nothing.
+				comp._parseInput(true);
 				comp.input.value = '';
 				comp._resizeInput();
 			}
-			Remote.request('ContactsGroupSuggestions',
-				(iError, data) => {
-					if (!iError && isArray(data.Result) && data.Result.length) {
-						const emails = data.Result
-							.filter(item => item?.[0])
-							.map(item => (new EmailModel(item[0], item[1])).toLine())
-							.join(',');
-						const existing = this[field]().trim();
-						this[field](existing ? existing + ',' + emails : emails);
-					}
-				},
-				{ Group: catName }
-			);
+			// Group chip stays as-is in the field; expansion happens on send.
 			return;
 		}
 
@@ -1521,6 +1510,35 @@ export class ComposePopupView extends AbstractViewPopup {
 		this.encryptOptions(options);
 	}
 
+	// Expand group chips (🏷 Name (N)) to individual member emails.
+	// Returns the field value unchanged if no group chips are present.
+	_expandGroupChips(fieldValue) {
+		if (!fieldValue) return Promise.resolve(fieldValue);
+		const parts = fieldValue.split(',').map(s => s.trim()).filter(Boolean);
+		if (!parts.some(p => /^🏷 .+ \(\d+\)$/.test(p))) {
+			return Promise.resolve(fieldValue);
+		}
+		return Promise.all(parts.map(part => {
+			const m = part.match(/^🏷 (.+) \(\d+\)$/);
+			if (!m) return Promise.resolve([part]);
+			return new Promise(resolve => {
+				Remote.request('ContactsGroupSuggestions',
+					(iError, data) => {
+						if (!iError && isArray(data.Result) && data.Result.length) {
+							resolve(data.Result
+								.filter(item => item?.[0])
+								.map(item => (new EmailModel(item[0], item[1])).toLine())
+							);
+						} else {
+							resolve([]); // group not found or empty — drop the chip
+						}
+					},
+					{ Group: m[1] }
+				);
+			});
+		})).then(arrays => arrays.flat().filter(Boolean).join(','));
+	}
+
 	async getMessageRequestParams(sSaveFolder, draft)
 	{
 		let Text = this.oEditor.getData().trim(),
@@ -1548,6 +1566,13 @@ export class ComposePopupView extends AbstractViewPopup {
 			sToAddress = sToAddress.match(/<.*>/g)[0].replace(/[<>]/g, '');
 		}
 */
+		// Expand any group chips (🏷 Name (N)) in recipient fields to member emails.
+		const [sTo, sCc, sBcc] = await Promise.all([
+			this._expandGroupChips(this.to()),
+			this._expandGroupChips(this.cc()),
+			this._expandGroupChips(this.bcc()),
+		]);
+
 		const
 			identity = this.currentIdentity(),
 			params = {
@@ -1556,9 +1581,9 @@ export class ComposePopupView extends AbstractViewPopup {
 				messageUid: this.draftUid(),
 				saveFolder: sSaveFolder,
 				from: this.from(),
-				to: this.to(),
-				cc: this.cc(),
-				bcc: this.bcc(),
+				to: sTo,
+				cc: sCc,
+				bcc: sBcc,
 				replyTo: this.replyTo(),
 				subject: this.subject(),
 				draftInfo: this.aDraftInfo,

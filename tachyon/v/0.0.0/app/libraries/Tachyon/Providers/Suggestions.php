@@ -43,18 +43,12 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 					}
 				}
 
-				// Group expansion: try exact category name match and expand members.
-				$aGroupMembers = $oAddressBookProvider->GetGroup($sQuery, $iLimit);
-				if ($aGroupMembers) {
-					// Prepend a sentinel entry so the client can render a group chip.
-					// Key uses '{group}' prefix — never a valid email address.
-					$aResult['{group}' . $sQuery] = ['{group}' . $sQuery, (string) \count($aGroupMembers)];
-					foreach ($aGroupMembers as $aItem) {
-						$sLine = \mb_strtolower($aItem[0]);
-						if (!isset($aResult[$sLine])) {
-							$aResult[$sLine] = $aItem;
-						}
-					}
+				// Group chip: if query exactly matches a category, add a sentinel so
+				// the client can render a group chip. Member emails are NOT expanded
+				// here — expansion happens client-side just before the message is sent.
+				$iGroupCount = $oAddressBookProvider->HasCategory($sQuery);
+				if ($iGroupCount > 0) {
+					$aResult['{group}' . $sQuery] = ['{group}' . $sQuery, (string) $iGroupCount];
 				}
 			}
 		}
@@ -79,15 +73,7 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 					}
 				}
 
-				if ($oDriver instanceof \Tachyon\Providers\Suggestions\IGroupSuggestions) {
-					$aGroupMembers = $oDriver->GetGroup($sQuery, $iLimit);
-					foreach ($aGroupMembers as $aItem) {
-						$sLine = \mb_strtolower($aItem[0]);
-						if (!isset($aResult[$sLine])) {
-							$aResult[$sLine] = $aItem;
-						}
-					}
-				}
+				// Plugin group expansion deferred to client-side send; skip here.
 			} catch (\Throwable $oException) {
 				$this->logException($oException);
 			}

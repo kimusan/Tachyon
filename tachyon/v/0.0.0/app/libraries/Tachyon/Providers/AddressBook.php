@@ -63,6 +63,14 @@ class AddressBook extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->GetCategories() : [];
 	}
 
+	public function HasCategory(string $sCategoryName) : int
+	{
+		if ($this->IsActive() && \method_exists($this->oDriver, 'HasCategory')) {
+			return $this->oDriver->HasCategory($sCategoryName);
+		}
+		return 0;
+	}
+
 	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array
 	{
 		if ($this->IsActive() && $this->oDriver instanceof \Tachyon\Providers\Suggestions\IGroupSuggestions) {
