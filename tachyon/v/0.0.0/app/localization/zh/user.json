@@ -237,7 +237,7 @@
     "ADD_MENU_BIRTHDAY": "生日",
     "ADD_MENU_TAGS": "标签",
 		"CATEGORY_ALL": "All categories",
-		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group."
+		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group.",
     "BUTTON_SHARE_ALL": "所有人",
     "BUTTON_SYNC": "同步 (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "发送到所有联系人邮箱"

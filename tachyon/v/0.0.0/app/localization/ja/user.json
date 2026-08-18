@@ -237,7 +237,7 @@
     "ADD_MENU_BIRTHDAY": "誕生日",
     "ADD_MENU_TAGS": "タグ",
 		"CATEGORY_ALL": "All categories",
-		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group."
+		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group.",
     "BUTTON_SHARE_ALL": "すべて",
     "BUTTON_SYNC": "同期(CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails"
