@@ -22,16 +22,24 @@
 
 	.left {
 		max-width: 30%;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.b-list-toolbar {
 		padding: 0;
-		height: 44px;
+		min-height: 44px;
 		text-align: center;
 		border-bottom: 1px solid var(--border-color, #ddd);
+		flex-shrink: 0;
 
 		.e-search {
 			margin: 7px 0 0;
+			width: calc(100% - 10px);
+		}
+
+		.e-category-filter {
+			margin: 4px 0 5px;
 			width: calc(100% - 10px);
 		}
 	}
@@ -39,6 +47,7 @@
 	.b-list-footer-toolbar {
 		height: 46px;
 		border-top: 1px solid var(--border-color, #ddd);
+		flex-shrink: 0;
 
 		.footer-pager {
 			padding: 8px 10px 0 0;
@@ -47,7 +56,8 @@
 	}
 
 	.b-list-content {
-		height: calc(100% - 44px - 46px);
+		flex: 1;
+		min-height: 0;
 		overflow: hidden;
 		overflow-y: auto;
 		scroll-behavior: smooth;

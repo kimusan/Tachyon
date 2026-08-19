@@ -768,29 +768,35 @@ class PdoAddressBook
 		return $aResult;
 	}
 
-	public function HasCategory(string $sCategoryName) : int
+	public function GetMatchingCategories(string $sQuery, int $iLimit = 5) : array
 	{
-		if (1 > $this->iUserID || !\strlen($sCategoryName)) {
-			return 0;
+		if (1 > $this->iUserID || !\strlen($sQuery)) {
+			return [];
 		}
 
-		$sLowerCategory = \mb_strtolower($sCategoryName, 'UTF-8');
+		$sPattern = $this->specialConvertSearchValueLower($sQuery);
 
 		$oStmt = $this->prepareAndExecute(
-			'SELECT COUNT(DISTINCT id_contact) FROM rainloop_ab_properties '.
-			'WHERE id_user = :id_user AND prop_type = :prop_type AND prop_value_lower = :category',
+			'SELECT MIN(prop_value) AS name, COUNT(DISTINCT id_contact) AS cnt '.
+			'FROM rainloop_ab_properties '.
+			"WHERE id_user = :id_user AND prop_type = :prop_type AND prop_value_lower LIKE :pattern ESCAPE '=' ".
+			'GROUP BY prop_value_lower ORDER BY cnt DESC LIMIT '.(int) $iLimit,
 			[
 				':id_user'   => array($this->iUserID, \PDO::PARAM_INT),
 				':prop_type' => array(PropertyType::CATEGORIES, \PDO::PARAM_INT),
-				':category'  => array($sLowerCategory, \PDO::PARAM_STR)
+				':pattern'   => array($sPattern, \PDO::PARAM_STR)
 			]
 		);
 
+		$aResult = [];
 		if ($oStmt) {
-			$aRow = $oStmt->fetch(\PDO::FETCH_NUM);
-			return $aRow ? (int) $aRow[0] : 0;
+			foreach ($oStmt->fetchAll(\PDO::FETCH_NUM) as $aRow) {
+				if (!empty($aRow[0])) {
+					$aResult[] = [(string) $aRow[0], (int) $aRow[1]];
+				}
+			}
 		}
-		return 0;
+		return $aResult;
 	}
 
 	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array
@@ -830,19 +836,19 @@ class PdoAddressBook
 
 		$oStmt = $this->prepareAndExecute(
 			'SELECT id_contact, prop_type, prop_value FROM rainloop_ab_properties '.
-			'WHERE id_contact IN ('.$sIds.') AND prop_type IN ('.$sTypes.')'
+			'WHERE id_contact IN ('.$sIds.') AND prop_type IN ('.$sTypes.') ORDER BY id_prop ASC'
 		);
 
 		$aNames  = [];
-		$aEmails = []; // id_contact → string[]
+		$aEmails = []; // id_contact → string (first/primary email only)
 
 		if ($oStmt) {
 			foreach ($oStmt->fetchAll(\PDO::FETCH_ASSOC) as $aItem) {
 				$iId   = (int) $aItem['id_contact'];
 				$iType = (int) $aItem['prop_type'];
 				$sVal  = (string) $aItem['prop_value'];
-				if (PropertyType::EMAIl === $iType) {
-					$aEmails[$iId][] = $sVal; // collect ALL addresses per contact
+				if (PropertyType::EMAIl === $iType && !isset($aEmails[$iId])) {
+					$aEmails[$iId] = $sVal; // first email = primary
 				} elseif (PropertyType::FIRST_NAME === $iType) {
 					$aNames[$iId][0] = $sVal;
 				} elseif (PropertyType::LAST_NAME === $iType) {
@@ -852,16 +858,13 @@ class PdoAddressBook
 		}
 
 		$aResult = [];
-		foreach ($aEmails as $iId => $aContactEmails) {
+		foreach ($aEmails as $iId => $sEmail) {
+			if ($iLimit <= \count($aResult)) {
+				break;
+			}
 			$sFirst = $aNames[$iId][0] ?? '';
 			$sLast  = $aNames[$iId][1] ?? '';
-			$sName  = \trim($sFirst . ' ' . $sLast);
-			foreach ($aContactEmails as $sEmail) {
-				if ($iLimit <= \count($aResult)) {
-					break 2;
-				}
-				$aResult[] = [$sEmail, $sName];
-			}
+			$aResult[] = [$sEmail, \trim($sFirst . ' ' . $sLast)];
 		}
 		return $aResult;
 	}

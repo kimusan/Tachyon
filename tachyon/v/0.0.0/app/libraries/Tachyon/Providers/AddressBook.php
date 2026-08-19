@@ -63,12 +63,12 @@ class AddressBook extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->GetCategories() : [];
 	}
 
-	public function HasCategory(string $sCategoryName) : int
+	public function GetMatchingCategories(string $sQuery, int $iLimit = 5) : array
 	{
-		if ($this->IsActive() && \method_exists($this->oDriver, 'HasCategory')) {
-			return $this->oDriver->HasCategory($sCategoryName);
+		if ($this->IsActive() && \method_exists($this->oDriver, 'GetMatchingCategories')) {
+			return $this->oDriver->GetMatchingCategories($sQuery, $iLimit);
 		}
-		return 0;
+		return [];
 	}
 
 	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array

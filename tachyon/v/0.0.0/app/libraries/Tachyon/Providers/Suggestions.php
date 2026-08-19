@@ -43,12 +43,11 @@ class Suggestions extends \Tachyon\Providers\AbstractProvider
 					}
 				}
 
-				// Group chip: if query exactly matches a category, add a sentinel so
-				// the client can render a group chip. Member emails are NOT expanded
-				// here — expansion happens client-side just before the message is sent.
-				$iGroupCount = $oAddressBookProvider->HasCategory($sQuery);
-				if ($iGroupCount > 0) {
-					$aResult['{group}' . $sQuery] = ['{group}' . $sQuery, (string) $iGroupCount];
+				// Group chips: find all categories whose name contains the query.
+				// Member emails are NOT expanded here — expansion happens client-side
+				// just before the message is sent.
+				foreach ($oAddressBookProvider->GetMatchingCategories($sQuery, 5) as [$sCatName, $iCount]) {
+					$aResult['{group}' . $sCatName] = ['{group}' . $sCatName, (string) $iCount];
 				}
 			}
 		}
