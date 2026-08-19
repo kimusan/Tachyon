@@ -643,21 +643,23 @@ input:focus, textarea:focus, select:focus {
 .alert-info     { background-color: var(--info-bg-clr);     color: var(--info-clr);     border-color: var(--info-border-clr); }
 
 /* ── Success button text ────────────────────────────────────────────────── */
-/* app.css hardcodes color:#fff on .btn-success (specificity 0,1,0).
-   Use .btn.btn-success (0,2,0) to win without !important.
-   Dracula green (#50fa7b) is too bright for white text — dark fg in dark mode.
-   Alucard green (#14710a) is dark enough that white text is fine. */
-.btn.btn-success {
+/* app.css has two sources of color:#fff on these buttons:
+ *   .btn-success { color:#fff }            — specificity 0,1,0
+ *   .b-folders .b-toolbar { color:#fff }   — specificity 0,2,0 (inherited by children)
+ * Anchoring to #rl-app gives 1,2,0, beating both unconditionally.
+ * Dracula green (#50fa7b) is too bright for white text — dark fg in dark mode.
+ * Alucard green (#14710a) is dark enough that white text is fine. */
+#rl-app .btn.btn-success {
 	color: #282a36;
 	text-shadow: none;
 }
 
 @media (prefers-color-scheme: light) {
-	.btn.btn-success { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
+	#rl-app .btn.btn-success { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
 }
 
-:root[data-color-scheme="light"] .btn.btn-success { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
-:root[data-color-scheme="dark"]  .btn.btn-success { color: #282a36; text-shadow: none; }
+:root[data-color-scheme="light"] #rl-app .btn.btn-success { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
+:root[data-color-scheme="dark"]  #rl-app .btn.btn-success { color: #282a36; text-shadow: none; }
 
 /* ── Links / Checkboxes ─────────────────────────────────────────────────── */
 a { color: var(--link-color); text-decoration: none; }
