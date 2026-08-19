@@ -642,6 +642,22 @@ input:focus, textarea:focus, select:focus {
 .alert-error    { background-color: var(--error-bg-clr);    color: var(--error-clr);    border-color: var(--error-border-clr); }
 .alert-info     { background-color: var(--info-bg-clr);     color: var(--info-clr);     border-color: var(--info-border-clr); }
 
+/* ── Success button text ────────────────────────────────────────────────── */
+/* app.css hardcodes color:#fff on .btn-success. Dracula green (#50fa7b) is
+   too bright for white text — use dark foreground in dark mode instead.
+   Alucard green (#14710a) is dark enough that white text is fine. */
+.btn-success {
+	color: #282a36;
+	text-shadow: none;
+}
+
+@media (prefers-color-scheme: light) {
+	.btn-success { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
+}
+
+:root[data-color-scheme="light"] .btn-success { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
+:root[data-color-scheme="dark"]  .btn-success { color: #282a36; text-shadow: none; }
+
 /* ── Links / Checkboxes ─────────────────────────────────────────────────── */
 a { color: var(--link-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
