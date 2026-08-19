@@ -246,7 +246,7 @@ export class MessageModel extends AbstractModel {
 						? 1
 						: (counts[a] > counts[b] ? -1 : a.localeCompare(b))
 					);
-					from && options.unshift(from.email);
+					from && !list.includes(from.email) && options.unshift(from.email);
 				}
 				return options;
 			}
@@ -552,7 +552,6 @@ export class MessageModel extends AbstractModel {
 				});
 				regex = regex.join('|').replace(/\|+/g, '|');
 				if (regex) {
-					console.log('whitelist images = '+regex);
 					regex = new RegExp(regex);
 					if (this.from[0]?.email.match(regex)) {
 						regex = null;
