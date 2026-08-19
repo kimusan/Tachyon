@@ -232,7 +232,7 @@ class OpenSSL
 			$encrypted .= $line;
 		} while (true);
 
-		return $data;
+		return $encrypted;
 	}
 
 	public function sign(/*string|Temporary*/$input, bool $detached = true)
@@ -261,33 +261,22 @@ class OpenSSL
 		 * Only fetch the signed body part
 		 */
 		$fp = $output->fopen();
-		$micalg = '';
 		while (!\feof($fp)) {
 			$line = \fgets($fp);
-			$fp = $output->fopen();
-			while (!\feof($fp)) {
-				$line = \fgets($fp);
-/*
-				if (!$micalg && \str_contains($line, 'Content-Type: multipart/signed')) {
-					\preg_match('/micalg="([^"+])"/', $line, $match);
-					$micalg = $match[1];
-				}
-*/
-				if (($detached && \str_contains($line, 'Content-Type: application/x-pkcs7-signature'))
-				 || (!$detached && \str_contains($line, 'Content-Type: application/x-pkcs7-mime'))
-				) {
-					// Skip headers
-					while (\trim(\fgets($fp)));
-					// Fetch the body
-					$signature = '';
-					do {
-						$line = \fgets($fp);
-						if (!\trim($line)) {
-							return $signature;
-						}
-						$signature .= $line;
-					} while (true);
-				}
+			if (($detached && \str_contains($line, 'Content-Type: application/x-pkcs7-signature'))
+			 || (!$detached && \str_contains($line, 'Content-Type: application/x-pkcs7-mime'))
+			) {
+				// Skip headers
+				while (\trim(\fgets($fp)));
+				// Fetch the body
+				$signature = '';
+				do {
+					$line = \fgets($fp);
+					if (!\trim($line)) {
+						return $signature;
+					}
+					$signature .= $line;
+				} while (true);
 			}
 		}
 

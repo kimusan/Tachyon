@@ -1705,11 +1705,7 @@ export class ComposePopupView extends AbstractViewPopup {
 						break;
 					}
 				} else if ('S/MIME' == signOptions[i][0]) {
-					// TODO: sign in PHP fails
 					params.sign = 'S/MIME';
-//					params.signCertificate = identity.smimeCertificate();
-//					params.signPrivateKey = identity.smimeKey();
-//					params.attachCertificate = false;
 					if (identity.smimeKeyEncrypted()) {
 						const pass = await Passphrases.ask(identity,
 							i18n('SMIME/PRIVATE_KEY_OF', {EMAIL: identity.email}),
@@ -1720,6 +1716,8 @@ export class ComposePopupView extends AbstractViewPopup {
 							pass.remember && Passphrases.handle(identity, pass.password);
 							isSigned = true;
 						}
+					} else {
+						isSigned = true;
 					}
 				}
 			}
