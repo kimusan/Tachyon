@@ -16,7 +16,7 @@
  */
 
 /* ── Alucard (forced light) ─────────────────────────────────────────────── */
-[data-color-scheme="light"] :root {
+:root[data-color-scheme="light"] {
 	color-scheme: light;
 
 	--main-color: #1f1f1f;
@@ -100,7 +100,7 @@
 }
 
 /* ── Dracula (forced dark) ──────────────────────────────────────────────── */
-[data-color-scheme="dark"] :root {
+:root[data-color-scheme="dark"] {
 	color-scheme: dark;
 
 	--main-color: #f8f8f2;

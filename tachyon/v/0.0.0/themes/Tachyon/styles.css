@@ -1,5 +1,5 @@
 /* Color scheme overrides (light/dark mode toggle) */
-[data-color-scheme="light"] :root {
+:root[data-color-scheme="light"] {
 	color-scheme: light;
 
 	--main-color: #1d1d1f;
@@ -82,7 +82,7 @@
 	--info-border-clr: #bfdbfe;
 }
 
-[data-color-scheme="dark"] :root {
+:root[data-color-scheme="dark"] {
 	color-scheme: dark;
 
 	--main-color: #f5f5f7;
