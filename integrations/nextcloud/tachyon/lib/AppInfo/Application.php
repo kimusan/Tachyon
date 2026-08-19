@@ -3,8 +3,6 @@
 namespace OCA\Tachyon\AppInfo;
 
 use OCA\Tachyon\Util\TachyonHelper;
-use OCA\Tachyon\Controller\FetchController;
-use OCA\Tachyon\Controller\PageController;
 use OCA\Tachyon\Dashboard\UnreadMailWidget;
 use OCA\Tachyon\Search\Provider;
 use OCA\Tachyon\Listeners\AccessTokenUpdatedListener;
@@ -13,15 +11,11 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Bootstrap\IBootContext;
-use OCP\IL10N;
-use OCP\IUser;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\User\Events\PostLoginEvent;
 use OCP\User\Events\BeforeUserLoggedOutEvent;
-use OCA\OIDCLogin\Events\AccessTokenUpdatedEvent;
 use OCP\IConfig;
 use OCP\ISession;
-use OCP\IUserSession;
-use OCP\INavigationManager;
 
 class Application extends App implements IBootstrap
 {
@@ -34,44 +28,17 @@ class Application extends App implements IBootstrap
 
 	public function register(IRegistrationContext $context): void
 	{
-		/**
-		 * Controllers
-		 */
-		$context->registerService(
-			'PageController', function($c) {
-				return new PageController(
-					$c->query('AppName'),
-					$c->query('Request'),
-					$c->query(IConfig::class),
-					$c->query(INavigationManager::class)
-				);
-			}
-		);
-
-		$context->registerService(
-			'FetchController', function($c) {
-				return new FetchController(
-					$c->query('AppName'),
-					$c->query('Request'),
-					$c->query('ServerContainer')->getAppManager(),
-					$c->query('ServerContainer')->get(\OCP\IConfig::class),
-					$c->query(IL10N::class),
-					$c->query(IUserSession::class)
-				);
-			}
-		);
-
-		/**
-		 * Utils
-		 */
-		$context->registerService(
-			'TachyonHelper', function($c) {
-				return new TachyonHelper();
-			}
-		);
+		// Controllers are autowired by NC's DI container from their typed constructors.
 
 		$context->registerSearchProvider(Provider::class);
-		$context->registerEventListener(AccessTokenUpdatedEvent::class, AccessTokenUpdatedListener::class);
+
+		// Only register OIDC token listener when the oidc_login app is present.
+		if (\class_exists('OCA\OIDCLogin\Events\AccessTokenUpdatedEvent')) {
+			$context->registerEventListener(
+				\OCA\OIDCLogin\Events\AccessTokenUpdatedEvent::class,
+				AccessTokenUpdatedListener::class
+			);
+		}
 
 		// TODO: Not working yet, needs a Vue UI
 //		$context->registerDashboardWidget(UnreadMailWidget::class);
@@ -86,7 +53,7 @@ class Application extends App implements IBootstrap
 		}
 		unset($_dataDir);
 
-		$dispatcher = $context->getAppContainer()->query('OCP\EventDispatcher\IEventDispatcher');
+		$dispatcher = $context->getServerContainer()->get(IEventDispatcher::class);
 		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) use ($context) {
 /*
 			$config = $context->getServerContainer()->get(\OCP\IConfig::class);

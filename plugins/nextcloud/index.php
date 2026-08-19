@@ -257,16 +257,16 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 				$sEmail = '';
 				// Only store the user's password in the current session if they have
 				// enabled auto-login using Nextcloud username or email address.
-				if ($config->getAppValue('snappymail', 'snappymail-autologin', false)) {
+				if ($config->getAppValue('tachyon', 'tachyon-autologin', false)) {
 					$sEmail = $sUID;
-				} else if ($config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
+				} else if ($config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 					$sEmail = $config->getUserValue($sUID, 'settings', 'email', '');
 				} else {
-					\Tachyon\Util\Log::debug('Nextcloud', 'snappymail-autologin is off');
+					\Tachyon\Util\Log::debug('Nextcloud', 'tachyon-autologin is off');
 				}
 				// If the user has set credentials for Tachyon in their personal
 				// settings, override everything before and use those instead.
-				$sCustomEmail = $config->getUserValue($sUID, 'snappymail', 'snappymail-email', '');
+				$sCustomEmail = $config->getUserValue($sUID, 'tachyon', 'tachyon-email', '');
 				if ($sCustomEmail) {
 					$sEmail = $sCustomEmail;
 				}
