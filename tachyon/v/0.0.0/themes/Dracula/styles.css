@@ -1,0 +1,653 @@
+/*
+ * Dracula / Alucard theme for Tachyon
+ *
+ * Dark mode — Dracula Classic (https://draculatheme.com/spec)
+ *   Background #282A36   Selection #44475A   Foreground #F8F8F2
+ *   Comment    #6272A4   Red #FF5555  Orange #FFB86C  Yellow #F1FA8C
+ *   Green      #50FA7B   Cyan #8BE9FD  Purple #BD93F9  Pink #FF79C6
+ *
+ * Light mode — Alucard Classic (https://draculatheme.com/spec)
+ *   Background #FFFBEB   Selection #CFCFDE   Foreground #1F1F1F
+ *   Comment    #6C664B   Red #CB3A2A  Orange #A34D14  Yellow #846E15
+ *   Green      #14710A   Cyan #036A96  Purple #644AC9  Pink #A3144D
+ *
+ * Default: Dracula dark. Respects system preference and the
+ * [data-color-scheme] toggle from the theme switcher in the menu.
+ */
+
+/* ── Alucard (forced light) ─────────────────────────────────────────────── */
+[data-color-scheme="light"] :root {
+	color-scheme: light;
+
+	--main-color: #1f1f1f;
+	--main-bg-color: #fffbeb;
+	--link-color: #644ac9;
+	--border-color: #cfcfde;
+	--hr-color: #cfcfde;
+	--panel-bg-clr: #ffffff;
+
+	--loading-color: #1f1f1f;
+	--spinner-color: #644ac9;
+
+	--login-color: #1f1f1f;
+	--login-bg-color: rgba(255,255,255,0.96);
+	--login-box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+	--login-border: 1px solid #cfcfde;
+	--login-border-radius: 6px;
+
+	--dropdown-menu-color: #1f1f1f;
+	--dropdown-menu-bg-color: rgba(255,255,255,0.98);
+	--dropdown-menu-hover-bg-color: rgba(100,74,201,0.08);
+	--dropdown-menu-hover-color: #644ac9;
+	--dropdown-menu-disable-color: #6c664b;
+	--dropdown-menu-border-clr: rgba(0,0,0,0.10);
+
+	--folders-color: #1f1f1f;
+	--folders-disabled-color: #6c664b;
+	--folders-selected-color: #644ac9;
+	--folders-selected-bg-color: rgba(100,74,201,0.08);
+	--folders-focused-color: #644ac9;
+	--folders-focused-bg-color: rgba(100,74,201,0.13);
+	--folders-hover-color: #1f1f1f;
+	--folders-hover-bg-color: rgba(0,0,0,0.04);
+	--folders-drop-color: #644ac9;
+	--folders-drop-bg-color: rgba(100,74,201,0.10);
+	--unread-count-color: #fffbeb;
+	--unread-count-bg-color: #644ac9;
+
+	--settings-menu-color: #1f1f1f;
+	--settings-menu-selected-color: #644ac9;
+	--settings-menu-selected-bg-color: rgba(100,74,201,0.08);
+	--settings-menu-hover-color: #1f1f1f;
+	--settings-menu-hover-bg-color: rgba(0,0,0,0.04);
+
+	--message-list-toolbar-bg-color: #f2eedc;
+	--message-header-bg-clr: #fffbeb;
+
+	--dialog-clr: #1f1f1f;
+	--dialog-bg-clr: #ffffff;
+	--dialog-border-clr: #cfcfde;
+	--dialog-border-radius: 6px;
+
+	--btn-clr: #fffbeb;
+	--btn-bg-clr: #644ac9;
+	--btn-border-clr: #644ac9;
+	--btn-border-radius: 4px;
+	--btn-success-bg-clr: #14710a;
+	--btn-danger-bg-clr: #cb3a2a;
+
+	--input-clr: #1f1f1f;
+	--input-bg-clr: #ffffff;
+	--input-border-clr: #cfcfde;
+	--input-border-radius: 4px;
+	--input-focus-border-clr: #644ac9;
+
+	--tr-hover-bg-clr: rgba(0,0,0,0.03);
+	--tr-odd-bg-clr: rgba(0,0,0,0.015);
+
+	--tab-active-bg-clr: #ffffff;
+	--tab-hover-border-clr: #cfcfde;
+
+	--warning-clr: #846e15;
+	--warning-bg-clr: rgba(132,110,21,0.08);
+	--warning-border-clr: rgba(132,110,21,0.25);
+	--error-clr: #cb3a2a;
+	--error-bg-clr: rgba(203,58,42,0.07);
+	--error-border-clr: rgba(203,58,42,0.22);
+	--info-clr: #036a96;
+	--info-bg-clr: rgba(3,106,150,0.07);
+	--info-border-clr: rgba(3,106,150,0.22);
+}
+
+/* ── Dracula (forced dark) ──────────────────────────────────────────────── */
+[data-color-scheme="dark"] :root {
+	color-scheme: dark;
+
+	--main-color: #f8f8f2;
+	--main-bg-color: #282a36;
+	--link-color: #bd93f9;
+	--border-color: #44475a;
+	--hr-color: #44475a;
+	--panel-bg-clr: #21222c;
+
+	--loading-color: #f8f8f2;
+	--spinner-color: #bd93f9;
+
+	--login-color: #f8f8f2;
+	--login-bg-color: rgba(33,34,44,0.97);
+	--login-box-shadow: 0 4px 20px rgba(0,0,0,0.50);
+	--login-border: 1px solid #44475a;
+	--login-border-radius: 6px;
+
+	--dropdown-menu-color: #f8f8f2;
+	--dropdown-menu-bg-color: rgba(40,42,54,0.98);
+	--dropdown-menu-hover-bg-color: rgba(189,147,249,0.15);
+	--dropdown-menu-hover-color: #bd93f9;
+	--dropdown-menu-disable-color: #6272a4;
+	--dropdown-menu-border-clr: rgba(255,255,255,0.08);
+
+	--folders-color: #f8f8f2;
+	--folders-disabled-color: #6272a4;
+	--folders-selected-color: #bd93f9;
+	--folders-selected-bg-color: rgba(189,147,249,0.15);
+	--folders-focused-color: #bd93f9;
+	--folders-focused-bg-color: rgba(189,147,249,0.22);
+	--folders-hover-color: #f8f8f2;
+	--folders-hover-bg-color: rgba(255,255,255,0.06);
+	--folders-drop-color: #bd93f9;
+	--folders-drop-bg-color: rgba(189,147,249,0.18);
+	--unread-count-color: #282a36;
+	--unread-count-bg-color: #bd93f9;
+
+	--settings-menu-color: #f8f8f2;
+	--settings-menu-selected-color: #bd93f9;
+	--settings-menu-selected-bg-color: rgba(189,147,249,0.15);
+	--settings-menu-hover-color: #f8f8f2;
+	--settings-menu-hover-bg-color: rgba(255,255,255,0.06);
+
+	--message-list-toolbar-bg-color: #21222c;
+	--message-header-bg-clr: #282a36;
+
+	--dialog-clr: #f8f8f2;
+	--dialog-bg-clr: #21222c;
+	--dialog-border-clr: #44475a;
+	--dialog-border-radius: 6px;
+
+	--btn-clr: #21222c;
+	--btn-bg-clr: #bd93f9;
+	--btn-border-clr: #bd93f9;
+	--btn-border-radius: 4px;
+	--btn-success-bg-clr: #50fa7b;
+	--btn-danger-bg-clr: #ff5555;
+
+	--input-clr: #f8f8f2;
+	--input-bg-clr: #343746;
+	--input-border-clr: #44475a;
+	--input-border-radius: 4px;
+	--input-focus-border-clr: #bd93f9;
+
+	--tr-hover-bg-clr: rgba(255,255,255,0.04);
+	--tr-odd-bg-clr: rgba(255,255,255,0.02);
+
+	--tab-active-bg-clr: #21222c;
+	--tab-hover-border-clr: #44475a;
+
+	--warning-clr: #f1fa8c;
+	--warning-bg-clr: rgba(241,250,140,0.08);
+	--warning-border-clr: rgba(241,250,140,0.22);
+	--error-clr: #ff5555;
+	--error-bg-clr: rgba(255,85,85,0.10);
+	--error-border-clr: rgba(255,85,85,0.28);
+	--info-clr: #8be9fd;
+	--info-bg-clr: rgba(139,233,253,0.08);
+	--info-border-clr: rgba(139,233,253,0.22);
+}
+
+/* ── Default: Dracula dark ──────────────────────────────────────────────── */
+:root {
+	color-scheme: dark;
+
+	--main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--main-font-size: 14px;
+
+	/* MAIN */
+	--main-color: #f8f8f2;
+	--main-bg-color: #282a36;
+	--main-bg-image: none;
+	--main-bg-size: auto;
+	--main-bg-repeat: repeat;
+	--link-color: #bd93f9;
+	--border-color: #44475a;
+	--hr-color: #44475a;
+	--panel-bg-clr: #21222c;
+
+	/* LOADING */
+	--loading-color: #f8f8f2;
+	--loading-text-shadow: none;
+	--spinner-color: #bd93f9;
+
+	/* LOGIN */
+	--login-color: #f8f8f2;
+	--login-bg-color: rgba(33,34,44,0.97);
+	--login-box-shadow: 0 4px 20px rgba(0,0,0,0.50);
+	--login-border: 1px solid #44475a;
+	--login-border-radius: 6px;
+
+	/* MENU */
+	--dropdown-menu-color: #f8f8f2;
+	--dropdown-menu-bg-color: rgba(40,42,54,0.98);
+	--dropdown-menu-hover-bg-color: rgba(189,147,249,0.15);
+	--dropdown-menu-hover-color: #bd93f9;
+	--dropdown-menu-disable-color: #6272a4;
+	--dropdown-menu-border-clr: rgba(255,255,255,0.08);
+
+	/* FOLDERS */
+	--folders-color: #f8f8f2;
+	--folders-disabled-color: #6272a4;
+	--folders-selected-color: #bd93f9;
+	--folders-selected-bg-color: rgba(189,147,249,0.15);
+	--folders-focused-color: #bd93f9;
+	--folders-focused-bg-color: rgba(189,147,249,0.22);
+	--folders-hover-color: #f8f8f2;
+	--folders-hover-bg-color: rgba(255,255,255,0.06);
+	--folders-drop-color: #bd93f9;
+	--folders-drop-bg-color: rgba(189,147,249,0.18);
+	--unread-count-color: #282a36;
+	--unread-count-bg-color: #bd93f9;
+
+	/* SETTINGS */
+	--settings-menu-color: #f8f8f2;
+	--settings-menu-selected-color: #bd93f9;
+	--settings-menu-selected-bg-color: rgba(189,147,249,0.15);
+	--settings-menu-hover-color: #f8f8f2;
+	--settings-menu-hover-bg-color: rgba(255,255,255,0.06);
+
+	/* MESSAGES */
+	--message-list-toolbar-bg-color: #21222c;
+	--message-header-bg-clr: #282a36;
+
+	/* DIALOGS */
+	--dialog-clr: #f8f8f2;
+	--dialog-bg-clr: #21222c;
+	--dialog-border-clr: #44475a;
+	--dialog-border-radius: 6px;
+
+	/* FORMS */
+	--btn-clr: #21222c;
+	--btn-bg-clr: #bd93f9;
+	--btn-border-clr: #bd93f9;
+	--btn-border-radius: 4px;
+	--btn-success-bg-clr: #50fa7b;
+	--btn-danger-bg-clr: #ff5555;
+
+	--input-clr: #f8f8f2;
+	--input-bg-clr: #343746;
+	--input-border-clr: #44475a;
+	--input-border-radius: 4px;
+	--input-focus-border-clr: #bd93f9;
+
+	/* TABLES */
+	--tr-hover-bg-clr: rgba(255,255,255,0.04);
+	--tr-odd-bg-clr: rgba(255,255,255,0.02);
+
+	/* TABS */
+	--tab-active-bg-clr: #21222c;
+	--tab-hover-border-clr: #44475a;
+
+	/* ALERTS */
+	--warning-clr: #f1fa8c;
+	--warning-bg-clr: rgba(241,250,140,0.08);
+	--warning-border-clr: rgba(241,250,140,0.22);
+	--error-clr: #ff5555;
+	--error-bg-clr: rgba(255,85,85,0.10);
+	--error-border-clr: rgba(255,85,85,0.28);
+	--info-clr: #8be9fd;
+	--info-bg-clr: rgba(139,233,253,0.08);
+	--info-border-clr: rgba(139,233,253,0.22);
+}
+
+/* ── System light preference → Alucard ─────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+	:root {
+		color-scheme: light;
+
+		--main-color: #1f1f1f;
+		--main-bg-color: #fffbeb;
+		--link-color: #644ac9;
+		--border-color: #cfcfde;
+		--hr-color: #cfcfde;
+		--panel-bg-clr: #ffffff;
+
+		--loading-color: #1f1f1f;
+		--spinner-color: #644ac9;
+
+		--login-color: #1f1f1f;
+		--login-bg-color: rgba(255,255,255,0.96);
+		--login-box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+		--login-border: 1px solid #cfcfde;
+
+		--dropdown-menu-color: #1f1f1f;
+		--dropdown-menu-bg-color: rgba(255,255,255,0.98);
+		--dropdown-menu-hover-bg-color: rgba(100,74,201,0.08);
+		--dropdown-menu-hover-color: #644ac9;
+		--dropdown-menu-disable-color: #6c664b;
+		--dropdown-menu-border-clr: rgba(0,0,0,0.10);
+
+		--folders-color: #1f1f1f;
+		--folders-disabled-color: #6c664b;
+		--folders-selected-color: #644ac9;
+		--folders-selected-bg-color: rgba(100,74,201,0.08);
+		--folders-focused-color: #644ac9;
+		--folders-focused-bg-color: rgba(100,74,201,0.13);
+		--folders-hover-color: #1f1f1f;
+		--folders-hover-bg-color: rgba(0,0,0,0.04);
+		--folders-drop-color: #644ac9;
+		--folders-drop-bg-color: rgba(100,74,201,0.10);
+		--unread-count-color: #fffbeb;
+		--unread-count-bg-color: #644ac9;
+
+		--settings-menu-color: #1f1f1f;
+		--settings-menu-selected-color: #644ac9;
+		--settings-menu-selected-bg-color: rgba(100,74,201,0.08);
+		--settings-menu-hover-color: #1f1f1f;
+		--settings-menu-hover-bg-color: rgba(0,0,0,0.04);
+
+		--message-list-toolbar-bg-color: #f2eedc;
+		--message-header-bg-clr: #fffbeb;
+
+		--dialog-clr: #1f1f1f;
+		--dialog-bg-clr: #ffffff;
+		--dialog-border-clr: #cfcfde;
+
+		--btn-clr: #fffbeb;
+		--btn-bg-clr: #644ac9;
+		--btn-border-clr: #644ac9;
+		--btn-success-bg-clr: #14710a;
+		--btn-danger-bg-clr: #cb3a2a;
+
+		--input-clr: #1f1f1f;
+		--input-bg-clr: #ffffff;
+		--input-border-clr: #cfcfde;
+		--input-focus-border-clr: #644ac9;
+
+		--tr-hover-bg-clr: rgba(0,0,0,0.03);
+		--tr-odd-bg-clr: rgba(0,0,0,0.015);
+
+		--tab-active-bg-clr: #ffffff;
+		--tab-hover-border-clr: #cfcfde;
+
+		--warning-clr: #846e15;
+		--warning-bg-clr: rgba(132,110,21,0.08);
+		--warning-border-clr: rgba(132,110,21,0.25);
+		--error-clr: #cb3a2a;
+		--error-bg-clr: rgba(203,58,42,0.07);
+		--error-border-clr: rgba(203,58,42,0.22);
+		--info-clr: #036a96;
+		--info-bg-clr: rgba(3,106,150,0.07);
+		--info-border-clr: rgba(3,106,150,0.22);
+	}
+}
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+body, button, input, select, textarea {
+	font-family: var(--main-font-family);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 32px;
+	padding: 6px 16px;
+	font-weight: 600;
+	font-size: 13px;
+	letter-spacing: 0.2px;
+	text-transform: none;
+	box-shadow: none;
+	text-shadow: none;
+	line-height: 1.2;
+	text-decoration: none;
+	border-radius: var(--btn-border-radius);
+}
+
+.btn-block { display: flex; }
+.btn.btn-thin { padding: 6px 10px; }
+.btn:hover, .btn:focus { text-decoration: none; filter: brightness(1.12); }
+.btn:active { filter: brightness(0.88); }
+
+/* ── Inputs ─────────────────────────────────────────────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+	border-radius: var(--input-border-radius);
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+	outline: none;
+	border-color: var(--input-focus-border-clr);
+	box-shadow: 0 0 0 2px rgba(189,147,249,0.25);
+}
+
+@media (prefers-color-scheme: light) {
+	input:focus, textarea:focus, select:focus {
+		box-shadow: 0 0 0 2px rgba(100,74,201,0.18);
+	}
+}
+
+[data-color-scheme="light"] input:focus,
+[data-color-scheme="light"] textarea:focus,
+[data-color-scheme="light"] select:focus {
+	box-shadow: 0 0 0 2px rgba(100,74,201,0.18);
+}
+
+[data-color-scheme="dark"] input:focus,
+[data-color-scheme="dark"] textarea:focus,
+[data-color-scheme="dark"] select:focus {
+	box-shadow: 0 0 0 2px rgba(189,147,249,0.25);
+}
+
+/* ── Dropdown menu ──────────────────────────────────────────────────────── */
+.dropdown-menu {
+	border-radius: 6px;
+	box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+	border: none;
+	padding: 4px;
+}
+
+@media (prefers-color-scheme: light) {
+	.dropdown-menu {
+		box-shadow: 0 4px 20px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.07);
+	}
+}
+
+[data-color-scheme="light"] .dropdown-menu {
+	box-shadow: 0 4px 20px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.07);
+}
+
+[data-color-scheme="dark"] .dropdown-menu {
+	box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.dropdown-menu a {
+	border-radius: 4px;
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	transition: background-color 0.08s ease, color 0.08s ease;
+}
+
+.dropdown-menu .dividerbar { margin: 4px; }
+
+/* ── Color scheme toggle ────────────────────────────────────────────────── */
+.color-scheme-toggle {
+	padding: 6px 4px;
+	margin: 4px;
+	display: flex;
+	justify-content: center;
+}
+
+.color-scheme-buttons {
+	display: flex;
+	gap: 2px;
+	background-color: rgba(255,255,255,0.06);
+	border-radius: 4px;
+	padding: 3px;
+}
+
+@media (prefers-color-scheme: light) {
+	.color-scheme-buttons { background-color: rgba(0,0,0,0.06); }
+}
+
+[data-color-scheme="light"] .color-scheme-buttons { background-color: rgba(0,0,0,0.06); }
+[data-color-scheme="dark"]  .color-scheme-buttons { background-color: rgba(255,255,255,0.06); }
+
+.color-scheme-btn {
+	background: none;
+	border: none;
+	padding: 4px 8px;
+	border-radius: 3px;
+	cursor: pointer;
+	font-size: 16px;
+	transition: background-color 0.08s ease;
+	color: var(--dropdown-menu-color);
+}
+
+.color-scheme-btn:hover {
+	background-color: var(--dropdown-menu-hover-bg-color);
+	color: var(--dropdown-menu-hover-color);
+}
+
+/* Dark (Dracula): dark bg on purple button */
+.color-scheme-btn.active {
+	background-color: #bd93f9;
+	color: #282a36;
+}
+
+@media (prefers-color-scheme: light) {
+	.color-scheme-btn.active {
+		background-color: #644ac9;
+		color: #fffbeb;
+	}
+}
+
+[data-color-scheme="light"] .color-scheme-btn.active {
+	background-color: #644ac9;
+	color: #fffbeb;
+}
+
+[data-color-scheme="dark"] .color-scheme-btn.active {
+	background-color: #bd93f9;
+	color: #282a36;
+}
+
+/* ── Message list ───────────────────────────────────────────────────────── */
+/* Unseen: cyan tint (dark) / purple tint (light) */
+.messageListItem [data-unseen] {
+	background-color: rgba(139,233,253,0.05);
+	border-color: rgba(139,233,253,0.18);
+}
+
+@media (prefers-color-scheme: light) {
+	.messageListItem [data-unseen] {
+		background-color: rgba(100,74,201,0.05);
+		border-color: rgba(207,207,222,0.80);
+	}
+}
+
+[data-color-scheme="light"] .messageListItem [data-unseen] {
+	background-color: rgba(100,74,201,0.05);
+	border-color: rgba(207,207,222,0.80);
+}
+
+[data-color-scheme="dark"] .messageListItem [data-unseen] {
+	background-color: rgba(139,233,253,0.05);
+	border-color: rgba(139,233,253,0.18);
+}
+
+/* Selected message */
+.messageListItem.selected {
+	background-color: rgba(189,147,249,0.14);
+	border-left-color: #bd93f9;
+	border-right-color: #bd93f9 !important;
+}
+
+@media (prefers-color-scheme: light) {
+	.messageListItem.selected {
+		background-color: rgba(100,74,201,0.09);
+		border-left-color: #644ac9;
+		border-right-color: #644ac9 !important;
+	}
+}
+
+[data-color-scheme="light"] .messageListItem.selected {
+	background-color: rgba(100,74,201,0.09);
+	border-left-color: #644ac9;
+	border-right-color: #644ac9 !important;
+}
+
+[data-color-scheme="dark"] .messageListItem.selected {
+	background-color: rgba(189,147,249,0.14);
+	border-left-color: #bd93f9;
+	border-right-color: #bd93f9 !important;
+}
+
+/* ── Panels & dialogs ───────────────────────────────────────────────────── */
+.panel, .dialog {
+	border-radius: var(--dialog-border-radius);
+	box-shadow: 0 8px 32px rgba(0,0,0,0.50);
+}
+
+@media (prefers-color-scheme: light) {
+	.panel, .dialog { box-shadow: 0 2px 16px rgba(0,0,0,0.10); }
+}
+
+[data-color-scheme="light"] .panel,
+[data-color-scheme="light"] .dialog { box-shadow: 0 2px 16px rgba(0,0,0,0.10); }
+
+[data-color-scheme="dark"] .panel,
+[data-color-scheme="dark"] .dialog { box-shadow: 0 8px 32px rgba(0,0,0,0.50); }
+
+/* ── Scrollbars (WebKit) ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+	background: rgba(98,114,164,0.40);
+	border-radius: 4px;
+	border: 2px solid transparent;
+	background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(189,147,249,0.60);
+	background-clip: padding-box;
+}
+
+@media (prefers-color-scheme: light) {
+	::-webkit-scrollbar-thumb {
+		background: rgba(207,207,222,0.80);
+		background-clip: padding-box;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: rgba(100,74,201,0.45);
+		background-clip: padding-box;
+	}
+}
+
+[data-color-scheme="light"] ::-webkit-scrollbar-thumb {
+	background: rgba(207,207,222,0.80);
+	background-clip: padding-box;
+}
+[data-color-scheme="light"] ::-webkit-scrollbar-thumb:hover {
+	background: rgba(100,74,201,0.45);
+	background-clip: padding-box;
+}
+
+/* ── Alerts ─────────────────────────────────────────────────────────────── */
+.alert {
+	border-radius: 4px;
+	border: 1px solid;
+	padding: 10px 14px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+.alert-warning  { background-color: var(--warning-bg-clr);  color: var(--warning-clr);  border-color: var(--warning-border-clr); }
+.alert-danger,
+.alert-error    { background-color: var(--error-bg-clr);    color: var(--error-clr);    border-color: var(--error-border-clr); }
+.alert-info     { background-color: var(--info-bg-clr);     color: var(--info-clr);     border-color: var(--info-border-clr); }
+
+/* ── Links / Checkboxes ─────────────────────────────────────────────────── */
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a.btn:hover, a.btn:focus { text-decoration: none; }
+
+input[type="checkbox"],
+input[type="radio"] {
+	accent-color: var(--link-color);
+}
