@@ -1,20 +1,74 @@
 ************************************************************************
 *
-* Nextcloud - SnappyMail Webmail package
+* Tachyon Webmail — Nextcloud integration
 *
-* @author SnappyMail Team, Nextgen-Networks (@nextgen-networks), Tab Fitts (@tabp0le), Pierre-Alain Bandinelli (@pierre-alain-b)
+* https://github.com/kimusan/Tachyon
 *
 ************************************************************************
 
-REQUIREMENTS:
-- Nextcloud version 18 and above
+REQUIREMENTS
+------------
+- Nextcloud 26 or later (tested up to 34)
+- PHP 8.2 or later
+- PHP extensions: mbstring, zlib
 
-INSTALL & CONFIGURATION:
-Start within Nextcloud, and click on the "+ Apps" button in the upper-left corner dropdown menu:
-Then, enable the SnappyMail plugin that is in the "Social & communication" section.
-After a quick wait, SnappyMail is installed. Even if it is really attractive, it is too soon to click on the newly appeared "Email" icon in the apps list. You should configure SnappyMail before using it (which makes some sense, doesn'it): go to Nextcloud admin panel (upper-right corner dropdown menu) and go to "Additionnal settings". There click on the "Go to SnappyMail Webmail admin panel".
-In the SnappyMail admin prompt, the default login is "admin" and the default password will be generated in "[nextcloud-data]/app_snappymail/_data_/_default_/admin_password.txt". No need to advise you to change it once in the admin panel!
-This is it, you are now free to configure SnappyMail as you wish. One important point is the Domains section when you will set up the IMAP/SMTP parameters that shall be associated with the email adresses of your users.
 
-STUCK IN MAINTENANCE:
-https://github.com/the-djmaze/snappymail/issues/929
+FRESH INSTALL
+-------------
+1. In Nextcloud Admin → Apps, find "Tachyon" and click Enable.
+   (Or install manually by placing the tachyon/ directory in apps/.)
+
+2. Go to Nextcloud Admin → Additional settings → Tachyon webmail.
+
+3. Click the link to the Tachyon admin panel. The generated admin
+   password is in:
+     <nextcloud-data>/appdata_tachyon/_data_/_default_/admin_password.txt
+   Change it after first login.
+
+4. In the Tachyon admin panel, configure your mail domain under
+   Domains (IMAP/SMTP host, port, and security settings).
+
+
+MIGRATING FROM SNAPPYMAIL
+--------------------------
+Tachyon is a separate Nextcloud app (app ID: tachyon). It cannot be
+installed by extracting files on top of an existing SnappyMail
+installation — doing so leaves the old app registered and causes a
+fatal error on startup.
+
+Correct migration steps:
+
+1. In Nextcloud Admin → Apps, DISABLE the SnappyMail app.
+2. Remove the old app directory from your server:
+     rm -rf /path/to/nextcloud/apps/snappymail
+3. Install Tachyon from the app store, or place the tachyon/
+   directory in apps/.
+4. Enable Tachyon in Admin → Apps.
+
+Your existing mail data is kept automatically. Tachyon checks both
+appdata_tachyon/ and appdata_snappymail/ and uses whichever exists,
+so no data migration is needed.
+
+
+AUTO-LOGIN
+----------
+Tachyon can log users in automatically using their Nextcloud
+credentials. Enable one of these options in Admin → Additional
+settings → Tachyon webmail:
+
+- "Auto-login using Nextcloud username" — uses the NC username as
+  the IMAP login name.
+- "Auto-login using Nextcloud email address" — uses the email
+  address set in the user's profile.
+
+Users can also set a custom email/password under their personal
+settings if they use different credentials for their mail server.
+
+
+STUCK IN MAINTENANCE MODE
+--------------------------
+If Tachyon gets stuck in maintenance mode, run from your Nextcloud
+root:
+  php occ maintenance:mode --off
+  php occ app:disable tachyon
+  php occ app:enable tachyon
