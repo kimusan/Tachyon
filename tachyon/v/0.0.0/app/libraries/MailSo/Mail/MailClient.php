@@ -706,8 +706,11 @@ class MailClient
 			$aResultUids = $this->oImapClient->MessageSort($aSortTypes, $oSearchCriterias, $bReturnUid);
 		} else {
 //			$this->oImapClient->hasCapability('ESEARCH')
-//			$aResultUids = $this->oImapClient->MessageESearch($oSearchCriterias, null, $bReturnUid)
-			$aResultUids = $this->oImapClient->MessageSearch($oSearchCriterias,        $bReturnUid);
+//			$aResultUids = $this->oImapClient->MessageESearch($oSearchCriterias, null, $bReturnUid)['ALL'];
+			// Note: when $oSearchCriterias->sIn is set, the IN clause is intentionally omitted here.
+			// ESEARCH IN (subtree/mailboxes) requires different result parsing (per-folder UIDs) and
+			// is tracked as a future enhancement. For now we fall back to searching the current folder.
+			$aResultUids = $this->oImapClient->MessageSearch($oSearchCriterias, $bReturnUid);
 		}
 
 		if ($bUseCache) {

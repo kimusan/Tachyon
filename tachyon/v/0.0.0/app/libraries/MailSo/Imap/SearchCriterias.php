@@ -128,6 +128,7 @@ class SearchCriterias
 
 	private array $criterias = [];
 	public bool $fuzzy = false;
+	public string $sIn = '';  // subtree|subtree-one|mailboxes when MULTISEARCH IN is requested
 
 	function prepend(string $rule)
 	{
@@ -178,7 +179,9 @@ class SearchCriterias
 				}
 			} else {
 				if (isset($aLines['IN']) && $oImapClient->hasCapability('MULTISEARCH') && \in_array($aLines['IN'], ['subtree','subtree-one','mailboxes'])) {
-					$aCriteriasResult[] = "IN ({$aLines['IN']} \"{$sFolderName}\")";
+					// Stored on the returned object; ESEARCH IN (...) must not be embedded in plain SEARCH criteria
+					$sIn = $aLines['IN'];
+					unset($aLines['IN']);
 				}
 
 				if (isset($aLines['EMAIL'])) {
@@ -364,6 +367,7 @@ class SearchCriterias
 
 		$search = new self;
 		$search->criterias = $aCriteriasResult;
+		$search->sIn = $sIn ?? '';
 		return $search;
 	}
 
