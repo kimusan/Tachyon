@@ -62,24 +62,31 @@ class InstallStep implements IRepairStep
 		$oConfig = \Tachyon\Api::Config();
 		$bSave = false;
 
-		if (!$oConfig->Get('webmail', 'app_path')) {
+		$sCorrectAppPath = $this->appManager->getAppWebPath('tachyon') . '/app/';
+		$sCurrentAppPath = $oConfig->Get('webmail', 'app_path');
+		if ($sCurrentAppPath !== $sCorrectAppPath) {
 			$output->info('Set config [webmail]app_path');
-			$oConfig->Set('webmail', 'app_path', $this->appManager->getAppWebPath('tachyon') . '/app/');
-			$oConfig->Set('webmail', 'allow_languages_on_settings', false);
-			$oConfig->Set('login', 'allow_languages_on_login', false);
+			$oConfig->Set('webmail', 'app_path', $sCorrectAppPath);
+			if (!$sCurrentAppPath) {
+				// First install only
+				$oConfig->Set('webmail', 'allow_languages_on_settings', false);
+				$oConfig->Set('login', 'allow_languages_on_login', false);
+			}
 			$bSave = true;
 		}
 
-		if (!\is_dir(APP_PLUGINS_PATH . 'nextcloud')) {
-			$output->info('Install extension: nextcloud');
-			\Tachyon\Util\Repository::installPackage('plugin', 'nextcloud');
-			$oConfig->Set('plugins', 'enable', true);
-			$aList = \Tachyon\Util\Repository::getEnabledPackagesNames();
-			$aList[] = 'nextcloud';
-			$oConfig->Set('plugins', 'enabled_list', \implode(',', \array_unique($aList)));
+		// Always reinstall the nextcloud plugin to ensure it matches the current Tachyon version.
+		// Skipping this for existing dirs left snappymail-era plugins in place for migrating users.
+		$output->info('Install extension: nextcloud');
+		\Tachyon\Util\Repository::installPackage('plugin', 'nextcloud');
+		$oConfig->Set('plugins', 'enable', true);
+		$aList = \Tachyon\Util\Repository::getEnabledPackagesNames();
+		$aList[] = 'nextcloud';
+		$oConfig->Set('plugins', 'enabled_list', \implode(',', \array_unique($aList)));
+		if (!$sCurrentAppPath) {
 			$oConfig->Set('webmail', 'theme', 'NextcloudV25+');
-			$bSave = true;
 		}
+		$bSave = true;
 
 		$sPassword = $oConfig->Get('security', 'admin_password');
 		if ('12345' == $sPassword || !$sPassword) {
