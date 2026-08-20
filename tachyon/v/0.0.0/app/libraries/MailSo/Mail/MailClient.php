@@ -580,6 +580,22 @@ class MailClient
 		return $aUids;
 	}
 
+	private function getMessageListFetchItems() : array
+	{
+		$aFetchItems = array(
+			FetchType::UID,
+			FetchType::RFC822_SIZE,
+			FetchType::INTERNALDATE,
+			FetchType::FLAGS,
+			FetchType::BODYSTRUCTURE
+		);
+		if ($this->oImapClient->hasCapability('PREVIEW')) {
+			$aFetchItems[] = FetchType::PREVIEW; // . ' (LAZY)';
+		}
+		$aFetchItems[] = $this->getEnvelopeOrHeadersRequestString();
+		return $aFetchItems;
+	}
+
 	/**
 	 * @throws \MailSo\RuntimeException
 	 * @throws \MailSo\Net\Exceptions\*
@@ -589,17 +605,7 @@ class MailClient
 		array &$aAllThreads = [], array &$aUnseenUIDs = []) : void
 	{
 		if (\count($oRange)) {
-			$aFetchItems = array(
-				FetchType::UID,
-				FetchType::RFC822_SIZE,
-				FetchType::INTERNALDATE,
-				FetchType::FLAGS,
-				FetchType::BODYSTRUCTURE
-			);
-			if ($this->oImapClient->hasCapability('PREVIEW')) {
-				$aFetchItems[] = FetchType::PREVIEW; // . ' (LAZY)';
-			}
-			$aFetchItems[] = $this->getEnvelopeOrHeadersRequestString();
+			$aFetchItems = $this->getMessageListFetchItems();
 			$aFetchIterator = $this->oImapClient->FetchIterate($aFetchItems, (string) $oRange, $oRange->UID);
 			// FETCH does not respond in the id order of the SequenceSet, so we prefill $aCollection for the right sort order.
 			$aCollection = \array_fill_keys($oRange->getArrayCopy(), null);
@@ -707,9 +713,8 @@ class MailClient
 		} else {
 //			$this->oImapClient->hasCapability('ESEARCH')
 //			$aResultUids = $this->oImapClient->MessageESearch($oSearchCriterias, null, $bReturnUid)['ALL'];
-			// Note: when $oSearchCriterias->sIn is set, the IN clause is intentionally omitted here.
-			// ESEARCH IN (subtree/mailboxes) requires different result parsing (per-folder UIDs) and
-			// is tracked as a future enhancement. For now we fall back to searching the current folder.
+			// A search scoped with IN (subtree) never gets here, MessageList() routes it to
+			// MessageListMultiFolder() because ESEARCH returns UIDs per folder, not a flat list.
 			$aResultUids = $this->oImapClient->MessageSearch($oSearchCriterias, $bReturnUid);
 		}
 
@@ -777,6 +782,17 @@ class MailClient
 		$oInfo = $this->oImapClient->FolderStatusAndSelect($oParams->sFolderName);
 		$oMessageCollection->FolderInfo = $oInfo;
 		$oMessageCollection->totalEmails = $oInfo->MESSAGES;
+
+		// RFC 7377 MULTISEARCH spans folders, which the sort/thread/cache logic below cannot express.
+		// Must be checked before the empty folder return, the base folder can be empty while its subfolders match.
+		if (\strlen($sSearch) && $this->oImapClient->hasCapability('MULTISEARCH')) {
+			$oSearchCriterias = \MailSo\Imap\SearchCriterias::fromString(
+				$this->oImapClient, $oParams->sFolderName, $sSearch, $oParams->bHideDeleted
+			);
+			if (\strlen($oSearchCriterias->sIn)) {
+				return $this->MessageListMultiFolder($oParams, $oMessageCollection, $oSearchCriterias);
+			}
+		}
 
 		$oParams->bUseThreads = $oParams->bUseThreads && $this->oImapClient->CapabilityValue('THREAD');
 //			&& ($this->oImapClient->hasCapability('THREAD=REFS') || $this->oImapClient->hasCapability('THREAD=REFERENCES') || $this->oImapClient->hasCapability('THREAD=ORDEREDSUBJECT'));
@@ -913,6 +929,88 @@ class MailClient
 		}
 
 		return $oMessageCollection;
+	}
+
+	/**
+	 * RFC 7377 MULTISEARCH.
+	 * The result spans folders, so there is no single mailbox to SORT, THREAD or cache against.
+	 * Messages are returned folder by folder, keeping each folder's own order.
+	 */
+	protected function MessageListMultiFolder(MessageListParams $oParams, MessageCollection $oMessageCollection,
+		\MailSo\Imap\SearchCriterias $oSearchCriterias) : MessageCollection
+	{
+		$oMessageCollection->SearchScope = $oSearchCriterias->sIn;
+
+		try {
+			$aPerFolder = $this->oImapClient->MessageMultiSearch(
+				(string) $oSearchCriterias, $oSearchCriterias->sIn, $oParams->sFolderName
+			);
+		} catch (\Throwable $oException) {
+			// Advertising MULTISEARCH is no guarantee it works, fall back to the current folder
+			$this->logWrite('MULTISEARCH failed, searching only "'.$oParams->sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
+			$oMessageCollection->SearchScope = '';
+			$this->oImapClient->FolderExamine($oParams->sFolderName);
+			$aUids = $this->oImapClient->MessageSearch($oSearchCriterias, true);
+			$oMessageCollection->totalEmails = \count($aUids);
+			if ($aUids) {
+				$aUids = \array_slice($aUids, $oParams->iOffset, $oParams->iLimit);
+				$this->MessageListByRequestIndexOrUids($oMessageCollection, new SequenceSet($aUids));
+			}
+			return $oMessageCollection;
+		}
+
+		// Flatten folder by folder so the page slice stays contiguous per folder
+		$aTuples = array();
+		foreach ($aPerFolder as $sFolderName => $aUids) {
+			foreach ($aUids as $iUid) {
+				$aTuples[] = array($sFolderName, $iUid);
+			}
+		}
+
+		$oMessageCollection->totalEmails = \count($aTuples);
+		if ($aTuples) {
+			$this->MessageListMultiFolderFetch(
+				$oMessageCollection,
+				\array_slice($aTuples, $oParams->iOffset, $oParams->iLimit)
+			);
+		}
+
+		return $oMessageCollection;
+	}
+
+	/**
+	 * FETCH only reads the selected folder, so the page is grouped and fetched per folder.
+	 */
+	protected function MessageListMultiFolderFetch(MessageCollection $oMessageCollection, array $aTuples) : void
+	{
+		$aGrouped = array();
+		foreach ($aTuples as $aTuple) {
+			$aGrouped[$aTuple[0]][] = $aTuple[1];
+		}
+
+		$aFetchItems = $this->getMessageListFetchItems();
+		$aMessages = array();
+		foreach ($aGrouped as $sFolderName => $aUids) {
+			try {
+				$this->oImapClient->FolderExamine($sFolderName);
+			} catch (\Throwable $oException) {
+				// A folder the user cannot select must not fail the whole search
+				$this->logWrite('Skipped folder "'.$sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
+				continue;
+			}
+			$oRange = new SequenceSet($aUids);
+			// FETCH does not respond in the requested order, so prefill to restore it
+			$aFolderMessages = \array_fill_keys($aUids, null);
+			foreach ($this->oImapClient->FetchIterate($aFetchItems, (string) $oRange, true) as $oFetchResponse) {
+				$oMessage = Message::fromFetchResponse($sFolderName, $oFetchResponse);
+				if ($oMessage) {
+					$aFolderMessages[$oFetchResponse->GetFetchValue(FetchType::UID)] = $oMessage;
+				}
+			}
+			$aMessages = \array_merge($aMessages, \array_values(\array_filter($aFolderMessages)));
+		}
+
+		$oMessageCollection->exchangeArray($aMessages);
 	}
 
 	public function FindMessageUidByMessageId(string $sFolderName, string $sMessageId) : ?int

@@ -49,6 +49,8 @@ export const MessagelistUserStore = ko.observableArray().extend({ debounce: 0 })
 addObservablesTo(MessagelistUserStore, {
 	count: 0,
 	listSearch: '',
+	// RFC 7377 MULTISEARCH scope, set when the list spans several folders
+	listSearchScope: '',
 	listLimited: 0,
 	threadUid: 0,
 	page: 1,
@@ -116,9 +118,22 @@ addComputablesTo(MessagelistUserStore, {
 		let result = new Set;
 		MessagelistUserStore.listCheckedOrSelected().forEach(message => {
 			result.add(message.uid);
-			result.folder = message.folder;
 			if (1 < message.threadsLen()) {
 				message.threads().forEach(result.add, result);
+			}
+		});
+		return result;
+	},
+
+	// A search can span folders, so the uids are keyed by the folder they belong to
+	listCheckedOrSelectedByFolder: () => {
+		let result = new Map;
+		MessagelistUserStore.listCheckedOrSelected().forEach(message => {
+			result.has(message.folder) || result.set(message.folder, new Set);
+			const uids = result.get(message.folder);
+			uids.add(message.uid);
+			if (1 < message.threadsLen()) {
+				message.threads().forEach(uids.add, uids);
 			}
 		});
 		return result;
@@ -277,6 +292,7 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 
 					MessagelistUserStore.count(collection.totalEmails);
 					MessagelistUserStore.listSearch(pString(collection.search));
+					MessagelistUserStore.listSearchScope(pString(collection.searchScope));
 					MessagelistUserStore.listLimited(!!collection.limited);
 					MessagelistUserStore.page(Math.ceil(collection.offset / SettingsUserStore.messagesPerPage() + 1));
 					MessagelistUserStore.threadUid(collection.threadUid);
@@ -289,7 +305,7 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 					);
 					MessagelistUserStore.endThreadUid(collection.threadUid);
 					const message = MessageUserStore.message();
-					if (message && folderInfo.name !== message.folder) {
+					if (message && !collection.searchScope && folderInfo.name !== message.folder) {
 						MessageUserStore.message(null);
 					}
 
@@ -449,10 +465,9 @@ MessagelistUserStore.moveMessages = (
 		trashFolder = FolderUserStore.trashFolder(),
 		spamFolder = FolderUserStore.spamFolder(),
 		page = MessagelistUserStore.page(),
-		messages =
-			FolderUserStore.currentFolderFullName() === fromFolderFullName
-				? MessagelistUserStore.filter(item => item && oUids.has(item.uid))
-				: [],
+		messages = MessagelistUserStore.filter(item =>
+			item && item.folder === fromFolderFullName && oUids.has(item.uid)
+		),
 		moveOrDeleteResponseHelper = (iError, oData) => {
 			if (iError) {
 				setFolderETag(FolderUserStore.currentFolderFullName(), '');

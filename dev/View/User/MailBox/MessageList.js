@@ -57,14 +57,20 @@ const
 	 */
 	listAction = (...args) => MessagelistUserStore.setAction(...args),
 
+	// A search can span folders, so an action is issued once per folder
+	listActionPerFolder = (iSetAction, messages) => {
+		const byFolder = new Map;
+		(messages || MessagelistUserStore.listCheckedOrSelected()).forEach(message => {
+			byFolder.has(message.folder) || byFolder.set(message.folder, []);
+			byFolder.get(message.folder).push(message);
+		});
+		byFolder.forEach((list, folder) => listAction(folder, iSetAction, list));
+	},
+
 	moveMessagesToFolderType = (toFolderType, bDelete) => {
-		let messages = MessagelistUserStore.listCheckedOrSelectedUidsWithSubMails();
-		messages.size && rl.app.moveMessagesToFolderType(
-			toFolderType,
-			messages.folder,
-			messages,
-			bDelete
-		)
+		MessagelistUserStore.listCheckedOrSelectedByFolder().forEach((uids, folder) =>
+			uids.size && rl.app.moveMessagesToFolderType(toFolderType, folder, uids, bDelete)
+		);
 	},
 
 	pad2 = v => 10 > v ? '0' + v : '' + v,
@@ -156,14 +162,35 @@ export class MailMessageList extends AbstractViewRight {
 			listGrouped: () => {
 				let uid = MessagelistUserStore.threadUid(),
 					sort = FolderUserStore.sortMode() || 'DATE';
-				return SettingsUserStore.listGrouped() && (sort.includes('DATE') || sort.includes('FROM')) && !uid;
+				if (uid) {
+					return false;
+				}
+				// A list spanning folders is only readable when grouped, so ignore the setting
+				if (MessagelistUserStore.listSearchScope()) {
+					return true;
+				}
+				return SettingsUserStore.listGrouped() && (sort.includes('DATE') || sort.includes('FROM'));
 			},
 
 			timeFormat: () => (FolderUserStore.sortMode() || '').includes('FROM') ? 'AUTO' : 'LT',
 
 			groupedList: () => {
 				let list = [], current, sort = FolderUserStore.sortMode() || 'DATE';
-				if (sort.includes('FROM')) {
+				if (MessagelistUserStore.listSearchScope()) {
+					// The server returns the matches folder by folder, so a change of folder starts a group
+					MessagelistUserStore.forEach(msg => {
+						if (!current || msg.folder != current.id) {
+							current = {
+								id: msg.folder,
+								label: msg.folder,
+								search: '',
+								messages: []
+							};
+							list.push(current);
+						}
+						current.messages.push(msg);
+					});
+				} else if (sort.includes('FROM')) {
 					MessagelistUserStore.forEach(msg => {
 						let email = msg.from[0]?.email;
 						if (!current || email != current.id) {
@@ -415,11 +442,7 @@ export class MailMessageList extends AbstractViewRight {
 		 * flag as \Deleted for removal by later EXPUNGE
 		 */
 		if (UNUSED_OPTION_VALUE === FolderUserStore.trashFolder()) {
-			listAction(
-				FolderUserStore.currentFolderFullName(),
-				MessageSetAction.SetDeleted,
-				MessagelistUserStore.listCheckedOrSelected()
-			);
+			listActionPerFolder(MessageSetAction.SetDeleted);
 		} else {
 			moveMessagesToFolderType(FolderType.Trash);
 		}
@@ -427,11 +450,7 @@ export class MailMessageList extends AbstractViewRight {
 
 	// User setting !hideDeleted && !immediatelyMoveToTrash ??
 	undeleteCommand() {
-		listAction(
-			FolderUserStore.currentFolderFullName(),
-			MessageSetAction.UnsetDeleted,
-			MessagelistUserStore.listCheckedOrSelected()
-		);
+		listActionPerFolder(MessageSetAction.UnsetDeleted);
 	}
 
 	archiveCommand() {
@@ -487,11 +506,7 @@ export class MailMessageList extends AbstractViewRight {
 	}
 
 	listSetSeen() {
-		listAction(
-			FolderUserStore.currentFolderFullName(),
-			MessageSetAction.SetSeen,
-			MessagelistUserStore.listCheckedOrSelected()
-		);
+		listActionPerFolder(MessageSetAction.SetSeen);
 	}
 
 	listSetAllSeen() {
@@ -529,37 +544,21 @@ export class MailMessageList extends AbstractViewRight {
 	}
 
 	listUnsetSeen() {
-		listAction(
-			FolderUserStore.currentFolderFullName(),
-			MessageSetAction.UnsetSeen,
-			MessagelistUserStore.listCheckedOrSelected()
-		);
+		listActionPerFolder(MessageSetAction.UnsetSeen);
 	}
 
 	listSetFlags() {
-		listAction(
-			FolderUserStore.currentFolderFullName(),
-			MessageSetAction.SetFlag,
-			MessagelistUserStore.listCheckedOrSelected()
-		);
+		listActionPerFolder(MessageSetAction.SetFlag);
 	}
 
 	listUnsetFlags() {
-		listAction(
-			FolderUserStore.currentFolderFullName(),
-			MessageSetAction.UnsetFlag,
-			MessagelistUserStore.listCheckedOrSelected()
-		);
+		listActionPerFolder(MessageSetAction.UnsetFlag);
 	}
 
 	seenMessagesFast(seen) {
 		const checked = MessagelistUserStore.listCheckedOrSelected();
 		if (checked.length) {
-			listAction(
-				checked[0].folder,
-				seen ? MessageSetAction.SetSeen : MessageSetAction.UnsetSeen,
-				checked
-			);
+			listActionPerFolder(seen ? MessageSetAction.SetSeen : MessageSetAction.UnsetSeen, checked);
 		}
 	}
 

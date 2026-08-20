@@ -427,6 +427,84 @@ trait Messages
 	}
 
 	/**
+	 * RFC 7377 MULTISEARCH
+	 * Searches the $sIn scope ('subtree', 'subtree-one' or 'mailboxes') relative to $sBaseFolder.
+	 * Unlike SEARCH, the result spans folders, so the UIDs are returned per folder:
+	 *   ['INBOX/Sub' => [1,3,5], 'INBOX/Other' => [2]]
+	 *
+	 * @throws \InvalidArgumentException
+	 * @throws \MailSo\RuntimeException
+	 * @throws \MailSo\Net\Exceptions\*
+	 * @throws \MailSo\Imap\Exceptions\*
+	 */
+	public function MessageMultiSearch(string $sSearchCriterias, string $sIn, string $sBaseFolder, bool $bReturnUid = true) : array
+	{
+		$oESearch = new \MailSo\Imap\Requests\ESEARCH($this);
+		$oESearch->sCriterias = $sSearchCriterias ?: 'ALL';
+		$oESearch->aReturn = ['ALL'];
+		$oESearch->bUid = $bReturnUid;
+		$sFolder = $this->EscapeFolderName($sBaseFolder);
+		if ('subtree-one' === $sIn) {
+			$oESearch->aSubtreesOne = [$sFolder];
+		} else if ('mailboxes' === $sIn) {
+			$oESearch->aMailboxes = [$sFolder];
+		} else {
+			$oESearch->aSubtrees = [$sFolder];
+		}
+		if (!$this->UTF8 && !\MailSo\Base\Utils::IsAscii($sSearchCriterias)) {
+			$oESearch->sCharset = 'UTF-8';
+		}
+		$oESearch->SendRequest();
+		return $this->getMultiSearchResult($bReturnUid);
+	}
+
+	/**
+	 * MULTISEARCH replies with one untagged ESEARCH response per mailbox:
+	 *   * ESEARCH (TAG "A1" MAILBOX "INBOX/Sub" UIDVALIDITY 123) UID ALL 1,3,5
+	 * getSimpleESearchOrESortResult() cannot be used as it keeps only the last one.
+	 */
+	private function getMultiSearchResult(bool $bReturnUid) : array
+	{
+		$sRequestTag = $this->getCurrentTag();
+		$aResult = array();
+		foreach ($this->yieldUntaggedResponses() as $oResponse) {
+			if ('ESEARCH' !== $oResponse->StatusOrIndex
+			 || !\is_array($oResponse->ResponseList)
+			 || !isset($oResponse->ResponseList[2])
+			 || !\is_array($oResponse->ResponseList[2])
+			 || ($bReturnUid && (!isset($oResponse->ResponseList[3]) || 'UID' !== $oResponse->ResponseList[3]))
+			) {
+				continue;
+			}
+
+			// Extended tag-list: TAG <tag> [MAILBOX <name>] [UIDVALIDITY <n>]
+			$aTagList = $oResponse->ResponseList[2];
+			$sTag = '';
+			$sFolderName = '';
+			for ($i = 0, $iLen = \count($aTagList); $i + 1 < $iLen; $i += 2) {
+				if ('TAG' === $aTagList[$i]) {
+					$sTag = $aTagList[$i + 1];
+				} else if ('MAILBOX' === $aTagList[$i]) {
+					$sFolderName = $this->toUTF8($aTagList[$i + 1]);
+				}
+			}
+			if ($sTag !== $sRequestTag || !\strlen($sFolderName)) {
+				continue;
+			}
+
+			// A folder without matches can be reported without an ALL item
+			$aResult[$sFolderName] = $aResult[$sFolderName] ?? array();
+			for ($i = 3, $iLen = \count($oResponse->ResponseList); $i + 1 < $iLen; ++$i) {
+				if ('ALL' === $oResponse->ResponseList[$i]) {
+					$aResult[$sFolderName] = SequenceSet::expand($oResponse->ResponseList[$i + 1]);
+					break;
+				}
+			}
+		}
+		return $aResult;
+	}
+
+	/**
 	 * @throws \InvalidArgumentException
 	 * @throws \MailSo\RuntimeException
 	 * @throws \MailSo\Net\Exceptions\*

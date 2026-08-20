@@ -96,4 +96,28 @@ class SequenceSet /*extends \SplFixedArray*/ implements \Countable
 
 		return \implode(',', $aResult);
 	}
+
+	/**
+	 * Expands a sequence-set string into a list of numbers.
+	 * The reverse of __toString(), used for the ESEARCH ALL return value.
+	 * '*' is skipped as there is no folder context to resolve it against.
+	 */
+	public static function expand(string $sSequenceSet) : array
+	{
+		$aResult = [];
+		foreach (\explode(',', $sSequenceSet) as $sPart) {
+			$sPart = \trim($sPart);
+			if (!\strlen($sPart) || \str_contains($sPart, '*')) {
+				continue;
+			}
+			if (\str_contains($sPart, ':')) {
+				[$iStart, $iEnd] = \array_map('\\intval', \explode(':', $sPart, 2));
+				$aRange = \range(\min($iStart, $iEnd), \max($iStart, $iEnd));
+				$aResult = \array_merge($aResult, $iStart > $iEnd ? \array_reverse($aRange) : $aRange);
+			} else {
+				$aResult[] = \intval($sPart);
+			}
+		}
+		return \array_values(\array_unique(\array_filter($aResult)));
+	}
 }

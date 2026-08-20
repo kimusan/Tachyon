@@ -78,13 +78,11 @@ export class MailFolderList extends AbstractViewLeft {
 				if (folder) {
 					if (moveAction()) {
 						const copy = event.ctrlKey || 2 === moveAction(),
-							messages = MessagelistUserStore.listCheckedOrSelectedUidsWithSubMails();
+							byFolder = MessagelistUserStore.listCheckedOrSelectedByFolder();
 						moveAction(0);
-						messages.size && MessagelistUserStore.moveMessages(
-							messages.folder,
-							messages,
-							folder.fullName,
-							copy
+						// A search can span folders, so move each source folder separately
+						byFolder.forEach((uids, from) =>
+							uids.size && MessagelistUserStore.moveMessages(from, uids, folder.fullName, copy)
 						);
 					} else {
 						if (!SettingsUserStore.usePreviewPane()) {

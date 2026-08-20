@@ -8,7 +8,6 @@ import { EmailAddressesComponent } from 'Component/EmailAddresses';
 import { ThemeStore } from 'Stores/Theme';
 import { dropFilesInFolder } from 'Common/Folders';
 import { setExpandedFolder } from 'Model/FolderCollection';
-import { FolderUserStore } from 'Stores/User/Folder';
 import { MessagelistUserStore } from 'Stores/User/Messagelist';
 
 const rlContentType = 'tachyon/action',
@@ -63,8 +62,9 @@ const rlContentType = 'tachyon/action',
 	dragDrop = (e, element, folder, dragData) => {
 		dragStop(e, element);
 		if (dragMessages() && 'copyMove' == e.dataTransfer.effectAllowed) {
-			MessagelistUserStore.moveMessages(
-				FolderUserStore.currentFolderFullName(), dragData.data, folder.fullName, e.ctrlKey
+			// dragData.data is keyed by folder, a search can span several
+			dragData.data.forEach((uids, from) =>
+				uids.size && MessagelistUserStore.moveMessages(from, uids, folder.fullName, e.ctrlKey)
 			);
 		} else if (e.dataTransfer.types.includes('Files')) {
 			dropFilesInFolder(folder.fullName, e.dataTransfer.files);
@@ -136,15 +136,15 @@ Object.assign(ko.bindingHandlers, {
 				if (dragImage && !ThemeStore.isMobile()) {
 					ko.dataFor(doc.elementFromPoint(e.clientX, e.clientY))?.checked?.(true);
 
-					const uids = MessagelistUserStore.listCheckedOrSelectedUidsWithSubMails();
-					dragImage.querySelector('.text').textContent = uids.size;
+					dragImage.querySelector('.text').textContent =
+						MessagelistUserStore.listCheckedOrSelectedUidsWithSubMails().size;
 
 					// Make sure Chrome shows it
 					dragImage.style.left = e.clientX + 'px';
 					dragImage.style.top = e.clientY + 'px';
 					dragImage.style.right = 'auto';
 
-					setDragAction(e, 'messages', 'copyMove', uids, dragImage);
+					setDragAction(e, 'messages', 'copyMove', MessagelistUserStore.listCheckedOrSelectedByFolder(), dragImage);
 
 					// Remove the Chrome visibility
 					dragImage.style.cssText = '';
