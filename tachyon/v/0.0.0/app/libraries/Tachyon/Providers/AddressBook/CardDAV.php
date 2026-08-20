@@ -246,6 +246,12 @@ trait CardDAV
 		$aResponse = $this->detectionPropFind($oClient, $sAddressbookHomeSet);
 		if (\is_array($aResponse)) {
 			foreach ($aResponse as $sPropPath => $aItem) {
+				// Nextcloud publishes a generated, read-only address book holding every user of
+				// the instance. It is not a personal address book, only its DAV backend may write
+				// to it, and a PROPFIND on it answers 401. It must never be a sync target.
+				if (\str_contains($sPropPath, 'z-server-generated--')) {
+					continue;
+				}
 				if (!empty($sPropPath) && static::hasDAVCollection($aItem)
 				 && \in_array('{urn:ietf:params:xml:ns:carddav}addressbook', $aItem['{DAV:}resourcetype']))
 				{
