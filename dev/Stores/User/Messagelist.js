@@ -195,7 +195,7 @@ MessagelistUserStore.canSelect = () =>
 	&& SettingsUserStore.usePreviewPane();
 //	&& !SettingsUserStore.showNextMessage();
 
-let prevFolderName;
+let prevFolderName, prevSearch, prevOffset;
 
 /**
  * @param {boolean=} bDropPagePosition = false
@@ -225,8 +225,15 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 		);
 	}
 
-	if (prevFolderName != folderName) {
+	const search = MessagelistUserStore.listSearch();
+	// Drop the visible messages when they no longer answer what is being asked for.
+	// Keeping them hid the spinner, which only shows on an empty list, so a slow
+	// search or page change looked like nothing was happening at all.
+	// iOffset covers paging, and is already reset to 0 by bDropPagePosition above.
+	if (prevFolderName != folderName || prevSearch != search || prevOffset != iOffset) {
 		prevFolderName = folderName;
+		prevSearch = search;
+		prevOffset = iOffset;
 		MessagelistUserStore([]);
 	}
 
