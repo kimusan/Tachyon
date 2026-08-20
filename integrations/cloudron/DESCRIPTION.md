@@ -1,4 +1,4 @@
-This app packages Tachyon <upstream>3.2.4</upstream>.
+This app packages Tachyon <upstream>3.2.5</upstream>.
 
 Tachyon is a simple, modern, lightweight & fast web-based email client.
 
