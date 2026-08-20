@@ -433,6 +433,7 @@ Enables caching in the system'),
 				'message_all_headers' => array(false),
 				'show_login_alert' => array(true),
 				'fetch_new_messages' => array(true),
+				'search_subtree_fallback' => array(false, 'Search subfolders on servers without MULTISEARCH by searching each folder in turn (one IMAP search per folder)'),
 			),
 
 			'labs' => array(

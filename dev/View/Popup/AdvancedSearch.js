@@ -1,6 +1,7 @@
 import { addObservablesTo, addComputablesTo } from 'External/ko';
 import { i18n, translateTrigger } from 'Common/Translator';
 import { pString } from 'Common/Utils';
+import { SettingsCapa } from 'Common/Globals';
 
 import { MessagelistUserStore } from 'Stores/User/Messagelist';
 
@@ -27,7 +28,8 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		});
 
 		addComputablesTo(this, {
-			showMultisearch: () => FolderUserStore.hasCapability('MULTISEARCH'),
+			// Either the server does it, or the admin enabled the folder by folder fallback
+			showMultisearch: () => FolderUserStore.hasCapability('MULTISEARCH') || SettingsCapa('SubtreeSearch'),
 
 			// Almost the same as MessageModel.tagOptions
 			keywords: () => {

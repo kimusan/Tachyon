@@ -785,7 +785,10 @@ class MailClient
 
 		// RFC 7377 MULTISEARCH spans folders, which the sort/thread/cache logic below cannot express.
 		// Must be checked before the empty folder return, the base folder can be empty while its subfolders match.
-		if (\strlen($sSearch) && $this->oImapClient->hasCapability('MULTISEARCH')) {
+		if (\strlen($sSearch)
+		 && ($this->oImapClient->hasCapability('MULTISEARCH')
+		  || \Tachyon\Api::Config()->Get('imap', 'search_subtree_fallback', false))
+		) {
 			$oSearchCriterias = \MailSo\Imap\SearchCriterias::fromString(
 				$this->oImapClient, $oParams->sFolderName, $sSearch, $oParams->bHideDeleted
 			);
@@ -932,22 +935,38 @@ class MailClient
 	}
 
 	/**
-	 * RFC 7377 MULTISEARCH.
+	 * RFC 7377 MULTISEARCH, or the folder by folder emulation of it.
 	 * The result spans folders, so there is no single mailbox to SORT, THREAD or cache against.
-	 * Messages are returned folder by folder, keeping each folder's own order.
+	 * Messages are returned folder by folder, newest first within each folder.
 	 */
 	protected function MessageListMultiFolder(MessageListParams $oParams, MessageCollection $oMessageCollection,
 		\MailSo\Imap\SearchCriterias $oSearchCriterias) : MessageCollection
 	{
 		$oMessageCollection->SearchScope = $oSearchCriterias->sIn;
 
-		try {
-			$aPerFolder = $this->oImapClient->MessageMultiSearch(
-				(string) $oSearchCriterias, $oSearchCriterias->sIn, $oParams->sFolderName
-			);
-		} catch (\Throwable $oException) {
-			// Advertising MULTISEARCH is no guarantee it works, fall back to the current folder
-			$this->logWrite('MULTISEARCH failed, searching only "'.$oParams->sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
+		$aPerFolder = null;
+		if ($this->oImapClient->hasCapability('MULTISEARCH')) {
+			try {
+				$aPerFolder = $this->oImapClient->MessageMultiSearch(
+					(string) $oSearchCriterias, $oSearchCriterias->sIn, $oParams->sFolderName
+				);
+			} catch (\Throwable $oException) {
+				// Advertising MULTISEARCH is no guarantee it works
+				$this->logWrite('MULTISEARCH failed: '.$oException->getMessage(), \LOG_WARNING);
+			}
+		}
+
+		if (null === $aPerFolder && \Tachyon\Api::Config()->Get('imap', 'search_subtree_fallback', false)) {
+			try {
+				$aPerFolder = $this->MessageSearchSubtree($oSearchCriterias, $oParams->sFolderName);
+			} catch (\Throwable $oException) {
+				$this->logWrite('Subtree search failed: '.$oException->getMessage(), \LOG_WARNING);
+			}
+		}
+
+		if (null === $aPerFolder) {
+			// Nothing can search the subtree, use the current folder on its own
+			$this->logWrite('No subtree search available, searching only "'.$oParams->sFolderName.'"', \LOG_WARNING);
 			$oMessageCollection->SearchScope = '';
 			$this->oImapClient->FolderExamine($oParams->sFolderName);
 			$aUids = $this->oImapClient->MessageSearch($oSearchCriterias, true);
@@ -959,9 +978,15 @@ class MailClient
 			return $oMessageCollection;
 		}
 
+		// Both strategies must order the same way. The ESEARCH response order and the LIST
+		// order are both server chosen, and an unstable order breaks pagination.
+		\ksort($aPerFolder);
+
 		// Flatten folder by folder so the page slice stays contiguous per folder
 		$aTuples = array();
 		foreach ($aPerFolder as $sFolderName => $aUids) {
+			// Newest first, as plain MessageSearch() also reverses its result
+			\rsort($aUids, SORT_NUMERIC);
 			foreach ($aUids as $iUid) {
 				$aTuples[] = array($sFolderName, $iUid);
 			}
@@ -976,6 +1001,75 @@ class MailClient
 		}
 
 		return $oMessageCollection;
+	}
+
+	/**
+	 * Emulates RFC 7377 for servers without MULTISEARCH by searching each folder of the
+	 * subtree in turn. That is one EXAMINE plus one SEARCH per folder, hence the admin toggle.
+	 * Returns the same shape as ImapClient::MessageMultiSearch().
+	 */
+	protected function MessageSearchSubtree(\MailSo\Imap\SearchCriterias $oSearchCriterias, string $sBaseFolder) : array
+	{
+		$aResult = array();
+		foreach ($this->SubtreeFolderNames($sBaseFolder, $oSearchCriterias->sIn) as $sFolderName) {
+			try {
+				$this->oImapClient->FolderExamine($sFolderName);
+			} catch (\Throwable $oException) {
+				// RFC 7377 requires mailboxes the user has no rights on to be ignored
+				$this->logWrite('Skipped folder "'.$sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
+				continue;
+			}
+			$aResult[$sFolderName] = $this->oImapClient->MessageSearch($oSearchCriterias, true);
+		}
+		return $aResult;
+	}
+
+	/**
+	 * The selectable folders of a subtree. Both scopes include the base folder itself.
+	 * The LIST reference argument is read differently per server, so the whole list is
+	 * fetched once and filtered here, the same way Actions\Folders lists the tree.
+	 */
+	protected function SubtreeFolderNames(string $sBaseFolder, string $sScope) : array
+	{
+		$oFolders = $this->oImapClient->FolderList('', '*');
+
+		$sDelimiter = null;
+		foreach ($oFolders as $oFolder) {
+			if ($oFolder->FullName === $sBaseFolder) {
+				$sDelimiter = $oFolder->Delimiter();
+				break;
+			}
+		}
+		if (null === $sDelimiter) {
+			foreach ($oFolders as $oFolder) {
+				if (null !== $oFolder->Delimiter()) {
+					$sDelimiter = $oFolder->Delimiter();
+					break;
+				}
+			}
+		}
+
+		// A null delimiter means a flat namespace, so only the base folder can match
+		$sPrefix = $sDelimiter ? $sBaseFolder . $sDelimiter : '';
+		$aResult = array();
+		foreach ($oFolders as $oFolder) {
+			$sName = $oFolder->FullName;
+			if (!$oFolder->Selectable()) {
+				continue;
+			}
+			if ($sName === $sBaseFolder) {
+				$aResult[] = $sName;
+				continue;
+			}
+			if ('mailboxes' === $sScope || !$sPrefix || !\str_starts_with($sName, $sPrefix)) {
+				continue;
+			}
+			if ('subtree-one' === $sScope && \str_contains(\substr($sName, \strlen($sPrefix)), $sDelimiter)) {
+				continue;
+			}
+			$aResult[] = $sName;
+		}
+		return $aResult;
 	}
 
 	/**

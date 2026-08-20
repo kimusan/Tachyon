@@ -881,6 +881,7 @@ class Actions
 				Capa::IDENTITIES          => (bool) $oConfig->Get('webmail', 'allow_additional_identities', false),
 				Capa::OPENPGP             => (bool) $oConfig->Get('security', 'openpgp', true),
 				Capa::SIEVE               => false,
+				Capa::SUBTREE_SEARCH      => (bool) $oConfig->Get('imap', 'search_subtree_fallback', false),
 				Capa::THEMES              => (bool) $oConfig->Get('webmail', 'allow_themes', false),
 				Capa::USER_BACKGROUND     => (bool) $oConfig->Get('webmail', 'allow_user_background', false),
 				'Kolab'                   => false, // See Kolab plugin

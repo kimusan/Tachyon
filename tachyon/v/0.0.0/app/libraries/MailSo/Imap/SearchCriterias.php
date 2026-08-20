@@ -178,8 +178,9 @@ class SearchCriterias
 					$aCriteriasResult[] = $sValue;
 				}
 			} else {
-				if (isset($aLines['IN']) && $oImapClient->hasCapability('MULTISEARCH') && \in_array($aLines['IN'], ['subtree','subtree-one','mailboxes'])) {
-					// Stored on the returned object; ESEARCH IN (...) must not be embedded in plain SEARCH criteria
+				if (isset($aLines['IN']) && \in_array($aLines['IN'], ['subtree','subtree-one','mailboxes'])) {
+					// Stored on the returned object; ESEARCH IN (...) must not be embedded in plain SEARCH criteria.
+					// Kept even without MULTISEARCH, the caller decides whether to emulate the scope.
 					$sIn = $aLines['IN'];
 					unset($aLines['IN']);
 				}
