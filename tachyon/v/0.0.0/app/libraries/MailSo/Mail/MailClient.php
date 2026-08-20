@@ -1010,16 +1010,21 @@ class MailClient
 	 */
 	protected function MessageSearchSubtree(\MailSo\Imap\SearchCriterias $oSearchCriterias, string $sBaseFolder) : array
 	{
+		$aFolderNames = $this->SubtreeFolderNames($sBaseFolder, $oSearchCriterias->sIn);
+		$this->logWrite('Subtree search ('.$oSearchCriterias->sIn.' of "'.$sBaseFolder.'") over '
+			. \count($aFolderNames) . ' folders: ' . $oSearchCriterias);
+
 		$aResult = array();
-		foreach ($this->SubtreeFolderNames($sBaseFolder, $oSearchCriterias->sIn) as $sFolderName) {
+		foreach ($aFolderNames as $sFolderName) {
+			// The search must be inside the try as well as the examine. A BODY search can be
+			// refused or time out on a single folder, and that must not abort the whole subtree.
 			try {
 				$this->oImapClient->FolderExamine($sFolderName);
+				$aResult[$sFolderName] = $this->oImapClient->MessageSearch($oSearchCriterias, true);
 			} catch (\Throwable $oException) {
 				// RFC 7377 requires mailboxes the user has no rights on to be ignored
-				$this->logWrite('Skipped folder "'.$sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
-				continue;
+				$this->logWrite('Subtree search skipped folder "'.$sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
 			}
-			$aResult[$sFolderName] = $this->oImapClient->MessageSearch($oSearchCriterias, true);
 		}
 		return $aResult;
 	}
