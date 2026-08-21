@@ -2,10 +2,21 @@ name: Release
 
 on:
   release:
-    types: [published]
+    # published covers a fresh release or pre-release.
+    # released additionally covers flipping an existing pre-release to a full
+    # release, which is how a tested pre-release gets promoted to the stable
+    # Nextcloud App Store channel without burning a version number.
+    types: [published, released]
 
 permissions:
   contents: write
+
+# Whether a plain publish fires published, released, or both is not something to
+# rely on, so keep at most one run per tag alive and let a later event supersede
+# an earlier one. Both events arrive together, long before the publish step.
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -36,7 +47,11 @@ jobs:
         id: version
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
+          # A pre-release is tagged vX.Y.Z-pre. Everything after the first dash is a
+          # marker for humans, the artifacts and the App Store still use plain X.Y.Z,
+          # so it is stripped before comparing against package.json.
           TAG_VERSION="${GITHUB_REF_NAME#v}"
+          TAG_VERSION="${TAG_VERSION%%-*}"
           if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
             echo "::error::package.json version ($PKG_VERSION) does not match release tag ($GITHUB_REF_NAME)"
             exit 1
@@ -72,8 +87,9 @@ jobs:
   publish-appstore:
     name: Publish to Nextcloud App Store
     runs-on: ubuntu-latest
+    # needs: build already skips this if the build failed. A pre-release goes to
+    # the nightly channel, a full release to stable, see the nightly input below.
     needs: build
-    if: ${{ !github.event.release.prerelease || needs.build.result == 'success' }}
 
     steps:
       - name: Publish to Nextcloud App Store
