@@ -440,7 +440,15 @@
 		"IMAGEUPLOAD": "Image select",
 		"UNDO": "Undo",
 		"REDO": "Redo",
-		"REMOVESTYLE": "Remove style"
+		"REMOVESTYLE": "Remove style",
+		"TABLE": "Insert table",
+		"ROWABOVE": "Insert row above",
+		"ROWBELOW": "Insert row below",
+		"COLLEFT": "Insert column left",
+		"COLRIGHT": "Insert column right",
+		"ROWDELETE": "Delete row",
+		"COLDELETE": "Delete column",
+		"TABLEDELETE": "Delete table"
 	},
 	"SETTINGS_LABELS": {
 		"GENERAL": "General",

@@ -17,6 +17,50 @@ const
 
 	forEachObjectValue = (obj, fn) => Object.values(obj).forEach(fn),
 
+	// Squire has no table API, so tables are plain DOM work.
+	// The styles must be inline, mail clients routinely drop <style> blocks.
+	tableStyle = 'border-collapse:collapse;width:100%',
+	tableCellStyle = 'border:1px solid #ccc;padding:4px',
+
+	buildTableHTML = (rows, cols) => {
+		let html = '<table style="' + tableStyle + '">';
+		while (rows--) {
+			html += '<tr>';
+			let c = cols;
+			// the <br> keeps an empty cell focusable
+			while (c--) {
+				html += '<td style="' + tableCellStyle + '"><br></td>';
+			}
+			html += '</tr>';
+		}
+		return html + '</table>';
+	},
+
+	fillTableCell = td => {
+		td.style.cssText = tableCellStyle;
+		td.append(createElement('br'));
+		return td;
+	},
+
+	// table.rows and row.cells see through tbody, which the parser inserts for us
+	insertTableRow = (table, index, cols) => {
+		const tr = table.insertRow(Math.min(index, table.rows.length));
+		while (cols--) {
+			fillTableCell(tr.insertCell(-1));
+		}
+	},
+
+	insertTableColumn = (table, index) => {
+		[...table.rows].forEach(tr => fillTableCell(tr.insertCell(Math.min(index, tr.cells.length))));
+	},
+
+	deleteTableColumn = (table, index) => {
+		[...table.rows].forEach(tr => index < tr.cells.length && tr.deleteCell(index));
+	},
+
+	tablePickerRows = 8,
+	tablePickerCols = 10,
+
 	SquireDefaultConfig = {
 /*
 		addLinks: true // allow_smart_html_links
@@ -222,11 +266,46 @@ class SquireUI
 						matches: 'IMG'
 					}
 				},
-/*
 				table: {
-					// TODO
+					table: {
+						html: '⊞',
+						cmd: btn => openTablePicker(btn),
+						matches: 'TABLE'
+					}
 				},
-*/
+				// only shown while the cursor is inside a table, see pathChange below
+				tableEdit: {
+					rowAbove: {
+						html: '⤒',
+						cmd: () => tableOp((table, row) => insertTableRow(table, row.rowIndex, row.cells.length))
+					},
+					rowBelow: {
+						html: '⤓',
+						cmd: () => tableOp((table, row) => insertTableRow(table, row.rowIndex + 1, row.cells.length))
+					},
+					colLeft: {
+						html: '⇤',
+						cmd: () => tableOp((table, row, cell) => insertTableColumn(table, cell.cellIndex))
+					},
+					colRight: {
+						html: '⇥',
+						cmd: () => tableOp((table, row, cell) => insertTableColumn(table, cell.cellIndex + 1))
+					},
+					rowDelete: {
+						html: '⊖',
+						cmd: () => tableOp((table, row) =>
+							1 < table.rows.length ? table.deleteRow(row.rowIndex) : table.remove())
+					},
+					colDelete: {
+						html: '⊘',
+						cmd: () => tableOp((table, row, cell) =>
+							1 < row.cells.length ? deleteTableColumn(table, cell.cellIndex) : table.remove())
+					},
+					tableDelete: {
+						html: '⊠',
+						cmd: () => tableOp(table => table.remove())
+					}
+				},
 				changes: {
 					undo: {
 						html: '↶',
@@ -255,6 +334,23 @@ class SquireUI
 				}
 			},
 
+			tablePicker = createElement('div'),
+			tablePickerGrid = createElement('div'),
+			tablePickerLabel = createElement('div'),
+			hideTablePicker = () => tablePicker.classList.add('hidden'),
+			openTablePicker = btn => {
+				tablePicker.style.left = (btn.offsetLeft + btn.parentNode.offsetLeft) + 'px';
+				tablePicker.classList.toggle('hidden');
+			},
+			// every table operation works from the cell the cursor is in
+			tableOp = fn => {
+				const cell = squire.getSelectionClosest('TD,TH'),
+					table = cell?.closest('table');
+				if (table) {
+					fn(table, cell.closest('tr'), cell);
+					squire.focus();
+				}
+			},
 			plain = createElement('textarea'),
 			wysiwyg = createElement('div'),
 			toolbar = createElement('div'),
@@ -263,6 +359,47 @@ class SquireUI
 
 		clr.type = 'color';
 		toolbar.append(clr);
+
+		// Size picker for the insert-table button, a grid you drag across
+		tablePicker.className = 'squire-table-picker hidden';
+		tablePickerGrid.className = 'squire-table-picker-grid';
+		tablePickerGrid.style.gridTemplateColumns = 'repeat(' + tablePickerCols + ',1fr)';
+		for (let i = tablePickerRows * tablePickerCols; i--;) {
+			tablePickerGrid.append(createElement('i'));
+		}
+		tablePickerLabel.className = 'squire-table-picker-label';
+		tablePicker.append(tablePickerGrid, tablePickerLabel);
+		toolbar.append(tablePicker);
+
+		const tablePickerCells = [...tablePickerGrid.children],
+			tablePickerSizeAt = target => {
+				const i = tablePickerCells.indexOf(target);
+				return 0 > i ? null : {
+					row: 1 + Math.floor(i / tablePickerCols),
+					col: 1 + (i % tablePickerCols)
+				};
+			},
+			tablePickerHighlight = size => {
+				tablePickerCells.forEach((cell, i) => cell.classList.toggle('on', !!size
+					&& Math.floor(i / tablePickerCols) < size.row
+					&& (i % tablePickerCols) < size.col));
+				tablePickerLabel.textContent = size ? size.col + ' x ' + size.row : '';
+			};
+
+		tablePickerGrid.addEventListener('pointerover', e => tablePickerHighlight(tablePickerSizeAt(e.target)));
+		tablePickerGrid.addEventListener('pointerleave', () => tablePickerHighlight(null));
+		tablePickerGrid.addEventListener('click', e => {
+			const size = tablePickerSizeAt(e.target);
+			if (size) {
+				hideTablePicker();
+				squire.insertHTML(buildTableHTML(size.row, size.col));
+				squire.focus();
+			}
+		});
+
+		container.addEventListener('click', e =>
+			tablePicker.contains(e.target) || e.target.closest('[data-action="table"]') || hideTablePicker());
+		container.addEventListener('keydown', e => 'Escape' === e.key && hideTablePicker());
 		// Chrome https://github.com/the-djmaze/snappymail/issues/1199
 		let clrid = 'squire-colors',
 			colorlist = doc.getElementById(clrid),
@@ -378,6 +515,9 @@ class SquireUI
 		}
 
 		this.modeSelect = actions.mode.plain.input;
+
+		const tableEditGroup = toolbar.querySelector('#squire-toolgroup-tableEdit');
+		tableEditGroup.classList.add('hidden');
 
 		let changes = actions.changes;
 		changes.undo.input.disabled = changes.redo.input.disabled = true;
@@ -509,6 +649,9 @@ class SquireUI
 					)));
 				});
 			});
+
+			// The table controls only make sense inside a table, and the toolbar has no room to spare
+			tableEditGroup.classList.toggle('hidden', !elm?.closestWithin('TD,TH', squireRoot));
 
 			if (elm) {
 				// try to find font-family and/or font-size and set "select" elements' values
