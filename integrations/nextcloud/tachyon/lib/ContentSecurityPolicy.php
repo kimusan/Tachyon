@@ -2,51 +2,70 @@
 
 namespace OCA\Tachyon;
 
-use OCP\Server;
-use OCP\Security\IContentSecurityPolicyNonceManager;
-
 class ContentSecurityPolicy extends \OCP\AppFramework\Http\ContentSecurityPolicy {
 
-	/** @var bool Whether inline JS snippets are allowed */
-	protected $inlineScriptAllowed = false;
-	/** @var bool Whether eval in JS scripts is allowed */
-	protected $evalScriptAllowed = true;
-	/** @var bool Whether strict-dynamic should be set */
-//	protected $strictDynamicAllowed = true; // NC24+
-	/** @var bool Whether inline CSS is allowed */
-	protected $inlineStyleAllowed = true;
-
+	/**
+	 * Only public methods are used to build this policy. Nextcloud's protected
+	 * properties are not API and have changed under us more than once: NC34 no
+	 * longer has inlineScriptAllowed or evalScriptAllowed at all, so setting them
+	 * did nothing but look like it worked.
+	 */
 	function __construct() {
 		$CSP = \Tachyon\Api::getCSP();
 
-		$this->allowedScriptDomains = \array_unique(\array_merge($this->allowedScriptDomains, $CSP->get('script-src')));
-		$this->allowedScriptDomains = \array_diff($this->allowedScriptDomains, ["'unsafe-inline'", "'unsafe-eval'"]);
+		foreach ($CSP->get('script-src') as $sSource) {
+			// Scripts are allowed by nonce, see getTachyonNonce() below
+			if ("'unsafe-inline'" !== $sSource) {
+				$this->addAllowedScriptDomain($sSource);
+			}
+		}
+
+		/**
+		 * Knockout evaluates its binding strings, so it needs unsafe-eval.
+		 * NC34 dropped allowEvalScript() and only keeps allowEvalWasm(), so the token
+		 * has to go in as a script source. buildPolicy() implodes that array into
+		 * script-src verbatim, and strict-dynamic does not suppress unsafe-eval.
+		 */
+		$this->addAllowedScriptDomain("'unsafe-eval'");
 
 		// Nextcloud only sets 'strict-dynamic' when browserSupportsCspV3() ?
 		\method_exists($this, 'useStrictDynamic')
 			? $this->useStrictDynamic(true) // NC24+
 			: $this->addAllowedScriptDomain("'strict-dynamic'");
 
-		$this->allowedImageDomains = \array_unique(\array_merge($this->allowedImageDomains, $CSP->get('img-src')));
+		foreach ($CSP->get('img-src') as $sSource) {
+			$this->addAllowedImageDomain($sSource);
+		}
 
-		$this->allowedStyleDomains = \array_unique(\array_merge($this->allowedStyleDomains, $CSP->get('style-src')));
-		$this->allowedStyleDomains = \array_diff($this->allowedStyleDomains, ["'unsafe-inline'"]);
+		foreach ($CSP->get('style-src') as $sSource) {
+			// covered by allowInlineStyle() below
+			if ("'unsafe-inline'" !== $sSource) {
+				$this->addAllowedStyleDomain($sSource);
+			}
+		}
+		$this->allowInlineStyle(true);
 
-		$this->allowedFrameDomains = \array_unique(\array_merge($this->allowedFrameDomains, $CSP->get('frame-src')));
+		foreach ($CSP->get('frame-src') as $sSource) {
+			$this->addAllowedFrameDomain($sSource);
+		}
 
-		// No report_to here. Tachyon's CSP only emits a report-to directive from __toString()
-		// when reporting is enabled, it never stores one, and Nextcloud manages its own
-		// reporting endpoint anyway. Reading $CSP->report_to was a TypeError on PHP 8.
+		// No report-to. Tachyon's CSP only emits one from __toString() when reporting
+		// is enabled and never stores it, and Nextcloud has its own reporting endpoint.
 	}
 
 	public function getTachyonNonce() {
 		static $sNonce;
 		if (!$sNonce) {
-			$cspManager = Server::get(IContentSecurityPolicyNonceManager::class);
-			$sNonce = $cspManager->getNonce() ?: \Tachyon\Util\UUID::generate();
-			if (\method_exists($cspManager, 'browserSupportsCspV3') && !$cspManager->browserSupportsCspV3()) {
-				$this->addAllowedScriptDomain("'nonce-{$sNonce}'");
-			}
+			/**
+			 * Nextcloud exposes no public API for its CSP nonce.
+			 * OCP\Security\IContentSecurityPolicyNonceManager has never existed in any
+			 * release, and the private OC\Security\CSP class is not safe to depend on.
+			 * Tachyon controls both the policy it returns here and the inline script tag
+			 * in index_embed.php, so it mints its own nonce and declares it. Unconditional,
+			 * because Nextcloud knows nothing about this one and will not add it for us.
+			 */
+			$sNonce = \Tachyon\Util\UUID::generate();
+			$this->addAllowedScriptDomain("'nonce-{$sNonce}'");
 		}
 		return $sNonce;
 	}
