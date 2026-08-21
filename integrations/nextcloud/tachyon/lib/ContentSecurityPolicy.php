@@ -34,7 +34,9 @@ class ContentSecurityPolicy extends \OCP\AppFramework\Http\ContentSecurityPolicy
 
 		$this->allowedFrameDomains = \array_unique(\array_merge($this->allowedFrameDomains, $CSP->get('frame-src')));
 
-		$this->reportTo = \array_unique(\array_merge($this->reportTo, $CSP->report_to));
+		// No report_to here. Tachyon's CSP only emits a report-to directive from __toString()
+		// when reporting is enabled, it never stores one, and Nextcloud manages its own
+		// reporting endpoint anyway. Reading $CSP->report_to was a TypeError on PHP 8.
 	}
 
 	public function getTachyonNonce() {
