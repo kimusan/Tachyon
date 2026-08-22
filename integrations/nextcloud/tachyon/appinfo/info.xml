@@ -69,7 +69,7 @@ There, click on the link to go to the Tachyon admin panel.
 		<lib>xxtea</lib>
 		<lib>zip</lib>
 	-->
-		<nextcloud min-version="26" max-version="34" />
+		<nextcloud min-version="26" max-version="35" />
 	</dependencies>
 	<settings>
 		<admin>OCA\Tachyon\Settings\AdminSettings</admin>
