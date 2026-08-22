@@ -4,7 +4,7 @@
   "description": "Fast, modern & secure web-based email client",
   "private": true,
   "version": "3.2.8",
-  "homepage": "https://github.com/kimusan/Tachyon",
+  "homepage": "https://tachyonmail.app/",
   "author": {
     "name": "Kim Schulz",
     "email": "kim@schulz.dk"
