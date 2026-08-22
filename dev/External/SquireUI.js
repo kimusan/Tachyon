@@ -339,7 +339,10 @@ class SquireUI
 			tablePickerLabel = createElement('div'),
 			hideTablePicker = () => tablePicker.classList.add('hidden'),
 			openTablePicker = btn => {
-				tablePicker.style.left = (btn.offsetLeft + btn.parentNode.offsetLeft) + 'px';
+				// positioned against the container, so the toolbar's own height is the top offset
+				tablePicker.style.left =
+					(btn.offsetLeft + btn.parentNode.offsetLeft - toolbar.scrollLeft) + 'px';
+				tablePicker.style.top = (toolbar.offsetTop + toolbar.offsetHeight) + 'px';
 				tablePicker.classList.toggle('hidden');
 			},
 			// every table operation works from the cell the cursor is in
@@ -369,7 +372,8 @@ class SquireUI
 		}
 		tablePickerLabel.className = 'squire-table-picker-label';
 		tablePicker.append(tablePickerGrid, tablePickerLabel);
-		toolbar.append(tablePicker);
+		// Not the toolbar: it is overflow-y:hidden, which would clip this away
+		container.append(tablePicker);
 
 		const tablePickerCells = [...tablePickerGrid.children],
 			tablePickerSizeAt = target => {
