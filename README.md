@@ -7,6 +7,7 @@
     which itself forked <a href="https://github.com/RainLoop/rainloop-webmail">RainLoop Webmail Community edition</a>.
   </p>
   <p>Existing SnappyMail installations can upgrade directly to Tachyon.</p>
+  <p><strong><a href="https://tachyonmail.app/">tachyonmail.app</a></strong></p>
   <br>
 </div>
 
