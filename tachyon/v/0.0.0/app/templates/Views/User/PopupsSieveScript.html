@@ -16,8 +16,8 @@
 			data-i18n="[placeholder]GLOBAL/NAME">
 	</div>
 
-	<div class="alert g-ui-user-select-none" data-bind="visible: hasChanges" data-icon="⚠" data-i18n="POPUPS_SIEVE_SCRIPT/CHANGES_NEED_TO_BE_SAVED_DESC"></div>
-	<div class="alert alert-error g-ui-user-select-none" style="white-space:pre" data-bind="visible: $root.errorText, text: $root.errorText" data-icon="⚠"></div>
+	<div class="alert g-ui-user-select-none" data-bind="visible: hasChanges" data-icon="triangle-alert" data-i18n="POPUPS_SIEVE_SCRIPT/CHANGES_NEED_TO_BE_SAVED_DESC"></div>
+	<div class="alert alert-error g-ui-user-select-none" style="white-space:pre" data-bind="visible: $root.errorText, text: $root.errorText" data-icon="triangle-alert"></div>
 
 	<div class="control-group" data-bind="visible: $root.rawActive">
 		<details>
@@ -49,8 +49,8 @@
 			</colgroup>
 			<tbody data-bind="foreach: filters, i18nUpdate: filters">
 				<tr class="filter-item" draggable="true" data-bind="sortableItem: { list: $parent.filters }">
-					<td class="fontastic" data-bind="click: function () { $parent.hasChanges(true); enabled(!enabled()); }, text: enabled() ? '☑' : '☐'"></td>
-					<td class="drag-wrapper fontastic drag-handle">⬍</td>
+					<td class="" data-bind="click: function () { $parent.hasChanges(true); enabled(!enabled()); }, css: enabled() ? 'icon-square-check' : 'icon-square'"></td>
+					<td class="drag-wrapper drag-handle icon-arrow-up-down"></td>
 					<td class="e-action">
 						<span class="filter-name" data-bind="text: name()"></span>
 						&nbsp;&nbsp;
@@ -61,12 +61,12 @@
 							data-i18n="GLOBAL/ARE_YOU_SURE"></a>
 					</td>
 					<td>
-						<span class="delete-filter fontastic" data-bind="visible: !askDelete(), click: function (oFilter) { $root.filterForDeletion(oFilter); }">🗑</span>
+						<span class="delete-filter icon-trash-2" data-bind="visible: !askDelete(), click: function (oFilter) { $root.filterForDeletion(oFilter); }"></span>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-		<a class="btn" data-bind="click: $root.addFilter" data-icon="✚" data-i18n="POPUPS_SIEVE_SCRIPT/BUTTON_ADD_FILTER"></a>
+		<a class="btn" data-bind="click: $root.addFilter" data-icon="plus" data-i18n="POPUPS_SIEVE_SCRIPT/BUTTON_ADD_FILTER"></a>
 	</div>
 </form>
 <footer>
@@ -79,7 +79,7 @@
 	</a>
 -->
 	<a class="btn buttonSave" data-bind="click: function() { $root.saveScript(); }, css: {'btn-danger': $root.saveError}">
-		<i class="fontastic" data-bind="css: {'icon-spinner': $root.saving}">💾</i>
+		<i class="icon-save" data-bind="css: {'icon-spinner': $root.saving}"></i>
 		<span data-i18n="GLOBAL/SAVE"></span>
 	</a>
 </footer>

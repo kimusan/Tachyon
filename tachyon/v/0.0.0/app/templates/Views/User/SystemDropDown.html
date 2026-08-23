@@ -2,12 +2,12 @@
 	<div class="audioPlace"
 			data-bind="visible: '' !== currentAudio(), attr: { title: currentAudio }, click: stopPlay">
 		<div class="playIcon"><div></div></div>
-		<i class="stopIcon fontastic">⏸</i>
+		<i class="stopIcon icon-pause"></i>
 	</div>
 	<div class="btn-group dropdown" data-bind="registerBootstrapDropdown: true, initDom: accountMenu">
 		<a id="top-system-dropdown-id" href="#" tabindex="-1" class="btn single btn-block dropdown-toggle">
 			<span class="accountPlace hide-mobile" data-bind="text: accountName(), attr:{ title: accountEmail }"></span>
-			<i class="fontastic" data-bind="css: {'icon-spinner': accountsLoading()}">👤</i>
+			<i class="icon-user" data-bind="css: {'icon-spinner': accountsLoading()}"></i>
 			<b data-bind="text: accountsUnreadCount, visible: 100 > accountsUnreadCount() && accountsUnreadCount()"></b>
 			<b data-bind="visible: 99 < accountsUnreadCount()">99+</b>
 		</a>
@@ -24,27 +24,27 @@
 			<!-- ko foreach: accounts -->
 			<li role="presentation">
 				<a class="email-title" href="#" data-bind="click: $root.accountClick, text: label(),
-					attr: {title: email, 'data-unread': unreadEmails, 'data-icon': $root.accountEmail() === email ? '✔' : '👤'}"></a>
+					attr: {title: email, 'data-unread': unreadEmails, 'data-icon': $root.accountEmail() === email ? 'check' : 'user'}"></a>
 			</li>
 			<!-- /ko -->
 
 			<li class="dividerbar" role="presentation" data-bind="visible: allowAccounts">
-				<a href="#" tabindex="-1" data-bind="click: addAccountClick" data-icon="✚" data-i18n="TOP_TOOLBAR/BUTTON_ADD_ACCOUNT"></a>
+				<a href="#" tabindex="-1" data-bind="click: addAccountClick" data-icon="plus" data-i18n="TOP_TOOLBAR/BUTTON_ADD_ACCOUNT"></a>
 			</li>
 			<li role="presentation" data-bind="visible: allowContacts">
-				<a href="#" tabindex="-1" data-bind="click: contactsClick" data-icon="📇" data-i18n="GLOBAL/CONTACTS"></a>
+				<a href="#" tabindex="-1" data-bind="click: contactsClick" data-icon="contact" data-i18n="GLOBAL/CONTACTS"></a>
 			</li>
 			<li role="presentation" data-bind="visible: allowCalendar">
-				<a href="#" tabindex="-1" data-bind="click: calendarClick" data-icon="📅" data-i18n="GLOBAL/CALENDAR"></a>
+				<a href="#" tabindex="-1" data-bind="click: calendarClick" data-icon="calendar" data-i18n="GLOBAL/CALENDAR"></a>
 			</li>
 			<li role="presentation">
-				<a href="#" tabindex="-1" data-bind="click: settingsClick" data-icon="⚙" data-i18n="TITLES/SETTINGS"></a>
+				<a href="#" tabindex="-1" data-bind="click: settingsClick" data-icon="settings" data-i18n="TITLES/SETTINGS"></a>
 			</li>
 			<li role="presentation">
-				<a href="#" tabindex="-1" data-bind="click: settingsHelp" data-icon="🛈" data-i18n="GLOBAL/HELP"></a>
+				<a href="#" tabindex="-1" data-bind="click: settingsHelp" data-icon="info" data-i18n="GLOBAL/HELP"></a>
 			</li>
 			<li class="dividerbar" role="presentation">
-				<a href="#" tabindex="-1" data-bind="click: logoutClick" data-icon="⏻" data-i18n="GLOBAL/LOGOUT"></a>
+				<a href="#" tabindex="-1" data-bind="click: logoutClick" data-icon="circle-help" data-i18n="GLOBAL/LOGOUT"></a>
 			</li>
 		</menu>
 	</div>

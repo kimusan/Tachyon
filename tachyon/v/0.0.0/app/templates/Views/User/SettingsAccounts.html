@@ -12,7 +12,7 @@
 		}
 	}"></div>
 	<a class="btn" data-bind="click: addNewAccount">
-		<i class="icon-user-add"></i>
+		<i class="icon-user-plus"></i>
 		<span data-i18n="SETTINGS_ACCOUNTS/BUTTON_ADD_ACCOUNT"></span>
 	</a>
 	<table class="table table-hover list-table accounts-list" data-bind="i18nUpdate: accounts">
@@ -24,20 +24,20 @@
 				<!-- /ko -->
 				<!-- ko if:isAdditional -->
 				<td>
-					<i class="fontastic drag-handle">⬍</i>
+					<i class="drag-handle icon-arrow-up-down"></i>
 				</td>
 				<td class="e-action">
 					<span class="account-name" data-bind="text: displayName"></span>
 				</td>
 <!--
-				<td><span class="icon-import" data-bind="click: importAll"></span></td>
+				<td><span class="icon-download" data-bind="click: importAll"></span></td>
 -->
 				<td>
 					<a class="btn btn-small btn-danger button-confirm-delete" data-bind="css: {'delete-access': askDelete}, click: function(oAccount) { $root.deleteAccount(oAccount); }"
 						data-i18n="GLOBAL/ARE_YOU_SURE"></a>
 				</td>
 				<td>
-					<span class="delete fontastic" data-bind="visible: !askDelete(), click: function (oAccount) { $root.accountForDeletion(oAccount); }">🗑</span>
+					<span class="delete icon-trash-2" data-bind="visible: !askDelete(), click: function (oAccount) { $root.accountForDeletion(oAccount); }"></span>
 				</td>
 				<!-- /ko -->
 			</tr>
@@ -47,14 +47,14 @@
 <div data-bind="visible: allowIdentities">
 	<div class="legend" data-i18n="SETTINGS_ACCOUNTS/LEGEND_IDENTITIES"></div>
 	<a class="btn" data-bind="click: addNewIdentity">
-		<i class="icon-user-add"></i>
+		<i class="icon-user-plus"></i>
 		<span data-i18n="SETTINGS_ACCOUNTS/BUTTON_ADD_IDENTITY"></span>
 	</a>
 	<table class="table table-hover list-table identities-list" data-bind="i18nUpdate: identities">
 		<tbody data-bind="foreach: identities">
 			<tr draggable="true" data-bind="attr: {'data-identity-id': id}, sortableItem: { list: $root.identities, afterMove: $root.accountsAndIdentitiesAfterMove }">
 				<td>
-					<i class="fontastic drag-handle">⬍</i>
+					<i class="drag-handle icon-arrow-up-down"></i>
 				</td>
 				<td class="e-action">
 					<span class="identity-name" data-bind="text: $data"></span>
@@ -65,7 +65,7 @@
 						data-i18n="GLOBAL/ARE_YOU_SURE"></a>
 				</td>
 				<td>
-					<span class="delete fontastic" data-bind="visible: !askDelete() && id(), click: function (oIdentity) { $root.identityForDeletion(oIdentity); }">🗑</span>
+					<span class="delete icon-trash-2" data-bind="visible: !askDelete() && id(), click: function (oIdentity) { $root.identityForDeletion(oIdentity); }"></span>
 				</td>
 			</tr>
 		</tbody>

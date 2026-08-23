@@ -12,7 +12,7 @@
 				data-bind="textInput: name">
 			<div class="alert-error" data-bind="visible: savingError, text: savingError"></div>
 			<button class="btn" type="button" data-bind="click: autoconfig">
-				<i class="fontastic" data-bind="css: {'icon-spinner': detectingConfig()}">⚙</i>
+				<i class="icon-settings" data-bind="css: {'icon-spinner': detectingConfig()}"></i>
 				autoconfig
 			</button>
 		</div>
@@ -243,7 +243,7 @@
 			<input type="radio" name="tabs" id="tab-sieve">
 			<label for="tab-sieve" role="tab" tabindex="0"
 				data-bind="css: { 'testing-done': testingDone, 'testing-error': testingSieveError }">
-				<i class="icon-filter"></i>
+				<i class="icon-funnel"></i>
 				SIEVE
 			</label>
 			<div class="tab-content" role="tabpanel" aria-hidden="true">
@@ -298,7 +298,7 @@
 			</div>
 
 			<input type="radio" name="tabs" id="tab-whitelist">
-			<label for="tab-whitelist" role="tab" tabindex="0" data-icon="👥" data-i18n="POPUPS_DOMAIN/BUTTON_WHITE_LIST"></label>
+			<label for="tab-whitelist" role="tab" tabindex="0" data-icon="users" data-i18n="POPUPS_DOMAIN/BUTTON_WHITE_LIST"></label>
 			<div class="tab-content" role="tabpanel" aria-hidden="true">
 				<div class="alert" data-i18n="POPUPS_DOMAIN/WHITE_LIST_ALERT"></div>
 				<textarea class="input-xxlarge" style="width: 100%" rows="8" data-bind="value: whiteList" tabindex="-1" placeholder="@example.com&#10;user@example.org&#10;username"></textarea>
@@ -310,13 +310,13 @@
 	<a class="btn" data-bind="command: testConnectionCommand, css: {
 	   'btn-success': testingDone() && !testingImapError() && !testingSmtpError(),
 	   'btn-danger': testingDone() && (testingImapError() || testingSmtpError()) }">
-		<i class="fontastic" data-bind="css: {'icon-spinner': testing()}">ℹ</i>
+		<i class="icon-info" data-bind="css: {'icon-spinner': testing()}"></i>
 		<span data-i18n="GLOBAL/TEST"></span>
 	</a>
-	<a class="btn buttonClose" data-bind="click: close, visible: edit()" data-icon="✖" data-i18n="GLOBAL/CLOSE"></a>
-	<a class="btn buttonClose" data-bind="click: close, visible: !edit()" data-icon="✖" data-i18n="GLOBAL/CANCEL"></a>
+	<a class="btn buttonClose" data-bind="click: close, visible: edit()" data-icon="x" data-i18n="GLOBAL/CLOSE"></a>
+	<a class="btn buttonClose" data-bind="click: close, visible: !edit()" data-icon="x" data-i18n="GLOBAL/CANCEL"></a>
 	<a class="btn" data-bind="command: createOrAddCommand">
-		<i class="fontastic" data-bind="css: {'icon-spinner': saving()}">✔</i>
+		<i class="icon-check" data-bind="css: {'icon-spinner': saving()}"></i>
 		<span data-i18n="GLOBAL/SAVE"></span>
 	</a>
 </footer>

@@ -1,10 +1,10 @@
 <div class="b-folders g-ui-user-select-none">
 	<div class="b-toolbar btn-toolbar">
 		<a class="btn buttonCompose" data-bind="click: composeClick, css: {'btn-warning': composeInEdit, 'btn-success': !composeInEdit()}" data-i18n="[title]FOLDER_LIST/BUTTON_NEW_MESSAGE">
-			<i class="icon-paper-plane"></i>
+			<i class="icon-send"></i>
 			<span class="buttonComposeText" data-i18n="FOLDER_LIST/BUTTON_NEW_MESSAGE"></span>
 		</a>
-		<a class="btn buttonContacts fontastic" data-bind="visible: allowContacts, click: contactsClick" data-i18n="[title]GLOBAL/CONTACTS">📇</a>
+		<a class="btn buttonContacts icon-contact" data-bind="visible: allowContacts, click: contactsClick" data-i18n="[title]GLOBAL/CONTACTS"></a>
 	</div>
 	<div class="b-content">
 		<ul class="b-folders-system" data-bind="foreach: systemFolders">
@@ -25,7 +25,7 @@
 			<a data-bind="click: clearFolderSearch, visible: foldersFilter">✕</a>
 		</div>
 		<div class="e-checkbox" tabindex="0" data-bind="toggle: filterUnseen">
-			<i role="checkbox" class="fontastic" data-bind="text: filterUnseen() ? '☑' : '☐'"></i>
+			<i role="checkbox" class="" data-bind="css: filterUnseen() ? 'icon-square-check' : 'icon-square'"></i>
 			<span data-i18n="SEARCH/UNSEEN"></span>
 		</div>
 		<ul class="b-folders-user" data-bind="css: {unreadOnly: filterUnseen}, template: { name: 'MailFolderListItem', foreach: folderListVisible }"></ul>
@@ -36,8 +36,8 @@
 			<a class="btn fontastic toggleLeft" data-bind="click: toggleLeftPanel"></a>
 		</div>
 		<div class="btn-group hide-on-panel-disabled">
-			<a class="btn icon-folder-add" data-bind="click: createFolder" data-i18n="[title]POPUPS_CREATE_FOLDER/TITLE_CREATE_FOLDER"></a>
-			<a class="btn fontastic" data-bind="click: configureFolders" data-i18n="[title]SETTINGS_LABELS/FOLDERS">⚙</a>
+			<a class="btn icon-folder-plus" data-bind="click: createFolder" data-i18n="[title]POPUPS_CREATE_FOLDER/TITLE_CREATE_FOLDER"></a>
+			<a class="btn icon-settings" data-bind="click: configureFolders" data-i18n="[title]SETTINGS_LABELS/FOLDERS"></a>
 		</div>
 	</div>
 </div>

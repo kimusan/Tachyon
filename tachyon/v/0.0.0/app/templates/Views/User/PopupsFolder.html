@@ -17,7 +17,7 @@
 	<div data-bind="with: folder">
 		<!-- ko if: canBeSubscribed -->
 		<div class="control-group">
-			<label class="fontastic">👁</label>
+			<label class="icon-eye"></label>
 			<div data-bind="component: {
 				name: 'Checkbox',
 				params: {
@@ -39,7 +39,7 @@
 		</div>
 		<!-- ko if: $root.displaySpecSetting() && canBeSelected() && isSubscribed() -->
 		<div class="control-group">
-			<label class="icon-check-mark-circle-two"></label>
+			<label class="icon-circle-check"></label>
 			<div data-bind="component: {
 				name: 'Checkbox',
 				params: {
@@ -66,14 +66,14 @@
 				<tr>
 					<td data-bind="text: identifier"></td>
 					<td>
-						<button class="btn fontastic" data-bind="visible: mine, click: $root.editACL">👁</button>
-						<button class="btn fontastic" data-bind="visible: !mine(), click: $root.editACL">🖉</button>
-						<button class="btn fontastic" data-bind="visible: !mine(), click: $root.deleteACL">🗑</button>
+						<button class="btn icon-eye" data-bind="visible: mine, click: $root.editACL"></button>
+						<button class="btn icon-pencil" data-bind="visible: !mine(), click: $root.editACL"></button>
+						<button class="btn icon-trash-2" data-bind="visible: !mine(), click: $root.deleteACL"></button>
 					</td>
 				</tr>
 				<!-- /ko -->
 				<tr data-bind="visible: adminACL"><td></td><td>
-					<button class="btn fontastic" data-bind="click: createACL">✚</button>
+					<button class="btn icon-plus" data-bind="click: createACL"></button>
 				</td></tr>
 			</tbody></table>
 		</div>
@@ -81,7 +81,7 @@
 </form>
 <footer>
 	<button form="folderform" class="btn">
-		<i class="icon-folder-add"></i>
+		<i class="icon-folder-plus"></i>
 		<span data-i18n="GLOBAL/SAVE"></span>
 	</button>
 </footer>

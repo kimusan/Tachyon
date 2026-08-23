@@ -25,16 +25,16 @@
 			<div>
 				<hr>
 				<div data-bind="visible: 'error' === statusType()">
-					<i class="fontastic" style="color:red">⚠</i>
+					<i class="icon-triangle-alert" style="color:red"></i>
 					<span data-bind="text: errorDesc"></span>
 				</div>
 				<div data-bind="visible: 'available' === statusType()">
-					<i class="fontastic" style="color:orange">⚠</i>
+					<i class="icon-triangle-alert" style="color:orange"></i>
 					<span data-bind="html: coreVersionHtmlDesc"></span>
 					<br />
 					<span data-bind="if: coreWarning">
 						<br />
-						<i class="fontastic" style="color:red">⚠</i>
+						<i class="icon-triangle-alert" style="color:red"></i>
 						<b data-i18n="HINTS/WARNING"></b>
 						<span data-i18n="TAB_ABOUT/HINT_READ_CHANGE_LOG"></span>
 						<br />
@@ -77,7 +77,7 @@
 
 			<h3>PHP</h3>
 			<div data-bind="hidden: php64" class="alert">
-				<i class="fontastic" style="color:red">⚠</i>
+				<i class="icon-triangle-alert" style="color:red"></i>
 				PHP is running in 32bit mode. <a href="https://github.com/kimusan/Tachyon/wiki/32bit-php" target="_blank">read here</a>
 			</div>
 
