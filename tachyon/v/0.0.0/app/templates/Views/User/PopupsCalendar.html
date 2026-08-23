@@ -121,6 +121,8 @@
 					<textarea class="span5" rows="3" data-bind="value: editDescription, enable: !editReadOnly()"></textarea>
 				</div>
 
+				<div class="alert alert-error b-calendar-editor-error" data-bind="visible: !!editError(), text: editError"></div>
+
 				<div class="buttons">
 					<a class="btn btn-success" data-i18n="GLOBAL/SAVE" data-bind="command: saveEventCommand,
 						visible: !editReadOnly()"></a>

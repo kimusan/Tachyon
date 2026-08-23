@@ -40,8 +40,22 @@ trait Calendar
 		if (!$oProvider->IsActive()) {
 			return $this->FalseResponse();
 		}
+		$aCalendars = $oProvider->GetCalendars();
+
+		// GetCalendars only reads what is stored, and Sync is what fetches from
+		// the server, so without this the list is empty until the user happens to
+		// press the sync button
+		if (!$aCalendars) {
+			try {
+				$oProvider->Sync();
+				$aCalendars = $oProvider->GetCalendars();
+			} catch (\Throwable $oException) {
+				\Tachyon\Util\LOG::error('Calendar', $oException->getMessage());
+			}
+		}
+
 		return $this->DefaultResponse(array(
-			'Calendars' => $oProvider->GetCalendars()
+			'Calendars' => $aCalendars
 		));
 	}
 
@@ -106,10 +120,14 @@ trait Calendar
 			throw new ClientException(\Tachyon\Notifications::CantSaveMessage, $oException, $oException->getMessage());
 		}
 
-		return $this->DefaultResponse(array(
-			'Result' => $bResult,
-			'Uid' => $oEvent->Uid
-		));
+		// Reporting this inside the payload would read as success to the client,
+		// because the transport only looks at the response's own Result
+		if (!$bResult) {
+			throw new ClientException(\Tachyon\Notifications::CantSaveMessage, null,
+				'The calendar server rejected the event');
+		}
+
+		return $this->TrueResponse(array('Uid' => $oEvent->Uid));
 	}
 
 	public function DoCalendarEventDelete() : array
@@ -129,7 +147,12 @@ trait Calendar
 			throw new ClientException(\Tachyon\Notifications::CantDeleteMessage, $oException, $oException->getMessage());
 		}
 
-		return $this->DefaultResponse($bResult);
+		if (!$bResult) {
+			throw new ClientException(\Tachyon\Notifications::CantDeleteMessage, null,
+				'The calendar server refused to delete the event');
+		}
+
+		return $this->TrueResponse();
 	}
 
 	public function DoCalendarSync() : array
@@ -205,8 +228,13 @@ trait Calendar
 	{
 		$iStart = (int) $this->GetActionParam('Start', 0);
 		$iEnd = (int) $this->GetActionParam('End', 0);
-		if (1 > $iStart || $iEnd < $iStart) {
-			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Bad event times');
+		if (1 > $iStart) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null,
+				'The start date is missing or could not be read');
+		}
+		if ($iEnd < $iStart) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null,
+				'The event ends before it starts');
 		}
 
 		$bAllDay = !empty($this->GetActionParam('AllDay', 0));

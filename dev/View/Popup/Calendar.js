@@ -85,7 +85,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 			editEnd: '',
 			editAllDay: false,
 			editReadOnly: false,
-			editRecurring: false
+			editRecurring: false,
+			editError: ''
 		});
 
 		addComputablesTo(this, {
@@ -106,8 +107,13 @@ export class CalendarPopupView extends AbstractViewPopup {
 
 		decorateKoCommands(this, {
 			newEventCommand: self => self.hasWritableCalendar(),
-			saveEventCommand: self => !self.isSaving() && !self.editReadOnly() && self.editSummary().trim(),
-			deleteEventCommand: self => !self.isSaving() && !self.editReadOnly() && self.editUid()
+			/**
+			 * Deliberately not gated on the fields being valid. A command that
+			 * cannot execute swallows the click silently, which reads as a dead
+			 * button; validateEditor() says what is wrong instead.
+			 */
+			saveEventCommand: self => !self.isSaving() && !self.editReadOnly(),
+			deleteEventCommand: self => !self.isSaving() && !self.editReadOnly() && !!self.editUid()
 		});
 	}
 
@@ -252,6 +258,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editEnd(this.toInput(end, allDay));
 		this.editRecurring(false);
 		this.editReadOnly(false);
+		this.editError('');
 		this.editorVisible(true);
 	}
 
@@ -280,6 +287,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 		// Saving rebuilds the VEVENT from the fields below, which carry no RRULE,
 		// so editing a series here would quietly turn it into a single event
 		this.editReadOnly(!!props.readOnly || !!props.recurring);
+		this.editError('');
 		this.editorVisible(true);
 	}
 
@@ -298,6 +306,31 @@ export class CalendarPopupView extends AbstractViewPopup {
 
 	fromInput(value, allDay) {
 		return toStamp(new Date(allDay ? value + 'T00:00' : value));
+	}
+
+	/**
+	 * @returns {string} empty when the form can be sent
+	 */
+	validateEditor() {
+		const allDay = this.editAllDay(),
+			start = new Date(allDay ? this.editStart() + 'T00:00' : this.editStart()),
+			end = new Date(allDay ? this.editEnd() + 'T00:00' : this.editEnd());
+		if (!this.editSummary().trim()) {
+			return i18n('CALENDAR/ERROR_NO_TITLE');
+		}
+		if (isNaN(start)) {
+			return i18n('CALENDAR/ERROR_BAD_START');
+		}
+		if (isNaN(end)) {
+			return i18n('CALENDAR/ERROR_BAD_END');
+		}
+		if (end < start) {
+			return i18n('CALENDAR/ERROR_END_BEFORE_START');
+		}
+		if (!this.editCalendar()) {
+			return i18n('CALENDAR/ERROR_NO_CALENDAR');
+		}
+		return '';
 	}
 
 	/**
@@ -323,13 +356,19 @@ export class CalendarPopupView extends AbstractViewPopup {
 	}
 
 	saveEventCommand() {
+		const invalid = this.validateEditor();
+		if (invalid) {
+			this.editError(invalid);
+			return;
+		}
+		this.editError('');
 		this.isSaving(true);
 		const allDay = this.editAllDay();
 		Remote.request('CalendarEventSave',
-			(iError) => {
+			(iError, data) => {
 				this.isSaving(false);
 				if (iError) {
-					this.failed(getNotification(iError));
+					this.editError(data?.messageAdditional || data?.message || getNotification(iError));
 				} else {
 					this.editorVisible(false);
 					this.ec?.refetchEvents();
@@ -353,10 +392,10 @@ export class CalendarPopupView extends AbstractViewPopup {
 			() => {
 				this.isSaving(true);
 				Remote.request('CalendarEventDelete',
-					(iError) => {
+					(iError, data) => {
 						this.isSaving(false);
 						if (iError) {
-							this.failed(getNotification(iError));
+							this.editError(data?.messageAdditional || data?.message || getNotification(iError));
 						} else {
 							this.editorVisible(false);
 							this.ec?.refetchEvents();
@@ -391,6 +430,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 		}
 		this.editorVisible(false);
 		this.editRecurring(false);
+		this.editError('');
 		this.failed('');
 		this.calendars([]);
 	}
