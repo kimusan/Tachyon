@@ -53,6 +53,7 @@ Notifications = {
 	CryptKeyError: 111,
 
 	ContactsSyncError: 140,
+	CalendarSyncError: 141,
 
 	CantGetMessageList: 201,
 	CantGetMessage: 202,

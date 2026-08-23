@@ -20,6 +20,7 @@ class Notifications
 	const CryptKeyError = 111;
 
 	const ContactsSyncError = 140;
+	const CalendarSyncError = 141;
 
 	const CantGetMessageList = 201;
 	const CantGetMessage = 202;

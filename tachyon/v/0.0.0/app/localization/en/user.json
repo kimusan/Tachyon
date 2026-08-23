@@ -556,7 +556,8 @@
 		"LABEL_CALENDAR_SYNC_ENABLE": "Enable remote synchronization",
 		"LABEL_CALENDAR_SYNC_URL": "CalDAV URL",
 		"LABEL_CALENDAR_SYNC_USER": "User",
-		"SYNC_READ": "Read only"
+		"SYNC_READ": "Read only",
+		"TEST_OK": "Connection succeeded"
 	},
 	"SETTINGS_CONTACTS": {
 		"LABEL_CONTACTS_AUTOSAVE": "Automatically add recipients to your address book",
@@ -667,6 +668,7 @@
 		"AccountNotAllowed": "Account is not allowed",
 		"CryptKeyError": "Your login passphrase has changed",
 		"ContactsSyncError": "Contacts synchronization error",
+		"CalendarSyncError": "Calendar synchronization failed",
 		"CantGetMessageList": "Can't get message list",
 		"CantGetMessage": "Can't get message",
 		"CantDeleteMessage": "Can't delete message",

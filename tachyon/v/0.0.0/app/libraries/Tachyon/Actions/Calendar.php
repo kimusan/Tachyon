@@ -169,7 +169,8 @@ trait Calendar
 		$oAccount = $this->getAccountFromToken();
 		$oProvider = $this->CalendarProvider($oAccount);
 		if (!$oProvider->IsActive()) {
-			return $this->FalseResponse();
+			throw new ClientException(\Tachyon\Notifications::CalendarSyncError, null,
+				'The calendar backend is not available');
 		}
 
 		$sPassword = $this->GetActionParam('Password', '');
@@ -184,11 +185,15 @@ trait Calendar
 			'Url' => $this->GetActionParam('Url', '')
 		));
 
+		// The outcome has to travel as the response's own Result. Returning it
+		// inside the payload makes every answer look like success to the client,
+		// because a non-empty array is truthy.
 		$sError = $oProvider->Test();
-		return $this->DefaultResponse(array(
-			'Result' => '' === $sError,
-			'Message' => $sError
-		));
+		if ('' !== $sError) {
+			throw new ClientException(\Tachyon\Notifications::CalendarSyncError, null, $sError);
+		}
+
+		return $this->TrueResponse();
 	}
 
 	/**
