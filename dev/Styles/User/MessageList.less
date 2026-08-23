@@ -40,7 +40,7 @@
 	}
 
 	.reply::before {
-		content: '↳';
+		.icon-mask(corner-down-right);
 		line-height: 3;
 		position: absolute;
 		margin-left: -1em;
@@ -277,7 +277,7 @@
 		}
 	}
 	.threads-len::after {
-		content: ' ›';
+		.icon-mask(chevron-right);
 	}
 
 	.replyFlag, .forwardFlag {
@@ -326,12 +326,12 @@
 		min-width: 1em;
 	}
 	.flagParent::after {
-		content: '☆'; /*⚐*/
+		.icon-mask(star-off); /*⚐*/
 	}
 	&.msgflag-\\flagged .flagParent::after,
 	&.hasFlaggedSubMessage .flagParent::after {
 		color: orange;
-		content: '★'; /*⚑*/
+		.icon-mask(star); /*⚑*/
 	}
 	&:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage) .flagParent:not(:hover)::after {
 		opacity: 0.5;
@@ -341,13 +341,13 @@
 		font-family: tachyon;
 	}
 	&.msgflag-\\answered .senderParent::before {
-		content: '← ';
+		.icon-mask(arrow-left);
 	}
 	&.msgflag-\$forwarded .senderParent::before {
-		content: '→ ';
+		.icon-mask(arrow-right);
 	}
 	&.msgflag-\\answered.msgflag-\$forwarded .senderParent::before {
-		content: '←→ ';
+		.icon-mask(arrow-left-right);
 	}
 	&.msgflag-\\deleted {
 		opacity: .7;

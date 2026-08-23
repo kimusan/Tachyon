@@ -49,7 +49,7 @@
 			</colgroup>
 			<tbody data-bind="foreach: filters, i18nUpdate: filters">
 				<tr class="filter-item" draggable="true" data-bind="sortableItem: { list: $parent.filters }">
-					<td class="" data-bind="click: function () { $parent.hasChanges(true); enabled(!enabled()); }, css: enabled() ? 'icon-square-check' : 'icon-square'"></td>
+					<td data-bind="click: function () { $parent.hasChanges(true); enabled(!enabled()); }, css: enabled() ? 'icon-square-check' : 'icon-square'"></td>
 					<td class="drag-wrapper drag-handle icon-arrow-up-down"></td>
 					<td class="e-action">
 						<span class="filter-name" data-bind="text: name()"></span>

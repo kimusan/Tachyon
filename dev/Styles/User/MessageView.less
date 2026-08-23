@@ -62,7 +62,7 @@
 		opacity: 0.6;
 	}
 	.b-message-view-checked-helper::after {
-		content: ' ✉';
+		.icon-mask(mail);
 		font-family: tachyon;
 	}
 
@@ -133,7 +133,7 @@
 		flex-shrink: 0;
 		word-break: keep-all;
 
-		.fontastic + span {
+		[class^="icon-"] + span {
 			margin-left: 0.25em;
 		}
 

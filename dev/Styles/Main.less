@@ -1,3 +1,4 @@
+@import "_IconMask.less";
 
 html.list-loading body {
 /*	cursor: wait;*/
@@ -5,10 +6,10 @@ html.list-loading body {
 }
 
 .toggleLeft::before {
-	content: '❮';
+	.icon-mask(chevron-left);
 }
 html.rl-left-panel-disabled .toggleLeft::before {
-	content: '❯';
+	.icon-mask(chevron-right);
 }
 
 @media screen and (min-width: @maxMobileWidth + 1px) {

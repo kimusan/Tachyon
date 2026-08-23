@@ -12,7 +12,7 @@
 			<i class="icon-circle-check"></i>
 		</a>
 		<a class="btn icon-trash-2" data-bind="visible: !canBeUndeleted(), command: deleteCommand" data-i18n="[title]GLOBAL/DELETE"></a>
-		<a class="btn fontastic" data-bind="visible: canBeUndeleted, command: undeleteCommand" data-i18n="[title]GLOBAL/UNDELETE"><div class=btn-rotate>🗑</div></a>
+		<a class="btn" data-bind="visible: canBeUndeleted, command: undeleteCommand" data-i18n="[title]GLOBAL/UNDELETE"><div class="btn-rotate icon-trash-2"></div></a>
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-thin buttonUp icon-chevron-left" data-bind="command: goUpCommand"></a>
@@ -142,9 +142,9 @@
 			</div>
 			<div class="informationShort">
 				<span class="from" data-bind="html: viewFromShort, attr:{ title: message().from }"></span>
-				<i class="fontastic" data-bind="text: dkimIcon, css: dkimIconClass, attr:{ title: dkimTitle }"></i>
-				<i class="fontastic" data-bind="text: dmarcIcon, css: dmarcIconClass, attr:{ title: dmarcTitle }"></i>
-				<i class="fontastic" data-bind="text: spfIcon, css: spfIconClass, attr:{ title: spfTitle }"></i>
+				<i data-bind="css: dkimIconClass, attr:{ title: dkimTitle }"></i>
+				<i data-bind="css: dmarcIconClass, attr:{ title: dmarcTitle }"></i>
+				<i data-bind="css: spfIconClass, attr:{ title: spfTitle }"></i>
 			</div>
 		</div>
 		<div id="messageItem">

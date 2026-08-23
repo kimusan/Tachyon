@@ -1,0 +1,16 @@
+/*
+ * Draws a Lucide icon into a pseudo element. The icons are published as
+ * --icon-<name> custom properties by tasks/icons.js, so rules that build their
+ * own glyph through content: can use the same set as the markup does.
+ */
+.icon-mask(@name) {
+	content: "";
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	vertical-align: -0.125em;
+	background-color: currentColor;
+	--tachyon-icon: ~"var(--icon-@{name})";
+	-webkit-mask: var(--tachyon-icon) no-repeat center / contain;
+	mask: var(--tachyon-icon) no-repeat center / contain;
+}

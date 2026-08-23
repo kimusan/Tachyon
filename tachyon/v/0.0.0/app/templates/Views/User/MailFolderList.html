@@ -14,7 +14,7 @@
 					attr: { 'data-icon': icon, 'data-unread': unreadCount }">
 					<!-- ko text: localName --><!-- /ko -->
 					<!-- ko if: isInbox -->
-					<span class="flag-icon fontastic"></span>
+					<span class="flag-icon"></span>
 					<!-- /ko -->
 				</a>
 			</li>
@@ -25,7 +25,7 @@
 			<a data-bind="click: clearFolderSearch, visible: foldersFilter">✕</a>
 		</div>
 		<div class="e-checkbox" tabindex="0" data-bind="toggle: filterUnseen">
-			<i role="checkbox" class="" data-bind="css: filterUnseen() ? 'icon-square-check' : 'icon-square'"></i>
+			<i role="checkbox" data-bind="css: filterUnseen() ? 'icon-square-check' : 'icon-square'"></i>
 			<span data-i18n="SEARCH/UNSEEN"></span>
 		</div>
 		<ul class="b-folders-user" data-bind="css: {unreadOnly: filterUnseen}, template: { name: 'MailFolderListItem', foreach: folderListVisible }"></ul>
@@ -33,7 +33,7 @@
 	</div>
 	<div class="b-footer btn-toolbar">
 		<div class="btn-group">
-			<a class="btn fontastic toggleLeft" data-bind="click: toggleLeftPanel"></a>
+			<a class="btn toggleLeft" data-bind="click: toggleLeftPanel"></a>
 		</div>
 		<div class="btn-group hide-on-panel-disabled">
 			<a class="btn icon-folder-plus" data-bind="click: createFolder" data-i18n="[title]POPUPS_CREATE_FOLDER/TITLE_CREATE_FOLDER"></a>
