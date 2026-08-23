@@ -224,6 +224,22 @@ Warning: only enable when server does not do this, else double compression error
 				'suggestions_limit' => array(20)
 			),
 
+			'calendar' => array(
+				'enable'            => array(false, 'Enable the calendar screen and its endpoints'),
+				'allow_sync'        => array(true, 'Allow users to connect a CalDAV server'),
+				'sync_interval'     => array(20, 'Minutes between automatic CalDAV synchronisations'),
+				'type'              => array('sqlite', 'Storage backend: sqlite, mysql or pgsql'),
+				'pdo_dsn'           => array('host=127.0.0.1;port=3306;dbname=tachyon', 'Used when the type is not sqlite'),
+				'pdo_user'          => array('root'),
+				'pdo_password'      => array(''),
+				'mysql_ssl_ca'      => array('', 'PEM format certificate'),
+				'mysql_ssl_verify'  => array(true),
+				'mysql_ssl_ciphers' => array('', 'HIGH'),
+				'sqlite_global'     => array(false, 'Use one shared SQLite database for everyone instead of one per user'),
+				'max_range_days'    => array(400, 'Largest window a single event query may ask for, which bounds recurrence expansion'),
+				'max_occurrences'   => array(1000, 'Occurrences expanded per recurring event before giving up on a pathological rule')
+			),
+
 			'security' => array(
 				'custom_server_signature' => array('Tachyon'),
 				'x_xss_protection_header' => array('1; mode=block'),

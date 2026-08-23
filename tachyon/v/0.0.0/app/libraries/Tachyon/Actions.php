@@ -875,6 +875,7 @@ class Actions
 						|| \extension_loaded('imagick')
 					),
 				Capa::ATTACHMENTS_ACTIONS => (bool) $oConfig->Get('capa', 'attachments_actions', false),
+				Capa::CALENDAR            => (bool) $oConfig->Get('calendar', 'enable', false),
 				Capa::CONTACTS            => (bool) $oConfig->Get('contacts', 'enable', false),
 				Capa::DANGEROUS_ACTIONS   => (bool) $oConfig->Get('capa', 'dangerous_actions', true),
 				Capa::GNUPG               => (bool) $oConfig->Get('security', 'gnupg', true) && \Tachyon\Util\PGP\GnuPG::isSupported(),
