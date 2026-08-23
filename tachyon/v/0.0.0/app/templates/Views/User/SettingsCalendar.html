@@ -29,7 +29,9 @@
 	</div>
 	<div class="control-group" data-bind="hidden: !syncUrl()">
 		<label></label>
-		<button class="btn" data-i18n="GLOBAL/TEST" data-bind="click: test"></button>
+		<button class="btn" data-i18n="GLOBAL/TEST" data-bind="click: test, disable: testing"></button>
+		<span data-bind="visible: testing"><i class="icon-spinner"></i></span>
 	</div>
 	<div class="alert alert-error" data-bind="visible: syncError, text: syncError"></div>
+	<div class="alert alert-info" data-bind="visible: syncSuccess" data-i18n="SETTINGS_CALENDAR/TEST_OK"></div>
 </form>

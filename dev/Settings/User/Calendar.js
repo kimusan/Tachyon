@@ -15,6 +15,8 @@ export class UserSettingsCalendar /*extends AbstractViewSettings*/ {
 		this.syncUser = ko.observable(config.User || '');
 		this.syncPass = ko.observable(config.Password || '');
 		this.syncError = ko.observable('');
+		this.syncSuccess = ko.observable(false);
+		this.testing = ko.observable(false);
 
 		this.syncModeOptions = koComputable(() => {
 			translateTrigger();
@@ -47,8 +49,13 @@ export class UserSettingsCalendar /*extends AbstractViewSettings*/ {
 
 	test() {
 		this.syncError('');
+		this.syncSuccess(false);
+		this.testing(true);
 		Remote.request('TestCalendarSyncData', (iError, data) => {
-			iError && this.syncError(data.messageAdditional || data.message || getErrorMessage(iError, data));
+			this.testing(false);
+			iError
+				? this.syncError(data?.messageAdditional || data?.message || getErrorMessage(iError, data))
+				: this.syncSuccess(true);
 		}, {
 			Mode: this.syncMode(),
 			Url: this.syncUrl(),
