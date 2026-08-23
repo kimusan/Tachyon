@@ -25,14 +25,14 @@
 	<div data-bind="foreach: conditions">
 		<div class="control-group" data-bind="css: {'error': valueError}" style="display:flex">
 			<div style="flex-grow:1" data-bind="css: {'error': valueError}, template: {name: template(), data: $data}"></div>
-			<span class="delete-action button-delete fontastic" style="margin-top: 5px;"
-				data-bind="click: function (oCondition) { $root.removeCondition(oCondition); }">🗑</span>
+			<span class="delete-action button-delete icon-trash-2" style="margin-top: 5px;"
+				data-bind="click: function (oCondition) { $root.removeCondition(oCondition); }"></span>
 		</div>
 	</div>
 	<div class="control-group" data-bind="visible: 0 === conditions().length"
 		data-i18n="POPUPS_FILTER/ALL_INCOMING_MESSAGES_DESC"></div>
 	<div class="control-group">
-		<a class="btn" data-bind="click: addCondition" data-icon="✚" data-i18n="POPUPS_FILTER/BUTTON_ADD_CONDITION"></a>
+		<a class="btn" data-bind="click: addCondition" data-icon="plus" data-i18n="POPUPS_FILTER/BUTTON_ADD_CONDITION"></a>
 	</div>
 
 	<div class="legend" data-i18n="POPUPS_FILTER/LEGEND_ACTIONS"></div>
@@ -40,5 +40,5 @@
 	<div data-bind="template: {name: actionTemplate()}, i18nUpdate: actionTemplate"></div>
 </form>
 <footer>
-	<button class="btn buttonSave" form="sieve-script-filter" data-icon="✔" data-i18n="GLOBAL/DONE"></button>
+	<button class="btn buttonSave" form="sieve-script-filter" data-icon="check" data-i18n="GLOBAL/DONE"></button>
 </footer>

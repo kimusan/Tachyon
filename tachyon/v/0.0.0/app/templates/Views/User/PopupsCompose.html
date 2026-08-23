@@ -1,84 +1,84 @@
 <header class="g-ui-user-select-none" data-bind="css: {loading: saving() || sending()}">
 	<!-- ko if: sendUndoCountdown() -->
 	<a class="btn btn-warning send-undo" data-bind="click: sendUndoCommand">
-		<i class="fontastic">↩</i>
+		<i class="icon-reply"></i>
 		<span data-i18n="COMPOSE/BUTTON_SEND_UNDO"></span>
 		<b data-bind="text: sendUndoCountdown"></b>
 	</a>
 	<!-- /ko -->
 	<!-- ko ifnot: sendUndoCountdown() -->
 	<a class="btn" data-bind="command: sendCommand, tooltipErrorTip: sendErrorDesc, css: {'btn-success': sendButtonSuccess, 'btn-danger': sendError, 'btn-warning': sendSuccessButSaveError }">
-		<i data-bind="css: {'icon-paper-plane': !sending(), 'icon-spinner': sending()}"></i>
+		<i data-bind="css: {'icon-send': !sending(), 'icon-spinner': sending()}"></i>
 		<span class="hide-mobile" data-i18n="COMPOSE/BUTTON_SEND"></span>
 	</a>
 	<!-- /ko -->
 	<a class="btn button-save" data-bind="command: saveCommand, tooltipErrorTip: savedErrorDesc, css: {'btn-danger': savedError }">
-		<i class="fontastic" data-bind="css: {'icon-spinner': saving()}">💾</i>
+		<i class="icon-save" data-bind="css: {'icon-spinner': saving()}"></i>
 		<span class="hide-mobile" data-i18n="GLOBAL/SAVE"></span>
 	</a>
 
-	<a class="btn btn-danger button-delete fontastic" data-bind="command: deleteCommand">🗑</a>
+	<a class="btn btn-danger button-delete icon-trash-2" data-bind="command: deleteCommand"></a>
 	<span class="saved-text hide-mobile" data-bind="text: savedTimeText"></span>
 
 	<div class="pull-right">
 		<a class="btn hide-mobile" data-i18n="GLOBAL/BCC" data-bind="visible: !showBcc(), toggle: showBcc"></a>
 		<a class="btn hide-mobile" data-i18n="GLOBAL/CC" data-bind="visible: !showCc(), toggle: showCc"></a>
-		<a class="btn fontastic" data-bind="visible: allowContacts, command: contactsCommand" data-i18n="[title]GLOBAL/CONTACTS">📇</a>
+		<a class="btn icon-contact" data-bind="visible: allowContacts, command: contactsCommand" data-i18n="[title]GLOBAL/CONTACTS"></a>
 		<div class="btn-group dropdown" data-bind="registerBootstrapDropdown: true" style="display:inline-block;vertical-align:top">
-			<a class="btn dropdown-toggle fontastic">☰</a>
+			<a class="btn dropdown-toggle icon-menu"></a>
 			<menu class="dropdown-menu right-edge" role="menu">
 				<li data-bind="toggle: showBcc">
 					<a>
-						<i class="fontastic" data-bind="text: showBcc() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: showBcc() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="GLOBAL/BCC"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: showCc">
 					<a>
-						<i class="fontastic" data-bind="text: showCc() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: showCc() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="GLOBAL/CC"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: showReplyTo">
 					<a>
-						<i class="fontastic" data-bind="text: showReplyTo() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: showReplyTo() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="GLOBAL/REPLY_TO"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: requestReadReceipt">
 					<a>
-						<i class="fontastic" data-bind="text: requestReadReceipt() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: requestReadReceipt() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="COMPOSE/BUTTON_REQUEST_READ_RECEIPT"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: requestDsn">
 					<a>
-						<i class="fontastic" data-bind="text: requestDsn() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: requestDsn() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="COMPOSE/BUTTON_REQUEST_DSN"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: requireTLS">
 					<a>
-						<i class="fontastic" data-bind="text: requireTLS() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: requireTLS() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="COMPOSE/BUTTON_REQUIRE_TLS"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: markAsImportant">
 					<a>
-						<i class="fontastic" data-bind="text: markAsImportant() ? '☑' : '☐'"></i>
+						<i class="" data-bind="css: markAsImportant() ? 'icon-square-check' : 'icon-square'"></i>
 						<span data-i18n="COMPOSE/BUTTON_MARK_AS_IMPORTANT"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: doSign, visible: canSign">
 					<a data-bind="attr:{title: signOptionsText}">
-						<i class="fontastic" data-bind="text: doSign() ? '☑' : '☐'"></i>
-						<span data-icon="✍" data-i18n="CRYPTO/SIGN"></span>
+						<i class="" data-bind="css: doSign() ? 'icon-square-check' : 'icon-square'"></i>
+						<span data-icon="signature" data-i18n="CRYPTO/SIGN"></span>
 					</a>
 				</li>
 				<li data-bind="toggle: doEncrypt, visible: canEncrypt">
 					<a data-bind="attr:{title: encryptOptionsText}">
-						<i class="fontastic" data-bind="text: doEncrypt() || 'mailvelope' == viewArea() ? '☑' : '☐'"></i>
-						<span data-icon="🔒" data-i18n="CRYPTO/ENCRYPT"></span>
+						<i class="" data-bind="css: doEncrypt() || 'mailvelope' == viewArea() ? 'icon-square-check' : 'icon-square'"></i>
+						<span data-icon="lock" data-i18n="CRYPTO/ENCRYPT"></span>
 					</a>
 				</li>
 			</menu>
@@ -146,18 +146,12 @@
 		<div style="display:flex">
 			<div class="btn-group" style="flex-grow:1"></div>
 			<div class="btn-group">
-				<a class="btn fontastic" data-bind="toggle: doSign, visible: canSign, css: {'btn-success': doSign()}" data-i18n="[title]CRYPTO/SIGN">
-					✍
-				</a>
-				<a class="btn fontastic" data-bind="toggle: doEncrypt, visible: canEncrypt, css: {'btn-success': doEncrypt() || 'mailvelope' == viewArea()}" data-i18n="[title]CRYPTO/ENCRYPT">
-					🔒
-				</a>
+				<a class="btn icon-signature" data-bind="toggle: doSign, visible: canSign, css: {'btn-success': doSign()}" data-i18n="[title]CRYPTO/SIGN"></a>
+				<a class="btn icon-lock" data-bind="toggle: doEncrypt, visible: canEncrypt, css: {'btn-success': doEncrypt() || 'mailvelope' == viewArea()}" data-i18n="[title]CRYPTO/ENCRYPT"></a>
 			</div>
 			<div class="btn-group">
-				<a class="btn fontastic" style="padding-left: 10px; padding-right: 10px;" id="composeUploadButton"
-					data-bind="visible: addAttachmentEnabled()" data-i18n="[title]COMPOSE/ATTACH_FILES">
-					⁺📎
-				</a>
+				<a class="btn icon-paperclip" style="padding-left: 10px; padding-right: 10px;" id="composeUploadButton"
+					data-bind="visible: addAttachmentEnabled()" data-i18n="[title]COMPOSE/ATTACH_FILES"></a>
 			</div>
 		</div>
 	</div>
@@ -186,7 +180,7 @@
 				css: { 'btn-danger': attachmentsInErrorCount() },
 				tooltipErrorTip: attachmentsErrorTooltip">
 			<b data-bind="visible: attachmentsCount, text: attachmentsCount"></b>
-			<i data-bind="css: { 'icon-attachment': !attachmentsInProcessCount(), 'icon-spinner': attachmentsInProcessCount()}"></i>
+			<i data-bind="css: { 'icon-paperclip': !attachmentsInProcessCount(), 'icon-spinner': attachmentsInProcessCount()}"></i>
 			<span data-i18n="GLOBAL/ATTACHMENTS"></span>
 		</label>
 		<div class="tab-content attachmentAreaParent" role="tabpanel" aria-hidden="true" style="grid-column-end:4">

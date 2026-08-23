@@ -22,16 +22,16 @@
 					data-i18n="TAB_DOMAINS/DELETE_ARE_YOU_SURE"></a>
 			</td>
 			<td>
-				<span class="delete-domain fontastic" data-bind="visible: !askDelete(), click: function (oDomain) { $root.domainForDeletion(oDomain); }">🗑</span>
+				<span class="delete-domain icon-trash-2" data-bind="visible: !askDelete(), click: function (oDomain) { $root.domainForDeletion(oDomain); }"></span>
 			</td>
-			<td class="disabled-domain fontastic" data-bind="click: function (oDomain) { $root.disableDomain(oDomain); }, text: disabled() ? '☐' : '☑'"></td>
+			<td class="disabled-domain" data-bind="click: function (oDomain) { $root.disableDomain(oDomain); }, css: disabled() ? 'icon-square' : 'icon-square-check'"></td>
 		</tr>
 	</tbody>
 	<tfoot>
 		<tr><td colspan="4" style="text-align:right">
-			<a class="btn" data-bind="click: createDomain" data-icon="✚" data-i18n="TAB_DOMAINS/BUTTON_ADD_DOMAIN"></a>
+			<a class="btn" data-bind="click: createDomain" data-icon="plus" data-i18n="TAB_DOMAINS/BUTTON_ADD_DOMAIN"></a>
 			&nbsp;&nbsp;
-			<a class="btn" data-bind="click: createDomainAlias" data-icon="✚" data-i18n="TAB_DOMAINS/BUTTON_ADD_ALIAS"></a>
+			<a class="btn" data-bind="click: createDomainAlias" data-icon="plus" data-i18n="TAB_DOMAINS/BUTTON_ADD_ALIAS"></a>
 		</td></tr>
 	</tfoot>
 </table>

@@ -5,21 +5,21 @@
 </div>
 <form action="#/" spellcheck="false" method="POST" data-bind="submit: submitForm, css: {'errorAnimated': formError, 'submitting': submitRequest()}">
 	<div class="controls" data-bind="css: {'error': loginError}">
-		<span class="fontastic">👤</span>
+		<span class="icon-user"></span>
 		<input name="Login" required="" type="text" class="input-block-level"
 			autofocus="" autocomplete="username" autocorrect="off" autocapitalize="off"
 			data-bind="textInput: login, disable: submitRequest"
 			data-i18n="[placeholder]LOGIN/LABEL_LOGIN">
 	</div>
 	<div class="controls" data-bind="css: {'error': passwordError}">
-		<span class="fontastic">🔑</span>
+		<span class="icon-key"></span>
 		<input name="Password" required="" type="password" class="input-block-level"
 			autocomplete="current-password" autocorrect="off" autocapitalize="off"
 			data-bind="textInput: password, disable: submitRequest"
 			data-i18n="[placeholder]GLOBAL/PASSWORD">
 	</div>
 	<div class="controls">
-		<span class="fontastic">⏱</span>
+		<span class="icon-timer"></span>
 		<input name="TOTP" type="text" pattern="[0-9]*" inputmode="numeric" class="input-block-level"
 			autocomplete="one-time-code" autocorrect="off" autocapitalize="off"
 			data-bind="textInput: totp, disable: submitRequest"

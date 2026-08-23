@@ -28,9 +28,9 @@
 </form>
 <footer>
 	<button form="accountform" class="btn buttonAddAccount">
-		<i data-bind="visible: isNew, css: {'icon-user-add': !submitRequest(), 'icon-spinner': submitRequest()}"></i>
+		<i data-bind="visible: isNew, css: {'icon-user-plus': !submitRequest(), 'icon-spinner': submitRequest()}"></i>
 		<span data-bind="visible: isNew" data-i18n="POPUPS_ADD_ACCOUNT/BUTTON_ADD_ACCOUNT"></span>
-		<i data-bind="visible: !isNew(), css: {'icon-ok': !submitRequest(), 'icon-spinner': submitRequest()}"></i>
+		<i data-bind="visible: !isNew(), css: {'icon-check': !submitRequest(), 'icon-spinner': submitRequest()}"></i>
 		<span data-bind="visible: !isNew()" data-i18n="GLOBAL/SAVE"></span>
 	</button>
 </footer>

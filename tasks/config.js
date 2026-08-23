@@ -32,7 +32,8 @@ config.paths.css = {
 		name: 'app.css',
 		src: [
 			'vendors/normalize.css/normalize.css',
-			'vendors/fontastic/styles.css'
+			'vendors/fontastic/styles.css',
+			'vendors/lucide/icons.css'
 		]
 	},
 	admin: {
