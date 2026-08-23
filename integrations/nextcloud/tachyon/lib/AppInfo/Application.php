@@ -17,6 +17,8 @@ use OCP\User\Events\BeforeUserLoggedOutEvent;
 use OCP\IConfig;
 use OCP\ISession;
 
+use Psr\Log\LoggerInterface;
+
 class Application extends App implements IBootstrap
 {
 	public const APP_ID = 'tachyon';
@@ -54,6 +56,7 @@ class Application extends App implements IBootstrap
 		unset($_dataDir);
 
 		$dispatcher = $context->getServerContainer()->get(IEventDispatcher::class);
+		$logger = $context->getServerContainer()->get(LoggerInterface::class);
 		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) use ($context) {
 /*
 			$config = $context->getServerContainer()->get(\OCP\IConfig::class);
@@ -71,28 +74,39 @@ class Application extends App implements IBootstrap
 */
 		});
 
-		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) {
+		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) use ($logger) {
 			// https://github.com/nextcloud/server/issues/36083#issuecomment-1387370634
 //			\OC::$server->getSession()['tachyon-passphrase'] = '';
-			TachyonHelper::loadApp();
-//			\Tachyon\Api::Actions()->Logout(true);
-			\Tachyon\Api::Actions()->DoLogout();
+			/**
+			 * Signing out of the mail client is not worth failing a Nextcloud
+			 * logout over. Without this a broken load ends in index.php calling
+			 * exit(), which abandons the logout half done and leaves the user
+			 * unable to sign back in.
+			 */
+			try {
+				TachyonHelper::loadApp();
+//				\Tachyon\Api::Actions()->Logout(true);
+				\Tachyon\Api::Actions()->DoLogout();
+			} catch (\Throwable $oException) {
+				$logger->error('Tachyon logout failed: ' . $oException->getMessage(), ['app' => self::APP_ID]);
+			}
 		});
 
 		// https://github.com/nextcloud/impersonate/issues/179
 		// https://github.com/nextcloud/impersonate/pull/180
 		$class = 'OCA\Impersonate\Events\BeginImpersonateEvent';
 		if (\class_exists($class)) {
-			$dispatcher->addListener($class, function ($Event) use ($context) {
+			$logout = function ($Event) use ($context, $logger) {
 				$context->getServerContainer()->get(\OCP\ISession::class)->set('tachyon-passphrase', '');
-				TachyonHelper::loadApp();
-				\Tachyon\Api::Actions()->Logout(true);
-			});
-			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) use ($context) {
-				$context->getServerContainer()->get(\OCP\ISession::class)->set('tachyon-passphrase', '');
-				TachyonHelper::loadApp();
-				\Tachyon\Api::Actions()->Logout(true);
-			});
+				try {
+					TachyonHelper::loadApp();
+					\Tachyon\Api::Actions()->Logout(true);
+				} catch (\Throwable $oException) {
+					$logger->error('Tachyon logout failed: ' . $oException->getMessage(), ['app' => self::APP_ID]);
+				}
+			};
+			$dispatcher->addListener($class, $logout);
+			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', $logout);
 		}
 	}
 }

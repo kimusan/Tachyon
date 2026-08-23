@@ -48,6 +48,22 @@ class TachyonHelper
 //		define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_tachyon/');
 
 		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
+
+		/**
+		 * index.php only defines APP_VERSION when nothing else has, so another app
+		 * loaded earlier in the same request wins. SnappyMail's Nextcloud app does
+		 * exactly that, and index.php then looks for a version directory this
+		 * package never shipped, prints [105] and calls exit(), taking the whole
+		 * request with it. Refuse here instead, where the caller can handle it.
+		 */
+		if (\defined('APP_VERSION') && !\is_dir($app_dir . '/tachyon/v/' . APP_VERSION)) {
+			throw new \RuntimeException(
+				'Tachyon cannot start because APP_VERSION is already set to ' . APP_VERSION
+				. ', which is not a version this app ships. Another mail app, usually SnappyMail,'
+				. ' is loaded in the same request. Disable or remove it.'
+			);
+		}
+
 		require_once $app_dir . '/index.php';
 	}
 
