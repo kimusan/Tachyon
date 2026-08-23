@@ -193,49 +193,46 @@ export class MailMessageView extends AbstractViewRight {
 
 			canBeRepliedOrForwarded: () => !MessagelistUserStore.isDraftFolder() && this.messageVisible(),
 
-			dkimIcon: () => {
+			dkimIconClass: () => {
 				switch (this.dkimData()[0]) {
 					case 'none':
-						return '🚫︎';
+						return 'icon-ban';
 					case 'pass':
-						return '✔';
+						return 'icon-check iconcolor-green';
 					default:
-						return '✖';
+						return 'icon-x iconcolor-red';
 				}
 			},
-			dkimIconClass: () => 'pass' === this.dkimData()[0] ? 'iconcolor-green' : 'iconcolor-red',
 			dkimTitle:() => {
 				const dkim = this.dkimData();
 				return dkim[0] ? dkim[2] || 'DKIM: ' + dkim[0] : '';
 			},
 
-			spfIcon: () => {
+			spfIconClass: () => {
 				switch (this.spfData()[0]) {
 					case 'none':
-						return '🚫︎';
+						return 'icon-ban';
 					case 'pass':
-						return '✔';
+						return 'icon-check iconcolor-green';
 					default:
-						return '✖';
+						return 'icon-x iconcolor-red';
 				}
 			},
-			spfIconClass: () => 'pass' === this.spfData()[0] ? 'iconcolor-green' : 'iconcolor-red',
 			spfTitle:() => {
 				const spf = this.spfData();
 				return spf[0] ? spf[2] || 'SPF: ' + spf[0] : '';
 			},
 
-			dmarcIcon: () => {
+			dmarcIconClass: () => {
 				switch (this.dmarcData()[0]) {
 					case 'none':
-						return '🚫︎';
+						return 'icon-ban';
 					case 'pass':
-						return '✔';
+						return 'icon-check iconcolor-green';
 					default:
-						return '✖';
+						return 'icon-x iconcolor-red';
 				}
 			},
-			dmarcIconClass: () => 'pass' === this.dmarcData()[0] ? 'iconcolor-green' : 'iconcolor-red',
 			dmarcTitle:() => {
 				const dmarc = this.dmarcData();
 				return dmarc[0] ? dmarc[2] || 'DMARC: ' + dmarc[0] : '';

@@ -165,13 +165,13 @@
 		margin-left: 7px;
 	}
 	.flag-icon::after {
-		content:'☆';
+		.icon-mask(star-off);
 		opacity: .5;
 	}
 	.is-flagged {
 		.flag-icon::after {
 			color: orange;
-			content:'★';
+			.icon-mask(star);
 			opacity: 1;
 		}
 	}

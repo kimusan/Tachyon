@@ -6,8 +6,8 @@
 
 		<a class="btn" data-bind="click: newContact" data-icon="plus" data-i18n="CONTACTS/BUTTON_ADD_CONTACT"></a>
 
-		<a class="btn fontastic checkAllContacts" data-bind="visible: useCheckboxesInList,
-			click: () => checkAll(!checkAll()), text: checkAll() ? '☑' : '☐'"
+		<a class="btn checkAllContacts" data-bind="visible: useCheckboxesInList,
+			click: () => checkAll(!checkAll()), css: checkAll() ? 'icon-square-check' : 'icon-square'"
 			data-i18n="[title]CONTACTS/SELECT_ALL"></a>
 
 		<a class="btn btn-success icon-mail" data-bind="command: newMessageCommand"></a>
