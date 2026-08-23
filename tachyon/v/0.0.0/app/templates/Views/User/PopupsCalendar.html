@@ -7,9 +7,9 @@
 		<a class="btn btn-success" data-i18n="CALENDAR/BUTTON_NEW_EVENT" data-bind="command: newEventCommand"></a>
 
 		<div class="btn-group">
-			<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_PREV" data-bind="click: () => navigate(0)">◀️</a>
+			<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_PREV" data-bind="click: () => navigate(0)"><i class="icon-right-mini b-calendar-flip"></i></a>
 			<a class="btn" data-i18n="CALENDAR/BUTTON_TODAY" data-bind="click: () => today()"></a>
-			<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_NEXT" data-bind="click: () => navigate(1)">▶️</a>
+			<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_NEXT" data-bind="click: () => navigate(1)"><i class="icon-right-mini"></i></a>
 		</div>
 
 		<span class="b-calendar-title" data-bind="text: title"></span>
@@ -26,7 +26,7 @@
 		</div>
 
 		<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_SYNC" data-bind="click: () => syncCalendars(),
-			css: {'disabled': loading()}">&#8646;</a>
+			css: {'disabled': loading()}"><svg class="b-calendar-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg></a>
 
 		<span class="b-calendar-loading" data-bind="visible: loading()">
 			<i class="icon-spinner"></i>
