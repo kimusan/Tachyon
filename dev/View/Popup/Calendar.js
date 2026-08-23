@@ -105,6 +105,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 		});
 
 		decorateKoCommands(this, {
+			newEventCommand: self => self.hasWritableCalendar(),
 			saveEventCommand: self => !self.isSaving() && !self.editReadOnly() && self.editSummary().trim(),
 			deleteEventCommand: self => !self.isSaving() && !self.editReadOnly() && self.editUid()
 		});
@@ -172,6 +173,9 @@ export class CalendarPopupView extends AbstractViewPopup {
 			this.calendars().forEach(cal =>
 				cal.visible.subscribe(() => this.ec?.refetchEvents())
 			);
+			// The grid is created before this response arrives, so the flag that
+			// enables drag to create has to be set again now one is known
+			this.ec?.setOption('selectable', this.hasWritableCalendar());
 			this.ec?.refetchEvents();
 		});
 	}
@@ -210,7 +214,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 			eventSources: [{ events: (info, ok, fail) => this.fetchEvents(info, ok, fail) }],
 			datesSet: info => this.title(info.view.title),
 			eventClick: info => this.openEditor(info.event),
-			select: info => this.openNewEditor(info),
+			select: info => this.openNewEditor(info.start, info.end, info.allDay),
 			eventDrop: info => this.persistMove(info),
 			eventResize: info => this.persistMove(info)
 		});
@@ -233,7 +237,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.ec?.setOption('date', new Date());
 	}
 
-	openNewEditor(info) {
+	openNewEditor(start, end, allDay) {
 		const writable = this.calendars().find(cal => !cal.readOnly);
 		if (!writable) {
 			return;
@@ -243,11 +247,23 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editSummary('');
 		this.editLocation('');
 		this.editDescription('');
-		this.editAllDay(!!info.allDay);
-		this.editStart(this.toInput(info.start, info.allDay));
-		this.editEnd(this.toInput(info.end, info.allDay));
+		this.editAllDay(!!allDay);
+		this.editStart(this.toInput(start, allDay));
+		this.editEnd(this.toInput(end, allDay));
+		this.editRecurring(false);
 		this.editReadOnly(false);
 		this.editorVisible(true);
+	}
+
+	/**
+	 * The toolbar route, for when there is nothing to drag on. Starts at the next
+	 * whole hour so the common case needs no editing of the times.
+	 */
+	newEventCommand() {
+		const start = new Date();
+		start.setMinutes(0, 0, 0);
+		start.setHours(start.getHours() + 1);
+		this.openNewEditor(start, new Date(start.getTime() + 3600000), false);
 	}
 
 	openEditor(event) {
