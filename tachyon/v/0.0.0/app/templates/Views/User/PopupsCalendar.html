@@ -68,11 +68,20 @@
 
 				<div class="control-group">
 					<label data-i18n="CALENDAR/LABEL_CALENDAR"></label>
-					<select class="span5" data-bind="value: editCalendar, enable: !editReadOnly() && !editUid()">
-						<!-- ko foreach: calendars -->
-						<option data-bind="value: uuid, text: name, disable: readOnly"></option>
-						<!-- /ko -->
-					</select>
+					<!-- ko if: editUid -->
+					<span class="b-calendar-editor-static" data-bind="text: editCalendarName"></span>
+					<!-- /ko -->
+					<!-- ko ifnot: editUid -->
+					<div data-bind="component: {
+						name: 'Select',
+						params: {
+							options: writableCalendars,
+							value: editCalendar,
+							optionsText: 'name',
+							optionsValue: 'uuid'
+						}
+					}"></div>
+					<!-- /ko -->
 				</div>
 
 				<div class="control-group">
