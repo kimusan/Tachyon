@@ -81,7 +81,7 @@
 		<div id="no-sort-list" class="btn icon-x" data-i18n="[title]MESSAGE_LIST/NO_SORT"></div>
 	</div>
 	<div class="btn-group dropdown onCheckedHide" data-bind="visible: sortSupported(), registerBootstrapDropdown: true">
-		<a id="sort-list-dropdown-id" class="btn dropdown-toggle icon-arrow-down" href="#" tabindex="-1" data-i18n="[title]MESSAGE_LIST/SORT" data-bind="text: sortText"></a>
+		<a id="sort-list-dropdown-id" class="btn dropdown-toggle" href="#" tabindex="-1" data-i18n="[title]MESSAGE_LIST/SORT" data-bind="css: sortIcon"></a>
 		<menu class="dropdown-menu" role="menu" aria-labelledby="sort-list-dropdown-id">
 			<li role="presentation" data-sort="" data-bind="click: changeSort">
 				<a href="#" tabindex="-1" data-icon="calendar-arrow-down" data-i18n="MESSAGE_LIST/SORT_DATE_DESC"></a>
