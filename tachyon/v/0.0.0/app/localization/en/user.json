@@ -199,6 +199,7 @@
 		"SEARCHING_DESC": "Searching..."
 	},
 	"CALENDAR": {
+		"BUTTON_NEW_EVENT": "New event",
 		"BUTTON_PREV": "Previous",
 		"BUTTON_NEXT": "Next",
 		"BUTTON_TODAY": "Today",
