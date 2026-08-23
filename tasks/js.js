@@ -42,6 +42,14 @@ const jsOpenPGP = () => {
 		.pipe(gulp.dest(config.paths.staticJS));
 };
 
+// Calendar (loaded on demand by the calendar screen)
+const jsCalendar = () => {
+	return gulp
+		.src('vendors/event-calendar/dist/event-calendar.min.js')
+		.pipe(rename('calendar.js'))
+		.pipe(gulp.dest(config.paths.staticJS));
+};
+
 // libs
 const jsLibs = () => {
 	const src = config.paths.js.libs.src;
@@ -130,6 +138,6 @@ exports.jsLint = jsLint;
 exports.js = gulp.series(
 	jsClean,
 	jsLint,
-	gulp.parallel(jsBoot, jsServiceWorker, jsOpenPGP, jsLibs, jsSieve, jsApp, jsAdmin),
+	gulp.parallel(jsBoot, jsServiceWorker, jsOpenPGP, jsCalendar, jsLibs, jsSieve, jsApp, jsAdmin),
 	jsMin
 );

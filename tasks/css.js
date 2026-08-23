@@ -70,6 +70,14 @@ const cssAdminBuild = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
+const cssCalendarBuild = () => {
+	return gulp
+		.src('vendors/event-calendar/dist/event-calendar.min.css')
+		.pipe(rename('calendar.css'))
+		.pipe(eol('\n', true))
+		.pipe(gulp.dest(config.paths.staticCSS));
+};
+
 const cssBootMin = () => {
 	return gulp
 		.src(config.paths.staticCSS + config.paths.css.boot.name)
@@ -99,8 +107,17 @@ const cssAdminMin = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
-const cssBuild = gulp.parallel(cssBootBuild, cssMainBuild, cssAdminBuild);
-const cssMin = gulp.parallel(cssBootMin, cssMainMin, cssAdminMin);
+const cssCalendarMin = () => {
+	return gulp
+		.src(config.paths.staticCSS + 'calendar.css')
+		.pipe(cleanCss())
+		.pipe(rename({ suffix: '.min' }))
+		.pipe(eol('\n', true))
+		.pipe(gulp.dest(config.paths.staticCSS));
+};
+
+const cssBuild = gulp.parallel(cssBootBuild, cssMainBuild, cssAdminBuild, cssCalendarBuild);
+const cssMin = gulp.parallel(cssBootMin, cssMainMin, cssAdminMin, cssCalendarMin);
 
 const cssLint = (done) => done();
 
