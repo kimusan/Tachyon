@@ -1,0 +1,125 @@
+<header class="b-header-toolbar g-ui-user-select-none">
+
+	<a href="#" class="close" data-bind="click: tryToClose">×</a>
+
+	<div class="btn-toolbar">
+
+		<div class="btn-group">
+			<a class="btn fontastic" data-i18n="[title]CALENDAR/BUTTON_PREV" data-bind="click: () => navigate(0)">&#9664;</a>
+			<a class="btn" data-i18n="CALENDAR/BUTTON_TODAY" data-bind="click: () => today()"></a>
+			<a class="btn fontastic" data-i18n="[title]CALENDAR/BUTTON_NEXT" data-bind="click: () => navigate(1)">&#9654;</a>
+		</div>
+
+		<span class="b-calendar-title" data-bind="text: title"></span>
+
+		<div class="btn-group">
+			<a class="btn" data-i18n="CALENDAR/VIEW_MONTH" data-bind="click: () => setView('dayGridMonth'),
+				css: {'active': 'dayGridMonth' === currentView()}"></a>
+			<a class="btn" data-i18n="CALENDAR/VIEW_WEEK" data-bind="click: () => setView('timeGridWeek'),
+				css: {'active': 'timeGridWeek' === currentView()}"></a>
+			<a class="btn" data-i18n="CALENDAR/VIEW_DAY" data-bind="click: () => setView('timeGridDay'),
+				css: {'active': 'timeGridDay' === currentView()}"></a>
+			<a class="btn" data-i18n="CALENDAR/VIEW_LIST" data-bind="click: () => setView('listWeek'),
+				css: {'active': 'listWeek' === currentView()}"></a>
+		</div>
+
+		<a class="btn fontastic" data-i18n="[title]CALENDAR/BUTTON_SYNC" data-bind="click: () => syncCalendars(),
+			css: {'disabled': loading()}">&#8646;</a>
+
+		<span class="b-calendar-loading" data-bind="visible: loading()">
+			<i class="icon-spinner"></i>
+		</span>
+
+	</div>
+
+</header>
+<div class="modal-body">
+
+	<div class="left">
+		<div class="b-calendar-list">
+			<div class="listEmptyList" data-bind="visible: !calendars().length && !loading()"
+				data-i18n="CALENDAR/EMPTY_LIST"></div>
+			<!-- ko foreach: calendars -->
+			<label class="e-calendar-item">
+				<input type="checkbox" data-bind="checked: visible">
+				<span class="e-calendar-color" data-bind="style: {'background-color': color || 'transparent'}"></span>
+				<span class="e-calendar-name" data-bind="text: name"></span>
+				<span class="e-calendar-readonly fontastic" data-bind="visible: readOnly"
+					data-i18n="[title]CALENDAR/READ_ONLY">&#128274;</span>
+			</label>
+			<!-- /ko -->
+		</div>
+	</div>
+
+	<div class="right">
+		<div class="b-calendar-error" data-bind="visible: !!failed(), text: failed"></div>
+		<div class="b-calendar-grid"></div>
+
+		<div class="b-calendar-editor" data-bind="visible: editorVisible">
+			<form class="b-calendar-editor-form" spellcheck="false" data-bind="css: {'read-only': editReadOnly()}">
+
+				<div class="b-calendar-editor-note" data-bind="visible: editRecurring"
+					data-i18n="CALENDAR/RECURRING_READ_ONLY"></div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_SUMMARY"></label>
+					<input type="text" class="span5" data-bind="value: editSummary, enable: !editReadOnly()">
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_CALENDAR"></label>
+					<select class="span5" data-bind="value: editCalendar, enable: !editReadOnly() && !editUid()">
+						<!-- ko foreach: calendars -->
+						<option data-bind="value: uuid, text: name, disable: readOnly"></option>
+						<!-- /ko -->
+					</select>
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_ALL_DAY"></label>
+					<input type="checkbox" data-bind="checked: editAllDay, enable: !editReadOnly()">
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_START"></label>
+					<!-- ko if: editAllDay -->
+					<input type="date" data-bind="value: editStart, enable: !editReadOnly()">
+					<!-- /ko -->
+					<!-- ko ifnot: editAllDay -->
+					<input type="datetime-local" data-bind="value: editStart, enable: !editReadOnly()">
+					<!-- /ko -->
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_END"></label>
+					<!-- ko if: editAllDay -->
+					<input type="date" data-bind="value: editEnd, enable: !editReadOnly()">
+					<!-- /ko -->
+					<!-- ko ifnot: editAllDay -->
+					<input type="datetime-local" data-bind="value: editEnd, enable: !editReadOnly()">
+					<!-- /ko -->
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_LOCATION"></label>
+					<input type="text" class="span5" data-bind="value: editLocation, enable: !editReadOnly()">
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_DESCRIPTION"></label>
+					<textarea class="span5" rows="3" data-bind="value: editDescription, enable: !editReadOnly()"></textarea>
+				</div>
+
+				<div class="buttons">
+					<a class="btn btn-success" data-i18n="GLOBAL/SAVE" data-bind="command: saveEventCommand,
+						visible: !editReadOnly()"></a>
+					<a class="btn btn-danger" data-i18n="GLOBAL/DELETE" data-bind="command: deleteEventCommand,
+						visible: !editReadOnly() && !!editUid()"></a>
+					<a class="btn" data-i18n="GLOBAL/CANCEL" data-bind="click: () => closeEditor()"></a>
+				</div>
+
+			</form>
+		</div>
+	</div>
+
+</div>

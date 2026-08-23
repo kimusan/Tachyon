@@ -19,6 +19,7 @@ module.exports = [
 				shortcuts: 'readonly',
 				progressJs: 'readonly',
 				openpgp: 'readonly',
+				EventCalendar: 'readonly',
 				CKEDITOR: 'readonly',
 				Squire: 'readonly',
 				SquireUI: 'readonly',

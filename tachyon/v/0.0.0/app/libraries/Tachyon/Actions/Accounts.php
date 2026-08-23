@@ -209,6 +209,7 @@ trait Accounts
 			'accountHash' => $oAccount->Hash(),
 			'mainEmail' => \Tachyon\Api::Actions()->getMainAccountFromToken()->Email(),
 			'contactsAllowed' => $this->AddressBookProvider($oAccount)->IsActive(),
+			'calendarAllowed' => $this->CalendarProvider($oAccount)->IsActive(),
 			'HideUnsubscribed' => false,
 			'defaultSort' => '',
 			'useThreads' => (bool) $oConfig->Get('defaults', 'mail_use_threads', false),
