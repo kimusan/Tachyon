@@ -91,6 +91,16 @@ export class CalendarPopupView extends AbstractViewPopup {
 		addComputablesTo(this, {
 			hasWritableCalendar: () => this.calendars().some(cal => !cal.readOnly),
 
+			// Only these can take a new event, so they are the only sensible choices
+			writableCalendars: () => this.calendars().filter(cal => !cal.readOnly),
+
+			// An existing event cannot move between calendars yet, so its calendar
+			// is shown as text rather than as a control that refuses to work
+			editCalendarName: () => {
+				const uuid = this.editCalendar();
+				return this.calendars().find(cal => cal.uuid === uuid)?.name || '';
+			},
+
 			visibleCalendarUuids: () => this.calendars().filter(cal => cal.visible()).map(cal => cal.uuid)
 		});
 
