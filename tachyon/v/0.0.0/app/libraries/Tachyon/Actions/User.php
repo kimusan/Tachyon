@@ -11,6 +11,7 @@ use Tachyon\Utils;
 trait User
 {
 	use Accounts;
+	use Calendar;
 	use Contacts;
 	use Filters;
 	use Folders;

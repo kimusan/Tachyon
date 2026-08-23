@@ -209,6 +209,10 @@ class Actions
 					// Providers\AddressBook\AddressBookInterface
 					$mResult = new Providers\AddressBook\PdoAddressBook();
 					break;
+				case 'calendar':
+					// Providers\Calendar\CalendarInterface
+					$mResult = new Providers\Calendar\PdoCalendar();
+					break;
 				case 'identities':
 				case 'suggestions':
 					$mResult = [];
