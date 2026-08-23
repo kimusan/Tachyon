@@ -2,6 +2,7 @@ import ko from 'ko';
 
 import { addObservablesTo, addComputablesTo } from 'External/ko';
 import { SettingsGet } from 'Common/Globals';
+import { LanguageStore } from 'Stores/Language';
 import { staticLink } from 'Common/Links';
 import { i18n, getNotification } from 'Common/Translator';
 
@@ -87,6 +88,14 @@ export class CalendarPopupView extends AbstractViewPopup {
 			editReadOnly: false,
 			editRecurring: false,
 			editError: ''
+		});
+
+		// Switching the inputs between date and datetime-local leaves the old
+		// string in place, which the other input type cannot parse, so it falls
+		// back to showing an empty placeholder and the date looks wiped
+		this.editAllDay.subscribe(allDay => {
+			this.editStart(this.reformatForAllDay(this.editStart(), allDay));
+			this.editEnd(this.reformatForAllDay(this.editEnd(), allDay));
 		});
 
 		addComputablesTo(this, {
@@ -207,9 +216,28 @@ export class CalendarPopupView extends AbstractViewPopup {
 		list.toggle('ec-auto-dark', !mode);
 	}
 
+	/**
+	 * The component formats its own times, so it has to be told the same hour
+	 * cycle the rest of the UI uses rather than falling back to the locale's.
+	 */
+	timeFormatOptions() {
+		const cycle = LanguageStore.hourCycle(),
+			options = { hour: 'numeric', minute: '2-digit' };
+		if (cycle) {
+			options.hourCycle = cycle;
+			// hour12 otherwise wins over hourCycle in several engines
+			options.hour12 = 'h11' === cycle || 'h12' === cycle;
+		}
+		return options;
+	}
+
 	createCalendar() {
 		this.applyColorScheme();
+		const el = document.documentElement;
 		this.ec = EventCalendar.create(this.calendarEl, {
+			locale: el.dataset.dateLang || el.lang || undefined,
+			eventTimeFormat: this.timeFormatOptions(),
+			slotLabelFormat: this.timeFormatOptions(),
 			view: this.currentView(),
 			headerToolbar: { start: '', center: '', end: '' },
 			height: '100%',
@@ -306,6 +334,19 @@ export class CalendarPopupView extends AbstractViewPopup {
 
 	fromInput(value, allDay) {
 		return toStamp(new Date(allDay ? value + 'T00:00' : value));
+	}
+
+	/**
+	 * date wants YYYY-MM-DD, datetime-local wants YYYY-MM-DDTHH:MM
+	 */
+	reformatForAllDay(value, allDay) {
+		if (!value) {
+			return value;
+		}
+		if (allDay) {
+			return value.split('T')[0];
+		}
+		return value.includes('T') ? value : value + 'T09:00';
 	}
 
 	/**
