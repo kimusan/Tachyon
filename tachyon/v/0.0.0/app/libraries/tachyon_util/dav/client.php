@@ -12,6 +12,8 @@ class Client
 {
 	public string $urlPath;
 
+	protected string $sPreemptiveAuth = '';
+
 	const
 		NS_DAV  = 'urn:DAV',
 		NS_CARDDAV = 'urn:ietf:params:xml:ns:carddav';
@@ -42,6 +44,16 @@ class Client
 		$this->HTTP->proxy = $settings['proxy'] ?? null;
 		if (!empty($settings['userName']) && !empty($settings['password'])) {
 			$this->HTTP->setAuth(3, $settings['userName'], $settings['password']);
+			/**
+			 * Also send Basic up front. Allowing both Basic and Digest makes cURL
+			 * probe unauthenticated first and wait for a 401 to pick a scheme, and
+			 * a server that answers anything else to an anonymous request (Nextcloud
+			 * behind nginx returns 404) never gets authenticated at all. Digest is
+			 * still available, because a server wanting it replies 401 to this and
+			 * cURL then negotiates normally.
+			 */
+			$this->sPreemptiveAuth = 'Authorization: Basic '
+				. \base64_encode($settings['userName'] . ':' . $settings['password']);
 		} else {
 			\Tachyon\Util\Log::warning('DAV', 'No user credentials set');
 		}
@@ -76,6 +88,9 @@ class Client
 			}
 		}
 		\Tachyon\Util\Log::debug('DAV', "{$method} {$url}" . ($body ? "\n\t" . \str_replace("\n", "\n\t", $body) : ''));
+		if (\strlen($this->sPreemptiveAuth) && !isset($headers['Authorization'])) {
+			$headers['Authorization'] = $this->sPreemptiveAuth;
+		}
 		$response = $this->HTTP->doRequest($method, $url, $body, $headers);
 		if (301 == $response->status) {
 			// Like: RewriteRule ^\.well-known/carddav /nextcloud/remote.php/dav [R=301,L]
@@ -172,6 +187,18 @@ class Client
 						if ('{DAV:}resourcetype' === $propertyName) {
 							foreach ($element->xpath("*") as $resourcetype) {
 								$propList[$propertyName][] = self::toClarkNotation($resourcetype);
+							}
+						} else if ('{DAV:}current-user-privilege-set' === $propertyName) {
+							/**
+							 * Each granted right is a <privilege> wrapping an empty element
+							 * naming it, so the name is one level further down than usual.
+							 * Reading it like an ordinary property collapses the whole set to
+							 * a single empty '{DAV:}privilege' and loses every right.
+							 */
+							foreach ($element->xpath("*") as $privilege) {
+								foreach ($privilege->xpath("*") as $granted) {
+									$propList[$propertyName][] = self::toClarkNotation($granted);
+								}
 							}
 						} else {
 							foreach ($element->xpath("*") as $child) {
