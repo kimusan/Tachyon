@@ -17,10 +17,25 @@
 		 * stack with room to breathe they match each other.
 		 */
 		.b-calendar-icon {
-			font-size: 1em;
-			line-height: 1.4;
 			min-width: 2em;
 			text-align: center;
+			line-height: 1;
+		}
+
+		/*
+		 * The icon font carries no left arrow and no refresh glyph, so the right
+		 * arrow is mirrored and the sync button draws its own. Both take their
+		 * colour from the button, unlike the emoji that were here before.
+		 */
+		.b-calendar-flip::before {
+			display: inline-block;
+			transform: rotate(180deg);
+		}
+
+		.b-calendar-svg {
+			width: 1em;
+			height: 1em;
+			vertical-align: -.125em;
 		}
 	}
 
