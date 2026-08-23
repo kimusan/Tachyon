@@ -166,15 +166,29 @@ SQLITEINITIAL;
 	 */
 	public static function getForDbType(string $sDbType) : array
 	{
+		$aVersions = [];
 		switch ($sDbType)
 		{
 			case 'mysql':
 			case 'pgsql':
 			case 'sqlite':
-				return [
+				$aVersions = [
 					1 => []
 				];
+				break;
 		}
-		return [];
+
+		// Version 1 is the CREATE above, split into statements the same way the
+		// address book schema does it. Without this the tables are never created.
+		if ($aVersions) {
+			foreach (\explode(';', \trim(static::{$sDbType}())) as $sQuery) {
+				$sQuery = \trim($sQuery);
+				if (\strlen($sQuery)) {
+					$aVersions[1][] = $sQuery;
+				}
+			}
+		}
+
+		return $aVersions;
 	}
 }
