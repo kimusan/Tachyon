@@ -10,6 +10,7 @@
 		"CLEAR": "Clear",
 		"CLOSE": "Close",
 		"CONTACTS": "Contacts",
+		"CALENDAR": "Calendar",
 		"DELETE": "Delete",
 		"UNDELETE": "Undelete",
 		"DONE": "Done",
@@ -196,6 +197,28 @@
 	},
 	"SUGGESTIONS": {
 		"SEARCHING_DESC": "Searching..."
+	},
+	"CALENDAR": {
+		"BUTTON_PREV": "Previous",
+		"BUTTON_NEXT": "Next",
+		"BUTTON_TODAY": "Today",
+		"BUTTON_SYNC": "Synchronize calendars",
+		"VIEW_MONTH": "Month",
+		"VIEW_WEEK": "Week",
+		"VIEW_DAY": "Day",
+		"VIEW_LIST": "List",
+		"EMPTY_LIST": "No calendars",
+		"READ_ONLY": "Read only",
+		"LABEL_SUMMARY": "Title",
+		"LABEL_CALENDAR": "Calendar",
+		"LABEL_ALL_DAY": "All day",
+		"LABEL_START": "Start",
+		"LABEL_END": "End",
+		"LABEL_LOCATION": "Location",
+		"LABEL_DESCRIPTION": "Description",
+		"CONFIRM_DELETE_EVENT": "Are you sure you want to delete this event?",
+		"ERROR_LOAD_COMPONENT": "Could not load the calendar component",
+		"RECURRING_READ_ONLY": "This event repeats. Editing a repeating event is not supported yet, so it is shown read only."
 	},
 	"CONTACTS": {
 		"TAB_CONTACT": "Contact",

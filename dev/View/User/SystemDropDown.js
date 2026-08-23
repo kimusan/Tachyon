@@ -11,6 +11,7 @@ import { AbstractViewRight } from 'Knoin/AbstractViews';
 import { KeyboardShortcutsHelpPopupView } from 'View/Popup/KeyboardShortcutsHelp';
 import { AccountPopupView } from 'View/Popup/Account';
 import { ContactsPopupView } from 'View/Popup/Contacts';
+import { CalendarPopupView } from 'View/Popup/Calendar';
 
 import { fireEvent, stopEvent, SettingsCapa, registerShortcut } from 'Common/Globals';
 
@@ -41,6 +42,7 @@ export class SystemDropDownUserView extends AbstractViewRight {
 		});
 
 		this.allowContacts = AppUserStore.allowContacts();
+		this.allowCalendar = AppUserStore.allowCalendar();
 
 		this.colorSchemeMode = colorSchemeMode;
 
@@ -107,6 +109,10 @@ export class SystemDropDownUserView extends AbstractViewRight {
 
 	contactsClick() {
 		this.allowContacts && showScreenPopup(ContactsPopupView);
+	}
+
+	calendarClick() {
+		this.allowCalendar && showScreenPopup(CalendarPopupView);
 	}
 
 	logoutClick() {

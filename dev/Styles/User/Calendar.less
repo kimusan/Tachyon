@@ -1,0 +1,163 @@
+#V-PopupsCalendar {
+	height: 100vh;
+	height: 100dvh;
+	max-width: 1200px;
+	min-height: 300px;
+
+	/* Follow whichever theme is active instead of the component's own palette */
+	--ec-bg-color: var(--main-bg-color);
+	--ec-text-color: var(--main-color);
+	--ec-border-color: var(--border-color);
+	--ec-day-bg-color: var(--main-bg-color);
+	--ec-today-bg-color: var(--dropdown-menu-hover-bg-color);
+	--ec-highlight-color: var(--dropdown-menu-hover-bg-color);
+	--ec-popup-bg-color: var(--dialog-bg-clr);
+	--ec-event-bg-color: var(--link-color);
+	--ec-now-indicator-color: #e33;
+
+	.b-header-toolbar {
+		.btn.active {
+			font-weight: bold;
+		}
+	}
+
+	.b-calendar-title {
+		padding: 0 1em;
+		font-weight: bold;
+		white-space: nowrap;
+	}
+
+	.b-calendar-loading {
+		padding-left: .5em;
+	}
+
+	.modal-body {
+		display: flex;
+		height: 100%;
+		padding: 0;
+	}
+
+	.left {
+		max-width: 30%;
+		min-width: 180px;
+		display: flex;
+		flex-direction: column;
+		border-right: 1px solid var(--border-color);
+	}
+
+	.right {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		position: relative;
+	}
+
+	.b-calendar-list {
+		overflow-y: auto;
+		padding: .5em;
+
+		.e-calendar-item {
+			display: flex;
+			align-items: center;
+			gap: .4em;
+			padding: .25em 0;
+			margin: 0;
+			cursor: pointer;
+		}
+
+		.e-calendar-color {
+			width: .8em;
+			height: .8em;
+			border-radius: 2px;
+			border: 1px solid var(--border-color);
+			flex: none;
+		}
+
+		.e-calendar-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.e-calendar-readonly {
+			opacity: .6;
+			flex: none;
+		}
+	}
+
+	.b-calendar-error {
+		padding: .5em 1em;
+		color: #a94442;
+	}
+
+	/* The component measures its container, so this must have a real height */
+	.b-calendar-grid {
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.b-calendar-editor {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, .35);
+		z-index: 10;
+	}
+
+	.b-calendar-editor-form {
+		background: var(--dialog-bg-clr);
+		border: 1px solid var(--border-color);
+		border-radius: var(--dialog-border-radius);
+		padding: 1em;
+		max-width: 480px;
+		width: 90%;
+		max-height: 90%;
+		overflow-y: auto;
+
+		.b-calendar-editor-note {
+			margin-bottom: .75em;
+			padding: .5em;
+			border-radius: var(--border-radius);
+			background: var(--dropdown-menu-hover-bg-color);
+			font-size: .9em;
+		}
+
+		.control-group {
+			margin-bottom: .5em;
+		}
+
+		label {
+			display: block;
+			font-weight: bold;
+		}
+
+		input[type="text"],
+		input[type="date"],
+		input[type="datetime-local"],
+		select,
+		textarea {
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.buttons {
+			margin-top: 1em;
+			display: flex;
+			gap: .5em;
+		}
+	}
+}
+
+@media screen and (max-width: @maxMobileWidth) {
+	#V-PopupsCalendar {
+		width: 100%;
+
+		.left {
+			display: none;
+		}
+	}
+}
