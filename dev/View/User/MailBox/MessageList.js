@@ -238,23 +238,28 @@ export class MailMessageList extends AbstractViewRight {
 				return list;
 			},
 
-			// An icon class rather than a glyph, so the button matches the entries
-			// in its own menu instead of rendering as emoji
+			// Icon classes rather than glyphs, so the button matches the entries in
+			// its own menu instead of rendering as emoji. Split into what is being
+			// sorted and which way, because the arrow tucked into a combined icon
+			// is too small to read at this size.
 			sortIcon: () => {
 				let mode = FolderUserStore.sortMode(),
-					has = w => mode.includes(w),
-					desc = '' === mode || has('REVERSE');
-				mode = mode.split(/\s+/);
-				if (has('FROM') || has('SUBJECT')) {
-					 return desc ? 'icon-arrow-up-a-z' : 'icon-arrow-down-a-z';
+					has = w => mode.includes(w);
+				if (has('FROM')) {
+					return 'icon-user';
+				}
+				if (has('SUBJECT')) {
+					return 'icon-a-arrow-down';
 				}
 				if (has('SIZE')) {
-					 return desc ? 'icon-arrow-down-wide-narrow' : 'icon-arrow-up-narrow-wide';
+					return 'icon-scale';
 				}
-				if (has('ARRIVAL')) {
-					 return desc ? 'icon-clock-arrow-down' : 'icon-clock-arrow-up';
-				}
-				return desc ? 'icon-calendar-arrow-down' : 'icon-calendar-arrow-up';
+				return has('ARRIVAL') ? 'icon-clock' : 'icon-calendar';
+			},
+
+			sortDirectionIcon: () => {
+				let mode = FolderUserStore.sortMode();
+				return ('' === mode || mode.includes('REVERSE')) ? 'icon-arrow-down' : 'icon-arrow-up';
 			},
 
 			downloadAsZipAllowed: () => this.attachmentsActions.includes('zip')
