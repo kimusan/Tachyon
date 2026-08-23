@@ -10,6 +10,7 @@ import { AbstractSettingsScreen, settingsAddViewModel } from 'Screen/AbstractSet
 
 import { UserSettingsGeneral } from 'Settings/User/General';
 import { UserSettingsContacts } from 'Settings/User/Contacts';
+import { UserSettingsCalendar } from 'Settings/User/Calendar';
 import { UserSettingsAccounts } from 'Settings/User/Accounts';
 import { UserSettingsFilters } from 'Settings/User/Filters';
 import { UserSettingsSecurity } from 'Settings/User/Security';
@@ -30,6 +31,10 @@ export class SettingsUserScreen extends AbstractSettingsScreen {
 
 		if (AppUserStore.allowContacts()) {
 			views.push(UserSettingsContacts);
+		}
+
+		if (AppUserStore.allowCalendar()) {
+			views.push(UserSettingsCalendar);
 		}
 
 		if (SettingsCapa('AdditionalAccounts') || SettingsCapa('Identities')) {

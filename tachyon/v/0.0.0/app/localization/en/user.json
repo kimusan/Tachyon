@@ -480,6 +480,7 @@
 	"SETTINGS_LABELS": {
 		"GENERAL": "General",
 		"CONTACTS": "Contacts",
+		"CALENDAR": "Calendar",
 		"FOLDERS": "Folders",
 		"ACCOUNTS": "Accounts",
 		"FILTERS": "Filters",
@@ -549,6 +550,13 @@
 		"MESSAGE_POPUP_WINDOW": "Popup in new window instead of tab",
 		"MAILTO": "Register as 'mailto:' links handler",
 		"HTML_TO_MD": "Convert HTML to Markdown instead of plain text"
+	},
+	"SETTINGS_CALENDAR": {
+		"LEGEND_CALENDAR_SYNC": "Remote Synchronization (CalDAV)",
+		"LABEL_CALENDAR_SYNC_ENABLE": "Enable remote synchronization",
+		"LABEL_CALENDAR_SYNC_URL": "CalDAV URL",
+		"LABEL_CALENDAR_SYNC_USER": "User",
+		"SYNC_READ": "Read only"
 	},
 	"SETTINGS_CONTACTS": {
 		"LABEL_CONTACTS_AUTOSAVE": "Automatically add recipients to your address book",
