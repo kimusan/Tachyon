@@ -7,6 +7,7 @@ abstract class Capa
 	const ADDITIONAL_ACCOUNTS = 'AdditionalAccounts';
 	const ATTACHMENTS_ACTIONS = 'AttachmentsActions';
 	const ATTACHMENT_THUMBNAILS = 'AttachmentThumbnails';
+	const CALENDAR = 'Calendar';
 	const CONTACTS = 'Contacts';
 	const DANGEROUS_ACTIONS = 'DangerousActions';
 	const GNUPG = 'GnuPG';
