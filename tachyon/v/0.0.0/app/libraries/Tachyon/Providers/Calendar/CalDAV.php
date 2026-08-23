@@ -278,16 +278,31 @@ trait CalDAV
 	 * Absent privileges are treated as writable, since plenty of servers omit the
 	 * property. The configured Mode is what actually protects a read only mount.
 	 */
+	/**
+	 * Only rights that actually allow adding or changing an event count. Matching
+	 * "write" loosely also accepts write-properties, which merely permits renaming
+	 * or recolouring a calendar. Nextcloud grants exactly that on the generated
+	 * birthday calendar, so a loose test offers the user an editable calendar the
+	 * server then refuses every event on.
+	 */
 	private static function davCanWrite($aItem) : bool
 	{
 		$mPrivileges = $aItem['{DAV:}current-user-privilege-set'] ?? null;
 		if (!\is_array($mPrivileges) || !\count($mPrivileges)) {
+			// Nothing advertised, so assume writable and let the server refuse
 			return true;
 		}
-		$sFlat = \implode(' ', \array_map(function($mItem) {
-			return \is_string($mItem) ? $mItem : \json_encode($mItem);
-		}, $mPrivileges));
-		return false !== \stripos($sFlat, 'write');
+		foreach ($mPrivileges as $mItem) {
+			if (\is_string($mItem) && \in_array($mItem, array(
+				'{DAV:}all',
+				'{DAV:}write',
+				'{DAV:}write-content',
+				'{DAV:}bind'
+			))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private function getDavClientFromUrl(string $sUrl, string $sUser,
