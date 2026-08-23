@@ -29,7 +29,32 @@ const
 
 	// @event-calendar wants seconds since epoch as Date objects
 	toDate = value => new Date(value * 1000),
-	toStamp = value => Math.floor(value.getTime() / 1000);
+	toStamp = value => Math.floor(value.getTime() / 1000),
+
+	/**
+	 * Calendar colours come from the CalDAV server, so nothing guarantees a
+	 * fixed label colour stays readable on them. Pick per event from relative
+	 * luminance (WCAG 2.x) instead of hoping.
+	 */
+	DEFAULT_EVENT_COLOR = '#31708f',
+
+	readableOn = color => {
+		const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec((color || '').trim());
+		if (!m) {
+			return '#fff';
+		}
+		let hex = m[1];
+		if (3 === hex.length) {
+			hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+		}
+		const channel = offset => {
+				const c = parseInt(hex.substr(offset, 2), 16) / 255;
+				return 0.03928 >= c ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+			},
+			luminance = 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
+		// Contrast against white vs against black, whichever is further away
+		return (1.05 / (luminance + 0.05)) >= ((luminance + 0.05) / 0.05) ? '#fff' : '#000';
+	};
 
 export class CalendarPopupView extends AbstractViewPopup {
 	constructor() {
@@ -101,7 +126,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 						end: toDate(event.end),
 						allDay: !!event.allDay,
 						editable: !event.readOnly && !event.recurring,
-						backgroundColor: event.color || undefined,
+						backgroundColor: event.color || DEFAULT_EVENT_COLOR,
+						textColor: readableOn(event.color || DEFAULT_EVENT_COLOR),
 						extendedProps: {
 							uid: event.uid,
 							calendarUuid: event.calendarUuid,
@@ -148,7 +174,21 @@ export class CalendarPopupView extends AbstractViewPopup {
 		});
 	}
 
+	/**
+	 * .ec-dark and .ec-auto-dark are the component's own way of switching its
+	 * greys and color-scheme. Drive them from the same attribute the theme
+	 * switcher sets, so scrollbars and form controls inside the grid match.
+	 */
+	applyColorScheme() {
+		const mode = document.documentElement.getAttribute('data-color-scheme'),
+			list = this.calendarEl.classList;
+		list.toggle('ec-dark', 'dark' === mode);
+		// No explicit choice means follow the system, which is what ec-auto-dark does
+		list.toggle('ec-auto-dark', !mode);
+	}
+
 	createCalendar() {
+		this.applyColorScheme();
 		this.ec = EventCalendar.create(this.calendarEl, {
 			view: this.currentView(),
 			headerToolbar: { start: '', center: '', end: '' },
@@ -311,7 +351,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 	onShow() {
 		loadAssets().then(
 			() => {
-				this.ec || this.createCalendar();
+				this.ec ? this.applyColorScheme() : this.createCalendar();
 				this.loadCalendars();
 			},
 			() => this.failed(i18n('CALENDAR/ERROR_LOAD_COMPONENT'))
