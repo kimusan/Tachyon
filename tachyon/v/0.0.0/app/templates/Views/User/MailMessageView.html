@@ -136,7 +136,7 @@
 		<div class="messageItemHeader" data-bind="if: message, i18nUpdate: message">
 			<div class="subjectParent">
 				<span class="infoParent g-ui-user-select-none icon-info" data-bind="click: toggleFullInfo"></span>
-				<span class="flagParent g-ui-user-select-none flagOff" data-bind="css: message().isFlagged() ? 'icon-star' : 'icon-star-off', css: {flagOn: message().isFlagged(), flagOff: !message().isFlagged()}"></span>
+				<span class="flagParent g-ui-user-select-none flagOff" data-bind="css: {'icon-star': message().isFlagged(), 'icon-star-off': !message().isFlagged(), flagOn: message().isFlagged(), flagOff: !message().isFlagged()}"></span>
 				<span class="subject" data-bind="text: message().subject"></span>
 				<a href="#" class="close" data-bind="click: closeMessage" style="margin-top: -8px;">×</a>
 			</div>
