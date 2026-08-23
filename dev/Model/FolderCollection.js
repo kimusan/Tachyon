@@ -471,15 +471,17 @@ export class FolderModel extends AbstractModel {
 
 			detailedName: () => this.name() + ' ' + this.nameInfo(),
 
+			// Icon names, not glyphs, so the folder list follows the theme like the
+			// rest of the chrome. Consumed through data-icon.
 			icon: () => {
 				switch (this.type())
 				{
-					case 1: return '📥'; // FolderType.Inbox
-					case 2: return '📧'; // FolderType.Sent icon-paper-plane
-					case 3: return '🗎'; // FolderType.Drafts
-					case 4: return '⚠'; // FolderType.Junk
-					case 5: return '🗑'; // FolderType.Trash
-					case 6: return '🗄'; // FolderType.Archive
+					case 1: return 'inbox';    // FolderType.Inbox
+					case 2: return 'send';     // FolderType.Sent
+					case 3: return 'file-text';// FolderType.Drafts
+					case 4: return 'triangle-alert'; // FolderType.Junk
+					case 5: return 'trash-2';  // FolderType.Trash
+					case 6: return 'archive';  // FolderType.Archive
 				}
 				return null;
 			},
@@ -540,7 +542,7 @@ export class FolderModel extends AbstractModel {
 	 */
 	collapsedCss() {
 		return 'e-collapsed-sign ' + (this.hasVisibleSubfolders()
-			? (this.collapsed() ? 'icon-right-mini' : 'icon-down-mini')
+			? (this.collapsed() ? 'icon-chevron-right' : 'icon-chevron-down')
 			: 'icon-none'
 		);
 	}
