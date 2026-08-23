@@ -85,6 +85,8 @@ class Contact implements \JsonSerializable
 			'@Object' => 'Object/Contact',
 			'id' => $this->id,
 			'readOnly' => $this->ReadOnly,
+			// An etag only exists once a contact has been seen on the CardDAV server
+			'synced' => '' !== $this->Etag,
 			'jCard' => $this->vCard
 		);
 	}

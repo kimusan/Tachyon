@@ -6,6 +6,10 @@
 
 		<a class="btn" data-bind="click: newContact" data-icon="✚" data-i18n="CONTACTS/BUTTON_ADD_CONTACT"></a>
 
+		<a class="btn fontastic checkAllContacts" data-bind="visible: useCheckboxesInList,
+			click: () => checkAll(!checkAll()), text: checkAll() ? '☑' : '☐'"
+			data-i18n="[title]CONTACTS/SELECT_ALL"></a>
+
 		<a class="btn btn-success fontastic" data-bind="command: newMessageCommand">✉</a>
 
 		<a class="btn fontastic" data-bind="command: deleteCommand">🗑</a>
@@ -29,6 +33,12 @@
 					<a href="#" data-bind="click: exportVcf">
 						<i class="icon-export"></i>
 						<span data-i18n="CONTACTS/BUTTON_EXPORT_VCARD"></span>
+					</a>
+				</li>
+				<li class="dividerbar" role="presentation">
+					<a href="#" data-bind="command: clearLocalCommand">
+						<i class="fontastic">🗑</i>
+						<span data-i18n="CONTACTS/BUTTON_DELETE_LOCAL"></span>
 					</a>
 				</li>
 				<li class="dividerbar" role="presentation" data-bind="visible: contactsSyncEnabled">
@@ -72,6 +82,7 @@
 					<div class="e-contact-item g-ui-user-select-none" data-bind="css: lineAsCss()">
 						<div class="checkboxItem fontastic" data-bind="text: checked() ? '☑' : '☐'"></div>
 						<div class="nameParent" data-bind="text: display"></div>
+						<div class="syncedItem fontastic" data-bind="visible: synced" data-i18n="[title]CONTACTS/SYNCED_CONTACT">⇆</div>
 					</div>
 				</div>
 			</div>

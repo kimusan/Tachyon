@@ -90,6 +90,8 @@ export class ContactModel extends AbstractModel {
 
 			deleted: false,
 			readOnly: false,
+			// true once the CardDAV server has an etag for this contact
+			synced: false,
 
 			id: 0,
 			givenName:  '', // FirstName

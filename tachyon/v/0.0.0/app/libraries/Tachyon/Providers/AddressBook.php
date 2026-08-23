@@ -42,6 +42,17 @@ class AddressBook extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->DeleteContacts($aContactIds) : false;
 	}
 
+	/**
+	 * Not on AddressBookInterface: whether a contact is local or synced is a
+	 * PDO address book notion, the Kolab driver stores contacts as IMAP messages.
+	 */
+	public function DeleteContactsByScope(string $sScope) : bool
+	{
+		return $this->IsActive() && \method_exists($this->oDriver, 'DeleteContactsByScope')
+			? $this->oDriver->DeleteContactsByScope($sScope)
+			: false;
+	}
+
 	public function DeleteAllContacts(string $sEmail) : bool
 	{
 		return $this->IsActive() ? $this->oDriver->DeleteAllContacts($sEmail) : false;

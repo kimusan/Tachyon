@@ -79,6 +79,14 @@ export class ContactsPopupView extends AbstractViewPopup {
 				return checked.length ? checked : (selected ? [selected] : []);
 			},
 
+			checkAll: {
+				read: () => ContactUserStore.hasChecked(),
+				write: value => {
+					value = !!value;
+					ContactUserStore.forEach(contact => contact.checked(value));
+				}
+			},
+
 			contactsSyncEnabled: () => ContactUserStore.allowSync() && ContactUserStore.syncMode(),
 
 			isBusy: () => ContactUserStore.syncing() | ContactUserStore.importing() | ContactUserStore.loading()
@@ -94,7 +102,8 @@ export class ContactsPopupView extends AbstractViewPopup {
 			deleteCommand: self => !self.isBusy() && 0 < self.contactsCheckedOrSelected().length,
 			newMessageCommand: self => !self.isBusy() && 0 < self.contactsCheckedOrSelected().length,
 			saveCommand: self => !self.isBusy(),
-			syncCommand: self => !self.isBusy()
+			syncCommand: self => !self.isBusy(),
+			clearLocalCommand: self => !self.isBusy()
 		});
 	}
 
@@ -134,6 +143,26 @@ export class ContactsPopupView extends AbstractViewPopup {
 				}
 			);
 		}
+	}
+
+	/**
+	 * Deletes only contacts the CardDAV server has never seen. Synced ones are left
+	 * alone on purpose: removing them here would delete them from the server on the
+	 * next read-write sync.
+	 */
+	clearLocalCommand() {
+		AskPopupView.showModal([
+			i18n('CONTACTS/CONFIRM_DELETE_LOCAL'),
+			() => Remote.request('ContactsClear',
+				(iError, oData) => {
+					iError && alert(oData?.message || getNotification(iError));
+					this.contactsPage(1);
+					this.reloadContactList(true);
+				}, {
+					scope: 'local'
+				}
+			)
+		]);
 	}
 
 	newMessageCommand() {

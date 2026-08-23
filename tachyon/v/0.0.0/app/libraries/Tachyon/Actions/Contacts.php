@@ -184,6 +184,29 @@ trait Contacts
 		return $this->DefaultResponse($aResult);
 	}
 
+	/**
+	 * Bulk delete by origin. 'local' spares anything the CardDAV server knows about,
+	 * 'all' does not and with read-write sync would delete from the server too, which
+	 * is why nothing in the UI sends it yet.
+	 */
+	public function DoContactsClear() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+
+		$sScope = (string) $this->GetActionParam('scope', 'local');
+		if (!\in_array($sScope, array('local', 'all'))) {
+			$sScope = 'local';
+		}
+
+		$bResult = false;
+		$oAddressBookProvider = $this->AddressBookProvider($oAccount);
+		if ($oAddressBookProvider && $oAddressBookProvider->IsActive()) {
+			$bResult = $oAddressBookProvider->DeleteContactsByScope($sScope);
+		}
+
+		return $this->DefaultResponse($bResult);
+	}
+
 	public function DoContactsDelete() : array
 	{
 		$oAccount = $this->getAccountFromToken();

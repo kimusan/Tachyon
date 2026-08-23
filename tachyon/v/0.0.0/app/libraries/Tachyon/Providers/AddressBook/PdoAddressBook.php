@@ -466,6 +466,50 @@ class PdoAddressBook
 		return true;
 	}
 
+	/**
+	 * Bulk delete by origin rather than by id.
+	 *   local - only contacts the CardDAV server has never seen, so this can never reach it
+	 *   all   - everything, which with read-write sync DOES delete from the server
+	 * Only 'local' is reachable from the UI today.
+	 */
+	public function DeleteContactsByScope(string $sScope) : bool
+	{
+		if (1 > $this->iUserID) {
+			\Tachyon\Util\Log::warning('PdoAddressBook', 'DeleteContactsByScope() invalid $iUserID');
+			return false;
+		}
+
+		if (!\in_array($sScope, array('local', 'all'))) {
+			\Tachyon\Util\Log::warning('PdoAddressBook', "DeleteContactsByScope() unknown scope '{$sScope}'");
+			return false;
+		}
+
+		$sSql = 'SELECT id_contact FROM rainloop_ab_contacts WHERE id_user = :id_user AND deleted = 0';
+		if ('local' === $sScope) {
+			// A contact gains an etag only once it has been on the server
+			$sSql .= " AND (etag = '' OR etag IS NULL)";
+		}
+
+		$oStmt = $this->prepareAndExecute($sSql,
+			array(':id_user' => array($this->iUserID, \PDO::PARAM_INT))
+		);
+
+		$aIds = array();
+		if ($oStmt) {
+			$aFetch = $oStmt->fetchAll(\PDO::FETCH_ASSOC);
+			if (\is_array($aFetch)) {
+				foreach ($aFetch as $aItem) {
+					if (isset($aItem['id_contact'])) {
+						$aIds[] = (int) $aItem['id_contact'];
+					}
+				}
+			}
+		}
+
+		// Nothing matching is a success, there is simply nothing to remove
+		return \count($aIds) ? $this->DeleteContacts($aIds) : true;
+	}
+
 	public function DeleteAllContacts(string $sEmail) : bool
 	{
 		$iUserID = $this->getUserId($sEmail);
@@ -494,7 +538,8 @@ class PdoAddressBook
 						$oContact->IdContactStr = (string) $aItem['id_contact_str'];
 //						$oContact->Display = (string) $aItem['display'];
 						$oContact->Changed = (int) $aItem['changed'];
-						$oContact->Etag = (int) $aItem['etag'];
+						// (int) here turned a CardDAV etag into "0", and DoContactSave writes it back
+						$oContact->Etag = (string) $aItem['etag'];
 						if (!empty($aItem['jcard'])) {
 							$oContact->setVCard(
 								\Sabre\VObject\Reader::readJson($aItem['jcard'])

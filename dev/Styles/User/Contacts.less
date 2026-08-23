@@ -113,6 +113,15 @@
 			width: 100%;
 		}
 
+		/* Marks a contact the CardDAV server knows about, so it is clear which
+		   ones "delete local contacts" leaves alone */
+		.syncedItem {
+			flex: 0 0 auto;
+			line-height: 45px;
+			opacity: 0.45;
+			padding: 0 8px;
+		}
+
 		&.checked {
 			border-color: #69A8F5;
 
