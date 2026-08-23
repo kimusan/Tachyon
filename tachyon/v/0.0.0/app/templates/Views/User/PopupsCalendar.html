@@ -7,9 +7,9 @@
 		<a class="btn btn-success" data-i18n="CALENDAR/BUTTON_NEW_EVENT" data-bind="command: newEventCommand"></a>
 
 		<div class="btn-group">
-			<a class="btn fontastic" data-i18n="[title]CALENDAR/BUTTON_PREV" data-bind="click: () => navigate(0)">&#9664;</a>
+			<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_PREV" data-bind="click: () => navigate(0)">◀️</a>
 			<a class="btn" data-i18n="CALENDAR/BUTTON_TODAY" data-bind="click: () => today()"></a>
-			<a class="btn fontastic" data-i18n="[title]CALENDAR/BUTTON_NEXT" data-bind="click: () => navigate(1)">&#9654;</a>
+			<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_NEXT" data-bind="click: () => navigate(1)">▶️</a>
 		</div>
 
 		<span class="b-calendar-title" data-bind="text: title"></span>
@@ -25,7 +25,7 @@
 				css: {'active': 'listWeek' === currentView()}"></a>
 		</div>
 
-		<a class="btn fontastic" data-i18n="[title]CALENDAR/BUTTON_SYNC" data-bind="click: () => syncCalendars(),
+		<a class="btn b-calendar-icon" data-i18n="[title]CALENDAR/BUTTON_SYNC" data-bind="click: () => syncCalendars(),
 			css: {'disabled': loading()}">&#8646;</a>
 
 		<span class="b-calendar-loading" data-bind="visible: loading()">

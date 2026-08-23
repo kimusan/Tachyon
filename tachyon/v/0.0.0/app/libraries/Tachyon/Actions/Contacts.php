@@ -72,14 +72,12 @@ trait Contacts
 			$mData = $this->getContactsSyncData($oAccount);
 			$sPassword = isset($mData['Password']) ? $mData['Password'] : '';
 		}
-		$sPasswordHMAC = null;
-		if ($sPassword) {
-			$oMainAccount = $this->getMainAccountFromToken();
-			$sPassword = \Tachyon\Util\Crypt::EncryptToJSON($sPassword, $oMainAccount->CryptKey());
-			if ($sPassword) {
-				$sPasswordHMAC = \hash_hmac('sha1', $sPassword, $oMainAccount->CryptKey());
-			}
-		}
+		/**
+		 * The password goes straight to the DAV client as the HTTP credential, so
+		 * it has to stay plaintext here. Encrypting is for storage, and
+		 * getContactsSyncData decrypts again on the way back out, so encrypting at
+		 * this point authenticated with ciphertext and every test failed.
+		 */
 
 		$oDriver = $this->fabrica('address-book', $oAccount);
 		if (!$oDriver) {
@@ -90,8 +88,7 @@ trait Contacts
 			'Mode' => 2, // readonly
 			'User' => $this->GetActionParam('User', ''),
 			'Password' => $sPassword,
-			'Url' => $this->GetActionParam('Url', ''),
-			'PasswordHMAC' => $sPasswordHMAC
+			'Url' => $this->GetActionParam('Url', '')
 		]);
 
 		$oClient = $oDriver->getDavClient();
