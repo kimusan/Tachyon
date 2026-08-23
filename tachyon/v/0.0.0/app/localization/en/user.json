@@ -219,7 +219,12 @@
 		"LABEL_DESCRIPTION": "Description",
 		"CONFIRM_DELETE_EVENT": "Are you sure you want to delete this event?",
 		"ERROR_LOAD_COMPONENT": "Could not load the calendar component",
-		"RECURRING_READ_ONLY": "This event repeats. Editing a repeating event is not supported yet, so it is shown read only."
+		"RECURRING_READ_ONLY": "This event repeats. Editing a repeating event is not supported yet, so it is shown read only.",
+		"ERROR_NO_TITLE": "Give the event a title",
+		"ERROR_BAD_START": "The start date is not a valid date and time",
+		"ERROR_BAD_END": "The end date is not a valid date and time",
+		"ERROR_END_BEFORE_START": "The event ends before it starts",
+		"ERROR_NO_CALENDAR": "Choose a calendar for the event"
 	},
 	"CONTACTS": {
 		"TAB_CONTACT": "Contact",
