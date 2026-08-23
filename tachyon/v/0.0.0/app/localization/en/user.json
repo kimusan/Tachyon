@@ -572,7 +572,8 @@
 		"LABEL_CONTACTS_SYNC_SERVER": "Server",
 		"LABEL_CONTACTS_SYNC_AB_URL": "Addressbook URL",
 		"LABEL_CONTACTS_SYNC_USER": "User",
-		"SYNC_READ": "Read only"
+		"SYNC_READ": "Read only",
+		"TEST_OK": "Connection succeeded"
 	},
 	"SETTINGS_THEMES": {
 		"LEGEND_THEMES": "Themes",

@@ -16,6 +16,8 @@ export class UserSettingsContacts /*extends AbstractViewSettings*/ {
 		this.syncUser = ContactUserStore.syncUser;
 		this.syncPass = ContactUserStore.syncPass;
 		this.syncError = ko.observable('');
+		this.syncSuccess = ko.observable(false);
+		this.testing = ko.observable(false);
 
 		this.syncModeOptions = koComputable(() => {
 			translateTrigger();
@@ -52,8 +54,14 @@ export class UserSettingsContacts /*extends AbstractViewSettings*/ {
 
 	test() {
 		this.syncError('');
+		this.syncSuccess(false);
+		this.testing(true);
+		// Reporting only failures made a working connection look like a dead button
 		Remote.request('TestContactsSyncData', (iError, data) => {
-			iError && this.syncError(data.messageAdditional || data.message || getErrorMessage(iError, data));
+			this.testing(false);
+			iError
+				? this.syncError(data?.messageAdditional || data?.message || getErrorMessage(iError, data))
+				: this.syncSuccess(true);
 		}, {
 			Url: ContactUserStore.syncUrl(),
 			User: ContactUserStore.syncUser(),
