@@ -5,14 +5,13 @@ const { cleanStatic } = require('./tasks/common');
 const { js, jsLint } = require('./tasks/js');
 const { css, cssLint } = require('./tasks/css');
 const { buildIcons } = require('./tasks/icons');
-const { vendors } = require('./tasks/vendors');
 const { sri } = require('./tasks/sri');
 
 const clean = gulp.series(cleanStatic);
 
 const lint = gulp.parallel(jsLint, cssLint);
 
-const buildState1 = gulp.parallel(js, gulp.series(buildIcons, css), vendors);
+const buildState1 = gulp.parallel(js, gulp.series(buildIcons, css));
 const buildState2 = gulp.series(clean, buildState1, sri);
 
 const build = gulp.parallel(lint, buildState2);
