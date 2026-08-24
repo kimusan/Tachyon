@@ -79,7 +79,9 @@
     "ALERT_NOTICE": "Hinweis!",
     "SUGGESTIONS_LIMIT": "Limit für Empfehlungen",
     "HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "Verwenden Sie diesen Datenbanktyp nicht bei einer hohen Anzahl aktiver Benutzer.",
-    "HTML_ALERT_DOES_NOT_SUPPORTED": "Ihr System unterstützt keine Kontakte.\n<br>\nSie müssen die <strong>PDO-Erweiterung (SQLite / MySQL / PostgreSQL)</strong> auf Ihrem Server installieren oder aktivieren."
+    "HTML_ALERT_DOES_NOT_SUPPORTED": "Ihr System unterstützt keine Kontakte.\n<br>\nSie müssen die <strong>PDO-Erweiterung (SQLite / MySQL / PostgreSQL)</strong> auf Ihrem Server installieren oder aktivieren.",
+    "COMPOSE_LIMIT": "Maximale Empfängerzahl aus einer Auswahl",
+    "BCC_LIMIT": "Ab dieser Empfängerzahl Bcc empfehlen"
   },
   "TAB_DOMAINS": {
     "LEGEND_DOMAINS": "Domains",

@@ -44,7 +44,8 @@
     "TEXT": "Texto",
     "ATTACHMENTS": "Adjuntos",
     "REMEMBER_FOR_SESSION": "Recordar para esta sesión",
-    "REMEMBER_PERMANENT": "Recordar permanentemente"
+    "REMEMBER_PERMANENT": "Recordar permanentemente",
+    "CALENDAR": "Calendario"
   },
   "LOGIN": {
     "LABEL_LOGIN": "Login",
@@ -94,15 +95,15 @@
     "ACL_RIGHTS": "Rights",
     "ACL_A": "Administer",
     "ACL_E": "Expunge",
-    "ACL_I": "Insert messages",
-    "ACL_K": "Create sub-folders",
-    "ACL_L": "Show messages",
-    "ACL_P": "Send mail",
-    "ACL_R": "Select folder",
-    "ACL_S": "\\SEEN tag",
-    "ACL_T": "\\DELETED tag",
-    "ACL_W": "Other tags",
-    "ACL_X": "Delete/Rename folder"
+    "ACL_I": "Insertar mensajes",
+    "ACL_K": "Crear subcarpetas",
+    "ACL_L": "Mostrar mensajes",
+    "ACL_P": "Enviar correo",
+    "ACL_R": "Seleccionar la carpeta",
+    "ACL_S": "Etiqueta \\SEEN",
+    "ACL_T": "Etiqueta \\DELETED",
+    "ACL_W": "Otras etiquetas",
+    "ACL_X": "Eliminar o renombrar la carpeta"
   },
   "MESSAGE_LIST": {
     "BUTTON_RELOAD": "Actualizar lista de mensajes",
@@ -132,8 +133,8 @@
     "QUOTA_SIZE": "Usando <strong>%SIZE% (%PROC%%)</strong> de sus <strong>%LIMIT%</strong>",
     "SORT": "Ordenar",
     "NO_SORT": "El servidor no soporta clasificación",
-    "SORT_ARRIVAL_ASC": "Arrived ascending",
-    "SORT_ARRIVAL_DESC": "Arrived descending",
+    "SORT_ARRIVAL_ASC": "Llegada ascendente",
+    "SORT_ARRIVAL_DESC": "Llegada descendente",
     "SORT_DATE_ASC": "Fecha ascendente",
     "SORT_DATE_DESC": "Fecha descendente",
     "SORT_SIZE_ASC": "Tamaño ascendente",
@@ -223,9 +224,9 @@
     "DISPLAY_NAME": "Nombre a visualizar",
     "LAST_NAME": "Apellidos",
     "FIRST_NAME": "Nombre",
-    "MIDDLE_NAME": "Middle name",
-    "NAME_PREFIX": "Name prefix",
-    "NAME_SUFFIX": "Name suffix",
+    "MIDDLE_NAME": "Segundo nombre",
+    "NAME_PREFIX": "Prefijo del nombre",
+    "NAME_SUFFIX": "Sufijo del nombre",
     "NICK_NAME": "Alias",
     "LABEL_READ_ONLY": "Solo lectura",
     "ADD_MENU_LABEL": "Añadir",
@@ -236,11 +237,23 @@
     "ADD_MENU_ADDRESS": "Dirección",
     "ADD_MENU_BIRTHDAY": "Cumpleaños",
     "ADD_MENU_TAGS": "Etiquetas",
-		"CATEGORY_ALL": "All categories",
-		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group.",
+		"CATEGORY_ALL": "Todas las categorías",
+		"TAGS_HINT": "Las etiquetas agrupan contactos para dirigirse a ellos rápidamente. Escriba el nombre de una etiqueta en la ventana de redacción para enviar a todo el grupo.",
     "BUTTON_SHARE_ALL": "Todos",
     "BUTTON_SYNC": "Sincronización (CardDAV)",
-    "SEND_TO_ALL_CONTACT_EMAILS": "Enviar a todos los correos de contactos"
+    "SEND_TO_ALL_CONTACT_EMAILS": "Enviar a todos los correos de contactos",
+    "SELECT_ALL": "Seleccionar todo en esta página",
+    "SELECT_PAGE": "Seleccionar esta página",
+    "SELECT_ALL_MATCHING": "Seleccionar todas las coincidencias",
+    "SELECT_NONE": "Borrar la selección",
+    "BUTTON_COMPOSE_TO": "Nuevo mensaje a",
+    "BUTTON_COMPOSE_CC": "Nuevo mensaje, destinatarios en Cc",
+    "BUTTON_COMPOSE_BCC": "Nuevo mensaje, destinatarios en Bcc",
+    "ASK_USE_BCC": "%COUNT% destinatarios. ¿Ponerlos en Bcc para que no vean las direcciones de los demás?",
+    "ERROR_COMPOSE_LIMIT": "Hay %COUNT% contactos seleccionados, más de los %LIMIT% que permite un solo mensaje. Reduzca antes la selección.",
+    "BUTTON_DELETE_LOCAL": "Eliminar los contactos locales",
+    "SYNCED_CONTACT": "Sincronizado con la libreta de direcciones remota",
+    "CONFIRM_DELETE_LOCAL": "¿Eliminar todos los contactos creados localmente? Los contactos sincronizados desde la libreta de direcciones remota están marcados y se conservarán."
   },
   "COMPOSE": {
     "LINK_SHOW_INPUTS": "mostrar todos los campos",
@@ -363,7 +376,7 @@
     "SELECT_TYPE_MATCHES": "Coincide (* and ? supported)",
     "SELECT_TYPE_NOT_MATCHES": "No Coindide (* and ? supported)",
     "SELECT_TYPE_REGEXP": "Regexp",
-    "SELECT_TYPE_NOT_REGEXP": "Not Regexp",
+    "SELECT_TYPE_NOT_REGEXP": "No es una expresión regular",
     "SELECT_TYPE_EQUAL_TO": "Igual A",
     "SELECT_TYPE_NOT_EQUAL_TO": "Distinto De",
     "SELECT_TYPE_OVER": "Por Encima",
@@ -375,7 +388,7 @@
     "MARK_AS_READ_LABEL": "Marcar como leído",
     "REPLY_INTERVAL_LABEL": "Intervalo de respuesta (días)",
     "KEEP_LABEL": "Mantener",
-    "STOP_LABEL": "Stop further processing of rules",
+    "STOP_LABEL": "Detener el procesamiento de las reglas siguientes",
     "VACATION_SUBJECT_LABEL": "Asunto (opcional)",
     "VACATION_MESSAGE_LABEL": "Mensaje",
     "VACATION_RECIPIENTS_LABEL": "Destinatarios (separados por coma)",
@@ -415,8 +428,8 @@
   },
   "EDITOR": {
     "PLAIN": "HTML <-> TEXTO",
-    "SOURCE": "HTML <-> SOURCE",
-    "FONTFAMILY": "Font family",
+    "SOURCE": "HTML <-> Fuente",
+    "FONTFAMILY": "Tipo de letra",
     "FONTSIZE": "Tamaño fuente",
     "DIR": "Dirección del texto",
     "DIR_LTR": "Izquierda a derecha",
@@ -440,7 +453,15 @@
     "IMAGEUPLOAD": "Seleccionar imagen",
     "UNDO": "Deshacer",
     "REDO": "Rehacer",
-    "REMOVESTYLE": "Quitar estilo"
+    "REMOVESTYLE": "Quitar estilo",
+    "TABLE": "Insertar tabla",
+    "ROWABOVE": "Insertar fila encima",
+    "ROWBELOW": "Insertar fila debajo",
+    "COLLEFT": "Insertar columna a la izquierda",
+    "COLRIGHT": "Insertar columna a la derecha",
+    "ROWDELETE": "Eliminar la fila",
+    "COLDELETE": "Eliminar la columna",
+    "TABLEDELETE": "Eliminar la tabla"
   },
   "SETTINGS_LABELS": {
     "GENERAL": "General",
@@ -449,7 +470,8 @@
     "ACCOUNTS": "Cuentas",
     "FILTERS": "Filtros",
     "SECURITY": "Seguridad",
-    "THEMES": "Temas"
+    "THEMES": "Temas",
+    "CALENDAR": "Calendario"
   },
   "SETTINGS_FILTERS": {
     "SIMPLE": "Simple",
@@ -512,8 +534,8 @@
     "IMAGES_OPTION_ALWAYS": "Mostrar siempre",
     "IMAGES_WHITELIST": "Lista blanca de imágenes",
     "MESSAGE_POPUP_WINDOW": "Popup en nueva ventana en lugar de pestaña",
-    "MAILTO": "Register as 'mailto:' links handler",
-    "HTML_TO_MD": "Convert HTML to Markdown instead of plain text"
+    "MAILTO": "Registrar como gestor de enlaces 'mailto:'",
+    "HTML_TO_MD": "Convertir HTML a Markdown en lugar de texto sin formato"
   },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Agregar automáticamente destinatarios a la libreta de direcciones",
@@ -522,7 +544,8 @@
     "LABEL_CONTACTS_SYNC_SERVER": "Servidor",
     "LABEL_CONTACTS_SYNC_AB_URL": "Libreta de direcciones URL",
     "LABEL_CONTACTS_SYNC_USER": "Usuario",
-    "SYNC_READ": "Solo lectura"
+    "SYNC_READ": "Solo lectura",
+    "TEST_OK": "Conexión correcta"
   },
   "SETTINGS_THEMES": {
     "LEGEND_THEMES": "Temas",
@@ -549,7 +572,7 @@
     "HELP_SHOW_HIDE_FOLDER": "Mostrar/ocultar carpeta",
     "HELP_CHECK_FOR_NEW_MESSAGES": "Chequear nuevos mensajes",
     "HIDE_UNSUBSCRIBED": "Ocultar carpetas dadas de baja",
-    "UNHIDE_KOLAB_FOLDERS": "Unhide Kolab folders",
+    "UNHIDE_KOLAB_FOLDERS": "Mostrar las carpetas de Kolab",
     "TYPE_CALENDAR": "Calendario",
     "TYPE_CONFIGURATION": "Configuración",
     "TYPE_CONTACTS": "Contactos",
@@ -650,6 +673,43 @@
     "AccountSwitchFailed": "El cambio a la cuenta \"%EMAIL%\" falló",
     "MailServerError": "Ocurrió un error mientras se accedía al servidor",
     "InvalidInputArgument": "Argumento no válido",
-    "UnknownError": "Error desconocido"
+    "UnknownError": "Error desconocido",
+    "CalendarSyncError": "Falló la sincronización del calendario"
+  },
+  "CALENDAR": {
+    "BUTTON_NEW_EVENT": "Nuevo evento",
+    "BUTTON_PREV": "Anterior",
+    "BUTTON_NEXT": "Siguiente",
+    "BUTTON_TODAY": "Hoy",
+    "BUTTON_SYNC": "Sincronizar calendarios",
+    "VIEW_MONTH": "Mes",
+    "VIEW_WEEK": "Semana",
+    "VIEW_DAY": "Día",
+    "VIEW_LIST": "Lista",
+    "EMPTY_LIST": "No hay calendarios",
+    "READ_ONLY": "Solo lectura",
+    "LABEL_SUMMARY": "Título",
+    "LABEL_CALENDAR": "Calendario",
+    "LABEL_ALL_DAY": "Todo el día",
+    "LABEL_START": "Inicio",
+    "LABEL_END": "Fin",
+    "LABEL_LOCATION": "Ubicación",
+    "LABEL_DESCRIPTION": "Descripción",
+    "CONFIRM_DELETE_EVENT": "¿Está seguro de que desea eliminar este evento?",
+    "ERROR_LOAD_COMPONENT": "No se pudo cargar el componente de calendario",
+    "RECURRING_READ_ONLY": "Este evento se repite. La edición de eventos periódicos todavía no está soportada, por lo que se muestra en solo lectura.",
+    "ERROR_NO_TITLE": "Asigne un título al evento",
+    "ERROR_BAD_START": "La fecha de inicio no es una fecha y hora válidas",
+    "ERROR_BAD_END": "La fecha de fin no es una fecha y hora válidas",
+    "ERROR_END_BEFORE_START": "El evento termina antes de comenzar",
+    "ERROR_NO_CALENDAR": "Elija un calendario para el evento"
+  },
+  "SETTINGS_CALENDAR": {
+    "LEGEND_CALENDAR_SYNC": "Sincronización remota (CalDAV)",
+    "LABEL_CALENDAR_SYNC_ENABLE": "Activar la sincronización remota",
+    "LABEL_CALENDAR_SYNC_URL": "URL de CalDAV",
+    "LABEL_CALENDAR_SYNC_USER": "Usuario",
+    "SYNC_READ": "Solo lectura",
+    "TEST_OK": "Conexión correcta"
   }
 }

@@ -79,7 +79,9 @@
     "ALERT_NOTICE": "Underretning!",
     "SUGGESTIONS_LIMIT": "Suggestions limit",
     "HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "Brug ikke denne database type med større antal af aktive brugere.",
-    "HTML_ALERT_DOES_NOT_SUPPORTED": "Dit system ser ikke ud til at understøtte kontakter.\n<br>\nDu skal installere og aktivere <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> udvidelsen på din server.\n"
+    "HTML_ALERT_DOES_NOT_SUPPORTED": "Dit system ser ikke ud til at understøtte kontakter.\n<br>\nDu skal installere og aktivere <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> udvidelsen på din server.\n",
+    "COMPOSE_LIMIT": "Største antal modtagere fra en markering",
+    "BCC_LIMIT": "Anbefal Bcc over dette antal modtagere"
   },
   "TAB_DOMAINS": {
     "LEGEND_DOMAINS": "Domæner",

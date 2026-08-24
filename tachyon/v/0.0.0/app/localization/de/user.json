@@ -44,7 +44,8 @@
     "DEFAULT": "Standard",
     "HELP": "Hilfe",
     "TEXT": "Text",
-    "ATTACHMENTS": "Anhänge"
+    "ATTACHMENTS": "Anhänge",
+    "CALENDAR": "Kalender"
   },
   "LOGIN": {
     "LABEL_LOGIN": "Anmeldung",
@@ -94,15 +95,15 @@
     "ACL_RIGHTS": "Rights",
     "ACL_A": "Administer",
     "ACL_E": "Expunge",
-    "ACL_I": "Insert messages",
-    "ACL_K": "Create sub-folders",
-    "ACL_L": "Show messages",
-    "ACL_P": "Send mail",
-    "ACL_R": "Select folder",
-    "ACL_S": "\\SEEN tag",
-    "ACL_T": "\\DELETED tag",
-    "ACL_W": "Other tags",
-    "ACL_X": "Delete/Rename folder"
+    "ACL_I": "Nachrichten einfügen",
+    "ACL_K": "Unterordner anlegen",
+    "ACL_L": "Nachrichten anzeigen",
+    "ACL_P": "E-Mail senden",
+    "ACL_R": "Ordner auswählen",
+    "ACL_S": "\\SEEN-Markierung",
+    "ACL_T": "\\DELETED-Markierung",
+    "ACL_W": "Weitere Markierungen",
+    "ACL_X": "Ordner löschen/umbenennen"
   },
   "MESSAGE_LIST": {
     "BUTTON_RELOAD": "Nachrichtenliste neu laden",
@@ -132,8 +133,8 @@
     "QUOTA_SIZE": "Sie nutzen <strong>%SIZE% (%PROC%%)</strong> von <strong>%LIMIT%</strong>.",
     "SORT": "Sortieren",
     "NO_SORT": "Ihr Mailserver unterstützt das Sortieren von E-Mails nicht",
-    "SORT_ARRIVAL_ASC": "Arrived ascending",
-    "SORT_ARRIVAL_DESC": "Arrived descending",
+    "SORT_ARRIVAL_ASC": "Eingang aufsteigend",
+    "SORT_ARRIVAL_DESC": "Eingang absteigend",
     "SORT_DATE_ASC": "Datum aufsteigend",
     "SORT_DATE_DESC": "Datum absteigend",
     "SORT_SIZE_ASC": "Größe aufsteigend",
@@ -211,9 +212,9 @@
     "ALWAYS_IF_POSSIBLE": "Wenn möglich",
     "BUTTON_ADD_CONTACT": "Kontakt hinzufügen",
     "BUTTON_CREATE_CONTACT": "Kontakt anlegen",
-    "BUTTON_IMPORT": "Import (csv, vcf, vCard)",
-    "BUTTON_EXPORT_VCARD": "Export (vcf, vCard)",
-    "BUTTON_EXPORT_CSV": "Export (csv)",
+    "BUTTON_IMPORT": "Importieren (csv, vcf, vCard)",
+    "BUTTON_EXPORT_VCARD": "Exportieren (vcf, vCard)",
+    "BUTTON_EXPORT_CSV": "Exportieren (csv)",
     "ERROR_IMPORT_FILE": "Importfehler (ungültiges Dateiformat)",
     "EMPTY_LIST": "Keine Kontakte",
     "EMPTY_SEARCH": "Keine Kontakte gefunden",
@@ -223,9 +224,9 @@
     "DISPLAY_NAME": "Anzeigename",
     "LAST_NAME": "Nachnamen",
     "FIRST_NAME": "Vornamen",
-    "MIDDLE_NAME": "Middle name",
-    "NAME_PREFIX": "Name prefix",
-    "NAME_SUFFIX": "Name suffix",
+    "MIDDLE_NAME": "Zweiter Vorname",
+    "NAME_PREFIX": "Namenspräfix",
+    "NAME_SUFFIX": "Namenssuffix",
     "NICK_NAME": "Spitzname",
     "LABEL_READ_ONLY": "Schreibgeschützt",
     "ADD_MENU_LABEL": "Hinzufügen",
@@ -236,11 +237,23 @@
     "ADD_MENU_ADDRESS": "Adresse",
     "ADD_MENU_BIRTHDAY": "Geburtstag",
     "ADD_MENU_TAGS": "Schlagwörter",
-		"CATEGORY_ALL": "All categories",
-		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group.",
+		"CATEGORY_ALL": "Alle Kategorien",
+		"TAGS_HINT": "Mit Tags lassen sich Kontakte gruppieren und schnell adressieren. Geben Sie im Verfassen-Fenster einen Tag-Namen ein, um an alle aus dieser Gruppe zu senden.",
     "BUTTON_SHARE_ALL": "Jeder",
     "BUTTON_SYNC": "Synchronisierung (CardDAV)",
-    "SEND_TO_ALL_CONTACT_EMAILS": "An alle E-Mail-Adressen schreiben"
+    "SEND_TO_ALL_CONTACT_EMAILS": "An alle E-Mail-Adressen schreiben",
+    "SELECT_ALL": "Alle auf dieser Seite auswählen",
+    "SELECT_PAGE": "Diese Seite auswählen",
+    "SELECT_ALL_MATCHING": "Alle Treffer auswählen",
+    "SELECT_NONE": "Auswahl aufheben",
+    "BUTTON_COMPOSE_TO": "Neue Nachricht an",
+    "BUTTON_COMPOSE_CC": "Neue Nachricht, Empfänger in Cc",
+    "BUTTON_COMPOSE_BCC": "Neue Nachricht, Empfänger in Bcc",
+    "ASK_USE_BCC": "%COUNT% Empfänger. In Bcc setzen, damit sie die Adressen der anderen nicht sehen?",
+    "ERROR_COMPOSE_LIMIT": "%COUNT% Kontakte sind ausgewählt, mehr als die %LIMIT%, die eine einzelne Nachricht zulässt. Schränken Sie die Auswahl zuerst ein.",
+    "BUTTON_DELETE_LOCAL": "Lokale Kontakte löschen",
+    "SYNCED_CONTACT": "Mit dem entfernten Adressbuch synchronisiert",
+    "CONFIRM_DELETE_LOCAL": "Alle lokal erstellten Kontakte löschen? Aus dem entfernten Adressbuch synchronisierte Kontakte sind markiert und bleiben erhalten."
   },
   "COMPOSE": {
     "LINK_SHOW_INPUTS": "alle Felder anzeigen",
@@ -414,7 +427,7 @@
     "ERROR_UNKNOWN": "Ein unbekannter Fehler trat beim Hochladen auf"
   },
   "EDITOR": {
-    "PLAIN": "HTML <-> TEXT",
+    "PLAIN": "HTML <-> Text",
     "SOURCE": "HTML <-> QUELLTEXT",
     "FONTFAMILY": "Schriftart",
     "FONTSIZE": "Schriftgröße",
@@ -440,7 +453,15 @@
     "IMAGEUPLOAD": "Bilddatei auswählen",
     "UNDO": "Rückgängig",
     "REDO": "Wiederholen",
-    "REMOVESTYLE": "Remove style"
+    "REMOVESTYLE": "Formatierung entfernen",
+    "TABLE": "Tabelle einfügen",
+    "ROWABOVE": "Zeile darüber einfügen",
+    "ROWBELOW": "Zeile darunter einfügen",
+    "COLLEFT": "Spalte links einfügen",
+    "COLRIGHT": "Spalte rechts einfügen",
+    "ROWDELETE": "Zeile löschen",
+    "COLDELETE": "Spalte löschen",
+    "TABLEDELETE": "Tabelle löschen"
   },
   "SETTINGS_LABELS": {
     "GENERAL": "Allgemein",
@@ -449,7 +470,8 @@
     "ACCOUNTS": "Konten",
     "FILTERS": "Filter",
     "SECURITY": "Sicherheit",
-    "THEMES": "Themen"
+    "THEMES": "Themen",
+    "CALENDAR": "Kalender"
   },
   "SETTINGS_FILTERS": {
     "SIMPLE": "Einfach",
@@ -512,8 +534,8 @@
     "IMAGES_OPTION_ALWAYS": "Immer anzeigen",
     "IMAGES_WHITELIST": "Ausnahmeliste für Bilder",
     "MESSAGE_POPUP_WINDOW": "In neuem Fenster statt Tab anzeigen",
-    "MAILTO": "Register as 'mailto:' links handler",
-    "HTML_TO_MD": "Convert HTML to Markdown instead of plain text"
+    "MAILTO": "Als Handler für 'mailto:'-Links registrieren",
+    "HTML_TO_MD": "HTML in Markdown statt in reinen Text umwandeln"
   },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Empfänger automatisch zu Ihrem Adressbuch hinzuzufügen",
@@ -522,7 +544,8 @@
     "LABEL_CONTACTS_SYNC_SERVER": "Server",
     "LABEL_CONTACTS_SYNC_AB_URL": "Adressbuch-URL",
     "LABEL_CONTACTS_SYNC_USER": "Benutzer",
-    "SYNC_READ": "Nur lesend"
+    "SYNC_READ": "Nur lesend",
+    "TEST_OK": "Verbindung erfolgreich"
   },
   "SETTINGS_THEMES": {
     "LEGEND_THEMES": "Themen",
@@ -650,6 +673,43 @@
     "AccountSwitchFailed": "Konto wechseln \"%EMAIL%\" versagt",
     "MailServerError": "Beim Zugriff auf den E-Mail-Server trat ein Fehler auf.",
     "InvalidInputArgument": "Ungültige Eingabe",
-    "UnknownError": "Unbekannter Fehler"
+    "UnknownError": "Unbekannter Fehler",
+    "CalendarSyncError": "Kalendersynchronisierung fehlgeschlagen"
+  },
+  "CALENDAR": {
+    "BUTTON_NEW_EVENT": "Neuer Termin",
+    "BUTTON_PREV": "Zurück",
+    "BUTTON_NEXT": "Weiter",
+    "BUTTON_TODAY": "Heute",
+    "BUTTON_SYNC": "Kalender synchronisieren",
+    "VIEW_MONTH": "Monat",
+    "VIEW_WEEK": "Woche",
+    "VIEW_DAY": "Tag",
+    "VIEW_LIST": "Liste",
+    "EMPTY_LIST": "Keine Kalender",
+    "READ_ONLY": "Nur lesend",
+    "LABEL_SUMMARY": "Titel",
+    "LABEL_CALENDAR": "Kalender",
+    "LABEL_ALL_DAY": "Ganztägig",
+    "LABEL_START": "Beginn",
+    "LABEL_END": "Ende",
+    "LABEL_LOCATION": "Ort",
+    "LABEL_DESCRIPTION": "Beschreibung",
+    "CONFIRM_DELETE_EVENT": "Möchten Sie diesen Termin wirklich löschen?",
+    "ERROR_LOAD_COMPONENT": "Die Kalenderkomponente konnte nicht geladen werden",
+    "RECURRING_READ_ONLY": "Dieser Termin wiederholt sich. Das Bearbeiten wiederkehrender Termine wird noch nicht unterstützt, daher wird er nur lesend angezeigt.",
+    "ERROR_NO_TITLE": "Geben Sie dem Termin einen Titel",
+    "ERROR_BAD_START": "Das Startdatum ist kein gültiges Datum mit Uhrzeit",
+    "ERROR_BAD_END": "Das Enddatum ist kein gültiges Datum mit Uhrzeit",
+    "ERROR_END_BEFORE_START": "Der Termin endet vor seinem Beginn",
+    "ERROR_NO_CALENDAR": "Wählen Sie einen Kalender für den Termin"
+  },
+  "SETTINGS_CALENDAR": {
+    "LEGEND_CALENDAR_SYNC": "Remote-Synchronisierung (CalDAV)",
+    "LABEL_CALENDAR_SYNC_ENABLE": "Remote-Synchronisierung aktivieren",
+    "LABEL_CALENDAR_SYNC_URL": "CalDAV-URL",
+    "LABEL_CALENDAR_SYNC_USER": "Benutzer",
+    "SYNC_READ": "Nur lesend",
+    "TEST_OK": "Verbindung erfolgreich"
   }
 }
