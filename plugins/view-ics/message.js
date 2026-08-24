@@ -11,7 +11,7 @@
 
 			attachmentsPlace.after(Element.fromHTML(`
 			<details data-bind="if: viewICS, visible: viewICS">
-				<summary data-icon="📅" data-bind="text: viewICS().SUMMARY"></summary>
+				<summary data-icon="calendar" data-bind="text: viewICS().SUMMARY"></summary>
 				<table><tbody style="white-space:pre">
 					<tr data-bind="visible: viewICS().ORGANIZER"><td>Organizer</td><td data-bind="text: viewICS().ORGANIZER"></td></tr>
 					<tr><td>Start</td><td data-bind="text: viewICS().DTSTART"></td></tr>

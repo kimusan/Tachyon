@@ -32,7 +32,7 @@
 		.content.querySelector('#more-list-dropdown-id + menu [data-bind*="forwardCommand"]');
 	if (msgMenu) {
 		msgMenu.after(Element.fromHTML(`<li role="presentation" data-bind="css:{disabled:!messageList.hasChecked()}">
-			<a href="#" tabindex="-1" data-icon="📥" data-bind="click: nextcloudSaveMsgs" data-i18n="NEXTCLOUD/SAVE_EML"></a>
+			<a href="#" tabindex="-1" data-icon="cloud-upload" data-bind="click: nextcloudSaveMsgs" data-i18n="NEXTCLOUD/SAVE_EML"></a>
 		</li>`));
 	}
 

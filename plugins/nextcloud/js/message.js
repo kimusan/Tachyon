@@ -13,15 +13,15 @@
 
 			if (attachmentsControls) {
 				attachmentsControls.append(Element.fromHTML(`<span>
-					<i class="fontastic iconcolor-red" data-bind="visible: saveNextcloudError">✖</i>
-					<i class="fontastic" data-bind="visible: !saveNextcloudError(),
-						css: {'icon-spinner': saveNextcloudLoading()}">💾</i>
+					<i class="icon-x iconcolor-red" data-bind="visible: saveNextcloudError"></i>
+					<i class="icon-save" data-bind="visible: !saveNextcloudError(),
+						css: {'icon-spinner': saveNextcloudLoading()}"></i>
 					<span class="g-ui-link" data-bind="click: saveNextcloud" data-i18n="NEXTCLOUD/SAVE_ATTACHMENTS"></span>
 				</span>`));
 
 				// https://github.com/nextcloud/calendar/issues/4684
 				if (cfg.CalDAV) {
-					attachmentsControls.append(Element.fromHTML(`<span data-bind="visible: nextcloudICS" data-icon="📅">
+					attachmentsControls.append(Element.fromHTML(`<span data-bind="visible: nextcloudICS" data-icon="calendar">
 						<span class="g-ui-link" data-bind="click: nextcloudSaveICS" data-i18n="NEXTCLOUD/SAVE_ICS"></span>
 					</span>`));
 				}
@@ -32,7 +32,7 @@
 				const attachmentsPlace = template.content.querySelector('.attachmentsPlace');
 				attachmentsPlace.after(Element.fromHTML(`
 				<table data-bind="if: nextcloudICS, visible: nextcloudICS"><tbody style="white-space:pre">
-					<tr><td>Summary</td><td data-icon="📅" data-bind="text: nextcloudICS().SUMMARY"></td></tr>
+					<tr><td>Summary</td><td data-icon="calendar" data-bind="text: nextcloudICS().SUMMARY"></td></tr>
 					<tr><td>Organizer</td><td data-bind="text: nextcloudICS().ORGANIZER"></td></tr>
 					<tr><td>Start</td><td data-bind="text: nextcloudICS().DTSTART"></td></tr>
 					<tr><td>End</td><td data-bind="text: nextcloudICS().DTEND"></td></tr>
@@ -45,7 +45,7 @@
 */
 			if (msgMenu) {
 				msgMenu.append(Element.fromHTML(`<li role="presentation">
-					<a href="#" tabindex="-1" data-icon="📥" data-bind="click: nextcloudSaveMsg" data-i18n="NEXTCLOUD/SAVE_EML"></a>
+					<a href="#" tabindex="-1" data-icon="cloud-upload" data-bind="click: nextcloudSaveMsg" data-i18n="NEXTCLOUD/SAVE_EML"></a>
 				</li>`));
 			}
 

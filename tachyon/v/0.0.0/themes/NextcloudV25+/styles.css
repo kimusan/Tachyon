@@ -158,7 +158,7 @@
 	color: var(--nc-color-error) !important;
 }
 
-#rl-app i.fontastic {
+#rl-app i[class*="icon-"] {
 	line-height: unset;
 }
 
@@ -367,15 +367,15 @@
 #rl-app button:focus,
 #rl-app button:active,
 #rl-app button.active,
-#rl-app span.fontastic:hover,
-#rl-app span.fontastic:focus,
-#rl-app span.fontastic:active {
+#rl-app span[class*="icon-"]:hover,
+#rl-app span[class*="icon-"]:focus,
+#rl-app span[class*="icon-"]:active {
 	outline: none;
 	opacity: unset;
 }
 
-#rl-app .btn.fontastic,
-#rl-app button.fontastic {
+#rl-app .btn[class*="icon-"],
+#rl-app button[class*="icon-"] {
 	border-radius: var(--nc-border-radius-large);
 }
 
@@ -443,17 +443,17 @@
 	border-color: var(--nc-color-primary-element-hover) !important;
 }
 
-#rl-app span.fontastic {
+#rl-app span[class*="icon-"] {
 	padding: 6px;
 	height: fit-content;
 	border-radius: var(--nc-border-radius);
 }
 
-#rl-app span.fontastic:hover {
+#rl-app span[class*="icon-"]:hover {
 	background-color: var(--nc-color-background-hover);
 }
 
-#rl-app span.fontastic:active {
+#rl-app span[class*="icon-"]:active {
 	background-color: var(--nc-color-primary-light);
 }
 
@@ -465,10 +465,10 @@
 #rl-app button.disabled:hover, button[disabled]:hover,
 #rl-app button.disabled:focus, button[disabled]:focus,
 #rl-app button.disabled:active, button[disabled]:active,
-#rl-app span.fontastic.disabled, span.fontastic[disabled],
-#rl-app span.fontastic.disabled:hover, span.fontastic[disabled]:hover,
-#rl-app span.fontastic.disabled:focus, span.fontastic[disabled]:focus,
-#rl-app span.fontastic.disabled:active, span.fontastic[disabled]:active {
+#rl-app span[class*="icon-"].disabled, span[class*="icon-"][disabled],
+#rl-app span[class*="icon-"].disabled:hover, span[class*="icon-"][disabled]:hover,
+#rl-app span[class*="icon-"].disabled:focus, span[class*="icon-"][disabled]:focus,
+#rl-app span[class*="icon-"].disabled:active, span[class*="icon-"][disabled]:active {
 	opacity: .5;
 	filter: saturate(0.7);
 }
@@ -477,8 +477,8 @@
 #rl-app .btn:not(.disabled, [disabled]):focus,
 #rl-app button:not(.disabled, [disabled]):hover,
 #rl-app button:not(.disabled, [disabled]):focus,
-#rl-app span.fontastic:not(.disabled, [disabled]):hover,
-#rl-app span.fontastic:not(.disabled, [disabled]):focus {
+#rl-app span[class*="icon-"]:not(.disabled, [disabled]):hover,
+#rl-app span[class*="icon-"]:not(.disabled, [disabled]):focus {
 	border-color: var(--nc-color-primary-element) !important;
 }
 
@@ -486,8 +486,8 @@
 #rl-app .btn:not(.disabled, [disabled]).active,
 #rl-app button:not(.disabled, [disabled]):active,
 #rl-app button:not(.disabled, [disabled]).active,
-#rl-app span.fontastic:not(.disabled, [disabled]):active,
-#rl-app span.fontastic:not(.disabled, [disabled]).active {
+#rl-app span[class*="icon-"]:not(.disabled, [disabled]):active,
+#rl-app span[class*="icon-"]:not(.disabled, [disabled]).active {
 	background-color: var(--nc-color-main-background);
 	color: var(--nc-color-text-light);
 }
@@ -567,44 +567,44 @@
 	border-radius: var(--nc-border-radius-large) !important;
 }
 
-#rl-app .btn-group .btn.fontastic:nth-child(1 of :not([style*="display: none;"])),
-[dir="rtl"] #rl-app .btn-group .btn.fontastic:nth-last-child(1 of :not([style*="display: none;"])) {
+#rl-app .btn-group .btn[class*="icon-"]:nth-child(1 of :not([style*="display: none;"])),
+[dir="rtl"] #rl-app .btn-group .btn[class*="icon-"]:nth-last-child(1 of :not([style*="display: none;"])) {
 	border-radius: 0 !important;
 	border-top-left-radius: var(--nc-border-radius-large) !important;
 	border-bottom-left-radius: var(--nc-border-radius-large) !important;
 }
 
 /* fallback */
-#rl-app .btn-group .btn.fontastic:first-of-type,
-[dir="rtl"] #rl-app .btn-group .btn.fontastic:last-of-type {
+#rl-app .btn-group .btn[class*="icon-"]:first-of-type,
+[dir="rtl"] #rl-app .btn-group .btn[class*="icon-"]:last-of-type {
 	border-radius: 0;
 	border-top-left-radius: var(--nc-border-radius-large);
 	border-bottom-left-radius: var(--nc-border-radius-large);
 }
 
-#rl-app .btn-group .btn.fontastic:nth-last-child(1 of :not([style*="display: none;"])),
-[dir="rtl"] #rl-app .btn-group .btn.fontastic:nth-child(1 of :not([style*="display: none;"])) {
+#rl-app .btn-group .btn[class*="icon-"]:nth-last-child(1 of :not([style*="display: none;"])),
+[dir="rtl"] #rl-app .btn-group .btn[class*="icon-"]:nth-child(1 of :not([style*="display: none;"])) {
 	border-radius: 0 !important;
 	border-top-right-radius: var(--nc-border-radius-large) !important;
 	border-bottom-right-radius: var(--nc-border-radius-large) !important;
 }
 
 /* fallback */
-#rl-app .btn-group .btn.fontastic:last-of-type,
-[dir="rtl"] #rl-app .btn-group .btn.fontastic:first-of-type {
+#rl-app .btn-group .btn[class*="icon-"]:last-of-type,
+[dir="rtl"] #rl-app .btn-group .btn[class*="icon-"]:first-of-type {
 	border-radius: 0;
 	border-top-right-radius: var(--nc-border-radius-large);
 	border-bottom-right-radius: var(--nc-border-radius-large);
 }
 
-#rl-app .btn-group .btn.fontastic:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])),
-[dir="rtl"] #rl-app .btn-group .btn.fontastic:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])) {
+#rl-app .btn-group .btn[class*="icon-"]:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])),
+[dir="rtl"] #rl-app .btn-group .btn[class*="icon-"]:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])) {
 	border-radius: var(--nc-border-radius-large) !important;
 }
 
 /* fallback */
-#rl-app .btn-group .btn.fontastic:first-of-type:last-of-type,
-[dir="rtl"] #rl-app .btn-group .btn.fontastic:first-of-type:last-of-type {
+#rl-app .btn-group .btn[class*="icon-"]:first-of-type:last-of-type,
+[dir="rtl"] #rl-app .btn-group .btn[class*="icon-"]:first-of-type:last-of-type {
 	border-radius: var(--nc-border-radius-large) !important;
 }
 
@@ -1228,17 +1228,17 @@ html.rl-mobile.rl-left-panel-disabled #rl-app #rl-left {
 	color: var(--nc-color-main-text);
 }
 
-#rl-app .LoginView .controls>.fontastic:first-child {
+#rl-app .LoginView .controls>[class*="icon-"]:first-child {
 	padding: unset;
 	left: 10px;
 }
 
-#rl-app .LoginView .controls span.fontastic {
+#rl-app .LoginView .controls span[class*="icon-"] {
 	user-select: none;
 }
 
-#rl-app .LoginView .controls span.fontastic:active,
-#rl-app .LoginView .controls span.fontastic:hover {
+#rl-app .LoginView .controls span[class*="icon-"]:active,
+#rl-app .LoginView .controls span[class*="icon-"]:hover {
 	background: unset;
 }
 
@@ -1434,32 +1434,32 @@ html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable {
 }
 
 #rl-app .b-footer.btn-toolbar .btn-group .btn:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])),
-#rl-app .b-footer.btn-toolbar .btn-group .btn.fontastic:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])),
+#rl-app .b-footer.btn-toolbar .btn-group .btn[class*="icon-"]:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])),
 [dir="rtl"] #rl-app .b-footer.btn-toolbar .btn-group .btn:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])),
-[dir="rtl"] #rl-app .b-footer.btn-toolbar .btn-group .btn.fontastic:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])) {
+[dir="rtl"] #rl-app .b-footer.btn-toolbar .btn-group .btn[class*="icon-"]:nth-child(1 of :not([style*="display: none;"])):nth-last-child(1 of :not([style*="display: none;"])) {
 	border-radius: var(--nc-border-radius-large) !important;
 }
 
 /* fallback */
 #rl-app .b-footer.btn-toolbar .btn-group .btn,
-#rl-app .b-footer.btn-toolbar .btn-group .btn.fontastic,
+#rl-app .b-footer.btn-toolbar .btn-group .btn[class*="icon-"],
 [dir="rtl"] #rl-app .b-footer.btn-toolbar .btn-group .btn,
-[dir="rtl"] #rl-app .b-footer.btn-toolbar .btn-group .btn.fontastic {
+[dir="rtl"] #rl-app .b-footer.btn-toolbar .btn-group .btn[class*="icon-"] {
 	border-radius: var(--nc-border-radius-large) !important;
 }
 
 #rl-app .b-footer.btn-toolbar .btn:hover,
-#rl-app .b-footer.btn-toolbar .btn.fontastic:hover {
+#rl-app .b-footer.btn-toolbar .btn[class*="icon-"]:hover {
 	background-color: var(--nc-color-background-hover);
 }
 
 #rl-app .b-footer.btn-toolbar .btn:active,
-#rl-app .b-footer.btn-toolbar .btn.fontastic:active {
+#rl-app .b-footer.btn-toolbar .btn[class*="icon-"]:active {
 	background-color: var(--nc-color-primary-light);
 }
 
 #rl-app .b-footer.btn-toolbar .btn:focus,
-#rl-app .b-footer.btn-toolbar .btn.fontastic:focus {
+#rl-app .b-footer.btn-toolbar .btn[class*="icon-"]:focus {
 	outline: none;
 }
 
@@ -1470,12 +1470,12 @@ html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable {
 	overflow: hidden;
 }
 
-#rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn.fontastic {
+#rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn[class*="icon-"] {
 	background-color: var(--nc-color-main-background);
 }
 
 #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn:after,
-[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn.fontastic:before {
+[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn[class*="icon-"]:before {
 	font-family: var(--nc-font-face);
 	font-size: var(--nc-default-font-size);
 	margin-left: 15px;
@@ -1489,15 +1489,15 @@ html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable {
 	position: unset;
 }
 
-#rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn.fontastic:after,
-[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn.fontastic:before {
+#rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn[class*="icon-"]:after,
+[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn[class*="icon-"]:before {
 	content: attr(title);
 	width: inherit;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn.fontastic:after {
+[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled .btn[class*="icon-"]:after {
 	content: unset;
 }
 
@@ -1512,9 +1512,9 @@ html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable {
 	text-overflow: ellipsis;
 }
 
-html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group .btn.fontastic:after,
+html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group .btn[class*="icon-"]:after,
 html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group .btn.icon-folder-add:after,
-html.rl-left-panel-disabled[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group .btn.fontastic:before {
+html.rl-left-panel-disabled[dir="rtl"] #rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group .btn[class*="icon-"]:before {
 	content: '';
 }
 
@@ -1934,7 +1934,7 @@ html.sm-msgView-bottom #rl-app .messageView {
 }
 
 #rl-app #messageItem .attachmentsControls .icon-file-archive,
-#rl-app #messageItem .attachmentsControls .fontastic {
+#rl-app #messageItem .attachmentsControls [class*="icon-"] {
 	color: var(--nc-color-main-text);
 }
 

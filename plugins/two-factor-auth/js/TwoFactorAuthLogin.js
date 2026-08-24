@@ -14,7 +14,7 @@
 				placeholder = 'PLUGIN_2FA/LABEL_TWO_FACTOR_CODE';
 			if (container) {
 				container.prepend(Element.fromHTML('<div class="controls">'
-					+ '<span class="fontastic">⏱</span>'
+					+ '<span class="icon-timer"></span>'
 					+ '<input name="totp_code" type="text" class="input-block-level"'
 					+ ' pattern="[0-9]*" inputmode="numeric"'
 					+ ' autocomplete="one-time-code" autocorrect="off" autocapitalize="none"'

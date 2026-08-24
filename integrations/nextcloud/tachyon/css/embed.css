@@ -43,7 +43,7 @@ This stylesheet is used when SnappyMail runs in embed mode.
 	margin-left: 20px;
 }
 
-#rl-app .LoginView .fontastic + input {
+#rl-app .LoginView [class^="icon-"] + input {
 	padding-left: 30px;
 }
 

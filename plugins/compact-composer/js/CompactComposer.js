@@ -713,8 +713,7 @@
 							menuBtn.innerHTML = item.icon;
 							menuBtn.firstElementChild.setAttribute('class', 'squire-toolbar-svg-icon');
 						} else {
-							menuBtn.className += ' fontastic';
-							menuBtn.textContent = '☰';
+							menuBtn.className += ' icon-menu';
 						}
 						menuWrap.appendChild(menuBtn);
 

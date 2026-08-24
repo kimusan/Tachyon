@@ -34,7 +34,7 @@
 
 			attachmentsPlace.after(Element.fromHTML(`
 			<details data-bind="if: ICSViewer, visible: ICSViewer">
-				<summary data-icon="📅" data-bind="text: ICSViewer().SUMMARY"></summary>
+				<summary data-icon="calendar" data-bind="text: ICSViewer().SUMMARY"></summary>
 				<table><tbody style="white-space:pre">
 					<tr data-bind="visible: ICSViewer().ORGANIZER_TXT"><td>Organizer: </td><td><a data-bind="text: ICSViewer().ORGANIZER_TXT, attr: { href: ICSViewer().ORGANIZER_MAIL }"></a></td></tr>
 					<tr><td>Start: </td><td data-bind="text: ICSViewer().DTSTART"></td></tr>

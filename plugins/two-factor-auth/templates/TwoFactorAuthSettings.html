@@ -65,16 +65,16 @@
 	</div>
 
 	<a class="btn btn-danger" data-bind="click: clearTwoFactor, visible: twoFactorStatus">
-		<i class="fontastic" data-bind="css: {'icon-spinner': clearing()}">✖</i>
+		<i class="icon-x" data-bind="css: {'icon-spinner': clearing()}"></i>
 		<span data-i18n="GLOBAL/CLEAR"></span>
 	</a>
 	<a class="btn" data-bind="click: createTwoFactor, visible: !twoFactorStatus()">
-		<i class="fontastic" data-bind="css: {'icon-spinner': processing()}">▶</i>
+		<i class="icon-play" data-bind="css: {'icon-spinner': processing()}"></i>
 		<span data-i18n="PLUGIN_2FA/BUTTON_ACTIVATE"></span>
 	</a>
 <!--
 	<a class="btn" data-bind="click: close, visible: viewEnable()">
-		<i class="icon-ok" ></i>
+		<i class="icon-check" ></i>
 		<span data-i18n="GLOBAL/DONE"></span>
 	</a>
 -->
