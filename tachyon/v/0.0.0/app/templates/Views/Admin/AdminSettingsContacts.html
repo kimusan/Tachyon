@@ -34,6 +34,14 @@
 			<span data-bind="saveTrigger: contactsComposeLimitTrigger"></span>
 		</div>
 	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_CONTACTS/BCC_LIMIT"></label>
+		<div>
+			<input type="number" min="1" max="10000" step="1" class="span1" data-bind="textInput: contactsBccLimit">
+			&nbsp;
+			<span data-bind="saveTrigger: contactsBccLimitTrigger"></span>
+		</div>
+	</div>
 </form>
 <form class="form-horizontal" spellcheck="false" data-bind="visible: contactsSupported">
 	<div class="legend" data-i18n="TAB_CONTACTS/LEGEND_STORAGE"></div>

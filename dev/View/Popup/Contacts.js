@@ -118,6 +118,9 @@ export class ContactsPopupView extends AbstractViewPopup {
 		decorateKoCommands(this, {
 			deleteCommand: self => !self.isBusy() && self.hasSelection(),
 			newMessageCommand: self => !self.isBusy() && self.hasSelection(),
+			composeToCommand: self => !self.isBusy() && self.hasSelection(),
+			composeCcCommand: self => !self.isBusy() && self.hasSelection(),
+			composeBccCommand: self => !self.isBusy() && self.hasSelection(),
 			selectAllCommand: self => !self.isBusy() && 0 < self.contactsCount(),
 			saveCommand: self => !self.isBusy(),
 			syncCommand: self => !self.isBusy(),
@@ -198,7 +201,27 @@ export class ContactsPopupView extends AbstractViewPopup {
 		return Math.max(1, pInt(SettingsGet('contactsComposeLimit')) || 100);
 	}
 
+	bccRecommendLimit() {
+		return Math.max(1, pInt(SettingsGet('contactsBccLimit')) || 20);
+	}
+
 	newMessageCommand() {
+		this.composeWithField(sComposeRecipientsField || 'to');
+	}
+
+	composeToCommand() {
+		this.composeWithField('to');
+	}
+
+	composeCcCommand() {
+		this.composeWithField('cc');
+	}
+
+	composeBccCommand() {
+		this.composeWithField('bcc');
+	}
+
+	composeWithField(field) {
 		const uids = this.selectedUids(),
 			limit = this.composeLimit();
 
@@ -206,6 +229,26 @@ export class ContactsPopupView extends AbstractViewPopup {
 			alert(i18n('CONTACTS/ERROR_COMPOSE_LIMIT', { LIMIT: limit, COUNT: uids.length }));
 			return;
 		}
+
+		/**
+		 * Putting a crowd in To hands every address to every recipient, so past a
+		 * threshold offer Bcc instead. A recommendation rather than a rule,
+		 * because a large To is legitimate for a team.
+		 */
+		if ('to' === field && this.bccRecommendLimit() < uids.length) {
+			AskPopupView.showModal([
+				i18n('CONTACTS/ASK_USE_BCC', { COUNT: uids.length }),
+				() => this.resolveAndCompose(uids, 'bcc'),
+				() => this.resolveAndCompose(uids, 'to')
+			]);
+			return;
+		}
+
+		this.resolveAndCompose(uids, field);
+	}
+
+	resolveAndCompose(uids, field) {
+		const limit = this.composeLimit();
 
 		// Details are kept for contacts checked by hand, but Select all only ever
 		// had uids, so those have to be fetched before a message can be addressed
@@ -225,7 +268,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 							sendToAll: contact.sendToAll()
 						});
 					});
-					this.composeToSelection(uids);
+					this.composeToSelection(uids, field);
 				}, {
 					Offset: 0,
 					Limit: limit,
@@ -234,11 +277,11 @@ export class ContactsPopupView extends AbstractViewPopup {
 				}
 			);
 		} else {
-			this.composeToSelection(uids);
+			this.composeToSelection(uids, field);
 		}
 	}
 
-	composeToSelection(uids) {
+	composeToSelection(uids, field) {
 		let aE = [],
 			recipients = {to:null,cc:null,bcc:null};
 
@@ -264,7 +307,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 		if (arrayLength(aE)) {
 			bOpenCompose = false;
 			this.close();
-			recipients[sComposeRecipientsField] = aE;
+			recipients[field] = aE;
 			showMessageComposer([ComposeType.Empty, null, recipients.to, recipients.cc, recipients.bcc])
 		}
 	}

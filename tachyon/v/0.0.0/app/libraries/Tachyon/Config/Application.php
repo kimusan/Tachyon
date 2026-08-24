@@ -222,7 +222,8 @@ Warning: only enable when server does not do this, else double compression error
 				'mysql_ssl_ciphers' => array('', 'HIGH'),
 				'sqlite_global'     => array(\is_file(APP_PRIVATE_DATA . '/AddressBook.sqlite')),
 				'suggestions_limit' => array(20),
-				'compose_recipients_limit' => array(100, 'Most recipients a single selection may open a compose window with')
+				'compose_recipients_limit' => array(100, 'Most recipients a single selection may open a compose window with'),
+				'bcc_recommend_limit' => array(20, 'Above this many recipients, offer to put them in Bcc so addresses stay private')
 			),
 
 			'calendar' => array(

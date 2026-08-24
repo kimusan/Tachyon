@@ -26,7 +26,23 @@
 		<span class="e-selection-count" data-bind="visible: hasSelection,
 			text: selectionCount() + (allSelected() ? ' \u2713' : '')"></span>
 
-		<a class="btn btn-success icon-mail" data-bind="command: newMessageCommand"></a>
+		<div class="btn-group dropdown" data-bind="registerBootstrapDropdown: true">
+			<a class="btn btn-success icon-mail" data-bind="command: newMessageCommand"
+				data-i18n="[title]CONTACTS/BUTTON_COMPOSE_TO"></a>
+			<a id="contacts-compose-dropdown-id" class="btn btn-success dropdown-toggle icon-chevron-down"
+				href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"></a>
+			<menu class="dropdown-menu" role="menu" aria-labelledby="contacts-compose-dropdown-id">
+				<li role="presentation" data-bind="command: composeToCommand">
+					<a href="#" tabindex="-1" data-icon="mail" data-i18n="CONTACTS/BUTTON_COMPOSE_TO"></a>
+				</li>
+				<li role="presentation" data-bind="command: composeCcCommand">
+					<a href="#" tabindex="-1" data-icon="copy" data-i18n="CONTACTS/BUTTON_COMPOSE_CC"></a>
+				</li>
+				<li role="presentation" data-bind="command: composeBccCommand">
+					<a href="#" tabindex="-1" data-icon="eye-off" data-i18n="CONTACTS/BUTTON_COMPOSE_BCC"></a>
+				</li>
+			</menu>
+		</div>
 
 		<a class="btn icon-trash-2" data-bind="command: deleteCommand"></a>
 
