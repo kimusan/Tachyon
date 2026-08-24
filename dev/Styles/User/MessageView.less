@@ -63,7 +63,6 @@
 	}
 	.b-message-view-checked-helper::after {
 		.icon-mask(mail);
-		font-family: tachyon;
 	}
 
 	.b-message-view-desc {
@@ -377,8 +376,7 @@
 				position: relative;
 			}
 			img[data-x-src]:not([src])::after {
-				content: "🖼";
-				font-family: tachyon;
+				.icon-mask(image);
 				position: absolute;
 				top: 0;
 				left: 0;

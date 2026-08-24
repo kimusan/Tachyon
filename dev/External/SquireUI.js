@@ -165,7 +165,7 @@ class SquireUI
 						cmd: doClr('color')
 					},
 					backgroundColor: {
-						html: '🎨', /* ▧ */
+						html: '<i class="icon-paint-bucket"></i>',
 						cmd: doClr('backgroundColor')
 					},
 				},
@@ -229,19 +229,19 @@ class SquireUI
 						matches: 'BLOCKQUOTE'
 					},
 					indentDecrease: {
-						html: '⇤',
+						html: '<i class="icon-indent-decrease"></i>',
 						cmd: () => squire.changeIndentationLevel('decrease'),
 						key: ']'
 					},
 					indentIncrease: {
-						html: '⇥',
+						html: '<i class="icon-indent-increase"></i>',
 						cmd: () => squire.changeIndentationLevel('increase'),
 						key: '['
 					}
 				},
 				targets: {
 					link: {
-						html: '🔗',
+						html: '<i class="icon-link"></i>',
 						cmd: () => {
 							let node = squire.getSelectionClosest('A'),
 								url = prompt("Link", node?.href || "https://");
@@ -252,7 +252,7 @@ class SquireUI
 						matches: 'A'
 					},
 					imageUrl: {
-						html: '🖼️',
+						html: '<i class="icon-image"></i>',
 						cmd: () => {
 							let node = squire.getSelectionClosest('IMG'),
 								src = prompt("Image", node?.src || "https://");
@@ -261,14 +261,14 @@ class SquireUI
 						matches: 'IMG'
 					},
 					imageUpload: {
-						html: '📂️',
+						html: '<i class="icon-folder-open"></i>',
 						cmd: () => browseImage.click(),
 						matches: 'IMG'
 					}
 				},
 				table: {
 					table: {
-						html: '⊞',
+						html: '<i class="icon-table"></i>',
 						cmd: btn => openTablePicker(btn),
 						matches: 'TABLE'
 					}
@@ -276,49 +276,49 @@ class SquireUI
 				// only shown while the cursor is inside a table, see pathChange below
 				tableEdit: {
 					rowAbove: {
-						html: '⤒',
+						html: '<i class="icon-between-vertical-start"></i>',
 						cmd: () => tableOp((table, row) => insertTableRow(table, row.rowIndex, row.cells.length))
 					},
 					rowBelow: {
-						html: '⤓',
+						html: '<i class="icon-between-vertical-end"></i>',
 						cmd: () => tableOp((table, row) => insertTableRow(table, row.rowIndex + 1, row.cells.length))
 					},
 					colLeft: {
-						html: '⇤',
+						html: '<i class="icon-between-horizontal-start"></i>',
 						cmd: () => tableOp((table, row, cell) => insertTableColumn(table, cell.cellIndex))
 					},
 					colRight: {
-						html: '⇥',
+						html: '<i class="icon-between-horizontal-end"></i>',
 						cmd: () => tableOp((table, row, cell) => insertTableColumn(table, cell.cellIndex + 1))
 					},
 					rowDelete: {
-						html: '⊖',
+						html: '<i class="icon-table-rows-split"></i>',
 						cmd: () => tableOp((table, row) =>
 							1 < table.rows.length ? table.deleteRow(row.rowIndex) : table.remove())
 					},
 					colDelete: {
-						html: '⊘',
+						html: '<i class="icon-table-columns-split"></i>',
 						cmd: () => tableOp((table, row, cell) =>
 							1 < row.cells.length ? deleteTableColumn(table, cell.cellIndex) : table.remove())
 					},
 					tableDelete: {
-						html: '⊠',
+						html: '<i class="icon-grid-2x2-x"></i>',
 						cmd: () => tableOp(table => table.remove())
 					}
 				},
 				changes: {
 					undo: {
-						html: '↶',
+						html: '<i class="icon-undo"></i>',
 						cmd: () => squire.undo(),
 						key: 'Z'
 					},
 					redo: {
-						html: '↷',
+						html: '<i class="icon-redo"></i>',
 						cmd: () => squire.redo(),
 						key: 'Y'
 					},
 					source: {
-						html: '👁',
+						html: '<i class="icon-code"></i>',
 						cmd: btn => {
 							this.setMode('source' == this.mode ? 'wysiwyg' : 'source');
 							btn.classList.toggle('active', 'source' == this.mode);
@@ -328,7 +328,7 @@ class SquireUI
 
 				clear: {
 					removeStyle: {
-						html: '⎚',
+						html: '<i class="icon-eraser"></i>',
 						cmd: () => squire.setStyle()
 					}
 				}
