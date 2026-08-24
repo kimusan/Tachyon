@@ -174,5 +174,5 @@ Squire is used in place of CKEditor.
 
 |        | normal  | min     | gzip   | min gzip |
 |--------|--------:|--------:|-------:|---------:|
-|squire  | 115,520 |  41,906 | 23,387 |   14,330 |
+|squire  | 115,520 |  47,548 | 23,387 |   14,867 |
 |ckeditor|       ? | 520,035 |      ? |  155,916 |
