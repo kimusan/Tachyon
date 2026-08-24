@@ -650,6 +650,9 @@ class Actions
 					$aResult['ContactsSync'] = $aData;
 				}
 
+				$aResult['contactsComposeLimit'] = \max(1,
+					(int) $oConfig->Get('contacts', 'compose_recipients_limit', 100));
+
 				if ($aResult['calendarAllowed'] && $oConfig->Get('calendar', 'allow_sync', false)) {
 					$aData = $this->getCalendarSyncData($oAccount) ?: [
 						'Mode' => 0,

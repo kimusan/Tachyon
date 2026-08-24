@@ -78,6 +78,7 @@
 		"SQLITE_GLOBAL": "Use a global DB instead of per account",
 		"ALERT_NOTICE": "Notice!",
 		"SUGGESTIONS_LIMIT": "Suggestions limit",
+		"COMPOSE_LIMIT": "Maximum recipients from a selection",
 		"HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "Don't use this database type with a large number of active users.",
 		"HTML_ALERT_DOES_NOT_SUPPORTED": "Your system doesn't support contacts.\n<br>\nYou need to install or enable <strong>PDO (SQLite \/ MySQL \/ PostgreSQL)<\/strong> extension on your server.\n"
 	},

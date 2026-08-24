@@ -1,6 +1,6 @@
 import { addObservablesTo, addComputablesTo } from 'External/ko';
 import { ComposeType } from 'Common/EnumsUser';
-import { registerShortcut } from 'Common/Globals';
+import { registerShortcut, SettingsGet } from 'Common/Globals';
 import { arrayLength, pInt } from 'Common/Utils';
 import { download, computedPaginatorHelper, showMessageComposer } from 'Common/UtilsUser';
 
@@ -51,6 +51,16 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 		this.availableCategories = ko.observableArray();
 
+		/**
+		 * Checked state cannot live on the contact objects, because the store is
+		 * replaced wholesale on every page load and paging away would drop it.
+		 * The uids are the selection; the details are kept alongside so a message
+		 * can be composed to contacts whose page is no longer loaded.
+		 */
+		this.checkedUids = ko.observableArray();
+		this.checkedDetails = new Map();
+		this.allSelected = ko.observable(false);
+
 		this.contacts = ContactUserStore;
 
 		this.useCheckboxesInList = SettingsUserStore.useCheckboxesInList;
@@ -79,12 +89,19 @@ export class ContactsPopupView extends AbstractViewPopup {
 				return checked.length ? checked : (selected ? [selected] : []);
 			},
 
+			// Counts the whole selection, not just the part currently on screen
+			selectionCount: () => this.checkedUids().length || (this.selectorContact() ? 1 : 0),
+
+			hasSelection: () => 0 < this.selectionCount(),
+
+			pageAllChecked: () => {
+				const page = ContactUserStore();
+				return page.length && page.every(contact => contact.checked());
+			},
+
 			checkAll: {
 				read: () => ContactUserStore.hasChecked(),
-				write: value => {
-					value = !!value;
-					ContactUserStore.forEach(contact => contact.checked(value));
-				}
+				write: value => value ? this.selectPage() : this.clearSelection()
 			},
 
 			contactsSyncEnabled: () => ContactUserStore.allowSync() && ContactUserStore.syncMode(),
@@ -93,14 +110,15 @@ export class ContactsPopupView extends AbstractViewPopup {
 				| this.isSaving()
 		});
 
-		this.search.subscribe(() => this.reloadContactList());
-		this.categoryFilter.subscribe(() => this.reloadContactList(true));
+		this.search.subscribe(() => { this.clearSelection(); this.reloadContactList(); });
+		this.categoryFilter.subscribe(() => { this.clearSelection(); this.reloadContactList(true); });
 
 		this.saveCommand = this.saveCommand.bind(this);
 
 		decorateKoCommands(this, {
-			deleteCommand: self => !self.isBusy() && 0 < self.contactsCheckedOrSelected().length,
-			newMessageCommand: self => !self.isBusy() && 0 < self.contactsCheckedOrSelected().length,
+			deleteCommand: self => !self.isBusy() && self.hasSelection(),
+			newMessageCommand: self => !self.isBusy() && self.hasSelection(),
+			selectAllCommand: self => !self.isBusy() && 0 < self.contactsCount(),
 			saveCommand: self => !self.isBusy(),
 			syncCommand: self => !self.isBusy(),
 			clearLocalCommand: self => !self.isBusy()
@@ -112,20 +130,30 @@ export class ContactsPopupView extends AbstractViewPopup {
 		this.selectorContact(null);
 	}
 
+	/**
+	 * @returns {Array} uids of the whole selection, which may reach past the
+	 * page on screen, falling back to the highlighted contact
+	 */
+	selectedUids() {
+		const uids = this.checkedUids();
+		if (uids.length) {
+			return uids.slice();
+		}
+		const selected = this.selectorContact();
+		return selected ? [selected.id()] : [];
+	}
+
 	deleteCommand() {
-		const contacts = this.contactsCheckedOrSelected();
-		if (contacts.length) {
+		const uids = this.selectedUids();
+		if (uids.length) {
 			let selectorContact = this.selectorContact(),
-				uids = [],
-				count = 0;
-			contacts.forEach(contact => {
-				uids.push(contact.id());
-				if (selectorContact && selectorContact.id() === contact.id()) {
-					this.selectorContact(selectorContact = null);
-				}
-				contact.deleted(true);
-				++count;
-			});
+				count = uids.length;
+			if (selectorContact && uids.includes(selectorContact.id())) {
+				this.selectorContact(selectorContact = null);
+			}
+			ContactUserStore.forEach(contact =>
+				uids.includes(contact.id()) && contact.deleted(true)
+			);
 			Remote.request('ContactsDelete',
 				(iError, oData) => {
 					if (iError) {
@@ -137,6 +165,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 						}
 //						contacts.forEach(contact => ContactUserStore.remove(contact));
 					}
+					this.clearSelection();
 					this.reloadContactList();
 				}, {
 					uids: uids.join(',')
@@ -165,20 +194,61 @@ export class ContactsPopupView extends AbstractViewPopup {
 		]);
 	}
 
+	composeLimit() {
+		return Math.max(1, pInt(SettingsGet('contactsComposeLimit')) || 100);
+	}
+
 	newMessageCommand() {
+		const uids = this.selectedUids(),
+			limit = this.composeLimit();
+
+		if (limit < uids.length) {
+			alert(i18n('CONTACTS/ERROR_COMPOSE_LIMIT', { LIMIT: limit, COUNT: uids.length }));
+			return;
+		}
+
+		// Details are kept for contacts checked by hand, but Select all only ever
+		// had uids, so those have to be fetched before a message can be addressed
+		const missing = uids.filter(uid => !this.checkedDetails.has(uid));
+		if (missing.length) {
+			Remote.request('Contacts',
+				(iError, data) => {
+					if (iError) {
+						alert(data?.message || getNotification(iError));
+						return;
+					}
+					(data.Result?.List || []).forEach(item => {
+						const contact = ContactModel.reviveFromJson(item);
+						contact && uids.includes(contact.id()) && this.checkedDetails.set(contact.id(), {
+							name: (contact.givenName() + ' ' + contact.surName()).trim(),
+							addresses: contact.email().map(address => address.value()),
+							sendToAll: contact.sendToAll()
+						});
+					});
+					this.composeToSelection(uids);
+				}, {
+					Offset: 0,
+					Limit: limit,
+					Search: this.search(),
+					Category: this.categoryFilter()
+				}
+			);
+		} else {
+			this.composeToSelection(uids);
+		}
+	}
+
+	composeToSelection(uids) {
 		let aE = [],
 			recipients = {to:null,cc:null,bcc:null};
 
-		this.contactsCheckedOrSelected().forEach(oContact => {
-			if (oContact) {
-				let name = (oContact.givenName() + ' ' + oContact.surName()).trim(),
-					email,
-					addresses = oContact.email();
-				if (!oContact.sendToAll()) {
-					addresses = addresses.slice(0,1);
-				}
+		uids.forEach(uid => {
+			const details = this.checkedDetails.get(uid);
+			if (details) {
+				let email,
+					addresses = details.sendToAll ? details.addresses : details.addresses.slice(0, 1);
 				addresses.forEach(address => {
-					email = new EmailModel(address.value(), name);
+					email = new EmailModel(address, details.name);
 					email.valid() && aE.push(email);
 				});
 /*
@@ -271,6 +341,67 @@ export class ContactsPopupView extends AbstractViewPopup {
 	/**
 	 * @param {boolean=} dropPagePosition = false
 	 */
+	/**
+	 * Reinstates checked state on a page that has just been fetched, and keeps
+	 * following it, since these are new objects each time.
+	 */
+	applySelectionTo(list) {
+		const uids = this.checkedUids();
+		list.forEach(contact => {
+			const uid = contact.id();
+			contact.checked(uids.includes(uid));
+			contact.checked.subscribe(value => this.setChecked(contact, value));
+		});
+	}
+
+	setChecked(contact, checked) {
+		const uid = contact.id();
+		if (checked) {
+			this.checkedUids.includes(uid) || this.checkedUids.push(uid);
+			this.checkedDetails.set(uid, {
+				name: (contact.givenName() + ' ' + contact.surName()).trim(),
+				addresses: contact.email().map(address => address.value()),
+				sendToAll: contact.sendToAll()
+			});
+		} else {
+			this.checkedUids.remove(uid);
+			this.checkedDetails.delete(uid);
+			this.allSelected(false);
+		}
+	}
+
+	selectPage() {
+		ContactUserStore.forEach(contact => contact.checked(true));
+	}
+
+	/**
+	 * Everything the current search and category match, not just this page, so
+	 * the count has to come from the server.
+	 */
+	selectAllCommand() {
+		Remote.request('ContactsUids',
+			(iError, data) => {
+				if (iError) {
+					alert(data?.message || getNotification(iError));
+					return;
+				}
+				this.checkedUids(data.Result?.Uids || []);
+				this.allSelected(true);
+				ContactUserStore.forEach(contact => contact.checked(true));
+			}, {
+				Search: this.search(),
+				Category: this.categoryFilter()
+			}
+		);
+	}
+
+	clearSelection() {
+		this.checkedUids([]);
+		this.checkedDetails.clear();
+		this.allSelected(false);
+		ContactUserStore.forEach(contact => contact.checked(false));
+	}
+
 	reloadContactList(dropPagePosition = false) {
 		let offset = (this.contactsPage() - 1) * CONTACTS_PER_PAGE;
 
@@ -297,6 +428,8 @@ export class ContactsPopupView extends AbstractViewPopup {
 				}
 
 				this.contactsCount(0 < count ? count : 0);
+
+				this.applySelectionTo(list);
 
 				ContactUserStore(list);
 
@@ -377,6 +510,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 	}
 
 	onHide() {
+		this.clearSelection();
 		this.contact(null);
 		this.selectorContact(null);
 		this.search('');

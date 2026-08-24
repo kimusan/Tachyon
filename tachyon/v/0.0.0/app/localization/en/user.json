@@ -271,6 +271,10 @@
 		"BUTTON_SYNC": "Synchronization (CardDAV)",
 		"SEND_TO_ALL_CONTACT_EMAILS": "Send to all contact emails",
 		"SELECT_ALL": "Select all on this page",
+		"SELECT_PAGE": "Select this page",
+		"SELECT_ALL_MATCHING": "Select all matching",
+		"SELECT_NONE": "Clear selection",
+		"ERROR_COMPOSE_LIMIT": "%COUNT% contacts are selected, which is more than the %LIMIT% a single message allows. Narrow the selection first.",
 		"BUTTON_DELETE_LOCAL": "Delete local contacts",
 		"SYNCED_CONTACT": "Synced with the remote address book",
 		"CONFIRM_DELETE_LOCAL": "Delete all locally created contacts? Contacts synced from the remote address book are marked and will be kept."

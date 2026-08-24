@@ -786,6 +786,61 @@ class PdoAddressBook
 		return [];
 	}
 
+	/**
+	 * Uids matching the same filter GetContacts applies, with no paging.
+	 * Expressed as one query with EXISTS clauses rather than reusing that
+	 * method's id collection, so selecting everything does not have to walk
+	 * every page and load a jCard per contact along the way.
+	 */
+	public function GetContactUids(string $sSearch = '', string $sCategory = '') : array
+	{
+		if (1 > $this->iUserID) {
+			return [];
+		}
+
+		$sSql = 'SELECT c.id_contact_str FROM rainloop_ab_contacts AS c'
+			. ' WHERE c.deleted = 0 AND c.id_user = :id_user';
+		$aParams = array(':id_user' => array($this->iUserID, \PDO::PARAM_INT));
+
+		if (\strlen($sCategory)) {
+			$sSql .= ' AND EXISTS (SELECT 1 FROM rainloop_ab_properties AS pc'
+				. ' WHERE pc.id_contact = c.id_contact AND pc.id_user = :id_user'
+				. ' AND pc.prop_type = :cat_type AND pc.prop_value_lower = :category)';
+			$aParams[':cat_type'] = array(PropertyType::CATEGORIES, \PDO::PARAM_INT);
+			$aParams[':category'] = array(\mb_strtolower($sCategory, 'UTF-8'), \PDO::PARAM_STR);
+		}
+
+		if (\strlen($sSearch)) {
+			$sLowerSearch = $this->specialConvertSearchValueLower($sSearch, '=');
+			$sSql .= ' AND EXISTS (SELECT 1 FROM rainloop_ab_properties AS ps'
+				. ' WHERE ps.id_contact = c.id_contact AND ps.id_user = :id_user'
+				. ' AND ps.prop_type IN (' . \implode(',', static::$aSearchInFields) . ')'
+				. ' AND (ps.prop_value LIKE :search ESCAPE \'=\''
+				. (\strlen($sLowerSearch)
+					? ' OR (ps.prop_value_lower <> \'\' AND ps.prop_value_lower LIKE :search_lower ESCAPE \'=\')'
+					: '')
+				. '))';
+			$aParams[':search'] = array($this->specialConvertSearchValue($sSearch, '='), \PDO::PARAM_STR);
+			if (\strlen($sLowerSearch)) {
+				$aParams[':search_lower'] = array($sLowerSearch, \PDO::PARAM_STR);
+			}
+		}
+
+		$sSql .= ' ORDER BY c.display ASC';
+
+		$aResult = array();
+		$oStmt = $this->prepareAndExecute($sSql, $aParams);
+		if ($oStmt) {
+			while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
+				if (\strlen((string) $aItem[0])) {
+					$aResult[] = (string) $aItem[0];
+				}
+			}
+		}
+
+		return $aResult;
+	}
+
 	public function GetCategories() : array
 	{
 		if (1 > $this->iUserID) {

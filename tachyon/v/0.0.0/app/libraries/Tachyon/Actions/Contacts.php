@@ -150,6 +150,26 @@ trait Contacts
 		));
 	}
 
+	/**
+	 * Every uid matching the current filter. DoContacts is paged, so selecting
+	 * beyond the visible page would otherwise mean walking every page.
+	 */
+	public function DoContactsUids() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$oAbp = $this->AddressBookProvider($oAccount);
+		if (!$oAbp || !$oAbp->IsActive()) {
+			return $this->FalseResponse();
+		}
+
+		return $this->DefaultResponse(array(
+			'Uids' => $oAbp->GetContactUids(
+				\trim($this->GetActionParam('Search', '')),
+				\trim($this->GetActionParam('Category', ''))
+			)
+		));
+	}
+
 	public function DoContactsCategories() : array
 	{
 		$oAccount = $this->getAccountFromToken();

@@ -6,9 +6,25 @@
 
 		<a class="btn" data-bind="click: newContact" data-icon="plus" data-i18n="CONTACTS/BUTTON_ADD_CONTACT"></a>
 
-		<a class="btn checkAllContacts" data-bind="visible: useCheckboxesInList,
-			click: () => checkAll(!checkAll()), css: checkAll() ? 'icon-square-check' : 'icon-square'"
-			data-i18n="[title]CONTACTS/SELECT_ALL"></a>
+		<div class="btn-group dropdown" data-bind="visible: useCheckboxesInList, registerBootstrapDropdown: true">
+			<a id="contacts-select-dropdown-id" class="btn dropdown-toggle checkAllContacts" href="#" tabindex="-1"
+				data-i18n="[title]CONTACTS/SELECT_ALL"
+				data-bind="css: pageAllChecked() ? 'icon-square-check' : (hasSelection() ? 'icon-square-minus' : 'icon-square')"></a>
+			<menu class="dropdown-menu" role="menu" aria-labelledby="contacts-select-dropdown-id">
+				<li role="presentation" data-bind="click: () => selectPage()">
+					<a href="#" tabindex="-1" data-icon="square-check" data-i18n="CONTACTS/SELECT_PAGE"></a>
+				</li>
+				<li role="presentation" data-bind="command: selectAllCommand">
+					<a href="#" tabindex="-1" data-icon="check" data-i18n="CONTACTS/SELECT_ALL_MATCHING"></a>
+				</li>
+				<li role="presentation" data-bind="click: () => clearSelection(), css: {'disabled': !hasSelection()}">
+					<a href="#" tabindex="-1" data-icon="x" data-i18n="CONTACTS/SELECT_NONE"></a>
+				</li>
+			</menu>
+		</div>
+
+		<span class="e-selection-count" data-bind="visible: hasSelection,
+			text: selectionCount() + (allSelected() ? ' \u2713' : '')"></span>
 
 		<a class="btn btn-success icon-mail" data-bind="command: newMessageCommand"></a>
 

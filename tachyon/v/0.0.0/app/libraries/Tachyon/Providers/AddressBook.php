@@ -69,6 +69,17 @@ class AddressBook extends AbstractProvider
 		) : array();
 	}
 
+	/**
+	 * Not on AddressBookInterface: plugins supply their own drivers, and a
+	 * driver written before this existed must keep working.
+	 */
+	public function GetContactUids(string $sSearch = '', string $sCategory = '') : array
+	{
+		return ($this->oDriver && \method_exists($this->oDriver, 'GetContactUids'))
+			? $this->oDriver->GetContactUids($sSearch, $sCategory)
+			: array();
+	}
+
 	public function GetCategories() : array
 	{
 		return $this->IsActive() ? $this->oDriver->GetCategories() : [];

@@ -38,6 +38,7 @@ export class AdminSettingsContacts extends AbstractViewSettings {
 		});
 
 		this.addSetting('contactsSuggestionsLimit');
+		this.addSetting('contactsComposeLimit');
 
 		const supportedTypes = SettingsGet('supportedPdoDrivers') || [],
 			types = [{

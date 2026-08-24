@@ -83,6 +83,7 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'contactsMySQLSSLCiphers', 'contacts', 'mysql_ssl_ciphers', 'string');
 		$this->setConfigFromParams($oConfig, 'contactsSQLiteGlobal', 'contacts', 'sqlite_global', 'bool');
 		$this->setConfigFromParams($oConfig, 'contactsSuggestionsLimit', 'contacts', 'suggestions_limit', 'int');
+		$this->setConfigFromParams($oConfig, 'contactsComposeLimit', 'contacts', 'compose_recipients_limit', 'int');
 		$this->setConfigFromParams($oConfig, 'contactsPdoType', 'contacts', 'type', 'string', function ($sType) use ($self) {
 			return Providers\AddressBook\PdoAddressBook::validPdoType($sType);
 		});
@@ -511,6 +512,7 @@ class ActionsAdmin extends Actions
 			$aResult['contactsMySQLSSLCiphers'] = (string) $oConfig->Get('contacts', 'mysql_ssl_ciphers', '');
 			$aResult['contactsSQLiteGlobal'] = !!$oConfig->Get('contacts', 'sqlite_global', \is_file(APP_PRIVATE_DATA . '/AddressBook.sqlite'));
 			$aResult['contactsSuggestionsLimit'] = (int)$oConfig->Get('contacts', 'suggestions_limit', 20);
+			$aResult['contactsComposeLimit'] = (int)$oConfig->Get('contacts', 'compose_recipients_limit', 100);
 
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
 			$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');
