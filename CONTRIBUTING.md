@@ -11,7 +11,7 @@
 2. Install node.js - `https://nodejs.org/download/`
 3. Install yarn - `https://yarnpkg.com/en/docs/install`
 4. Install gulp - `npm install gulp -g`
-5. Fork Tachyon from https://github.com/schulz-dk/tachyon
+5. Fork Tachyon from https://github.com/kimusan/tachyon
 6. Clone it - `git clone git@github.com:USERNAME/tachyon.git tachyon`
 7. `cd tachyon`
 8. Install all dependencies - `yarn install`
