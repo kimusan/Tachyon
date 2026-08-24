@@ -9,13 +9,7 @@
 			font-weight: bold;
 		}
 
-		/*
-		 * The arrows and the sync glyph are not in the snappymail icon font, so
-		 * routing them through .fontastic only forced a per-glyph fallback: the
-		 * two arrows picked up different fonts and came out different sizes, and
-		 * its line-height of 1 cropped the taller glyph. Left in the normal font
-		 * stack with room to breathe they match each other.
-		 */
+		/* Keeps the navigation and sync buttons a consistent size */
 		.b-calendar-icon {
 			min-width: 2em;
 			text-align: center;
