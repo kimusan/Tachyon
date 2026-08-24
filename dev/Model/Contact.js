@@ -86,7 +86,10 @@ export class ContactModel extends AbstractModel {
 			focused: false,
 			selected: false,
 			checked: false,
-			sendToAll: true,
+			// One address per contact. This is never persisted, so it resets on
+			// every load, and defaulting it to true meant composing to anyone
+			// with several addresses silently added all of them.
+			sendToAll: false,
 
 			deleted: false,
 			readOnly: false,
@@ -211,8 +214,6 @@ export class ContactModel extends AbstractModel {
 //			type: prop.params.type
 		});
 
-		if (this.sendToAllDisplayStatus())
-			document.getElementById('send-to-all').style.display = 'block';
 	}
 
 	addTel() {
@@ -324,8 +325,10 @@ export class ContactModel extends AbstractModel {
 			+ (this.focused() ? ' focused' : '');
 	}
 
+	// email is an observableArray, so .length was the function's own arity and
+	// this always answered false
 	sendToAllDisplayStatus() {
-		return this.email.length > 1
+		return 1 < this.email().length;
 	}
 
 }
