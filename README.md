@@ -11,6 +11,56 @@
   <br>
 </div>
 
+## What Tachyon adds
+
+**Calendar**
+- CalDAV support: month, week, day and list views, drag to move, and an editor for creating and changing events
+- Several calendars per account, each with the colour and read-only state the server reports
+- Recurring events expand correctly across timezones and DST, and all-day events stay date-only
+- Off by default; enable `[calendar] enable` and point it at a server in Settings, Calendar
+
+**Contacts**
+- Contact groups using the standard vCard `CATEGORIES` field, so they survive a CardDAV round trip. Typing a group name while composing inserts a chip that expands to its members when the mail is sent
+- Bulk operations: select a page or everything matching the current filter, and keep that selection while paging
+- Writing to a selection can target To, Cc or Bcc, and suggests Bcc past a configurable threshold so a large To does not hand every address to every recipient
+- Three DAV bugs fixed that affected calendars and address books alike: credentials are now sent with the first request rather than only after a 401, permissions are read correctly, and the connection test no longer authenticates with an encrypted copy of the password
+
+**Mail**
+- Subfolder search across a whole folder subtree, using IMAP MULTISEARCH where the server has it and falling back to searching each folder in turn where it does not
+- Undo send, with a configurable delay before SMTP delivery
+- Unread count badge per account on the account switcher
+
+**Interface**
+- Vector icons throughout, drawn in the current text colour so they follow the active theme. The interface previously drew most of its icons as emoji, which ignored theming entirely
+- Dracula theme, with the Alucard light variant and a toggle that applies without reloading
+- Tables in the HTML editor: insert, add and remove rows and columns
+
+**Nextcloud**
+- Published on the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon), supporting Nextcloud 26 through 35
+- Migrates an existing SnappyMail install in place, reusing its data directory
+
+**Compatibility**
+- Existing SnappyMail installations upgrade in place, data directory and config unchanged
+- Plugins written against the `RainLoop\` or `SnappyMail\` namespaces keep working through compatibility shims
+
+**PHP**
+- PHP 8.2 minimum, dropping 7.4, 8.0 and 8.1
+- Namespaces: `RainLoop\` to `Tachyon\`, `SnappyMail\` to `Tachyon\Util\`
+- PHP 8.1 enums replacing abstract constants: `ResponseType`, `StoreAction`, `MessagePriority`, `SignMeType`, `Layout`, `DkimStatus`
+
+**Security**
+- Content-Security-Policy: fixed `report-to` with a `Reporting-Endpoints` header, `report-uri` kept as fallback
+- `Permissions-Policy` denying camera, microphone, geolocation, payment and USB
+- Subresource Integrity hashes for all static JS and CSS
+- S/MIME signing fixed for identities whose private key has no passphrase
+
+**Build and toolchain**
+- Rollup v4, ESLint v9 flat config
+- GitHub Actions CI: PHP syntax check and JS/CSS lint on every push and pull request
+- `gulp i18n` reports what each translation is missing and where, so contributors do not have to diff by hand
+- Backup and restore produce ordinary ZIP files and download directly
+- OpenPGP.js v5.11.3
+
 ## Integrations
 
 - **Nextcloud** — install directly from the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon), or see `integrations/nextcloud/`
@@ -25,6 +75,14 @@
 - OpenSSL or Sodium extension
 - No database required
 
+## Documentation
+
+- [Installation instructions](https://github.com/kimusan/Tachyon/wiki/Installation-instructions)
+- [Admin manual](https://github.com/kimusan/Tachyon/wiki/Admin-Manual) — every setting, and what it does
+- [IMAP capabilities](https://github.com/kimusan/Tachyon/wiki/IMAP-capabilities) — which extensions Tachyon uses and what happens without them
+- [Sieve filters](https://github.com/kimusan/Tachyon/wiki/Filters---Sieve)
+- [Contributing](CONTRIBUTING.md)
+
 ## License
 
 **Tachyon** is released under
@@ -34,35 +92,6 @@ http://www.gnu.org/licenses/agpl-3.0.html
 Copyright (c) 2025 - present Tachyon
 Copyright (c) 2020 - 2024 SnappyMail
 Copyright (c) 2013 - 2022 RainLoop
-
-## What changed from SnappyMail
-
-**Compatibility**
-- Existing SnappyMail installations upgrade in-place — data directory and config are unchanged
-- User-installed plugins using `RainLoop\` or `SnappyMail\` namespaces continue to work via compatibility shims
-
-**PHP**
-- PHP 8.2 minimum (dropped support for 7.4, 8.0, 8.1)
-- Namespaces: `RainLoop\` → `Tachyon\`, `SnappyMail\` → `Tachyon\Util\`
-- PHP 8.1 enums replacing abstract constants: `ResponseType`, `StoreAction`, `MessagePriority`, `SignMeType`, `Layout`, `DkimStatus`
-- Dead code removed: `register_globals` ini_set, PHP 7.x compatibility shims
-
-**Security**
-- Content-Security-Policy: fixed `report-to` implementation with `Reporting-Endpoints` header; `report-uri` kept as fallback
-- `Permissions-Policy` header added: denies camera, microphone, geolocation, payment, USB
-- Subresource Integrity (SRI) hashes for all static JS and CSS assets
-
-**Features**
-- Undo send: configurable delay (Off / 5 / 10 / 20 / 30 seconds) before SMTP delivery; per-user preference
-- Multi-account unread count badge on the account switcher button
-
-**Build and toolchain**
-- Rollup v4, ESLint v9 flat config
-- GitHub Actions CI: PHP syntax check and JS/CSS lint on every push and pull request
-- Release archives named `tachyon-*.tar.gz`
-- OpenPGP.js updated to v5.11.3
-- Removed unused `marked.js` vendor library
-
 
 ## What SnappyMail changed from RainLoop
 
@@ -115,16 +144,24 @@ No Internet Explorer. No Edge Legacy.
 
 ### JavaScript size comparison (RainLoop 1.17 vs SnappyMail vs Tachyon)
 
-|js/min/*        |RainLoop  |SnappyMail|  Tachyon |
-|----------------|--------: |--------: |--------: |
-|admin.min.js    |  256,831 |   41,719 |   41,317 |
-|app.min.js      |  515,367 |  202,101 |  203,861 |
-|boot.min.js     |   84,659 |    2,231 |    2,273 |
-|libs.min.js     |  584,772 |  110,646 |  110,224 |
-|sieve.min.js    |        0 |   45,504 |   45,377 |
-|polyfills.min.js|   32,837 |        0 |        0 |
+|js/min/*        |RainLoop  |SnappyMail|  Tachyon | Tachyon gz |
+|----------------|--------: |--------: |--------: |----------: |
+|admin.min.js    |  256,831 |   41,719 |   42,225 |     14,182 |
+|app.min.js      |  515,367 |  202,101 |  221,355 |     74,075 |
+|boot.min.js     |   84,659 |    2,231 |    2,273 |      1,295 |
+|libs.min.js     |  584,772 |  110,646 |  113,032 |     40,243 |
+|sieve.min.js    |        0 |   45,504 |   45,377 |     11,092 |
+|calendar.min.js |        0 |        0 |  129,224 |     41,429 |
+|polyfills.min.js|   32,837 |        0 |        0 |          0 |
 
-For a user, the payload is around 66% smaller than traditional RainLoop.
+What a browser fetches on load is `boot`, `libs` and `app`, so about 337 KB
+minified or 116 KB over gzip, about 70% less than RainLoop.
+
+`sieve.min.js` loads only when the filters screen is opened, and
+`calendar.min.js` only when the calendar is, so neither is part of that figure.
+The calendar component is the single largest file in the project and is
+deliberately kept out of the initial payload for the many installations that
+will never enable it.
 
 ### PGP
 
@@ -137,5 +174,5 @@ Squire is used in place of CKEditor.
 
 |        | normal  | min     | gzip   | min gzip |
 |--------|--------:|--------:|-------:|---------:|
-|squire  | 122,321 |  41,906 | 31,867 |   14,330 |
+|squire  | 115,520 |  41,906 | 23,387 |   14,330 |
 |ckeditor|       ? | 520,035 |      ? |  155,916 |
