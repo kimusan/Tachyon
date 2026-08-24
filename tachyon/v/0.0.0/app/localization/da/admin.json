@@ -14,11 +14,11 @@
   },
   "LOGIN": {
     "LABEL_LOGIN": "Log ind",
-    "LABEL_TOTP": "TOTP code",
+    "LABEL_TOTP": "TOTP-kode",
     "BUTTON_LOGIN": "Log ind i administrationspanelet"
   },
   "TOP_PANEL": {
-    "LABEL_ADMIN_PANEL": "Admin Panel"
+    "LABEL_ADMIN_PANEL": "Administrationspanel"
   },
   "SETTINGS_LABELS": {
     "GENERAL": "Generelt",
@@ -44,7 +44,7 @@
     "LABEL_ATTACHMENT_SIZE_LIMIT": "Vedhæftede filers størrelsesgrænse",
     "LABEL_ALLOW_ADDITIONAL_ACCOUNTS": "Tillad flere konti",
     "LABEL_ALLOW_IDENTITIES": "Tillad flere identiteter",
-    "ALERT_DATA_ACCESS": "Data folder is accessible. Please configure your web server to hide the data folder from external access. Read more here:",
+    "ALERT_DATA_ACCESS": "Datamappen er tilgængelig udefra. Konfigurér din webserver, så datamappen ikke kan tilgås eksternt. Læs mere her:",
     "ALERT_WARNING": "Advarsler!",
     "HTML_ALERT_WEAK_PASSWORD": "Du bruger standard admin adgangskoden.\n<br>\nAf sikkerhedsmæssige hensyn bør du venligst\n<strong><a href=\"#/security\">ændre</a></strong>\nadgangskoden til noget andet snarest.\n"
   },
@@ -75,9 +75,9 @@
     "LABEL_STORAGE_DSN": "Dsn",
     "LABEL_STORAGE_USER": "Bruger",
     "LABEL_STORAGE_PASSWORD": "Adgangskode",
-    "SQLITE_GLOBAL": "Use a global DB instead of per account",
+    "SQLITE_GLOBAL": "Brug én fælles database i stedet for én per konto",
     "ALERT_NOTICE": "Underretning!",
-    "SUGGESTIONS_LIMIT": "Suggestions limit",
+    "SUGGESTIONS_LIMIT": "Grænse for forslag",
     "HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "Brug ikke denne database type med større antal af aktive brugere.",
     "HTML_ALERT_DOES_NOT_SUPPORTED": "Dit system ser ikke ud til at understøtte kontakter.\n<br>\nDu skal installere og aktivere <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> udvidelsen på din server.\n",
     "COMPOSE_LIMIT": "Største antal modtagere fra en markering",
@@ -93,7 +93,7 @@
   "TAB_SECURITY": {
     "LEGEND_SECURITY": "Sikkerhed",
     "LABEL_USE_IMAGE_PROXY": "Brug lokal proxy til eksterne billeder",
-    "LABEL_AUTO_VERIFY": "Verify signatures automatically",
+    "LABEL_AUTO_VERIFY": "Verificér signaturer automatisk",
     "LABEL_SHOW_PHP_INFO": "Vis PHP informationer",
     "LEGEND_ADMIN_PANEL_ACCESS_CREDENTIALS": "Admin Panel Adgangsoplysninger",
     "LABEL_CURRENT_PASSWORD": "Nuværende adgangskode",
@@ -104,7 +104,7 @@
     "LABEL_ALLOW_SELF_SIGNED": "Tillad selvsignerede certifikater"
   },
   "TAB_PACKAGES": {
-    "LABEL_ENABLE_PLUGINS": "Enable extensions",
+    "LABEL_ENABLE_PLUGINS": "Aktivér udvidelser",
     "LEGEND_AVAILABLE_FOR_UPDATE": "Opdatering tilgængelig",
     "LEGEND_AVAILABLE_FOR_INSTALLATION": "Installation tilgængelig",
     "LEGEND_INSTALLED_PACKAGES": "Installerede pakker",
@@ -115,7 +115,7 @@
     "LABEL_TAG_HINT": "Simpel, moderne & hurtig web-baseret e-mail klient",
     "LABEL_ALL_RIGHTS_RESERVED": "alle rettigheder forbeholdes.",
     "HINT_READ_CHANGE_LOG": "Læs ændrings listen før der opdateres.",
-    "HINT_IS_UP_TO_DATE": "Tachyon is up to date.",
+    "HINT_IS_UP_TO_DATE": "Tachyon er opdateret.",
     "HTML_NEW_VERSION": "Ny  <b>%VERSION%</b> version tilgængelig",
     "LABEL_UPDATING": "Opdatere",
     "LABEL_CHECKING": "Tjekker for opdateringer",
@@ -136,23 +136,23 @@
     "LABEL_PORT": "Port",
     "LABEL_SECURE": "Sikker",
     "TIMEOUT": "Timeout",
-    "DISABLE_CAPABILITIES": "Disable capabilities",
+    "DISABLE_CAPABILITIES": "Deaktivér funktioner",
     "LIMITS": "Limits",
     "FOLDERS": "Folders",
     "MESSAGES": "Messages",
     "SECURE_OPTION_NONE": "Ingen",
     "LABEL_ALLOW_SIEVE_SCRIPTS": "Tillad sieve skripts",
     "LABEL_USE_SHORT_LOGIN": "Brug kort log ind",
-    "LABEL_LOWERCASE_LOGIN": "Lowercase login (case-insensitive)",
+    "LABEL_LOWERCASE_LOGIN": "Små bogstaver i login (ikke versalfølsomt)",
     "LABEL_USE_AUTH": "Brug godkendelse",
-    "LABEL_SET_SENDER": "Use login as sender",
-    "LABEL_AUTH_PLAIN_LINE": "Force single command AUTH PLAIN login",
+    "LABEL_SET_SENDER": "Brug login som afsender",
+    "LABEL_AUTH_PLAIN_LINE": "Gennemtving login med én AUTH PLAIN-kommando",
     "LABEL_USE_PHP_MAIL": "Brug php mail()",
     "BUTTON_WHITE_LIST": "Whitelist",
     "NEW_DOMAIN_DESC": "Denne domæne konfiguration tillader <strong>%NAME%</strong> e-mail adresser.",
     "WHITE_LIST_ALERT": "Liste med godkendte domæne for webmail opsætning.\nBrug mellemrum til at separere domæner.\n",
-    "VALID_SPAM_HEADERS": "Valid SPAM headers",
-    "VALID_VIRUS_HEADERS": "Valid virus headers"
+    "VALID_SPAM_HEADERS": "Gyldige spam-headere",
+    "VALID_VIRUS_HEADERS": "Gyldige virus-headere"
   },
   "POPUPS_PLUGIN": {
     "TITLE_PLUGIN": "Tilføjelse",
@@ -173,9 +173,9 @@
     "UNKNOWN_ERROR": "Ukendt fejl"
   },
   "NOTIFICATIONS": {
-    "RequestError": "Request failed",
-    "RequestAborted": "Request is aborted",
-    "RequestTimeout": "Request timed out",
+    "RequestError": "Forespørgslen mislykkedes",
+    "RequestAborted": "Forespørgslen blev afbrudt",
+    "RequestTimeout": "Forespørgslen fik timeout",
     "InvalidToken": "Ugyldigt tegn",
     "AuthError": "Godkendelse fejlede",
     "DomainAlreadyExists": "Domæne eksisterer allerede",

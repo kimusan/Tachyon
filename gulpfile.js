@@ -6,6 +6,7 @@ const { js, jsLint } = require('./tasks/js');
 const { css, cssLint } = require('./tasks/css');
 const { buildIcons } = require('./tasks/icons');
 const { sri } = require('./tasks/sri');
+const { i18n } = require('./tasks/i18n');
 
 const clean = gulp.series(cleanStatic);
 
@@ -20,5 +21,6 @@ exports.css = gulp.series(buildIcons, css);
 exports.buildIcons = buildIcons;
 exports.lint = lint;
 exports.sri = sri;
+exports.i18n = i18n;
 exports.build = build;
 exports.default = build;
