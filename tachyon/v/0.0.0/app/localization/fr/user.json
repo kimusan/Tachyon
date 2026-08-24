@@ -236,8 +236,8 @@
     "ADD_MENU_ADDRESS": "Adresse",
     "ADD_MENU_BIRTHDAY": "Anniversaire",
     "ADD_MENU_TAGS": "Étiquettes",
-		"CATEGORY_ALL": "All categories",
-		"TAGS_HINT": "Tags group contacts for quick addressing. Type a tag name in the compose window to send to everyone in that group.",
+	"CATEGORY_ALL": "Toutes les catégories",
+	"TAGS_HINT": "Les étiquettes regroupent des contacts pour faciliter l'envoi de messages. Saisissez le nom d'une étiquette dans la fenêtre de rédaction pour envoyer un message à tous les membres de ce groupe.",
     "BUTTON_SHARE_ALL": "Tout le monde",
     "BUTTON_SYNC": "Synchronisation (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Envoyer à tous les e-mails contact"
