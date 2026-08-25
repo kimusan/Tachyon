@@ -255,6 +255,7 @@
     "ERROR_COMPOSE_LIMIT": "%COUNT% Kontakte sind ausgewählt, mehr als die %LIMIT%, die eine einzelne Nachricht zulässt. Schränken Sie die Auswahl zuerst ein.",
     "COMPOSE_SKIPPED": "%USED% von %TOTAL% ausgewählten Kontakten hatten eine E-Mail-Adresse. Die übrigen wurden ausgelassen.",
     "COMPOSE_NONE_USABLE": "Keiner der %TOTAL% ausgewählten Kontakte hat eine E-Mail-Adresse.",
+    "GROUP_NO_MEMBERS": "%NAME% hat keine Mitglieder mit einer E-Mail-Adresse.",
     "BUTTON_DELETE_LOCAL": "Lokale Kontakte löschen",
     "SYNCED_CONTACT": "Mit dem entfernten Adressbuch synchronisiert",
     "CONFIRM_DELETE_LOCAL": "Alle lokal erstellten Kontakte löschen? Aus dem entfernten Adressbuch synchronisierte Kontakte sind markiert und bleiben erhalten."

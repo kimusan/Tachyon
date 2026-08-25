@@ -159,7 +159,10 @@ class EmailCollection extends \MailSo\Base\Collection
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
-		return \array_slice($this->getArrayCopy(), 0, 100);
+		// Everything, not the first 100. Truncating here reached the browser as
+		// the real recipient list, so opening a 500 recipient draft and saving
+		// it wrote 100 back and lost the rest for good.
+		return $this->getArrayCopy();
 	}
 
 }

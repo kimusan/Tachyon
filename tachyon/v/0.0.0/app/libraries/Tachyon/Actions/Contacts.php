@@ -208,7 +208,11 @@ trait Contacts
 		$aResult = [];
 		$oAbp = $this->AddressBookProvider($oAccount);
 		if ($oAbp->IsActive()) {
-			$aResult = $oAbp->GetGroup($sGroup, 100);
+			// The admin's compose limit, not a literal 100. A group larger than
+			// that used to expand to its first 100 members with nothing said.
+			$aResult = $oAbp->GetGroup($sGroup, \max(1,
+				(int) $this->oConfig->Get('contacts', 'compose_recipients_limit', 100)
+			));
 		}
 
 		return $this->DefaultResponse($aResult);

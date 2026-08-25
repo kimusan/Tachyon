@@ -727,11 +727,10 @@ export class ComposePopupView extends AbstractViewPopup {
 
 	// getAutocomplete
 	emailsSource(value, fResponse) {
-		// Detect if the user selected a group chip from the datalist
-		const catName = this._groupSuggestions.get(value);
-		if (catName !== undefined) {
-			// Group chip: the immediate 'input' listener in onBuild already committed
-			// it as a chip (or blur will). Just clear the datalist and bail.
+		// A group was picked from the datalist. The 'input' listener in onBuild
+		// has already started expanding it into its members, so there is nothing
+		// to suggest for this value.
+		if (undefined !== this._groupSuggestions.get(value)) {
 			fResponse([]);
 			return;
 		}
@@ -1140,20 +1139,18 @@ export class ComposePopupView extends AbstractViewPopup {
 	}
 
 	onBuild(dom) {
-		// Store EmailAddressesComponent refs and attach immediate group-chip listener.
-		// When the user selects a group chip from the datalist, commit it as a chip
-		// right on the 'input' event — don't wait for the 500ms autocomplete throttle.
+		// Store EmailAddressesComponent refs and watch for a group being picked.
+		// Handled on 'input' rather than through the autocomplete callback so it
+		// does not wait out the 500ms throttle.
 		['to', 'cc', 'bcc'].forEach(name => {
 			const el = dom.querySelector(`[data-bind*="emailsTags: ${name}"]`);
 			if (el?.addresses) {
 				const comp = el.addresses;
 				this[`_${name}Component`] = comp;
 				comp.input.addEventListener('input', () => {
-					const val = comp.input.value.trim();
-					if (val && this._groupSuggestions.has(val)) {
-						comp._parseInput(true);
-						comp.input.value = '';
-						comp._resizeInput();
+					const group = this._groupSuggestions.get(comp.input.value.trim());
+					if (undefined !== group) {
+						this._insertGroupMembers(comp, group);
 					}
 				});
 			}
@@ -1513,8 +1510,44 @@ export class ComposePopupView extends AbstractViewPopup {
 		this.encryptOptions(options);
 	}
 
-	// Expand group chips (🏷 Name (N)) to individual member emails.
-	// Returns the field value unchanged if no group chips are present.
+	/**
+	 * Put a group's members straight into the field as ordinary chips, the same
+	 * as selecting that group in the contacts manager and adding it. No group
+	 * token is ever written, so a single member can be removed afterwards.
+	 */
+	_insertGroupMembers(comp, name) {
+		comp.input.value = '';
+		comp._resizeInput();
+
+		Remote.request('ContactsGroupSuggestions', (iError, data) => {
+			if (iError || !isArray(data?.Result)) {
+				alert(getNotification(iError));
+				return;
+			}
+
+			const members = data.Result.filter(item => item?.[0])
+					.map(item => (new EmailModel(item[0], item[1])).toLine()),
+				// Same limit the contacts manager enforces, read the same way
+				limit = Math.max(1, pInt(SettingsGet('contactsComposeLimit')) || 100),
+				total = comp._chosenValues.length + members.length;
+
+			if (!members.length) {
+				alert(i18n('CONTACTS/GROUP_NO_MEMBERS', { NAME: name }));
+			} else if (limit < total) {
+				// Nothing inserted rather than a partial group, so the field is
+				// never left in a state the user has to unpick by hand
+				alert(i18n('CONTACTS/ERROR_COMPOSE_LIMIT', { LIMIT: limit, COUNT: total }));
+			} else {
+				comp._parseValue(members.join(',') + ',');
+			}
+		}, { Group: name });
+	}
+
+	/**
+	 * Only reachable for drafts saved by 4.0.0 to 4.0.2, which stored the group
+	 * token in the recipient field instead of the addresses. Nothing composed
+	 * since writes one. Drop this once those drafts have aged out.
+	 */
 	_expandGroupChips(fieldValue) {
 		if (!fieldValue) return Promise.resolve(fieldValue);
 		const parts = fieldValue.split(',').map(s => s.trim()).filter(Boolean);

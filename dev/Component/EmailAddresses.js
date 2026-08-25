@@ -67,7 +67,7 @@ export class EmailAddressesComponent {
 
 		addEventsListeners(self.ul, {
 			click: e => self._focus(e),
-			dblclick: e => self._editTag(e),
+			dblclick: e => self._editTag(e) && self._enterRawMode(),
 			dragenter: fnDrag,
 			dragover: fnDrag,
 			drop: e => {
@@ -276,6 +276,70 @@ export class EmailAddressesComponent {
 		self._resizeInput(ev);
 	}
 
+	/**
+	 * Swap the chips for the plain comma separated list, so it can be selected,
+	 * copied and edited with the ordinary browser shortcuts. Chips have no text
+	 * for Ctrl+C to take, which is what #24 asked about.
+	 */
+	_enterRawMode() {
+		const self = this;
+		if (self.rawArea) {
+			return;
+		}
+
+		const area = createElement('textarea', {
+			class: 'emailaddresses-raw',
+			spellcheck: 'false',
+			autocomplete: 'off',
+			autocorrect: 'off',
+			autocapitalize: 'off'
+		});
+		area.value = self.element.value;
+
+		addEventsListeners(area, {
+			blur: () => self._exitRawMode(true),
+			keydown: e => {
+				if ('Escape' === e.key) {
+					e.preventDefault();
+					self._exitRawMode(false);
+				}
+			}
+		});
+
+		self.rawArea = area;
+		self.ul.after(area);
+		self.ul.hidden = true;
+		area.focus();
+		// Selected on entry, so double click then Ctrl+C is enough
+		area.select();
+		self._focusTrigger(true);
+	}
+
+	_exitRawMode(apply) {
+		const area = this.rawArea;
+		if (!area) {
+			return;
+		}
+
+		const text = area.value.trim();
+		this.rawArea = null;
+		area.remove();
+		this.ul.hidden = false;
+
+		if (apply) {
+			this._chosenValues = [];
+			this._renderTags();
+			text && this._parseValue(text + ',');
+			// _parseValue does nothing for an empty string and _setValue drops a
+			// write that matches what is already there, so emptying the field in
+			// raw mode would never reach the observable. Push it directly.
+			this.element.value = this._buildValue();
+			this.options.onChange(this.element.value);
+		}
+
+		this._focusTrigger(false);
+	}
+
 	_buildValue() {
 		return this._chosenValues.map(v => v.value).join(',');
 	}
@@ -407,12 +471,14 @@ export class EmailAddressesComponent {
 		li.remove();
 	}
 
+	// In raw mode the textarea is the field. Focusing the hidden chip input
+	// instead would blur the textarea and close raw mode on the spot.
 	focus () {
-		this.input.focus();
+		(this.rawArea || this.input).focus();
 	}
 
 	blur() {
-		this.input.blur();
+		(this.rawArea || this.input).blur();
 	}
 
 	_focus(ev) {

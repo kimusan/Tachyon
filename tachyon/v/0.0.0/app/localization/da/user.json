@@ -255,6 +255,7 @@
     "ERROR_COMPOSE_LIMIT": "%COUNT% kontakter er valgt, hvilket er flere end de %LIMIT%, en enkelt besked tillader. Begræns markeringen først.",
     "COMPOSE_SKIPPED": "%USED% af %TOTAL% valgte kontakter havde en e-mailadresse. De øvrige blev udeladt.",
     "COMPOSE_NONE_USABLE": "Ingen af de %TOTAL% valgte kontakter har en e-mailadresse.",
+    "GROUP_NO_MEMBERS": "%NAME% har ingen medlemmer med en e-mailadresse.",
     "BUTTON_DELETE_LOCAL": "Slet lokale kontakter",
     "SYNCED_CONTACT": "Synkroniseret med den eksterne adressebog",
     "CONFIRM_DELETE_LOCAL": "Slet alle lokalt oprettede kontakter? Kontakter synkroniseret fra den eksterne adressebog er markeret og bevares."

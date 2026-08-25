@@ -255,6 +255,7 @@
     "ERROR_COMPOSE_LIMIT": "Hay %COUNT% contactos seleccionados, más de los %LIMIT% que permite un solo mensaje. Reduzca antes la selección.",
     "COMPOSE_SKIPPED": "%USED% de %TOTAL% contactos seleccionados tenían dirección de correo. Los demás se han omitido.",
     "COMPOSE_NONE_USABLE": "Ninguno de los %TOTAL% contactos seleccionados tiene dirección de correo.",
+    "GROUP_NO_MEMBERS": "%NAME% no tiene miembros con dirección de correo.",
     "BUTTON_DELETE_LOCAL": "Eliminar los contactos locales",
     "SYNCED_CONTACT": "Sincronizado con la libreta de direcciones remota",
     "CONFIRM_DELETE_LOCAL": "¿Eliminar todos los contactos creados localmente? Los contactos sincronizados desde la libreta de direcciones remota están marcados y se conservarán."
