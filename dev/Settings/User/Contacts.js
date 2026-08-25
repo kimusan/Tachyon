@@ -9,6 +9,7 @@ import Remote from 'Remote/User/Fetch';
 export class UserSettingsContacts /*extends AbstractViewSettings*/ {
 	constructor() {
 		this.contactsAutosave = ko.observable(!!SettingsGet('ContactsAutosave'));
+		this.contactsHideNoEmail = ko.observable(!!SettingsGet('ContactsHideNoEmail'));
 
 		this.allowContactsSync = ContactUserStore.allowSync;
 		this.syncMode = ContactUserStore.syncMode;
@@ -40,6 +41,10 @@ export class UserSettingsContacts /*extends AbstractViewSettings*/ {
 
 		this.contactsAutosave.subscribe(value =>
 			Remote.saveSettings(null, { ContactsAutosave: value })
+		);
+
+		this.contactsHideNoEmail.subscribe(value =>
+			Remote.saveSettings(null, { ContactsHideNoEmail: value })
 		);
 
 		this.saveTrigger.subscribe(() =>

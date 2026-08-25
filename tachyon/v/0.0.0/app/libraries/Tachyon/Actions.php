@@ -616,7 +616,8 @@ class Actions
 						'keyPassForget' => 15,
 						'AllowDraftAutosave' => (bool) $oConfig->Get('defaults', 'allow_draft_autosave', true),
 						'UndoSendDelay' => (int) $oConfig->Get('defaults', 'undo_send_delay', 0),
-						'ContactsAutosave' => (bool) $oConfig->Get('defaults', 'contacts_autosave', true)
+						'ContactsAutosave' => (bool) $oConfig->Get('defaults', 'contacts_autosave', true),
+						'ContactsHideNoEmail' => false
 					],
 					// MainAccount or AdditionalAccount
 					$this->getAccountData($oAccount)
@@ -713,6 +714,7 @@ class Actions
 					$aResult['simpleAttachmentsList'] = (bool)$oSettings->GetConf('simpleAttachmentsList', $aResult['simpleAttachmentsList']);
 					$aResult['listGrouped'] = (bool)$oSettings->GetConf('listGrouped', $aResult['listGrouped']);
 					$aResult['ContactsAutosave'] = (bool)$oSettings->GetConf('ContactsAutosave', $aResult['ContactsAutosave']);
+					$aResult['ContactsHideNoEmail'] = (bool)$oSettings->GetConf('ContactsHideNoEmail', $aResult['ContactsHideNoEmail']);
 					$aResult['MessagesPerPage'] = \max(10, \intval($oSettings->GetConf('MessagesPerPage', $aResult['MessagesPerPage']) ?: $aResult['MessagesPerPage']));
 					$aResult['messageNewWindow'] = (bool)$oSettings->GetConf('messageNewWindow', $aResult['messageNewWindow']);
 					$aResult['markdown'] = (bool)$oSettings->GetConf('markdown', $aResult['markdown']);

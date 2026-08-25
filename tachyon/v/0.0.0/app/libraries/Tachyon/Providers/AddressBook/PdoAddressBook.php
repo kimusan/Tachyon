@@ -25,6 +25,14 @@ class PdoAddressBook
 		PropertyType::NICK_NAME
 	];
 
+	/**
+	 * "Has an address worth writing to". Assumes the outer query aliases
+	 * rainloop_ab_contacts as c and binds :id_user and :email_type.
+	 */
+	const EMAIL_EXISTS_SQL = 'EXISTS (SELECT 1 FROM rainloop_ab_properties AS pe'
+		. ' WHERE pe.id_contact = c.id_contact AND pe.id_user = :id_user'
+		. ' AND pe.prop_type = :email_type AND pe.prop_value <> \'\')';
+
 	public function __construct()
 	{
 		$oConfig = \Tachyon\Api::Config();
@@ -675,7 +683,7 @@ class PdoAddressBook
 		return [];
 	}
 
-	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '') : array
+	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '', bool $bWithEmailOnly = false) : array
 	{
 		if (1 > $this->iUserID) {
 			return [];
@@ -747,8 +755,29 @@ class PdoAddressBook
 			$iResultCount = \count($aSearchIds);
 		} else {
 			$oStmt = $this->prepareAndExecute(
-				'SELECT COUNT(*) FROM rainloop_ab_contacts WHERE id_user = :id_user AND deleted = 0',
-				[':id_user' => array($this->iUserID, \PDO::PARAM_INT)]
+				'SELECT COUNT(*) FROM rainloop_ab_contacts AS c WHERE c.id_user = :id_user AND c.deleted = 0'
+					. ($bWithEmailOnly ? ' AND ' . static::EMAIL_EXISTS_SQL : ''),
+				$bWithEmailOnly
+					? [':id_user' => array($this->iUserID, \PDO::PARAM_INT), ':email_type' => array(PropertyType::EMAIl, \PDO::PARAM_INT)]
+					: [':id_user' => array($this->iUserID, \PDO::PARAM_INT)]
+			);
+			if ($oStmt && $aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
+				$iResultCount = (int) $aItem[0];
+			}
+		}
+
+		// The search and category branches counted rows in PHP, before the email
+		// filter narrows them. Recount, or the pager offers pages that are empty.
+		if ($bWithEmailOnly && 0 < $iResultCount && \count($aSearchIds)) {
+			$oStmt = $this->prepareAndExecute(
+				'SELECT COUNT(*) FROM rainloop_ab_contacts AS c'
+					. ' WHERE c.deleted = 0 AND c.id_user = :id_user'
+					. ' AND c.id_contact IN (' . \implode(',', $aSearchIds) . ')'
+					. ' AND ' . static::EMAIL_EXISTS_SQL,
+				[
+					':id_user' => array($this->iUserID, \PDO::PARAM_INT),
+					':email_type' => array(PropertyType::EMAIl, \PDO::PARAM_INT)
+				]
 			);
 			if ($oStmt && $aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
 				$iResultCount = (int) $aItem[0];
@@ -769,6 +798,9 @@ class PdoAddressBook
 			if (\count($aSearchIds)) {
 				$sSql .= ' AND c.id_contact IN ('.\implode(',', $aSearchIds).')';
 			}
+			if ($bWithEmailOnly) {
+				$sSql .= ' AND ' . static::EMAIL_EXISTS_SQL;
+			}
 			// id_contact breaks ties. display is not unique, and without a
 			// deterministic order a row can land on two pages while another is
 			// skipped, which MySQL does not promise not to do with LIMIT/OFFSET.
@@ -780,6 +812,9 @@ class PdoAddressBook
 				':limit' => array($iLimit, \PDO::PARAM_INT),
 				':offset' => array($iOffset, \PDO::PARAM_INT)
 			);
+			if ($bWithEmailOnly) {
+				$aParams[':email_type'] = array(PropertyType::EMAIl, \PDO::PARAM_INT);
+			}
 
 			return $this->getContactsFromPDO(
 				$this->prepareAndExecute($sSql, $aParams)
@@ -802,7 +837,7 @@ class PdoAddressBook
 	 * compose, and on delete intval turned a uid beginning with digits into some
 	 * other contact's id.
 	 */
-	public function GetContactUids(string $sSearch = '', string $sCategory = '') : array
+	public function GetContactUids(string $sSearch = '', string $sCategory = '', bool $bWithEmailOnly = false) : array
 	{
 		if (1 > $this->iUserID) {
 			return [];
@@ -834,6 +869,11 @@ class PdoAddressBook
 			if (\strlen($sLowerSearch)) {
 				$aParams[':search_lower'] = array($sLowerSearch, \PDO::PARAM_STR);
 			}
+		}
+
+		if ($bWithEmailOnly) {
+			$sSql .= ' AND ' . static::EMAIL_EXISTS_SQL;
+			$aParams[':email_type'] = array(PropertyType::EMAIl, \PDO::PARAM_INT);
 		}
 
 		$sSql .= ' ORDER BY c.display ASC, c.id_contact ASC';

@@ -253,6 +253,8 @@
     "BUTTON_COMPOSE_BCC": "Nuevo mensaje, destinatarios en Bcc",
     "ASK_USE_BCC": "%COUNT% destinatarios. ¿Ponerlos en Bcc para que no vean las direcciones de los demás?",
     "ERROR_COMPOSE_LIMIT": "Hay %COUNT% contactos seleccionados, más de los %LIMIT% que permite un solo mensaje. Reduzca antes la selección.",
+    "COMPOSE_SKIPPED": "%USED% de %TOTAL% contactos seleccionados tenían dirección de correo. Los demás se han omitido.",
+    "COMPOSE_NONE_USABLE": "Ninguno de los %TOTAL% contactos seleccionados tiene dirección de correo.",
     "BUTTON_DELETE_LOCAL": "Eliminar los contactos locales",
     "SYNCED_CONTACT": "Sincronizado con la libreta de direcciones remota",
     "CONFIRM_DELETE_LOCAL": "¿Eliminar todos los contactos creados localmente? Los contactos sincronizados desde la libreta de direcciones remota están marcados y se conservarán."
@@ -541,6 +543,7 @@
   },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Agregar automáticamente destinatarios a la libreta de direcciones",
+    "LABEL_CONTACTS_HIDE_NO_EMAIL": "Ocultar contactos sin dirección de correo",
     "LEGEND_CONTACTS_SYNC": "Sincronización remota (CardDAV)",
     "LABEL_CONTACTS_SYNC_ENABLE": "Activar la sincronización remota",
     "LABEL_CONTACTS_SYNC_SERVER": "Servidor",

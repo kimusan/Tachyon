@@ -120,6 +120,17 @@ trait Contacts
 		return $this->TrueResponse();
 	}
 
+	/**
+	 * Read server side rather than taken from the request, so DoContacts and
+	 * DoContactsUids cannot end up filtering differently. A selection that
+	 * covered rows the list never showed would delete contacts the user cannot
+	 * see.
+	 */
+	private function contactsHideNoEmail(\Tachyon\Model\Account $oAccount) : bool
+	{
+		return !!$this->SettingsProvider()->Load($oAccount)->GetConf('ContactsHideNoEmail', false);
+	}
+
 	public function DoContacts() : array
 	{
 		$oAccount = $this->getAccountFromToken();
@@ -137,7 +148,8 @@ trait Contacts
 		$oAbp = $this->AddressBookProvider($oAccount);
 		if ($oAbp->IsActive()) {
 			$iResultCount = 0;
-			$mResult = $oAbp->GetContacts($iOffset, $iLimit, $sSearch, $iResultCount, $sCategory);
+			$mResult = $oAbp->GetContacts($iOffset, $iLimit, $sSearch, $iResultCount, $sCategory,
+				$this->contactsHideNoEmail($oAccount));
 		}
 
 		return $this->DefaultResponse(array(
@@ -165,7 +177,8 @@ trait Contacts
 		return $this->DefaultResponse(array(
 			'Uids' => $oAbp->GetContactUids(
 				\trim($this->GetActionParam('Search', '')),
-				\trim($this->GetActionParam('Category', ''))
+				\trim($this->GetActionParam('Category', '')),
+				$this->contactsHideNoEmail($oAccount)
 			)
 		));
 	}

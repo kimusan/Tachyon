@@ -281,6 +281,8 @@
     "BUTTON_COMPOSE_BCC": "Nouveau message, destinataires en copie cachée (Cci)",
     "ASK_USE_BCC": "%COUNT% destinataires. Les mettre en copie cachée (Cci) pour qu'ils ne puissent pas voir les autres adresses ?",
     "ERROR_COMPOSE_LIMIT": "%COUNT% contacts sont sélectionnés, ce qui dépasse la limite de %LIMIT% autorisée pour un seul message. Réduisez votre sélection.",
+    "COMPOSE_SKIPPED": "%USED% des %TOTAL% contacts sélectionnés avaient une adresse e-mail. Les autres ont été ignorés.",
+    "COMPOSE_NONE_USABLE": "Aucun des %TOTAL% contacts sélectionnés n'a d'adresse e-mail.",
     "BUTTON_DELETE_LOCAL": "Supprimer les contacts locaux",
     "SYNCED_CONTACT": "Synchronisé avec le carnet d'adresses distant",
     "CONFIRM_DELETE_LOCAL": "Supprimer tous les contacts créés localement ? Les contacts synchronisés depuis le carnet d'adresses distant sont marqués et seront conservés."
@@ -577,6 +579,7 @@
   },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Ajouter automatiquement les destinataires à votre carnet d'adresses",
+    "LABEL_CONTACTS_HIDE_NO_EMAIL": "Masquer les contacts sans adresse e-mail",
     "LEGEND_CONTACTS_SYNC": "Synchronisation à distance (CardDAV)",
     "LABEL_CONTACTS_SYNC_ENABLE": "Activer la synchronisation à distance",
     "LABEL_CONTACTS_SYNC_SERVER": "Serveur",

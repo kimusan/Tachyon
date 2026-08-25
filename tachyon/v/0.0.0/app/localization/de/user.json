@@ -253,6 +253,8 @@
     "BUTTON_COMPOSE_BCC": "Neue Nachricht, Empfänger in Bcc",
     "ASK_USE_BCC": "%COUNT% Empfänger. In Bcc setzen, damit sie die Adressen der anderen nicht sehen?",
     "ERROR_COMPOSE_LIMIT": "%COUNT% Kontakte sind ausgewählt, mehr als die %LIMIT%, die eine einzelne Nachricht zulässt. Schränken Sie die Auswahl zuerst ein.",
+    "COMPOSE_SKIPPED": "%USED% von %TOTAL% ausgewählten Kontakten hatten eine E-Mail-Adresse. Die übrigen wurden ausgelassen.",
+    "COMPOSE_NONE_USABLE": "Keiner der %TOTAL% ausgewählten Kontakte hat eine E-Mail-Adresse.",
     "BUTTON_DELETE_LOCAL": "Lokale Kontakte löschen",
     "SYNCED_CONTACT": "Mit dem entfernten Adressbuch synchronisiert",
     "CONFIRM_DELETE_LOCAL": "Alle lokal erstellten Kontakte löschen? Aus dem entfernten Adressbuch synchronisierte Kontakte sind markiert und bleiben erhalten."
@@ -541,6 +543,7 @@
   },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Empfänger automatisch zu Ihrem Adressbuch hinzuzufügen",
+    "LABEL_CONTACTS_HIDE_NO_EMAIL": "Kontakte ohne E-Mail-Adresse ausblenden",
     "LEGEND_CONTACTS_SYNC": "Remote-Synchronisierung (CardDAV)",
     "LABEL_CONTACTS_SYNC_ENABLE": "Remote-Synchronisierung aktivieren",
     "LABEL_CONTACTS_SYNC_SERVER": "Server",

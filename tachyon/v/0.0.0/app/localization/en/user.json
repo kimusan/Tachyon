@@ -281,6 +281,8 @@
 		"BUTTON_COMPOSE_BCC": "New message, recipients in Bcc",
 		"ASK_USE_BCC": "%COUNT% recipients. Put them in Bcc so they cannot see each other's addresses?",
 		"ERROR_COMPOSE_LIMIT": "%COUNT% contacts are selected, which is more than the %LIMIT% a single message allows. Narrow the selection first.",
+		"COMPOSE_SKIPPED": "%USED% of %TOTAL% selected contacts had an email address. The others were left out.",
+		"COMPOSE_NONE_USABLE": "None of the %TOTAL% selected contacts has an email address.",
 		"BUTTON_DELETE_LOCAL": "Delete local contacts",
 		"SYNCED_CONTACT": "Synced with the remote address book",
 		"CONFIRM_DELETE_LOCAL": "Delete all locally created contacts? Contacts synced from the remote address book are marked and will be kept."
@@ -577,6 +579,7 @@
 	},
 	"SETTINGS_CONTACTS": {
 		"LABEL_CONTACTS_AUTOSAVE": "Automatically add recipients to your address book",
+		"LABEL_CONTACTS_HIDE_NO_EMAIL": "Hide contacts without an email address",
 		"LEGEND_CONTACTS_SYNC": "Remote Synchronization (CardDAV)",
 		"LABEL_CONTACTS_SYNC_ENABLE": "Enable remote synchronization",
 		"LABEL_CONTACTS_SYNC_SERVER": "Server",

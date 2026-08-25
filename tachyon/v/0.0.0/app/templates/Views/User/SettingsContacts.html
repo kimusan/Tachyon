@@ -9,6 +9,15 @@
 			}
 		}"></div>
 	</div>
+	<div class="control-group">
+		<div data-bind="component: {
+			name: 'Checkbox',
+			params: {
+				label: 'SETTINGS_CONTACTS/LABEL_CONTACTS_HIDE_NO_EMAIL',
+				value: contactsHideNoEmail
+			}
+		}"></div>
+	</div>
 </div>
 <form class="form-horizontal" spellcheck="false" data-bind="visible: allowContactsSync">
 	<div class="legend" data-i18n="SETTINGS_CONTACTS/LEGEND_CONTACTS_SYNC"></div>

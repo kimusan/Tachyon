@@ -187,6 +187,7 @@ trait User
 		$this->setSettingsFromParams($oSettings, 'simpleAttachmentsList', 'bool');
 		$this->setSettingsFromParams($oSettings, 'listGrouped', 'bool');
 		$this->setSettingsFromParams($oSettings, 'ContactsAutosave', 'bool');
+		$this->setSettingsFromParams($oSettings, 'ContactsHideNoEmail', 'bool');
 		$this->setSettingsFromParams($oSettings, 'DesktopNotifications', 'bool');
 		$this->setSettingsFromParams($oSettings, 'SoundNotification', 'bool');
 		$this->setSettingsFromParams($oSettings, 'NotificationSound', 'string');

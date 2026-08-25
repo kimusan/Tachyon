@@ -253,6 +253,8 @@
     "BUTTON_COMPOSE_BCC": "Ny besked, modtagere i Bcc",
     "ASK_USE_BCC": "%COUNT% modtagere. Skal de sættes i Bcc, så de ikke kan se hinandens adresser?",
     "ERROR_COMPOSE_LIMIT": "%COUNT% kontakter er valgt, hvilket er flere end de %LIMIT%, en enkelt besked tillader. Begræns markeringen først.",
+    "COMPOSE_SKIPPED": "%USED% af %TOTAL% valgte kontakter havde en e-mailadresse. De øvrige blev udeladt.",
+    "COMPOSE_NONE_USABLE": "Ingen af de %TOTAL% valgte kontakter har en e-mailadresse.",
     "BUTTON_DELETE_LOCAL": "Slet lokale kontakter",
     "SYNCED_CONTACT": "Synkroniseret med den eksterne adressebog",
     "CONFIRM_DELETE_LOCAL": "Slet alle lokalt oprettede kontakter? Kontakter synkroniseret fra den eksterne adressebog er markeret og bevares."
@@ -541,6 +543,7 @@
   },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Tilføj automatisk modtager til adressebog",
+    "LABEL_CONTACTS_HIDE_NO_EMAIL": "Skjul kontakter uden e-mailadresse",
     "LEGEND_CONTACTS_SYNC": "Synkronisering (CardDAV)",
     "LABEL_CONTACTS_SYNC_ENABLE": "Aktivér synkronisering",
     "LABEL_CONTACTS_SYNC_SERVER": "Server",

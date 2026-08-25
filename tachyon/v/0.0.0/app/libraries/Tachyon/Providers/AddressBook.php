@@ -58,14 +58,21 @@ class AddressBook extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->DeleteAllContacts($sEmail) : false;
 	}
 
-	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '') : array
+	/**
+	 * $bWithEmailOnly is deliberately not on AddressBookInterface: adding a
+	 * parameter there would fatal every plugin driver that implements the
+	 * current signature. PHP ignores surplus arguments to userland methods, so
+	 * a driver that predates the filter simply does not apply it.
+	 */
+	public function GetContacts(int $iOffset = 0, int $iLimit = 20, string $sSearch = '', int &$iResultCount = 0, string $sCategory = '', bool $bWithEmailOnly = false) : array
 	{
 		return $this->IsActive() ? $this->oDriver->GetContacts(
 			\max(0, $iOffset),
 			0 < $iLimit ? $iLimit : 20,
 			\trim($sSearch),
 			$iResultCount,
-			\trim($sCategory)
+			\trim($sCategory),
+			$bWithEmailOnly
 		) : array();
 	}
 
@@ -73,10 +80,10 @@ class AddressBook extends AbstractProvider
 	 * Not on AddressBookInterface: plugins supply their own drivers, and a
 	 * driver written before this existed must keep working.
 	 */
-	public function GetContactUids(string $sSearch = '', string $sCategory = '') : array
+	public function GetContactUids(string $sSearch = '', string $sCategory = '', bool $bWithEmailOnly = false) : array
 	{
 		return ($this->oDriver && \method_exists($this->oDriver, 'GetContactUids'))
-			? $this->oDriver->GetContactUids($sSearch, $sCategory)
+			? $this->oDriver->GetContactUids($sSearch, $sCategory, $bWithEmailOnly)
 			: array();
 	}
 

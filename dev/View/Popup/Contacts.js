@@ -286,10 +286,12 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 	composeToSelection(uids, field) {
 		let aE = [],
+			skipped = 0,
 			recipients = {to:null,cc:null,bcc:null};
 
 		uids.forEach(uid => {
-			const details = this.checkedDetails.get(uid);
+			const details = this.checkedDetails.get(uid),
+				before = aE.length;
 			if (details) {
 				let email,
 					addresses = details.sendToAll ? details.addresses : details.addresses.slice(0, 1);
@@ -305,13 +307,24 @@ export class ContactsPopupView extends AbstractViewPopup {
 					email = [oContact.jCard.getOne('email')];
 */
 			}
+			// Nothing usable: no details, no address, or an address that did not
+			// parse. Counted per contact, since that is the number the user picked.
+			aE.length === before && ++skipped;
 		});
 
 		if (arrayLength(aE)) {
+			// Silently addressing fewer contacts than were selected is how a
+			// large send quietly misses people
+			skipped && alert(i18n('CONTACTS/COMPOSE_SKIPPED', {
+				USED: uids.length - skipped,
+				TOTAL: uids.length
+			}));
 			bOpenCompose = false;
 			this.close();
 			recipients[field] = aE;
 			showMessageComposer([ComposeType.Empty, null, recipients.to, recipients.cc, recipients.bcc])
+		} else {
+			alert(i18n('CONTACTS/COMPOSE_NONE_USABLE', { TOTAL: uids.length }));
 		}
 	}
 
