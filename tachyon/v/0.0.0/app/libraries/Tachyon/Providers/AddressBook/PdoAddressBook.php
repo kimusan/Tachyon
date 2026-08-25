@@ -769,7 +769,10 @@ class PdoAddressBook
 			if (\count($aSearchIds)) {
 				$sSql .= ' AND c.id_contact IN ('.\implode(',', $aSearchIds).')';
 			}
-			$sSql .= ' ORDER BY display ASC LIMIT :limit OFFSET :offset';
+			// id_contact breaks ties. display is not unique, and without a
+			// deterministic order a row can land on two pages while another is
+			// skipped, which MySQL does not promise not to do with LIMIT/OFFSET.
+			$sSql .= ' ORDER BY display ASC, c.id_contact ASC LIMIT :limit OFFSET :offset';
 
 			$aParams = array(
 				':id_user' => array($this->iUserID, \PDO::PARAM_INT),
@@ -833,7 +836,7 @@ class PdoAddressBook
 			}
 		}
 
-		$sSql .= ' ORDER BY c.display ASC';
+		$sSql .= ' ORDER BY c.display ASC, c.id_contact ASC';
 
 		$aResult = array();
 		$oStmt = $this->prepareAndExecute($sSql, $aParams);
