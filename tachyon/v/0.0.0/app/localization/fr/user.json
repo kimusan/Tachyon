@@ -10,6 +10,7 @@
     "CLEAR": "Vider",
     "CLOSE": "Fermer",
     "CONTACTS": "Contacts",
+    "CALENDAR": "Calendrier",
     "DELETE": "Supprimer",
     "UNDELETE": "Annuler la suppression",
     "DONE": "Fait",
@@ -27,6 +28,8 @@
     "USERNAME": "Nom d'utilisateur",
     "PASSWORD": "Mot de passe",
     "REMEMBER": "Se souvenir",
+    "REMEMBER_FOR_SESSION": "Se souvenir pour cette session",
+    "REMEMBER_PERMANENT": "Se souvenir définitivement",
     "REPLY_TO": "Répondre à",
     "SAVE": "Enregistrer",
     "SAVE_CHANGES": "Enregistrer les modifications?",
@@ -42,9 +45,7 @@
     "DEFAULT": "défaut",
     "HELP": "Aide",
     "TEXT": "Texte",
-    "ATTACHMENTS": "Pièces jointes",
-    "REMEMBER_FOR_SESSION": "Se souvenir pour cette session",
-    "REMEMBER_PERMANENT": "Se souvenir définitivement"
+    "ATTACHMENTS": "Pièces jointes"
   },
   "LOGIN": {
     "LABEL_LOGIN": "Identifiant",
@@ -197,6 +198,34 @@
   "SUGGESTIONS": {
     "SEARCHING_DESC": "Recherche..."
   },
+  "CALENDAR": {
+    "BUTTON_NEW_EVENT": "Nouvel événement",
+    "BUTTON_PREV": "Précédent",
+    "BUTTON_NEXT": "Suivant",
+    "BUTTON_TODAY": "Aujourd'hui",
+    "BUTTON_SYNC": "Synchroniser les calendriers",
+    "VIEW_MONTH": "Mois",
+    "VIEW_WEEK": "Semaine",
+    "VIEW_DAY": "Jour",
+    "VIEW_LIST": "Liste",
+    "EMPTY_LIST": "Aucun calendrier",
+    "READ_ONLY": "Lecture seule",
+    "LABEL_SUMMARY": "Titre",
+    "LABEL_CALENDAR": "Calendrier",
+    "LABEL_ALL_DAY": "Toute la journée",
+    "LABEL_START": "Début",
+    "LABEL_END": "Fin",
+    "LABEL_LOCATION": "Emplacement",
+    "LABEL_DESCRIPTION": "Description",
+    "CONFIRM_DELETE_EVENT": "Êtes-vous sûr de vouloir supprimer cet événement ?",
+    "ERROR_LOAD_COMPONENT": "Impossible de charger ce calendrier",
+    "RECURRING_READ_ONLY": "Cet événement est récurrent. La modification d'un événement récurrent n'est pas encore prise en charge. Il s'affiche donc en lecture seule",
+    "ERROR_NO_TITLE": "Donnez un titre à l'événement",
+    "ERROR_BAD_START": "La date de début ne correspond pas à une date et une heure valides",
+    "ERROR_BAD_END": "La date de fin n'est pas une date et une heure valides",
+    "ERROR_END_BEFORE_START": "L'événement se termine avant de commencer",
+    "ERROR_NO_CALENDAR": "Choisissez un calendrier pour l'événement"
+  },
   "CONTACTS": {
     "TAB_CONTACT": "Contact",
     "TAB_LOCATIONS": "Localisations",
@@ -240,11 +269,24 @@
     "TAGS_HINT": "Les étiquettes regroupent des contacts pour faciliter l'envoi de messages. Saisissez le nom d'une étiquette dans la fenêtre de rédaction pour envoyer un message à tous les membres de ce groupe.",
     "BUTTON_SHARE_ALL": "Tout le monde",
     "BUTTON_SYNC": "Synchronisation (CardDAV)",
-    "SEND_TO_ALL_CONTACT_EMAILS": "Envoyer à tous les e-mails contact"
+    "SEND_TO_ALL_CONTACT_EMAILS": "Envoyer à tous les e-mails contact",
+    "SELECT_ALL": "Tout sélectionner sur cette page",
+    "SELECT_PAGE": "Sélectionnez cette page",
+    "SELECT_ALL_MATCHING": "Sélectionner toutes les correspondances",
+    "SELECT_NONE": "Effacer la sélection",
+    "BUTTON_COMPOSE_TO": "Nouveau message à",
+    "BUTTON_COMPOSE_CC": "Nouveau message, destinataires en copie (Cc)",
+    "BUTTON_COMPOSE_BCC": "Nouveau message, destinataires en copie cachée (Cci)",
+    "ASK_USE_BCC": "%COUNT% destinataires. Les mettre en copie cachée (Cci) pour qu'ils ne puissent pas voir les autres adresses ?",
+    "ERROR_COMPOSE_LIMIT": "%COUNT% contacts sont sélectionnés, ce qui dépasse la limite de %LIMIT% autorisée pour un seul message. Réduisez votre sélection.",
+    "BUTTON_DELETE_LOCAL": "Supprimer les contacts locaux",
+    "SYNCED_CONTACT": "Synchronisé avec le carnet d'adresses distant",
+    "CONFIRM_DELETE_LOCAL": "Supprimer tous les contacts créés localement ? Les contacts synchronisés depuis le carnet d'adresses distant sont marqués et seront conservés."
   },
   "COMPOSE": {
     "LINK_SHOW_INPUTS": "Voir tous les champs",
     "BUTTON_SEND": "Envoyer",
+    "BUTTON_SEND_UNDO": "Annuler",
     "BUTTON_MINIMIZE": "Réduire",
     "SAVED_TIME": "Enregistré à %TIME%",
     "SAVED_ERROR_ON_SEND": "Le message a été envoyé mais n'a pas été enregistré dans le dossier des messages envoyés",
@@ -260,14 +302,13 @@
     "ATTACHMENTS_UPLOAD_ERROR_DESC": "Toutes les pièces jointes n'ont pas encore été téléchargées",
     "ALLOW_SPELLCHECK": "Activer le vérificateur d'orthographe du navigateur",
     "ALLOW_DRAFT_AUTOSAVE": "Brouillon sauvegardé automatiquement",
+    "UNDO_SEND_DELAY_LABEL": "Délai d'annulation d'envoi",
+    "UNDO_SEND_DELAY_OFF": "Désactivé",
     "BUTTON_REQUEST_READ_RECEIPT": "Demander une confirmation de lecture",
     "BUTTON_MARK_AS_IMPORTANT": "Marquer comme important",
     "BUTTON_REQUEST_DSN": "Demander un accusé de réception",
     "BUTTON_REQUIRE_TLS": "Exiger une livraison sécurisée",
-    "ERROR_EMPTY_BODY": "Le corps du message est vide",
-    "BUTTON_SEND_UNDO": "Annuler",
-    "UNDO_SEND_DELAY_LABEL": "Délai d'annulation d'envoi",
-    "UNDO_SEND_DELAY_OFF": "Désactivé"
+    "ERROR_EMPTY_BODY": "Le corps du message est vide"
   },
   "POPUPS_ASK": {
     "EXIT_ARE_YOU_SURE": "Êtes-vous sûr de vouloir quitter ?",
@@ -440,11 +481,20 @@
     "IMAGEUPLOAD": "Sélection de l'image",
     "UNDO": "Annuler",
     "REDO": "Refaire",
-    "REMOVESTYLE": "Supprimer le style"
+    "REMOVESTYLE": "Supprimer le style",
+    "TABLE": "Insérer une table",
+    "ROWABOVE": "Insérer une ligne au-dessus",
+    "ROWBELOW": "Insérer une ligne en dessous",
+    "COLLEFT": "Insérer une colonne à gauche",
+    "COLRIGHT": "Insérer une colonne à droite",
+    "ROWDELETE": "Supprimer la ligne",
+    "COLDELETE": "Supprimer la colonne",
+    "TABLEDELETE": "Supprimer la table"
   },
   "SETTINGS_LABELS": {
     "GENERAL": "Général",
     "CONTACTS": "Contacts",
+    "CALENDAR": "Calendrier",
     "FOLDERS": "Dossiers",
     "ACCOUNTS": "Comptes",
     "FILTERS": "Filtres",
@@ -515,6 +565,14 @@
     "MAILTO": "Inscrivez-vous en tant que gestionnaire de liens 'mailto:'",
     "HTML_TO_MD": "Convertir HTML en Markdown au lieu du texte brut"
   },
+  "SETTINGS_CALENDAR": {
+    "LEGEND_CALENDAR_SYNC": "Synchronisation à distance (CalDAV)",
+    "LABEL_CALENDAR_SYNC_ENABLE": "Activer la synchronisation à distance",
+    "LABEL_CALENDAR_SYNC_URL": "Adresse (url) CalDAV",
+    "LABEL_CALENDAR_SYNC_USER": "Utilisateur",
+    "SYNC_READ": "Lecture seule",
+    "TEST_OK": "Connexion réussie"
+  },
   "SETTINGS_CONTACTS": {
     "LABEL_CONTACTS_AUTOSAVE": "Ajouter automatiquement les destinataires à votre carnet d'adresses",
     "LEGEND_CONTACTS_SYNC": "Synchronisation à distance (CardDAV)",
@@ -522,7 +580,8 @@
     "LABEL_CONTACTS_SYNC_SERVER": "Serveur",
     "LABEL_CONTACTS_SYNC_AB_URL": "URL du carnet d'adresses",
     "LABEL_CONTACTS_SYNC_USER": "Utilisateur",
-    "SYNC_READ": "Lecture seulement"
+    "SYNC_READ": "Lecture seulement",
+    "TEST_OK": "Connexion réussie"
   },
   "SETTINGS_THEMES": {
     "LEGEND_THEMES": "Thèmes",
@@ -624,6 +683,7 @@
     "AccountNotAllowed": "Ce compte n'est pas autorisé",
     "CryptKeyError": "Your login passphrase has changed",
     "ContactsSyncError": "Erreur de synchronisation des contacts",
+    "CalendarSyncError": "La synchronisation du calendrier a échoué.",
     "CantGetMessageList": "Impossible d'obtenir la liste des messages",
     "CantGetMessage": "Impossible d'obtenir le message",
     "CantDeleteMessage": "Impossible de supprimer le message",
