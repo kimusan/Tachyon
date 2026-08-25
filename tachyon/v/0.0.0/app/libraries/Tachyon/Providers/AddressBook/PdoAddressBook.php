@@ -787,10 +787,17 @@ class PdoAddressBook
 	}
 
 	/**
-	 * Uids matching the same filter GetContacts applies, with no paging.
+	 * Ids matching the same filter GetContacts applies, with no paging.
 	 * Expressed as one query with EXISTS clauses rather than reusing that
 	 * method's id collection, so selecting everything does not have to walk
 	 * every page and load a jCard per contact along the way.
+	 *
+	 * Returns id_contact, not id_contact_str. Everything downstream keys on the
+	 * numeric id: getContactsFromPDO puts it in Contact::id, so it is what the
+	 * client sees as contact.id(), and DoContactsDelete runs intval over what it
+	 * is given. Returning the vCard uid instead silently matched nothing on
+	 * compose, and on delete intval turned a uid beginning with digits into some
+	 * other contact's id.
 	 */
 	public function GetContactUids(string $sSearch = '', string $sCategory = '') : array
 	{
@@ -798,7 +805,7 @@ class PdoAddressBook
 			return [];
 		}
 
-		$sSql = 'SELECT c.id_contact_str FROM rainloop_ab_contacts AS c'
+		$sSql = 'SELECT c.id_contact FROM rainloop_ab_contacts AS c'
 			. ' WHERE c.deleted = 0 AND c.id_user = :id_user';
 		$aParams = array(':id_user' => array($this->iUserID, \PDO::PARAM_INT));
 
@@ -832,8 +839,8 @@ class PdoAddressBook
 		$oStmt = $this->prepareAndExecute($sSql, $aParams);
 		if ($oStmt) {
 			while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
-				if (\strlen((string) $aItem[0])) {
-					$aResult[] = (string) $aItem[0];
+				if (0 < (int) $aItem[0]) {
+					$aResult[] = (string) (int) $aItem[0];
 				}
 			}
 		}
