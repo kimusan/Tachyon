@@ -45,7 +45,7 @@
     "DEFAULT": "défaut",
     "HELP": "Aide",
     "TEXT": "Texte",
-    "ATTACHMENTS": "Pièces jointes",
+    "ATTACHMENTS": "Pièces jointes"
   },
   "LOGIN": {
     "LABEL_LOGIN": "Identifiant",
@@ -221,7 +221,7 @@
     "ERROR_LOAD_COMPONENT": "Impossible de charger ce calendrier",
     "RECURRING_READ_ONLY": "Cet événement est récurrent. La modification d'un événement récurrent n'est pas encore prise en charge. Il s'affiche donc en lecture seule",
     "ERROR_NO_TITLE": "Donnez un titre à l'événement",
-    "ERROR_BAD_START": "TLa date de début ne correspond pas à une date et une heure valides",
+    "ERROR_BAD_START": "La date de début ne correspond pas à une date et une heure valides",
     "ERROR_BAD_END": "La date de fin n'est pas une date et une heure valides",
     "ERROR_END_BEFORE_START": "L'événement se termine avant de commencer",
     "ERROR_NO_CALENDAR": "Choisissez un calendrier pour l'événement"
@@ -269,7 +269,7 @@
     "TAGS_HINT": "Les étiquettes regroupent des contacts pour faciliter l'envoi de messages. Saisissez le nom d'une étiquette dans la fenêtre de rédaction pour envoyer un message à tous les membres de ce groupe.",
     "BUTTON_SHARE_ALL": "Tout le monde",
     "BUTTON_SYNC": "Synchronisation (CardDAV)",
-    "SEND_TO_ALL_CONTACT_EMAILS": "Envoyer à tous les e-mails contact"
+    "SEND_TO_ALL_CONTACT_EMAILS": "Envoyer à tous les e-mails contact",
     "SELECT_ALL": "Tout sélectionner sur cette page",
     "SELECT_PAGE": "Sélectionnez cette page",
     "SELECT_ALL_MATCHING": "Sélectionner toutes les correspondances",
@@ -303,12 +303,12 @@
     "ALLOW_SPELLCHECK": "Activer le vérificateur d'orthographe du navigateur",
     "ALLOW_DRAFT_AUTOSAVE": "Brouillon sauvegardé automatiquement",
     "UNDO_SEND_DELAY_LABEL": "Délai d'annulation d'envoi",
-    "UNDO_SEND_DELAY_OFF": "Désactivé"
+    "UNDO_SEND_DELAY_OFF": "Désactivé",
     "BUTTON_REQUEST_READ_RECEIPT": "Demander une confirmation de lecture",
     "BUTTON_MARK_AS_IMPORTANT": "Marquer comme important",
     "BUTTON_REQUEST_DSN": "Demander un accusé de réception",
     "BUTTON_REQUIRE_TLS": "Exiger une livraison sécurisée",
-    "ERROR_EMPTY_BODY": "Le corps du message est vide",
+    "ERROR_EMPTY_BODY": "Le corps du message est vide"
   },
   "POPUPS_ASK": {
     "EXIT_ARE_YOU_SURE": "Êtes-vous sûr de vouloir quitter ?",
@@ -481,7 +481,7 @@
     "IMAGEUPLOAD": "Sélection de l'image",
     "UNDO": "Annuler",
     "REDO": "Refaire",
-    "REMOVESTYLE": "Supprimer le style"
+    "REMOVESTYLE": "Supprimer le style",
     "TABLE": "Insérer une table",
     "ROWABOVE": "Insérer une ligne au-dessus",
     "ROWBELOW": "Insérer une ligne en dessous",
@@ -580,7 +580,7 @@
     "LABEL_CONTACTS_SYNC_SERVER": "Serveur",
     "LABEL_CONTACTS_SYNC_AB_URL": "URL du carnet d'adresses",
     "LABEL_CONTACTS_SYNC_USER": "Utilisateur",
-    "SYNC_READ": "Lecture seulement"
+    "SYNC_READ": "Lecture seulement",
     "TEST_OK": "Connexion réussie"
   },
   "SETTINGS_THEMES": {
