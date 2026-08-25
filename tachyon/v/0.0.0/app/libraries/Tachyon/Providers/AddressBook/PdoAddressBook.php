@@ -840,7 +840,10 @@ class PdoAddressBook
 		if ($oStmt) {
 			while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
 				if (0 < (int) $aItem[0]) {
-					$aResult[] = (string) (int) $aItem[0];
+					// Integers, not strings. ContactModel declares id as 0, so
+					// revivePropertiesFromJson casts it to a number, and the client
+					// compares these against contact.id() with strict equality.
+					$aResult[] = (int) $aItem[0];
 				}
 			}
 		}
