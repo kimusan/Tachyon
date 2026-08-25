@@ -274,6 +274,8 @@
 		"SELECT_PAGE": "Select this page",
 		"SELECT_ALL_MATCHING": "Select all matching",
 		"SELECT_NONE": "Clear selection",
+		"SELECTED_SOME": "%COUNT% selected",
+		"SELECTED_ALL": "%COUNT% selected, all matches",
 		"BUTTON_COMPOSE_TO": "New message to",
 		"BUTTON_COMPOSE_CC": "New message, recipients in Cc",
 		"BUTTON_COMPOSE_BCC": "New message, recipients in Bcc",

@@ -94,14 +94,17 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 			hasSelection: () => 0 < this.selectionCount(),
 
+			selectPageLabel: () => i18n('CONTACTS/SELECT_PAGE') + ' (' + ContactUserStore().length + ')',
+
+			selectAllLabel: () => i18n('CONTACTS/SELECT_ALL_MATCHING') + ' (' + this.contactsCount() + ')',
+
+			selectionLabel: () => this.allSelected()
+				? i18n('CONTACTS/SELECTED_ALL', { COUNT: this.selectionCount() })
+				: i18n('CONTACTS/SELECTED_SOME', { COUNT: this.selectionCount() }),
+
 			pageAllChecked: () => {
 				const page = ContactUserStore();
 				return page.length && page.every(contact => contact.checked());
-			},
-
-			checkAll: {
-				read: () => ContactUserStore.hasChecked(),
-				write: value => value ? this.selectPage() : this.clearSelection()
 			},
 
 			contactsSyncEnabled: () => ContactUserStore.allowSync() && ContactUserStore.syncMode(),
