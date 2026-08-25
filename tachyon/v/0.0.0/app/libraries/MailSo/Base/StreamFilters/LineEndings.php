@@ -20,7 +20,7 @@ class LineEndings extends \php_user_filter
 			$this->buffer += $bucket->data;
 			$consumed += $bucket->datalen;
 		}
-		$this->buffer = \preg_replace('/\R/s', "\r\n", $this->buffer);
+		$this->buffer = \preg_replace('/\r\n|\r|\n/', "\r\n", $this->buffer);
 		\stream_bucket_append($out, \stream_bucket_new($this->stream, $this->buffer));
 		$this->buffer = '';
 */
