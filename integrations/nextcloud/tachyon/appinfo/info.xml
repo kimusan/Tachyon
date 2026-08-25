@@ -73,7 +73,9 @@ There, click on the link to go to the Tachyon admin panel.
 	</dependencies>
 	<settings>
 		<admin>OCA\Tachyon\Settings\AdminSettings</admin>
+		<admin-section>OCA\Tachyon\Settings\Section</admin-section>
 		<personal>OCA\Tachyon\Settings\PersonalSettings</personal>
+		<personal-section>OCA\Tachyon\Settings\Section</personal-section>
 	</settings>
 	<navigations>
 		<navigation>

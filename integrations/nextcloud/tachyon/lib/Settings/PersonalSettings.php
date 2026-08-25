@@ -35,7 +35,7 @@ class PersonalSettings implements ISettings
 
 	public function getSection()
 	{
-		return 'additional';
+		return 'tachyon';
 	}
 
 	public function getPriority()
