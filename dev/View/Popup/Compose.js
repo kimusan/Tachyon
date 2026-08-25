@@ -1143,7 +1143,10 @@ export class ComposePopupView extends AbstractViewPopup {
 		// Handled on 'input' rather than through the autocomplete callback so it
 		// does not wait out the 500ms throttle.
 		['to', 'cc', 'bcc'].forEach(name => {
-			const el = dom.querySelector(`[data-bind*="emailsTags: ${name}"]`);
+			// The chip list, not the original input: that one is replaced and
+			// detached the moment the component is built, so querying for its
+			// data-bind attribute never matched and this listener never ran.
+			const el = dom.querySelector(`[data-emails-tags="${name}"]`);
 			if (el?.addresses) {
 				const comp = el.addresses;
 				this[`_${name}Component`] = comp;

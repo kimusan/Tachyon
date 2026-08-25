@@ -122,6 +122,13 @@ export class EmailAddressesComponent {
 		self.inputCont.append(input);
 		self.ul.append(self.inputCont);
 
+		// replaceWith detaches the bound element, so anything looking for this
+		// field by its data-bind attribute finds nothing. Carry the identity onto
+		// the replacement, which is the node that stays in the document.
+		self.ul.addresses = self;
+		const bound = (element.getAttribute('data-bind') || '').match(/emailsTags:\s*([\w$]+)/);
+		bound && (self.ul.dataset.emailsTags = bound[1]);
+
 		element.replaceWith(self.ul);
 
 		// if instantiated input already contains a value, parse that junk
