@@ -42,6 +42,11 @@ const bySection = keys =>
 		return out;
 	}, {})).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${s} ${n}`).join(', ');
 
+const NOTE = [
+	'Do not add English text for missing keys: they already fall back to English,',
+	'and filling them in makes untranslated strings impossible to find again.'
+];
+
 const i18n = done => {
 	const refUser = read(REFERENCE, 'user'),
 		refAdmin = read(REFERENCE, 'admin'),
@@ -49,8 +54,6 @@ const i18n = done => {
 		locales = fs.readdirSync(L10N)
 			.filter(d => d !== REFERENCE && fs.statSync(path.join(L10N, d)).isDirectory())
 			.sort();
-
-	console.log(`\nReference ${REFERENCE}: ${Object.keys(refUser).length} user + ${Object.keys(refAdmin).length} admin strings\n`);
 
 	const rows = locales.map(locale => {
 		const u = compare(refUser, read(locale, 'user')),
@@ -61,19 +64,73 @@ const i18n = done => {
 			missing,
 			maybe: u.maybe.length + a.maybe.length,
 			done: (100 * (total - missing) / total).toFixed(1),
-			where: bySection(u.missing.concat(a.missing))
+			where: bySection(u.missing.concat(a.missing)),
+			// Kept apart so the terminal keeps its one line per locale while the
+			// report can name the keys a translator would actually go and fill in
+			keys: {
+				user: u.missing, admin: a.missing,
+				userMaybe: u.maybe, adminMaybe: a.maybe
+			}
 		};
 	}).sort((x, y) => x.missing - y.missing || x.locale.localeCompare(y.locale));
 
-	console.log('locale   complete   missing   untranslated?  missing from');
-	rows.forEach(r => console.log(
-		`${r.locale.padEnd(8)} ${(r.done + '%').padStart(8)} ${String(r.missing).padStart(9)} ${String(r.maybe).padStart(14)}  ${r.where}`
-	));
+	// Only missing keys count against a locale. A string identical to English
+	// is a hint, and counting it here contradicted the 100.0% on its own row.
+	const complete = rows.filter(r => !r.missing).length,
+		table = [
+			'locale   complete   missing   untranslated?  missing from',
+			...rows.map(r =>
+				`${r.locale.padEnd(8)} ${(r.done + '%').padStart(8)} ${String(r.missing).padStart(9)} ${String(r.maybe).padStart(14)}  ${r.where}`)
+		];
 
-	const complete = rows.filter(r => !r.missing && !r.maybe).length;
-	console.log(`\n${complete} of ${rows.length} locales complete. Reference is ${L10N}/${REFERENCE}.`);
-	console.log('Do not add English text for missing keys: they already fall back to English,');
-	console.log('and filling them in makes untranslated strings impossible to find again.\n');
+	console.log(`\nReference ${REFERENCE}: ${Object.keys(refUser).length} user + ${Object.keys(refAdmin).length} admin strings\n`);
+	table.forEach(line => console.log(line));
+	console.log(`\n${complete} of ${rows.length} locales have every string translated. Reference is ${L10N}/${REFERENCE}.`);
+	NOTE.forEach(line => console.log(line));
+	console.log('');
+
+	// Attached to GitHub releases, so translators can see where their language
+	// stands without checking out the repository and running gulp.
+	const out = process.env.I18N_REPORT;
+	if (out) {
+		const version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version,
+			lines = [
+				`Tachyon ${version} translation status`,
+				'',
+				`Reference ${REFERENCE}: ${Object.keys(refUser).length} user + ${Object.keys(refAdmin).length} admin strings.`,
+				`${complete} of ${rows.length} locales have every string translated.`,
+				'',
+				...NOTE,
+				'',
+				'"untranslated?" counts strings identical to their English source. That is a',
+				'hint rather than a fault: some words are spelled the same in both languages.',
+				'',
+				...table,
+				''
+			];
+
+		rows.forEach(r => {
+			lines.push('', '-'.repeat(72), `${r.locale}  ${r.done}% complete`, '');
+			if (!r.missing && !r.maybe) {
+				lines.push('  Nothing missing. Thank you.');
+				return;
+			}
+			r.missing || lines.push('  Nothing missing. The entries below are only hints.', '');
+			[['user.json', r.keys.user], ['admin.json', r.keys.admin]].forEach(([file, keys]) => {
+				keys.length && lines.push(`  Missing from ${file} (${keys.length}):`,
+					...keys.map(k => '    ' + k), '');
+			});
+			[['user.json', r.keys.userMaybe], ['admin.json', r.keys.adminMaybe]].forEach(([file, keys]) => {
+				keys.length && lines.push(`  Same as English in ${file} (${keys.length}), possibly untranslated:`,
+					...keys.map(k => '    ' + k), '');
+			});
+		});
+
+		fs.mkdirSync(path.dirname(out), { recursive: true });
+		fs.writeFileSync(out, lines.join('\n').replace(/\n{3,}/g, '\n\n') + '\n');
+		console.log(`Report written to ${out}\n`);
+	}
+
 	done();
 };
 

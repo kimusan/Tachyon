@@ -62,6 +62,14 @@ jobs:
       - name: Build release (JS/CSS + PHP archive + plugins)
         run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian --nextcloud --owncloud
 
+      # Attached to the release so translators can see where their language stands
+      # without cloning the repository. build/dist is gitignored, so the
+      # checkout in the next step leaves it alone.
+      - name: Write the translation status report
+        run: |
+          I18N_REPORT="build/dist/releases/webmail/${{ steps.version.outputs.version }}/tachyon-${{ steps.version.outputs.version }}-translation-status.txt" \
+            npx gulp i18n
+
       - name: Commit updated packages.json
         run: |
           git config user.name "github-actions[bot]"
@@ -81,6 +89,7 @@ jobs:
             build/dist/releases/webmail/*/tachyon_*.deb
             build/dist/releases/webmail/*/tachyon-*-nextcloud.tar.gz
             build/dist/releases/webmail/*/tachyon-*-owncloud.tar.gz
+            build/dist/releases/webmail/*/tachyon-*-translation-status.txt
             build/dist/releases/plugins/*.tgz
             packages.json
 
