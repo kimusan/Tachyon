@@ -78,6 +78,8 @@
     "SQLITE_GLOBAL": "Utilisez une DB globale au lieu de par compte",
     "ALERT_NOTICE": "Note !",
     "SUGGESTIONS_LIMIT": "Limite de suggestions",
+    "COMPOSE_LIMIT": "Nombre maximum de destinataires dans la sélection",
+    "BCC_LIMIT": "Recommander l'utilisation de la copie cachée (Cci) au-delà de ce nombre de destinataires.",
     "HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "N'utilisez pas ce type de base de données avec un grand nombre d'utilisateurs actifs.",
     "HTML_ALERT_DOES_NOT_SUPPORTED": "Votre système ne supporte pas les contacts.\n<br>\nVous devez installer ou autoriser l'extension <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> sur votre serveur."
   },
