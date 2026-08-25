@@ -246,6 +246,8 @@
     "SELECT_PAGE": "Vælg denne side",
     "SELECT_ALL_MATCHING": "Vælg alle der matcher",
     "SELECT_NONE": "Ryd markering",
+    "SELECTED_SOME": "%COUNT% valgt",
+    "SELECTED_ALL": "%COUNT% valgt, alle match",
     "BUTTON_COMPOSE_TO": "Ny besked til",
     "BUTTON_COMPOSE_CC": "Ny besked, modtagere i Cc",
     "BUTTON_COMPOSE_BCC": "Ny besked, modtagere i Bcc",

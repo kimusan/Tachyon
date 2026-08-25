@@ -274,6 +274,8 @@
     "SELECT_PAGE": "Sélectionnez cette page",
     "SELECT_ALL_MATCHING": "Sélectionner toutes les correspondances",
     "SELECT_NONE": "Effacer la sélection",
+    "SELECTED_SOME": "%COUNT% sélectionnés",
+    "SELECTED_ALL": "%COUNT% sélectionnés, toutes les correspondances",
     "BUTTON_COMPOSE_TO": "Nouveau message à",
     "BUTTON_COMPOSE_CC": "Nouveau message, destinataires en copie (Cc)",
     "BUTTON_COMPOSE_BCC": "Nouveau message, destinataires en copie cachée (Cci)",

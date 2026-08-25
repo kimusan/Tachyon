@@ -246,6 +246,8 @@
     "SELECT_PAGE": "Diese Seite auswählen",
     "SELECT_ALL_MATCHING": "Alle Treffer auswählen",
     "SELECT_NONE": "Auswahl aufheben",
+    "SELECTED_SOME": "%COUNT% ausgewählt",
+    "SELECTED_ALL": "%COUNT% ausgewählt, alle Treffer",
     "BUTTON_COMPOSE_TO": "Neue Nachricht an",
     "BUTTON_COMPOSE_CC": "Neue Nachricht, Empfänger in Cc",
     "BUTTON_COMPOSE_BCC": "Neue Nachricht, Empfänger in Bcc",

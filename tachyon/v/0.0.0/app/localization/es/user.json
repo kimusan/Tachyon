@@ -246,6 +246,8 @@
     "SELECT_PAGE": "Seleccionar esta página",
     "SELECT_ALL_MATCHING": "Seleccionar todas las coincidencias",
     "SELECT_NONE": "Borrar la selección",
+    "SELECTED_SOME": "%COUNT% seleccionados",
+    "SELECTED_ALL": "%COUNT% seleccionados, todas las coincidencias",
     "BUTTON_COMPOSE_TO": "Nuevo mensaje a",
     "BUTTON_COMPOSE_CC": "Nuevo mensaje, destinatarios en Cc",
     "BUTTON_COMPOSE_BCC": "Nuevo mensaje, destinatarios en Bcc",
