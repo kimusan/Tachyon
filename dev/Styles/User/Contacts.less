@@ -236,7 +236,11 @@
 	white-space: nowrap;
 }
 
-#V-PopupsContacts {
+// The editor hides every span while editing and shows them when read only,
+// which is how it swaps between display and input. A chip is a span, so it was
+// caught by that and vanished. These beat #V-PopupsContacts .b-view-content
+// :not(.e-checkbox) > span on specificity and apply in both modes.
+#V-PopupsContacts .b-view-content {
 	.tag-chips {
 		display: flex;
 		flex-wrap: wrap;
@@ -246,20 +250,28 @@
 
 	// Self contained colours, matching the recipient chips in compose, so a tag
 	// reads as a chip in both themes without depending on theme variables
-	.tag-chip {
+	.tag-chips > .tag-chip {
 		align-items: center;
 		background-color: #eee;
 		border: 1px solid #aaa;
 		border-radius: 1em;
 		color: #555;
 		display: inline-flex;
+		font-size: inherit;
 		gap: 4px;
+		height: auto;
+		line-height: normal;
 		max-width: 100%;
 		padding: 1px 4px 1px 10px;
 	}
 
-	.tag-chip > span {
+	.tag-chips > .tag-chip > span {
+		display: inline;
+		font-size: inherit;
+		height: auto;
+		line-height: normal;
 		overflow: hidden;
+		padding: 0;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
