@@ -60,7 +60,23 @@ jobs:
           echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
 
       - name: Build release (JS/CSS + PHP archive + plugins)
-        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian --nextcloud --owncloud
+        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian --nextcloud --owncloud --cpanel
+
+      # The wiki and integrations/hestiacp/bin/v-add-sys-tachyon both fetch
+      # tachyon-latest.tar.gz from releases/latest/download, which 404s while
+      # every asset carries a version. Copies under stable names keep those
+      # working without an edit per release. The existing upload globs already
+      # match these, so no new entry is needed there.
+      - name: Provide stable "latest" filenames
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          D="build/dist/releases/webmail/$V"
+          cp "$D/tachyon-$V.tar.gz" "$D/tachyon-latest.tar.gz"
+          cp "$D/tachyon-$V.zip"    "$D/tachyon-latest.zip"
+          if [ -f "$D/tachyon_$V-1_all.deb" ]; then
+            cp "$D/tachyon_$V-1_all.deb" "$D/tachyon_latest_all.deb"
+          fi
+          ls -1 "$D"
 
       # Attached to the release so translators can see where their language stands
       # without cloning the repository. build/dist is gitignored, so the
