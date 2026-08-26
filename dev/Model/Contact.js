@@ -241,8 +241,19 @@ export class ContactModel extends AbstractModel {
 		this.note() || this.note('');
 	}
 
-	addCategory() {
-		this.categories.push({ value: ko.observable('') });
+	/**
+	 * A tag is atomic: added whole, removed whole. Refuses a blank or one the
+	 * contact already carries, comparing case insensitively because that is how
+	 * the server matches them. Returns whether it was added.
+	 */
+	addCategoryValue(name) {
+		name = (name || '').trim();
+		const key = name.toLowerCase();
+		if (!name || this.categories().some(c => c.value().trim().toLowerCase() === key)) {
+			return false;
+		}
+		this.categories.push({ value: ko.observable(name) });
+		return true;
 	}
 
 	removeEmail(item)    { this.email.remove(item); }

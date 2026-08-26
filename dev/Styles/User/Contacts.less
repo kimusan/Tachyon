@@ -236,6 +236,50 @@
 	white-space: nowrap;
 }
 
+#V-PopupsContacts {
+	.tag-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		margin-bottom: 5px;
+	}
+
+	// Self contained colours, matching the recipient chips in compose, so a tag
+	// reads as a chip in both themes without depending on theme variables
+	.tag-chip {
+		align-items: center;
+		background-color: #eee;
+		border: 1px solid #aaa;
+		border-radius: 1em;
+		color: #555;
+		display: inline-flex;
+		gap: 4px;
+		max-width: 100%;
+		padding: 1px 4px 1px 10px;
+	}
+
+	.tag-chip > span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.tag-chip .icon-x {
+		color: #999;
+		font-size: .8em;
+		text-decoration: none;
+	}
+
+	.tag-chip .icon-x:hover {
+		color: #666;
+	}
+
+	// The tag box does not need the 400px every other field gets
+	#contact-tag-input {
+		max-width: 260px;
+	}
+}
+
 #V-PopupsContacts .tags-hint {
 	font-size: .85em;
 	opacity: .7;

@@ -239,6 +239,7 @@
     "ADD_MENU_TAGS": "Schlagwörter",
 		"CATEGORY_ALL": "Alle Kategorien",
 		"TAGS_HINT": "Mit Tags lassen sich Kontakte gruppieren und schnell adressieren. Geben Sie im Verfassen-Fenster einen Tag-Namen ein, um an alle aus dieser Gruppe zu senden.",
+		"TAGS_PLACEHOLDER": "Schlagwort hinzufügen",
     "BUTTON_SHARE_ALL": "Jeder",
     "BUTTON_SYNC": "Synchronisierung (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "An alle E-Mail-Adressen schreiben",

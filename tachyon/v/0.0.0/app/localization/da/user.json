@@ -239,6 +239,7 @@
     "ADD_MENU_TAGS": "Mærkater",
 		"CATEGORY_ALL": "Alle kategorier",
 		"TAGS_HINT": "Mærkater grupperer kontakter, så de hurtigt kan adresseres. Skriv et mærkatnavn i skrivevinduet for at sende til alle i den gruppe.",
+		"TAGS_PLACEHOLDER": "Tilføj et mærke",
     "BUTTON_SHARE_ALL": "Alle",
     "BUTTON_SYNC": "Synkronisering (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send til alle kontaktens e-mailadresser",

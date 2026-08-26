@@ -1,6 +1,6 @@
 import { addObservablesTo, addComputablesTo } from 'External/ko';
 import { ComposeType } from 'Common/EnumsUser';
-import { registerShortcut, SettingsGet } from 'Common/Globals';
+import { registerShortcut, SettingsGet, elementById } from 'Common/Globals';
 import { arrayLength, pInt } from 'Common/Utils';
 import { download, computedPaginatorHelper, showMessageComposer } from 'Common/UtilsUser';
 
@@ -46,7 +46,10 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 			isSaving: false,
 
-			contact: null
+			contact: null,
+
+			// Text typed into the tag box but not yet committed to a chip
+			newCategory: ''
 		});
 
 		this.availableCategories = ko.observableArray();
@@ -78,6 +81,15 @@ export class ContactsPopupView extends AbstractViewPopup {
 		this.selector.on('ItemGetUid', contact => contact ? contact.id() : '');
 
 		addComputablesTo(this, {
+			// Offering a tag the contact already carries would be a no-op, since
+			// adding it is refused, so drop those from the list
+			categorySuggestions: () => {
+				const taken = new Set(
+					(this.contact()?.categories() || []).map(c => c.value().trim().toLowerCase())
+				);
+				return this.availableCategories().filter(cat => !taken.has(cat.trim().toLowerCase()));
+			},
+
 			contactsPaginator: computedPaginatorHelper(
 				this.contactsPage,
 				() => Math.max(1, Math.ceil(this.contactsCount() / CONTACTS_PER_PAGE))
@@ -333,6 +345,28 @@ export class ContactsPopupView extends AbstractViewPopup {
 		this.categoryFilter('');
 	}
 
+	addCategoryFromInput() {
+		const contact = this.contact();
+		// Silent when it is a blank or a duplicate: the chip that would have been
+		// created is already sitting there, so there is nothing to explain
+		contact?.addCategoryValue(this.newCategory());
+		this.newCategory('');
+	}
+
+	onCategoryKeydown(event) {
+		if ('Enter' === event.key) {
+			this.addCategoryFromInput();
+			return false;
+		}
+		// Knockout swallows the event unless the handler returns true, which
+		// would stop the box accepting any text at all
+		return true;
+	}
+
+	focusCategoryInput() {
+		setTimeout(() => elementById('contact-tag-input')?.focus(), 100);
+	}
+
 	loadCategories() {
 		Remote.request('ContactsCategories', (iError, data) => {
 			if (!iError && data?.Result?.List) {
@@ -390,7 +424,8 @@ export class ContactsPopupView extends AbstractViewPopup {
 	 */
 	populateViewContact(contact) {
 		const oldContact = this.contact(),
-			fn = () => this.contact(contact);
+			// Half typed tag belongs to the contact being left, not the next one
+			fn = () => { this.newCategory(''); this.contact(contact); };
 		if (oldContact?.hasChanges()) {
 			AskPopupView.showModal([
 				i18n('GLOBAL/SAVE_CHANGES'),
@@ -573,6 +608,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 
 	onHide() {
 		this.clearSelection();
+		this.newCategory('');
 		this.contact(null);
 		this.selectorContact(null);
 		this.search('');

@@ -248,19 +248,26 @@
 						<label class="iconsize24 icon-tag" data-i18n="[title]CONTACTS/ADD_MENU_TAGS"></label>
 						<div>
 							<p class="tags-hint" data-bind="visible: !readOnly()" data-i18n="CONTACTS/TAGS_HINT"></p>
-							<div data-bind="foreach: categories">
-								<div class="property-line">
+							<div class="tag-chips" data-bind="foreach: categories">
+								<span class="tag-chip">
 									<span data-bind="text: value"></span>
-									<input type="text" list="contact-categories"
-										autocomplete="off" autocorrect="off" autocapitalize="off"
-										data-bind="textInput: value">
-									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeCategory.bind($parent, $data)"></a>
-								</div>
+									<a href="#" class="icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeCategory.bind($parent, $data)"></a>
+								</span>
 							</div>
-							<datalist id="contact-categories" data-bind="foreach: $root.availableCategories">
+							<div class="property-line" data-bind="visible: !readOnly()">
+								<input type="text" id="contact-tag-input" list="contact-categories"
+									autocomplete="off" autocorrect="off" autocapitalize="off"
+									data-i18n="[placeholder]CONTACTS/TAGS_PLACEHOLDER"
+									data-bind="textInput: $root.newCategory,
+										event: {
+											change: $root.addCategoryFromInput.bind($root),
+											keydown: $root.onCategoryKeydown.bind($root)
+										}">
+								<a href="#" class="btn icon-plus" data-bind="click: $root.addCategoryFromInput.bind($root)"></a>
+							</div>
+							<datalist id="contact-categories" data-bind="foreach: $root.categorySuggestions">
 								<option data-bind="attr: { value: $data }"></option>
 							</datalist>
-							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addCategory"></a>
 						</div>
 					</div>
 				</div>
@@ -392,7 +399,7 @@
 						</a>
 					</li>
 					<li role="presentation">
-						<a href="#" data-bind="click: addCategory">
+						<a href="#" data-bind="click: $root.focusCategoryInput.bind($root)">
 							<i class="icon-tag"></i>
 							<span data-i18n="CONTACTS/ADD_MENU_TAGS"></span>
 						</a>

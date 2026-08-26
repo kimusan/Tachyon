@@ -239,6 +239,7 @@
     "ADD_MENU_TAGS": "Etiquetas",
 		"CATEGORY_ALL": "Todas las categorías",
 		"TAGS_HINT": "Las etiquetas agrupan contactos para dirigirse a ellos rápidamente. Escriba el nombre de una etiqueta en la ventana de redacción para enviar a todo el grupo.",
+		"TAGS_PLACEHOLDER": "Añadir una etiqueta",
     "BUTTON_SHARE_ALL": "Todos",
     "BUTTON_SYNC": "Sincronización (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Enviar a todos los correos de contactos",

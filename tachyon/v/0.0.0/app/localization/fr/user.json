@@ -267,6 +267,7 @@
     "ADD_MENU_TAGS": "Étiquettes",
     "CATEGORY_ALL": "Toutes les catégories",
     "TAGS_HINT": "Les étiquettes regroupent des contacts pour faciliter l'envoi de messages. Saisissez le nom d'une étiquette dans la fenêtre de rédaction pour envoyer un message à tous les membres de ce groupe.",
+    "TAGS_PLACEHOLDER": "Ajouter une étiquette",
     "BUTTON_SHARE_ALL": "Tout le monde",
     "BUTTON_SYNC": "Synchronisation (CardDAV)",
     "SEND_TO_ALL_CONTACT_EMAILS": "Envoyer à tous les e-mails contact",
