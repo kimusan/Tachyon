@@ -910,11 +910,21 @@ class PdoAddressBook
 			]
 		);
 
+		// Everything that matches a group does so on prop_value_lower, so Friends
+		// and friends already are one group. Returning both as separate entries
+		// would offer a choice that makes no difference and invites the very
+		// misspellings this list exists to prevent. First spelling seen wins.
 		$aResult = [];
+		$aSeen = [];
 		if ($oStmt) {
 			while ($aItem = $oStmt->fetch(\PDO::FETCH_NUM)) {
-				if (!empty($aItem[0])) {
-					$aResult[] = (string) $aItem[0];
+				$sValue = (string) $aItem[0];
+				if (\strlen($sValue)) {
+					$sKey = \mb_strtolower($sValue, 'UTF-8');
+					if (!isset($aSeen[$sKey])) {
+						$aSeen[$sKey] = true;
+						$aResult[] = $sValue;
+					}
 				}
 			}
 		}

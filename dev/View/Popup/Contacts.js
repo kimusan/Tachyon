@@ -360,6 +360,9 @@ export class ContactsPopupView extends AbstractViewPopup {
 						} else {
 							this.reloadContactList(); // TODO: remove when e-contact-foreach is dynamic
 						}
+						// A group invented here should be suggested on the next
+						// contact, not only after the popup is reopened
+						this.loadCategories();
 					}
 					this.isSaving(false);
 				}, data

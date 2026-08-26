@@ -251,12 +251,15 @@
 							<div data-bind="foreach: categories">
 								<div class="property-line">
 									<span data-bind="text: value"></span>
-									<input type="text"
+									<input type="text" list="contact-categories"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
 									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeCategory.bind($parent, $data)"></a>
 								</div>
 							</div>
+							<datalist id="contact-categories" data-bind="foreach: $root.availableCategories">
+								<option data-bind="attr: { value: $data }"></option>
+							</datalist>
 							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addCategory"></a>
 						</div>
 					</div>

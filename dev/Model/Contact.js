@@ -303,7 +303,14 @@ export class ContactModel extends AbstractModel {
 			encryptpref: this.encryptpref()
 		}, 'x-crypto');
 
-		const cats = this.categories.map(c => c.value()).filter(Boolean);
+		// Deduplicated case insensitively, matching how the server compares them.
+		// Picking from the suggestion list makes adding the same group twice easy,
+		// and CATEGORIES:friends,friends is not something to sync to a server.
+		const seen = new Set(),
+			cats = this.categories.map(c => c.value().trim()).filter(cat => {
+				const key = cat.toLowerCase();
+				return cat && !seen.has(key) && seen.add(key);
+			});
 		cats.length ? jCard.set('categories', cats) : jCard.remove('categories');
 
 		// Done by server
