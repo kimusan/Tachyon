@@ -39,7 +39,8 @@ class XCrypto extends Property
      */
     public function setRawMimeDirValue($val): void
     {
-        error_log("setRawMimeDirValue({$val})");
+        // Deliberately empty. getRawMimeDirValue() regenerates the value from the
+        // parameters, so a parsed value has nowhere to go and is dropped.
 //        $this->setValue(MimeDir::unescapeValue($val, $this->delimiter));
     }
 
