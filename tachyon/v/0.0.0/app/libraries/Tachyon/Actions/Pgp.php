@@ -36,11 +36,29 @@ trait Pgp
 		return $this->DefaultResponse(\array_values(\array_unique($result)));
 	}
 
+	/**
+	 * The keyservers that will be tried, so the browser can walk them one at a
+	 * time and name the one it is on.
+	 */
+	public function DoPgpKeyservers() : array
+	{
+		return $this->DefaultResponse(Keyservers::hosts());
+	}
+
 	public function DoPgpSearchKey() : array
 	{
-		$result = Keyservers::get(
-			$this->GetActionParam('query', '')
-		);
+		$sQuery = $this->GetActionParam('query', '');
+
+		// One named host, for the stepped search. getFrom checks the host against
+		// the configured list before fetching: taking a URL from the browser and
+		// requesting it would turn this into a server side request forgery.
+		$sHost = $this->GetActionParam('host', '');
+		if (\strlen($sHost)) {
+			$sKey = Keyservers::getFrom($sHost, $sQuery);
+			return $this->DefaultResponse($sKey ? ['key' => $sKey, 'host' => $sHost] : false);
+		}
+
+		$result = Keyservers::get($sQuery);
 		return $this->DefaultResponse($result ?: false);
 	}
 

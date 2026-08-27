@@ -19,7 +19,11 @@ export class OpenPgpImportPopupView extends AbstractViewPopup {
 			keyErrorMessage: '',
 
 			saveGnuPG: true,
-			saveServer: true
+			saveServer: true,
+
+			// Which keyserver is being tried, and which one answered
+			searchStatus: '',
+			searching: false
 		});
 
 		this.canGnuPG = GnuPGUserStore.isSupported();
@@ -30,42 +34,72 @@ export class OpenPgpImportPopupView extends AbstractViewPopup {
 		});
 	}
 
-	searchPGP() {
-		this.key(i18n('SUGGESTIONS/SEARCHING_DESC'));
-		const fn = () => Remote.request('PgpSearchKey',
-			(iError, oData) => {
-				if (iError) {
-					this.key(oData.message);
-				} else {
-					this.key(oData.Result);
-				}
-			}, {
-				query: this.search()
-			}
-		);
-		fetch(
-			`https://keys.openpgp.org/pks/lookup?op=get&options=mr&search=${this.search()}`,
-			{
-				method: 'GET',
-				mode: 'cors',
-				cache: 'no-cache',
-				redirect: 'error',
-				referrerPolicy: 'no-referrer',
-				credentials: 'omit'
-			}
-		)
-		.then(response => {
+	/**
+	 * Walks the keyservers one at a time so the box underneath can name the one
+	 * being tried and, at the end, the one the key came from. The server used to
+	 * loop internally and answer once, which could only ever say "found" or
+	 * "not found" after a silence as long as every host put together.
+	 *
+	 * keys.openpgp.org is asked by the browser first, as it was before: it is
+	 * CORS enabled, so the key never has to travel through this server.
+	 */
+	async searchPGP() {
+		const query = this.search().trim();
+		if (!query || this.searching()) {
+			return;
+		}
+
+		const found = (host, key) => {
+			this.key(key);
+			this.searchStatus(i18n('OPENPGP/SEARCH_FOUND_ON', { HOST: host }));
+			this.searching(false);
+		};
+
+		this.searching(true);
+		this.key('');
+
+		const direct = 'https://keys.openpgp.org';
+		this.searchStatus(i18n('OPENPGP/SEARCH_TRYING', { HOST: direct.replace('https://', '') }));
+		try {
+			const response = await fetch(
+				`${direct}/pks/lookup?op=get&options=mr&search=${encodeURIComponent(query)}`,
+				{ method: 'GET', mode: 'cors', cache: 'no-cache', redirect: 'error',
+				  referrerPolicy: 'no-referrer', credentials: 'omit' }
+			);
 			if ('application/pgp-keys' == response.headers.get('Content-Type')) {
-				response.text().then(body => this.key(body));
-			} else {
-				fn();
+				found(direct.replace('https://', ''), await response.text());
+				return;
 			}
-		})
-		.catch(e => {
-			this.key('keys.openpgp.org: ' + e?.message + '\nTrying local...');
-			fn();
-			throw e;
-		});
+		} catch {
+			// CORS, offline, or simply no key there. Fall through to the rest.
+		}
+
+		const hosts = await new Promise(resolve =>
+			Remote.request('PgpKeyservers', (iError, oData) =>
+				resolve((!iError && oData?.Result) || [])
+			)
+		);
+
+		for (const host of hosts) {
+			if (host === direct) {
+				continue;
+			}
+			const label = host.replace(/^https?:\/\//, '');
+			this.searchStatus(i18n('OPENPGP/SEARCH_TRYING', { HOST: label }));
+			const hit = await new Promise(resolve =>
+				Remote.request('PgpSearchKey', (iError, oData) =>
+					resolve((!iError && oData?.Result?.key) ? oData.Result : null),
+					{ query: query, host: host }
+				)
+			);
+			if (hit) {
+				found(label, hit.key);
+				return;
+			}
+		}
+
+		this.searchStatus(i18n('OPENPGP/SEARCH_NOT_FOUND', { QUERY: query }));
+		this.searching(false);
 	}
 
 	submitForm() {

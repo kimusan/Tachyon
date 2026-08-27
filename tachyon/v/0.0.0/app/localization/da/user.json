@@ -339,6 +339,9 @@
   },
   "OPENPGP": {
     "POPUP_IMPORT_TITLE": "Importer OpenPGP nøgle",
+    "SEARCH_TRYING": "Søger på %HOST%…",
+    "SEARCH_FOUND_ON": "Fundet på %HOST%",
+    "SEARCH_NOT_FOUND": "Ingen nøgle fundet for %QUERY% på nogen nøgleserver.",
     "POPUP_IMPORT_BUTTON": "Importer",
     "POPUP_VIEW_TITLE": "Vis OpenPGP nøgle",
     "POPUP_VIEW_BUTTON": "Vælg",

@@ -65,6 +65,32 @@ abstract class Keyservers
 	}
 
 	/**
+	 * The hosts that will be tried, in order.
+	 */
+	public static function hosts() : array
+	{
+		return static::$hosts;
+	}
+
+	/**
+	 * One host only. Returns null when that host simply has no such key, so a
+	 * caller stepping through the list host by host can report which one it is
+	 * on and move to the next without an exception per miss.
+	 */
+	public static function getFrom(string $host, string $keyId) : ?string
+	{
+		if (!\in_array($host, static::$hosts, true)) {
+			return null;
+		}
+		$oResponse = static::fetch($host, 'get', $keyId);
+		if (!$oResponse || 200 !== $oResponse->status) {
+			return null;
+		}
+		$sBody = \trim($oResponse->body);
+		return \str_contains($sBody, 'PGP PUBLIC KEY BLOCK') ? $sBody : null;
+	}
+
+	/**
 	 * Request the public key from the hkp servers
 	 * Returns PGP PUBLIC KEY BLOCK
 	 */

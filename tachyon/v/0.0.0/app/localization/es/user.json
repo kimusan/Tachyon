@@ -339,6 +339,9 @@
   },
   "OPENPGP": {
     "POPUP_IMPORT_TITLE": "Importar clave OpenPGP",
+    "SEARCH_TRYING": "Buscando en %HOST%…",
+    "SEARCH_FOUND_ON": "Encontrada en %HOST%",
+    "SEARCH_NOT_FOUND": "No se encontró ninguna clave para %QUERY% en ningún servidor de claves.",
     "POPUP_IMPORT_BUTTON": "Importar",
     "POPUP_VIEW_TITLE": "Ver clave OpenPGP",
     "POPUP_VIEW_BUTTON": "Seleccionar",

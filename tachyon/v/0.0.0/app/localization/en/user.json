@@ -367,6 +367,9 @@
 	},
 	"OPENPGP": {
 		"POPUP_IMPORT_TITLE": "Import OpenPGP key",
+		"SEARCH_TRYING": "Searching %HOST%…",
+		"SEARCH_FOUND_ON": "Found on %HOST%",
+		"SEARCH_NOT_FOUND": "No key found for %QUERY% on any keyserver.",
 		"POPUP_IMPORT_BUTTON": "Import",
 		"POPUP_VIEW_TITLE": "View OpenPGP key",
 		"POPUP_VIEW_BUTTON": "Select",
