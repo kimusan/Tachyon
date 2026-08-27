@@ -600,7 +600,8 @@
   "SETTINGS_OPENPGP": {
     "BUTTON_IMPORT_KEY": "Importar llave",
     "BUTTON_GENERATE_KEY_PAIR": "Generar llaves",
-    "IMPORT_FROM_SERVER": "Importar del servidor",
+    "RESTORE_FROM_ACCOUNT": "Restaurar las claves guardadas en mi cuenta",
+    "RESTORE_HINT": "Las claves están en su navegador, así que otro navegador u otro dispositivo empieza vacío. Esto vuelve a copiar las claves que decidió guardar en su cuenta de este servidor. No busca en servidores de claves públicos.",
     "IMPORT_NONE_FOUND": "No hay claves OpenPGP almacenadas en el servidor.",
     "IMPORT_ADDED": "%COUNT% clave(s) importada(s).",
     "IMPORT_ALL_KNOWN": "Las %COUNT% clave(s) del servidor ya están en su llavero.",

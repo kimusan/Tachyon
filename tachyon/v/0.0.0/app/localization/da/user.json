@@ -600,7 +600,8 @@
   "SETTINGS_OPENPGP": {
     "BUTTON_IMPORT_KEY": "Importer nøgle",
     "BUTTON_GENERATE_KEY_PAIR": "Generer nøgler",
-    "IMPORT_FROM_SERVER": "Importér fra serveren",
+    "RESTORE_FROM_ACCOUNT": "Gendan nøgler gemt på min konto",
+    "RESTORE_HINT": "Nøgler ligger i din browser, så en anden browser eller enhed starter tom. Dette kopierer de nøgler tilbage, du har valgt at gemme på din konto på denne server. Det søger ikke på offentlige nøgleservere.",
     "IMPORT_NONE_FOUND": "Der er ingen OpenPGP-nøgler gemt på serveren.",
     "IMPORT_ADDED": "%COUNT% nøgle(r) importeret.",
     "IMPORT_ALL_KNOWN": "Alle %COUNT% nøgle(r) på serveren findes allerede i din nøglering.",

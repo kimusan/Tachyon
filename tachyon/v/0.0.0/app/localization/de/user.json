@@ -600,7 +600,8 @@
   "SETTINGS_OPENPGP": {
     "BUTTON_IMPORT_KEY": "Schlüssel importieren",
     "BUTTON_GENERATE_KEY_PAIR": "Schlüssel generieren",
-    "IMPORT_FROM_SERVER": "Vom Server importieren",
+    "RESTORE_FROM_ACCOUNT": "In meinem Konto gespeicherte Schlüssel wiederherstellen",
+    "RESTORE_HINT": "Schlüssel liegen in Ihrem Browser, eine andere Browser oder ein anderes Gerät beginnt also leer. Dies kopiert die Schlüssel zurück, die Sie in Ihrem Konto auf diesem Server gespeichert haben. Öffentliche Schlüsselserver werden nicht durchsucht.",
     "IMPORT_NONE_FOUND": "Auf dem Server sind keine OpenPGP-Schlüssel gespeichert.",
     "IMPORT_ADDED": "%COUNT% Schlüssel importiert.",
     "IMPORT_ALL_KNOWN": "Alle %COUNT% Schlüssel auf dem Server sind bereits in Ihrem Schlüsselbund.",

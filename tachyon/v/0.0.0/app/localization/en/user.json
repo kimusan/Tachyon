@@ -636,7 +636,8 @@
 	"SETTINGS_OPENPGP": {
 		"BUTTON_IMPORT_KEY": "Import Key",
 		"BUTTON_GENERATE_KEY_PAIR": "Generate Key Pair",
-		"IMPORT_FROM_SERVER": "Import from server",
+		"RESTORE_FROM_ACCOUNT": "Restore keys saved to my account",
+		"RESTORE_HINT": "Keys are held by your browser, so a different browser or device starts empty. This copies back the keys you chose to save to your account on this server. It does not search public keyservers.",
 		"IMPORT_NONE_FOUND": "No OpenPGP keys are stored on the server.",
 		"IMPORT_ADDED": "%COUNT% key(s) imported.",
 		"IMPORT_ALL_KNOWN": "All %COUNT% key(s) on the server are already in your keyring.",
