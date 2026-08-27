@@ -601,6 +601,9 @@
     "BUTTON_IMPORT_KEY": "Schlüssel importieren",
     "BUTTON_GENERATE_KEY_PAIR": "Schlüssel generieren",
     "IMPORT_FROM_SERVER": "Vom Server importieren",
+    "IMPORT_NONE_FOUND": "Auf dem Server sind keine OpenPGP-Schlüssel gespeichert.",
+    "IMPORT_ADDED": "%COUNT% Schlüssel importiert.",
+    "IMPORT_ALL_KNOWN": "Alle %COUNT% Schlüssel auf dem Server sind bereits in Ihrem Schlüsselbund.",
     "TITLE_PRIVATE": "Privat",
     "TITLE_PUBLIC": "Öffentlich",
     "GET_MAILVELOPE": "Lade das Mailvelope Browser-Addon herunter."

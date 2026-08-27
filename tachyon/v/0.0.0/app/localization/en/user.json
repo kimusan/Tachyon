@@ -637,6 +637,9 @@
 		"BUTTON_IMPORT_KEY": "Import Key",
 		"BUTTON_GENERATE_KEY_PAIR": "Generate Key Pair",
 		"IMPORT_FROM_SERVER": "Import from server",
+		"IMPORT_NONE_FOUND": "No OpenPGP keys are stored on the server.",
+		"IMPORT_ADDED": "%COUNT% key(s) imported.",
+		"IMPORT_ALL_KNOWN": "All %COUNT% key(s) on the server are already in your keyring.",
 		"TITLE_PRIVATE": "Private",
 		"TITLE_PUBLIC": "Public",
 		"GET_MAILVELOPE": "Get Mailvelope browser add-on."

@@ -1,7 +1,7 @@
 import { koComputable } from 'External/ko';
 
 import { SettingsCapa } from 'Common/Globals';
-import { i18n, translateTrigger, relativeTime } from 'Common/Translator';
+import { i18n, translateTrigger, relativeTime, getNotification } from 'Common/Translator';
 
 import { AbstractViewSettings } from 'Knoin/AbstractViews';
 
@@ -14,6 +14,8 @@ import { showScreenPopup } from 'Knoin/Knoin';
 
 import { OpenPgpImportPopupView } from 'View/Popup/OpenPgpImport';
 import { OpenPgpGeneratePopupView } from 'View/Popup/OpenPgpGenerate';
+
+import Remote from 'Remote/User/Fetch';
 
 import { SMimeUserStore } from 'Stores/User/SMime';
 import { SMimeImportPopupView } from 'View/Popup/SMimeImport';
@@ -63,7 +65,30 @@ export class UserSettingsSecurity extends AbstractViewSettings {
 	}
 
 	importToOpenPGP() {
-		OpenPGPUserStore.loadBackupKeys();
+		// Not OpenPGPUserStore.loadBackupKeys(): that one is also run at startup
+		// and has to stay quiet. Pressing a button and getting nothing back, which
+		// is what it did here, is indistinguishable from a broken button.
+		const count = () => OpenPGPUserStore.privateKeys().length + OpenPGPUserStore.publicKeys().length,
+			before = count();
+
+		Remote.request('GetPGPKeys', async (iError, oData) => {
+			if (iError) {
+				alert(getNotification(iError, oData?.message));
+				return;
+			}
+
+			const keys = oData?.Result || [];
+			if (!keys.length) {
+				alert(i18n('SETTINGS_OPENPGP/IMPORT_NONE_FOUND'));
+				return;
+			}
+
+			await OpenPGPUserStore.importKeys(keys);
+			const added = count() - before;
+			alert(added
+				? i18n('SETTINGS_OPENPGP/IMPORT_ADDED', { COUNT: added })
+				: i18n('SETTINGS_OPENPGP/IMPORT_ALL_KNOWN', { COUNT: keys.length }));
+		});
 	}
 
 	importToSMime() {

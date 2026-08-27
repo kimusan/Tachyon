@@ -18,17 +18,27 @@ namespace Tachyon\Util\PGP;
 
 abstract class Keyservers
 {
+	/**
+	 * Tried in order, stopping at the first that answers with a key.
+	 *
+	 * keys.openpgp.org comes first because it is the privacy respecting one, but
+	 * it only serves an address to key mapping once the owner has confirmed that
+	 * address by mail. A key can sit on it and still 404 by email, which is why
+	 * lookups appeared broken with only this host enabled.
+	 *
+	 * Checked 2026-08-27 against a key known to be published. Dead or refusing,
+	 * left out rather than commented back in: keyring.debian.org replies 501,
+	 * attester.flowcrypt.com 301, zimmermann.mayfirst.org 404,
+	 * keys.mailvelope.com 404, and pool.sks-keyservers.net no longer resolves
+	 * since the SKS network was retired.
+	 *
+	 * Each host queried leaks the address being looked up, so the order also
+	 * puts the one that minimises that first.
+	 */
 	public static $hosts = [
-		'https://keys.openpgp.org'
-/*
-		'https://pgp.mit.edu',
-		'https://keyring.debian.org',
-		'https://attester.flowcrypt.com',
-		'https://zimmermann.mayfirst.org',
-		'https://pool.sks-keyservers.net',
-		'https://keys.mailvelope.com',
+		'https://keys.openpgp.org',
 		'https://keyserver.ubuntu.com',
-*/
+		'https://pgp.mit.edu'
 	];
 
 	private static function fetch(string $host, string $op, string $search, bool $fingerprint = false, bool $exact = false) : ?\Tachyon\Util\HTTP\Response

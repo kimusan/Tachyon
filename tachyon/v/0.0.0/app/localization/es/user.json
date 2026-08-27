@@ -601,6 +601,9 @@
     "BUTTON_IMPORT_KEY": "Importar llave",
     "BUTTON_GENERATE_KEY_PAIR": "Generar llaves",
     "IMPORT_FROM_SERVER": "Importar del servidor",
+    "IMPORT_NONE_FOUND": "No hay claves OpenPGP almacenadas en el servidor.",
+    "IMPORT_ADDED": "%COUNT% clave(s) importada(s).",
+    "IMPORT_ALL_KNOWN": "Las %COUNT% clave(s) del servidor ya están en su llavero.",
     "TITLE_PRIVATE": "Privado",
     "TITLE_PUBLIC": "Público",
     "GET_MAILVELOPE": "Obtener la extensión del navegador Mailvelope."
