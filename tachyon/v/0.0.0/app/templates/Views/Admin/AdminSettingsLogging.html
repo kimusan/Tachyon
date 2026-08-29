@@ -1,0 +1,103 @@
+<form class="form-horizontal" spellcheck="false">
+	<div class="legend" data-i18n="TAB_LOGS/LEGEND_LOGGING"></div>
+	<div class="control-group">
+		<div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: logsEnable, label: 'TAB_LOGS/LABEL_ENABLE' }
+			}"></div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: logsHidePasswords, label: 'TAB_LOGS/LABEL_HIDE_PASSWORDS' }
+			}"></div>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_LOGS/LABEL_LEVEL"></label>
+		<div data-bind="component: {
+			name: 'Select',
+			params: {
+				options: levelOptions,
+				value: logsLevel,
+				trigger: logsLevelTrigger,
+				optionsText: 'name',
+				optionsValue: 'id'
+			}
+		}"></div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_LOGS/LABEL_PATH"></label>
+		<div>
+			<input type="text" class="span6" autocomplete="off" autocorrect="off" autocapitalize="off"
+				data-bind="value: logsPath, saveTrigger: logsPathTrigger">
+			<span class="help-block" data-i18n="TAB_LOGS/HINT_PATH"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_LOGS/LABEL_FILENAME"></label>
+		<div>
+			<input type="text" class="span6" autocomplete="off" autocorrect="off" autocapitalize="off"
+				data-bind="value: logsFilename, saveTrigger: logsFilenameTrigger" placeholder="log-{date:Y-m-d}.txt">
+			<span class="help-block" data-i18n="TAB_LOGS/HINT_FILENAME"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_LOGS/LABEL_TIME_ZONE"></label>
+		<div>
+			<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
+				data-bind="value: logsTimeZone, saveTrigger: logsTimeZoneTrigger" placeholder="UTC">
+		</div>
+	</div>
+</form>
+<form class="form-horizontal" spellcheck="false">
+	<div class="legend" data-i18n="TAB_LOGS/LEGEND_AUTH_LOGGING"></div>
+	<div class="control-group">
+		<div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: logsAuthLogging, label: 'TAB_LOGS/LABEL_AUTH_LOGGING' }
+			}"></div>
+			<span class="help-block" data-i18n="TAB_LOGS/HINT_AUTH_LOGGING"></span>
+		</div>
+	</div>
+	<div data-bind="visible: logsAuthLogging">
+		<div class="control-group">
+			<label data-i18n="TAB_LOGS/LABEL_FILENAME"></label>
+			<div>
+				<input type="text" class="span6" autocomplete="off" autocorrect="off" autocapitalize="off"
+					data-bind="value: logsAuthLoggingFilename, saveTrigger: logsAuthLoggingFilenameTrigger">
+			</div>
+		</div>
+		<div class="control-group">
+			<label data-i18n="TAB_LOGS/LABEL_AUTH_FORMAT"></label>
+			<div>
+				<input type="text" class="span6" autocomplete="off" autocorrect="off" autocapitalize="off"
+					data-bind="value: logsAuthLoggingFormat, saveTrigger: logsAuthLoggingFormatTrigger">
+			</div>
+		</div>
+	</div>
+</form>
+<form class="form-horizontal" spellcheck="false">
+	<div class="legend" data-i18n="TAB_LOGS/LEGEND_DEBUG"></div>
+	<div class="control-group">
+		<div class="alert">
+			<div data-i18n="TAB_LOGS/HINT_DEBUG"></div>
+		</div>
+	</div>
+	<div class="control-group">
+		<div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: debugEnable, label: 'TAB_LOGS/LABEL_DEBUG_ENABLE' }
+			}"></div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: debugJavascript, label: 'TAB_LOGS/LABEL_DEBUG_JS' }
+			}"></div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: debugCss, label: 'TAB_LOGS/LABEL_DEBUG_CSS' }
+			}"></div>
+		</div>
+	</div>
+</form>

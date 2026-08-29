@@ -1,0 +1,125 @@
+<div class="row" data-bind="visible: !calendarSupported">
+	<div class="alert span8" style="margin-top: 10px;">
+		<h4 data-i18n="TAB_CALENDAR/ALERT_NOTICE"></h4>
+		<div data-i18n="[html]TAB_CALENDAR/HTML_ALERT_DOES_NOT_SUPPORTED"></div>
+	</div>
+</div>
+<form class="form-horizontal" spellcheck="false" data-bind="visible: calendarSupported">
+	<div class="legend" data-i18n="TAB_CALENDAR/LEGEND_CALENDAR"></div>
+	<div class="control-group">
+		<div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: calendarEnable, label: 'TAB_CALENDAR/LABEL_ENABLE_CALENDAR' }
+			}"></div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: calendarSync, label: 'TAB_CALENDAR/LABEL_ALLOW_SYNC' }
+			}"></div>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_CALENDAR/SYNC_INTERVAL"></label>
+		<div>
+			<input type="number" min="1" max="1440" step="1" class="span1" data-bind="textInput: calendarSyncInterval">
+			&nbsp;
+			<span data-bind="saveTrigger: calendarSyncIntervalTrigger"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_CALENDAR/MAX_RANGE_DAYS"></label>
+		<div>
+			<input type="number" min="1" max="3660" step="1" class="span1" data-bind="textInput: calendarMaxRangeDays">
+			&nbsp;
+			<span data-bind="saveTrigger: calendarMaxRangeDaysTrigger"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_CALENDAR/MAX_OCCURRENCES"></label>
+		<div>
+			<input type="number" min="1" max="100000" step="1" class="span1" data-bind="textInput: calendarMaxOccurrences">
+			&nbsp;
+			<span data-bind="saveTrigger: calendarMaxOccurrencesTrigger"></span>
+		</div>
+	</div>
+</form>
+<form class="form-horizontal" spellcheck="false" data-bind="visible: calendarSupported">
+	<div class="legend" data-i18n="TAB_CALENDAR/LEGEND_STORAGE"></div>
+	<div class="control-group">
+		<label data-i18n="TAB_CALENDAR/LABEL_STORAGE_TYPE"></label>
+		<div data-bind="component: {
+			name: 'Select',
+			params: {
+				options: calendarTypesOptions,
+				value: mainCalendarType,
+				trigger: calendarPdoTypeTrigger,
+				optionsText: 'name',
+				optionsValue: 'id'
+			}
+		}"></div>
+	</div>
+	<div data-bind="visible: 'sqlite' !== calendarPdoType()">
+		<div class="control-group">
+			<label data-i18n="TAB_CALENDAR/LABEL_STORAGE_DSN"></label>
+			<div>
+				<input type="text" class="span6" autocomplete="off" autocorrect="off" autocapitalize="off"
+					data-bind="value: calendarPdoDsn, saveTrigger: calendarPdoDsnTrigger" placeholder="mysql:host=127.0.0.1;port=3306;dbname=tachyon">
+			</div>
+		</div>
+		<div class="control-group">
+			<label data-i18n="TAB_CALENDAR/LABEL_STORAGE_USER"></label>
+			<div>
+				<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
+					data-bind="value: calendarPdoUser, saveTrigger: calendarPdoUserTrigger">
+			</div>
+		</div>
+		<div class="control-group">
+			<label data-i18n="TAB_CALENDAR/LABEL_STORAGE_PASSWORD"></label>
+			<div>
+				<input type="password" autocomplete="current-password" autocorrect="off" autocapitalize="off"
+					data-bind="value: calendarPdoPassword, saveTrigger: calendarPdoPasswordTrigger">
+			</div>
+		</div>
+
+		<div data-bind="visible: 'mysql' === calendarPdoType()">
+			<div class="control-group">
+				<label>SSL CA</label>
+				<div>
+					<textarea placeholder="PEM formatted" data-bind="value: calendarMySQLSSLCA, saveTrigger: calendarMySQLSSLCATrigger"></textarea>
+				</div>
+			</div>
+			<div class="control-group">
+				<label></label>
+				<div data-bind="component: {
+					name: 'Checkbox',
+					params: { value: calendarMySQLSSLVerify, label: 'VERIFY SERVER CERT' }
+				}"></div>
+			</div>
+			<div class="control-group">
+				<label>SSL CIPHER</label>
+				<div>
+					<input type="text" placeholder="HIGH" data-bind="value: calendarMySQLSSLCiphers, saveTrigger: calendarMySQLSSLCiphersTrigger">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-bind="visible: 'sqlite' === calendarPdoType()">
+		<div class="control-group">
+			<label></label>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: calendarSQLiteGlobal, label: 'TAB_CALENDAR/SQLITE_GLOBAL' }
+			}"></div>
+		</div>
+	</div>
+	<div data-bind="visible: calendarPdoType">
+		<div class="control-group">
+			<label></label>
+			<a class="btn" data-bind="command: testCalendarCommand, css: { 'btn-success': testCalendarSuccess, 'btn-danger': testCalendarError }">
+				<i class="icon-info" data-bind="css: {'icon-spinner': testing()}"></i>
+				<span data-i18n="GLOBAL/TEST"></span>
+			</a>
+		</div>
+	</div>
+	<div class="alert span8" data-bind="text: testCalendarErrorMessage, visible: '' !== testCalendarErrorMessage()"></div>
+</form>

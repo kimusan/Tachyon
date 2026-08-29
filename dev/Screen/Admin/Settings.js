@@ -6,10 +6,12 @@ import { AdminSettingsGeneral } from 'Settings/Admin/General';
 import { AdminSettingsDomains } from 'Settings/Admin/Domains';
 import { AdminSettingsLogin } from 'Settings/Admin/Login';
 import { AdminSettingsContacts } from 'Settings/Admin/Contacts';
+import { AdminSettingsCalendar } from 'Settings/Admin/Calendar';
 import { AdminSettingsSecurity } from 'Settings/Admin/Security';
 import { AdminSettingsPackages } from 'Settings/Admin/Packages';
 import { AdminSettingsAbout } from 'Settings/Admin/About';
 import { AdminSettingsBranding } from 'Settings/Admin/Branding';
+import { AdminSettingsLogging } from 'Settings/Admin/Logging';
 import { AdminSettingsConfig } from 'Settings/Admin/Config';
 
 import { MenuSettingsAdminView } from 'View/Admin/Settings/Menu';
@@ -25,8 +27,10 @@ export class SettingsAdminScreen extends AbstractSettingsScreen {
 			AdminSettingsLogin,
 			AdminSettingsBranding,
 			AdminSettingsContacts,
+			AdminSettingsCalendar,
 			AdminSettingsSecurity,
 			AdminSettingsPackages,
+			AdminSettingsLogging,
 			AdminSettingsConfig,
 			AdminSettingsAbout
 		].forEach((item, index) =>

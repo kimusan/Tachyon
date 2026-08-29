@@ -1,192 +1,238 @@
 {
-  "GLOBAL": {
-    "ADD": "Agregar",
-    "CLOSE": "Cerrar",
-    "SAVE": "Guardar",
-    "TEST": "Probar",
-    "UPDATE": "Actualizar",
-    "USERNAME": "Nombre de usuario",
-    "PASSWORD": "Contraseña",
-    "CANCEL": "Cancelar",
-    "SEARCH": "Buscar",
-    "YES": "Sí",
-    "NO": "No"
-  },
-  "LOGIN": {
-    "LABEL_LOGIN": "Ingresar",
-    "LABEL_TOTP": "Código TOTP",
-    "BUTTON_LOGIN": "Ingresar al panel de control"
-  },
-  "TOP_PANEL": {
-    "LABEL_ADMIN_PANEL": "Panel de Control"
-  },
-  "SETTINGS_LABELS": {
-    "GENERAL": "General",
-    "LOGIN": "Ingresar",
-    "BRANDING": "Personalización",
-    "CONTACTS": "Contactos",
-    "DOMAINS": "Dominios",
-    "SECURITY": "Seguridad",
-    "PACKAGES": "Extensiones",
-    "CONFIG": "Config",
-    "ABOUT": "Acerca"
-  },
-  "TAB_GENERAL": {
-    "LEGEND_INTERFACE": "Interfaz",
-    "LABEL_LANGUAGE": "Idioma",
-    "LABEL_LANGUAGE_ADMIN": "Idioma (Panel de Control)",
-    "LABEL_THEME": "Temas",
-    "LABEL_ALLOW_LANGUAGES_ON_SETTINGS": "Permitir selección del idioma",
-    "LABEL_ALLOW_THEMES_ON_SETTINGS": "Permitir personalización de la interfaz",
-    "LABEL_ALLOW_BACKGROUND_ON_SETTINGS": "Permitir cambiar el fondo de pantalla",
-    "LABEL_SHOW_THUMBNAILS": "Mostrar previsualización (adjuntos)",
-    "LEGEND_MAIN": "Principal",
-    "LABEL_ATTACHMENT_SIZE_LIMIT": "Tamaño máximo para adjuntos",
-    "LABEL_ALLOW_ADDITIONAL_ACCOUNTS": "Permitir cuentas adicionales",
-    "LABEL_ALLOW_IDENTITIES": "Permitir múltiples identidades",
-    "ALERT_DATA_ACCESS": "Se puede acceder a la carpeta de datos. Configure su servidor web para ocultarla del acceso externo. Lea más aquí:",
-    "ALERT_WARNING": "¡Atención!",
-    "HTML_ALERT_WEAK_PASSWORD": "Estas utilizando la contraseña por defecto.\n<br>\nDebido a razones de seguridad, debes\n<strong><a href=\"#/security\">cambiar</a></strong>\ntu contraseña inmediatamente.\n"
-  },
-  "TAB_LOGIN": {
-    "LEGEND_LOGIN_SCREEN": "Pantalla de Ingreso",
-    "LABEL_DEFAULT_DOMAIN": "Dominio por defecto",
-    "LABEL_DETERMINE_USER_DOMAIN": "Intentar encontrar el dominio del usuario",
-    "LABEL_ALLOW_LANGUAGES_ON_LOGIN": "Permitir la selección de idioma en la pantalla de ingreso",
-    "LABEL_DETERMINE_USER_LANGUAGE": "Intentar definir el idioma del usuari"
-  },
-  "TAB_BRANDING": {
-    "LEGEND_BRANDING": "Personalización",
-    "LABEL_PAGE_TITLE": "Título de la página",
-    "LABEL_LOADING_DESCRIPTION": "Descripción",
-    "LABEL_FAVICON_URL": "Favicon",
-    "BUTTON_DELETE_LOGO": "Eliminar logo",
-    "BUTTON_UPLOAD_LOGO": "Subir logo",
-    "LABEL_LOGIN_LOGO": "Logo",
-    "LABEL_NO_LOGO": "No hay logo configurado",
-    "LEGEND_LOGO": "Logo de inicio de sesión"
-  },
-  "TAB_CONTACTS": {
-    "LEGEND_CONTACTS": "Contactos",
-    "LEGEND_STORAGE": "Almacenamiento (PDO)",
-    "LABEL_ENABLE_CONTACTS": "Permitir contactos",
-    "LABEL_ALLOW_SYNC": "Permitir sincronización de contactos (servidor externo de CardDAV)",
-    "LABEL_STORAGE_TYPE": "Tip",
-    "LABEL_STORAGE_DSN": "Dsn",
-    "LABEL_STORAGE_USER": "Usuario",
-    "LABEL_STORAGE_PASSWORD": "Contraseña",
-    "SQLITE_GLOBAL": "Usar una base de datos global en lugar de una por cuenta",
-    "ALERT_NOTICE": "¡Advertencia!",
-    "SUGGESTIONS_LIMIT": "Límite de sugerencias",
-    "HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "No utilices este tipo de Base de Datos para un número grande de usuarios.",
-    "HTML_ALERT_DOES_NOT_SUPPORTED": "Tu sistema no soporta el uso de Contactos.\n<br>\nDebes instalar o habilitar el uso de <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> en tu servidor.\n",
-    "COMPOSE_LIMIT": "Número máximo de destinatarios desde una selección",
-    "BCC_LIMIT": "Recomendar Bcc por encima de este número de destinatarios"
-  },
-  "TAB_DOMAINS": {
-    "LEGEND_DOMAINS": "Dominios",
-    "BUTTON_ADD_DOMAIN": "Agregar dominio",
-    "BUTTON_ADD_ALIAS": "Agregar alias",
-    "DELETE_ARE_YOU_SURE": "¿Estás seguro?",
-    "HTML_DOMAINS_HELPER": "Lista de los dominios de correo al que se permite ingresar.\n<br>\nHaz click en el nombre de un dominio para modificarlo.\n"
-  },
-  "TAB_SECURITY": {
-    "LEGEND_SECURITY": "Seguridad",
-    "LABEL_USE_IMAGE_PROXY": "Utilizar un proxy local para mostrar imágenes externas",
-    "LABEL_AUTO_VERIFY": "Verificar las firmas automáticamente",
-    "LABEL_SHOW_PHP_INFO": "Mostrar información de PHP",
-    "LEGEND_ADMIN_PANEL_ACCESS_CREDENTIALS": "Credenciales de Acceso al panel de control",
-    "LABEL_CURRENT_PASSWORD": "Contraseña actual",
-    "HINT_CURRENT_PASSWORD": "Introduzca su contraseña actual para guardar cualquier cambio en esta pestaña.",
-    "LABEL_NEW_PASSWORD": "Nueva contraseña",
-    "LABEL_REPEAT_PASSWORD": "Re-ingresar",
-    "LABEL_TOTP_CONFIRM": "Código de confirmación",
-    "HINT_TOTP_CONFIRM": "Escanee el código de arriba con su aplicación de autenticación e introduzca los seis dígitos que muestra. Sin esto, la verificación en dos pasos no se activa.",
-    "LABEL_REQUIRE_VERIFICATION": "Requerir verificación del certificado SSL",
-    "CRYPTO": "Crypto",
-    "LABEL_ALLOW_SELF_SIGNED": "Permitir certificados auto-firmados"
-  },
-  "TAB_PACKAGES": {
-    "LABEL_ENABLE_PLUGINS": "Habilitar extensiones",
-    "LEGEND_AVAILABLE_FOR_UPDATE": "Actualización disponible",
-    "LEGEND_AVAILABLE_FOR_INSTALLATION": "Instalación disponible",
-    "LEGEND_INSTALLED_PACKAGES": "Extensiones instaladas",
-    "ALERT_CANNOT_ACCESS_REPOSITORY": "No se puede acceder al repositorio en estos momentos."
-  },
-  "TAB_ABOUT": {
-    "LEGEND_ABOUT": "Acerca",
-    "LABEL_TAG_HINT": "Moderno, simple y rápido cliente web de correo electrónico",
-    "LABEL_ALL_RIGHTS_RESERVED": "Todos los Derechos Reservados.",
-    "HINT_READ_CHANGE_LOG": "Revisa la lista de cambios antes de actualizar.",
-    "HINT_IS_UP_TO_DATE": "Tachyon está actualizado.",
-    "HTML_NEW_VERSION": "Nueva versión ( <b>%VERSION%</b> ) está disponible.",
-    "LABEL_UPDATING": "Actualizando",
-    "LABEL_CHECKING": "Buscando actualizaciones",
-    "BUTTON_RELEASES": "Releases"
-  },
-  "POPUPS_DOMAIN_ALIAS": {
-    "TITLE_ADD_DOMAIN_ALIAS": "Agregar alias",
-    "LABEL_ALIAS": "Alias",
-    "LABEL_DOMAIN": "Dominio"
-  },
-  "POPUPS_DOMAIN": {
-    "TITLE_ADD_DOMAIN": "Agregar dominio",
-    "TITLE_ADD_DOMAIN_WITH_NAME": "Agregar \"%NAME%\" como dominio",
-    "TITLE_EDIT_DOMAIN": "Editar \"&NAME&\"",
-    "LABEL_NAME": "Nombre",
-    "NAME_HELPER": "wildcards soportados",
-    "LABEL_SERVER": "Servidor",
-    "LABEL_PORT": "Puerto",
-    "LABEL_SECURE": "Seguridad",
-    "TIMEOUT": "Timeout",
-    "DISABLE_CAPABILITIES": "Desactivar capacidades",
-    "LIMITS": "Limits",
-    "FOLDERS": "Folders",
-    "MESSAGES": "Messages",
-    "SECURE_OPTION_NONE": "Ninguno",
-    "LABEL_ALLOW_SIEVE_SCRIPTS": "Permitir scripts de filtro",
-    "LABEL_USE_SHORT_LOGIN": "Inicio de Sesión corto",
-    "LABEL_LOWERCASE_LOGIN": "Inicio de sesión en minúsculas (sin distinguir mayúsculas)",
-    "LABEL_USE_AUTH": "Usar autenticación",
-    "LABEL_SET_SENDER": "Usar inicio de sesión como remitente",
-    "LABEL_AUTH_PLAIN_LINE": "Forzar el inicio de sesión con una sola orden AUTH PLAIN",
-    "LABEL_USE_PHP_MAIL": "Utilizar la función mail() de PHP",
-    "BUTTON_WHITE_LIST": "Lista blanca",
-    "NEW_DOMAIN_DESC": "Esta configuración de Dominio le permitirá trabajar con direcciones de correo tipo @<strong>%NAME%</strong>.",
-    "WHITE_LIST_ALERT": "Lista de dominios con que los usuarios pueden ingresar.\nUse un espacio como delimitador.\n",
-    "VALID_SPAM_HEADERS": "Cabeceras de SPAM válidas",
-    "VALID_VIRUS_HEADERS": "Cabeceras de virus válidas"
-  },
-  "POPUPS_PLUGIN": {
-    "TITLE_PLUGIN": "Extensión",
-    "DESC_NOTHING_TO_CONFIGURE": "Nada para configurar"
-  },
-  "POPUPS_ASK": {
-    "DESC_WANT_CLOSE_THIS_WINDOW": "¿Estás seguro de que deseas cerrar esta ventana?"
-  },
-  "POPUPS_LANGUAGES": {
-    "TITLE_LANGUAGES": "Seleccionar idioma"
-  },
-  "HINTS": {
-    "BETA": "beta",
-    "WARNING": "¡Atención!"
-  },
-  "ERRORS": {
-    "DOMAIN_ALREADY_EXISTS": "El Dominio ya existe",
-    "UNKNOWN_ERROR": "Error desconocido"
-  },
-  "NOTIFICATIONS": {
-    "RequestError": "La solicitud falló",
-    "RequestAborted": "La solicitud se canceló",
-    "RequestTimeout": "La solicitud agotó el tiempo de espera",
-    "InvalidToken": "Token inválido",
-    "AuthError": "Autenticación fallida",
-    "DomainAlreadyExists": "El Dominio ya existe",
-    "CantSavePluginSettings": "No se pudieron guardar las configuraciones",
-    "CantInstallPackage": "No se ha podido instalar el extensión",
-    "CantDeletePackage": "No se ha podido eliminar el extensión",
-    "InvalidPluginPackage": "El paquete de extensión no válido",
-    "UnsupportedPluginPackage": "El paquete del extensión es incompatible",
-    "UnknownError": "Error desconocido"
-  }
+	"GLOBAL": {
+		"ADD": "Agregar",
+		"CLOSE": "Cerrar",
+		"SAVE": "Guardar",
+		"TEST": "Probar",
+		"UPDATE": "Actualizar",
+		"USERNAME": "Nombre de usuario",
+		"PASSWORD": "Contraseña",
+		"CANCEL": "Cancelar",
+		"SEARCH": "Buscar",
+		"YES": "Sí",
+		"NO": "No"
+	},
+	"LOGIN": {
+		"LABEL_LOGIN": "Ingresar",
+		"LABEL_TOTP": "Código TOTP",
+		"BUTTON_LOGIN": "Ingresar al panel de control"
+	},
+	"TOP_PANEL": {
+		"LABEL_ADMIN_PANEL": "Panel de Control"
+	},
+	"SETTINGS_LABELS": {
+		"GENERAL": "General",
+		"LOGIN": "Ingresar",
+		"BRANDING": "Personalización",
+		"CONTACTS": "Contactos",
+		"DOMAINS": "Dominios",
+		"SECURITY": "Seguridad",
+		"PACKAGES": "Extensiones",
+		"CONFIG": "Config",
+		"ABOUT": "Acerca",
+		"CALENDAR": "Calendario",
+		"LOGGING": "Registro"
+	},
+	"TAB_GENERAL": {
+		"LEGEND_INTERFACE": "Interfaz",
+		"LABEL_LANGUAGE": "Idioma",
+		"LABEL_LANGUAGE_ADMIN": "Idioma (Panel de Control)",
+		"LABEL_THEME": "Temas",
+		"LABEL_ALLOW_LANGUAGES_ON_SETTINGS": "Permitir selección del idioma",
+		"LABEL_ALLOW_THEMES_ON_SETTINGS": "Permitir personalización de la interfaz",
+		"LABEL_ALLOW_BACKGROUND_ON_SETTINGS": "Permitir cambiar el fondo de pantalla",
+		"LABEL_SHOW_THUMBNAILS": "Mostrar previsualización (adjuntos)",
+		"LEGEND_MAIN": "Principal",
+		"LABEL_ATTACHMENT_SIZE_LIMIT": "Tamaño máximo para adjuntos",
+		"LABEL_ALLOW_ADDITIONAL_ACCOUNTS": "Permitir cuentas adicionales",
+		"LABEL_ALLOW_IDENTITIES": "Permitir múltiples identidades",
+		"ALERT_DATA_ACCESS": "Se puede acceder a la carpeta de datos. Configure su servidor web para ocultarla del acceso externo. Lea más aquí:",
+		"ALERT_WARNING": "¡Atención!",
+		"HTML_ALERT_WEAK_PASSWORD": "Estas utilizando la contraseña por defecto.\n<br>\nDebido a razones de seguridad, debes\n<strong><a href=\"#/security\">cambiar</a></strong>\ntu contraseña inmediatamente.\n"
+	},
+	"TAB_LOGIN": {
+		"LEGEND_LOGIN_SCREEN": "Pantalla de Ingreso",
+		"LABEL_DEFAULT_DOMAIN": "Dominio por defecto",
+		"LABEL_DETERMINE_USER_DOMAIN": "Intentar encontrar el dominio del usuario",
+		"LABEL_ALLOW_LANGUAGES_ON_LOGIN": "Permitir la selección de idioma en la pantalla de ingreso",
+		"LABEL_DETERMINE_USER_LANGUAGE": "Intentar definir el idioma del usuari"
+	},
+	"TAB_BRANDING": {
+		"LEGEND_BRANDING": "Personalización",
+		"LABEL_PAGE_TITLE": "Título de la página",
+		"LABEL_LOADING_DESCRIPTION": "Descripción",
+		"LABEL_FAVICON_URL": "Favicon",
+		"BUTTON_DELETE_LOGO": "Eliminar logo",
+		"BUTTON_UPLOAD_LOGO": "Subir logo",
+		"LABEL_LOGIN_LOGO": "Logo",
+		"LABEL_NO_LOGO": "No hay logo configurado",
+		"LEGEND_LOGO": "Logo de inicio de sesión"
+	},
+	"TAB_CONTACTS": {
+		"LEGEND_CONTACTS": "Contactos",
+		"LEGEND_STORAGE": "Almacenamiento (PDO)",
+		"LABEL_ENABLE_CONTACTS": "Permitir contactos",
+		"LABEL_ALLOW_SYNC": "Permitir sincronización de contactos (servidor externo de CardDAV)",
+		"LABEL_STORAGE_TYPE": "Tip",
+		"LABEL_STORAGE_DSN": "Dsn",
+		"LABEL_STORAGE_USER": "Usuario",
+		"LABEL_STORAGE_PASSWORD": "Contraseña",
+		"SQLITE_GLOBAL": "Usar una base de datos global en lugar de una por cuenta",
+		"ALERT_NOTICE": "¡Advertencia!",
+		"SUGGESTIONS_LIMIT": "Límite de sugerencias",
+		"HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "No utilices este tipo de Base de Datos para un número grande de usuarios.",
+		"HTML_ALERT_DOES_NOT_SUPPORTED": "Tu sistema no soporta el uso de Contactos.\n<br>\nDebes instalar o habilitar el uso de <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> en tu servidor.\n",
+		"COMPOSE_LIMIT": "Número máximo de destinatarios desde una selección",
+		"BCC_LIMIT": "Recomendar Bcc por encima de este número de destinatarios"
+	},
+	"TAB_DOMAINS": {
+		"LEGEND_DOMAINS": "Dominios",
+		"BUTTON_ADD_DOMAIN": "Agregar dominio",
+		"BUTTON_ADD_ALIAS": "Agregar alias",
+		"DELETE_ARE_YOU_SURE": "¿Estás seguro?",
+		"HTML_DOMAINS_HELPER": "Lista de los dominios de correo al que se permite ingresar.\n<br>\nHaz click en el nombre de un dominio para modificarlo.\n"
+	},
+	"TAB_SECURITY": {
+		"LEGEND_SECURITY": "Seguridad",
+		"LABEL_USE_IMAGE_PROXY": "Utilizar un proxy local para mostrar imágenes externas",
+		"LABEL_AUTO_VERIFY": "Verificar las firmas automáticamente",
+		"LABEL_SHOW_PHP_INFO": "Mostrar información de PHP",
+		"LEGEND_ADMIN_PANEL_ACCESS_CREDENTIALS": "Credenciales de Acceso al panel de control",
+		"LABEL_CURRENT_PASSWORD": "Contraseña actual",
+		"HINT_CURRENT_PASSWORD": "Introduzca su contraseña actual para guardar cualquier cambio en esta pestaña.",
+		"LABEL_NEW_PASSWORD": "Nueva contraseña",
+		"LABEL_REPEAT_PASSWORD": "Re-ingresar",
+		"LABEL_TOTP_CONFIRM": "Código de confirmación",
+		"HINT_TOTP_CONFIRM": "Escanee el código de arriba con su aplicación de autenticación e introduzca los seis dígitos que muestra. Sin esto, la verificación en dos pasos no se activa.",
+		"LABEL_REQUIRE_VERIFICATION": "Requerir verificación del certificado SSL",
+		"CRYPTO": "Crypto",
+		"LABEL_ALLOW_SELF_SIGNED": "Permitir certificados auto-firmados"
+	},
+	"TAB_PACKAGES": {
+		"LABEL_ENABLE_PLUGINS": "Habilitar extensiones",
+		"LEGEND_AVAILABLE_FOR_UPDATE": "Actualización disponible",
+		"LEGEND_AVAILABLE_FOR_INSTALLATION": "Instalación disponible",
+		"LEGEND_INSTALLED_PACKAGES": "Extensiones instaladas",
+		"ALERT_CANNOT_ACCESS_REPOSITORY": "No se puede acceder al repositorio en estos momentos."
+	},
+	"TAB_ABOUT": {
+		"LEGEND_ABOUT": "Acerca",
+		"LABEL_TAG_HINT": "Moderno, simple y rápido cliente web de correo electrónico",
+		"LABEL_ALL_RIGHTS_RESERVED": "Todos los Derechos Reservados.",
+		"HINT_READ_CHANGE_LOG": "Revisa la lista de cambios antes de actualizar.",
+		"HINT_IS_UP_TO_DATE": "Tachyon está actualizado.",
+		"HTML_NEW_VERSION": "Nueva versión ( <b>%VERSION%</b> ) está disponible.",
+		"LABEL_UPDATING": "Actualizando",
+		"LABEL_CHECKING": "Buscando actualizaciones",
+		"BUTTON_RELEASES": "Releases"
+	},
+	"POPUPS_DOMAIN_ALIAS": {
+		"TITLE_ADD_DOMAIN_ALIAS": "Agregar alias",
+		"LABEL_ALIAS": "Alias",
+		"LABEL_DOMAIN": "Dominio"
+	},
+	"POPUPS_DOMAIN": {
+		"TITLE_ADD_DOMAIN": "Agregar dominio",
+		"TITLE_ADD_DOMAIN_WITH_NAME": "Agregar \"%NAME%\" como dominio",
+		"TITLE_EDIT_DOMAIN": "Editar \"&NAME&\"",
+		"LABEL_NAME": "Nombre",
+		"NAME_HELPER": "wildcards soportados",
+		"LABEL_SERVER": "Servidor",
+		"LABEL_PORT": "Puerto",
+		"LABEL_SECURE": "Seguridad",
+		"TIMEOUT": "Timeout",
+		"DISABLE_CAPABILITIES": "Desactivar capacidades",
+		"LIMITS": "Limits",
+		"FOLDERS": "Folders",
+		"MESSAGES": "Messages",
+		"SECURE_OPTION_NONE": "Ninguno",
+		"LABEL_ALLOW_SIEVE_SCRIPTS": "Permitir scripts de filtro",
+		"LABEL_USE_SHORT_LOGIN": "Inicio de Sesión corto",
+		"LABEL_LOWERCASE_LOGIN": "Inicio de sesión en minúsculas (sin distinguir mayúsculas)",
+		"LABEL_USE_AUTH": "Usar autenticación",
+		"LABEL_SET_SENDER": "Usar inicio de sesión como remitente",
+		"LABEL_AUTH_PLAIN_LINE": "Forzar el inicio de sesión con una sola orden AUTH PLAIN",
+		"LABEL_USE_PHP_MAIL": "Utilizar la función mail() de PHP",
+		"BUTTON_WHITE_LIST": "Lista blanca",
+		"NEW_DOMAIN_DESC": "Esta configuración de Dominio le permitirá trabajar con direcciones de correo tipo @<strong>%NAME%</strong>.",
+		"WHITE_LIST_ALERT": "Lista de dominios con que los usuarios pueden ingresar.\nUse un espacio como delimitador.\n",
+		"VALID_SPAM_HEADERS": "Cabeceras de SPAM válidas",
+		"VALID_VIRUS_HEADERS": "Cabeceras de virus válidas"
+	},
+	"POPUPS_PLUGIN": {
+		"TITLE_PLUGIN": "Extensión",
+		"DESC_NOTHING_TO_CONFIGURE": "Nada para configurar"
+	},
+	"POPUPS_ASK": {
+		"DESC_WANT_CLOSE_THIS_WINDOW": "¿Estás seguro de que deseas cerrar esta ventana?"
+	},
+	"POPUPS_LANGUAGES": {
+		"TITLE_LANGUAGES": "Seleccionar idioma"
+	},
+	"HINTS": {
+		"BETA": "beta",
+		"WARNING": "¡Atención!"
+	},
+	"ERRORS": {
+		"DOMAIN_ALREADY_EXISTS": "El Dominio ya existe",
+		"UNKNOWN_ERROR": "Error desconocido"
+	},
+	"NOTIFICATIONS": {
+		"RequestError": "La solicitud falló",
+		"RequestAborted": "La solicitud se canceló",
+		"RequestTimeout": "La solicitud agotó el tiempo de espera",
+		"InvalidToken": "Token inválido",
+		"AuthError": "Autenticación fallida",
+		"DomainAlreadyExists": "El Dominio ya existe",
+		"CantSavePluginSettings": "No se pudieron guardar las configuraciones",
+		"CantInstallPackage": "No se ha podido instalar el extensión",
+		"CantDeletePackage": "No se ha podido eliminar el extensión",
+		"InvalidPluginPackage": "El paquete de extensión no válido",
+		"UnsupportedPluginPackage": "El paquete del extensión es incompatible",
+		"UnknownError": "Error desconocido"
+	},
+	"TAB_CALENDAR": {
+		"ALERT_NOTICE": "Aviso",
+		"HTML_ALERT_DOES_NOT_SUPPORTED": "Su instalación de PHP no tiene controladores PDO, así que el calendario no puede guardar nada.",
+		"LEGEND_CALENDAR": "Calendario",
+		"LABEL_ENABLE_CALENDAR": "Activar el calendario",
+		"LABEL_ALLOW_SYNC": "Permitir a los usuarios conectar un servidor CalDAV",
+		"SYNC_INTERVAL": "Intervalo de sincronización (minutos)",
+		"MAX_RANGE_DAYS": "Ventana máxima (días)",
+		"MAX_OCCURRENCES": "Repeticiones por evento recurrente",
+		"LEGEND_STORAGE": "Almacenamiento",
+		"LABEL_STORAGE_TYPE": "Tipo",
+		"LABEL_STORAGE_DSN": "DSN",
+		"LABEL_STORAGE_USER": "Usuario",
+		"LABEL_STORAGE_PASSWORD": "Contraseña",
+		"SQLITE_GLOBAL": "Una base de datos compartida para todos en lugar de una por usuario"
+	},
+	"TAB_LOGS": {
+		"LEGEND_LOGGING": "Registro",
+		"LABEL_ENABLE": "Activar el registro",
+		"LABEL_HIDE_PASSWORDS": "Ocultar las contraseñas en el registro",
+		"LABEL_LEVEL": "Nivel",
+		"LABEL_PATH": "Ruta",
+		"HINT_PATH": "Si se deja vacío, los registros se escriben en el directorio de datos.",
+		"LABEL_FILENAME": "Nombre de archivo",
+		"HINT_FILENAME": "Se sustituyen patrones como {date:Y-m-d}, {user:email} y {user:domain}. Use \"syslog\" o \"stderr\" para escribir allí.",
+		"LABEL_TIME_ZONE": "Zona horaria",
+		"LEGEND_AUTH_LOGGING": "Autenticación fallida",
+		"LABEL_AUTH_LOGGING": "Registrar los inicios de sesión fallidos en un archivo aparte",
+		"HINT_AUTH_LOGGING": "Pensado para fail2ban y similares.",
+		"LABEL_AUTH_FORMAT": "Formato",
+		"LEGEND_DEBUG": "Depuración",
+		"HINT_DEBUG": "Solo para desarrollo. El registro de depuración es extenso y guarda mucho más de lo que necesita el uso diario.",
+		"LABEL_DEBUG_ENABLE": "Activar el modo de depuración",
+		"LABEL_DEBUG_JS": "Servir JavaScript sin minificar",
+		"LABEL_DEBUG_CSS": "Servir CSS sin minificar",
+		"LEVEL_EMERGENCY": "Emergencia",
+		"LEVEL_ALERT": "Alerta",
+		"LEVEL_CRITICAL": "Crítico",
+		"LEVEL_ERROR": "Error",
+		"LEVEL_WARNING": "Advertencia",
+		"LEVEL_NOTICE": "Aviso",
+		"LEVEL_INFO": "Informativo",
+		"LEVEL_DEBUG": "Depuración"
+	}
 }

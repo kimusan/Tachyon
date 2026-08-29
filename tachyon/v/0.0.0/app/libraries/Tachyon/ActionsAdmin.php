@@ -89,6 +89,35 @@ class ActionsAdmin extends Actions
 			return Providers\AddressBook\PdoAddressBook::validPdoType($sType);
 		});
 
+		$this->setConfigFromParams($oConfig, 'calendarEnable', 'calendar', 'enable', 'bool');
+		$this->setConfigFromParams($oConfig, 'calendarSync', 'calendar', 'allow_sync', 'bool');
+		$this->setConfigFromParams($oConfig, 'calendarSyncInterval', 'calendar', 'sync_interval', 'int');
+		$this->setConfigFromParams($oConfig, 'calendarPdoDsn', 'calendar', 'pdo_dsn', 'string');
+		$this->setConfigFromParams($oConfig, 'calendarPdoUser', 'calendar', 'pdo_user', 'string');
+		$this->setConfigFromParams($oConfig, 'calendarPdoPassword', 'calendar', 'pdo_password', 'dummy');
+		$this->setConfigFromParams($oConfig, 'calendarMySQLSSLCA', 'calendar', 'mysql_ssl_ca', 'string');
+		$this->setConfigFromParams($oConfig, 'calendarMySQLSSLVerify', 'calendar', 'mysql_ssl_verify', 'bool');
+		$this->setConfigFromParams($oConfig, 'calendarMySQLSSLCiphers', 'calendar', 'mysql_ssl_ciphers', 'string');
+		$this->setConfigFromParams($oConfig, 'calendarSQLiteGlobal', 'calendar', 'sqlite_global', 'bool');
+		$this->setConfigFromParams($oConfig, 'calendarMaxRangeDays', 'calendar', 'max_range_days', 'int');
+		$this->setConfigFromParams($oConfig, 'calendarMaxOccurrences', 'calendar', 'max_occurrences', 'int');
+		$this->setConfigFromParams($oConfig, 'calendarPdoType', 'calendar', 'type', 'string', function ($sType) use ($self) {
+			return Providers\Calendar\PdoCalendar::validPdoType($sType);
+		});
+
+		$this->setConfigFromParams($oConfig, 'logsEnable', 'logs', 'enable', 'bool');
+		$this->setConfigFromParams($oConfig, 'logsPath', 'logs', 'path', 'string');
+		$this->setConfigFromParams($oConfig, 'logsFilename', 'logs', 'filename', 'string');
+		$this->setConfigFromParams($oConfig, 'logsLevel', 'logs', 'level', 'int');
+		$this->setConfigFromParams($oConfig, 'logsTimeZone', 'logs', 'time_zone', 'string');
+		$this->setConfigFromParams($oConfig, 'logsHidePasswords', 'logs', 'hide_passwords', 'bool');
+		$this->setConfigFromParams($oConfig, 'logsAuthLogging', 'logs', 'auth_logging', 'bool');
+		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFilename', 'logs', 'auth_logging_filename', 'string');
+		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFormat', 'logs', 'auth_logging_format', 'string');
+		$this->setConfigFromParams($oConfig, 'debugEnable', 'debug', 'enable', 'bool');
+		$this->setConfigFromParams($oConfig, 'debugJavascript', 'debug', 'javascript', 'bool');
+		$this->setConfigFromParams($oConfig, 'debugCss', 'debug', 'css', 'bool');
+
 		$this->setConfigFromParams($oConfig, 'CapaAdditionalAccounts', 'webmail', 'allow_additional_accounts', 'bool');
 		$this->setConfigFromParams($oConfig, 'CapaIdentities', 'webmail', 'allow_additional_identities', 'bool');
 		$this->setConfigFromParams($oConfig, 'CapaAttachmentThumbnails', 'interface', 'show_attachment_thumbnail', 'bool');
@@ -227,6 +256,37 @@ class ActionsAdmin extends Actions
 			$sTestMessage = $AddressBook->Test();
 		} catch (\Throwable $e) {
 			\Tachyon\Util\LOG::error('AddressBook', $e->getMessage()."\n".$e->getTraceAsString());
+			$sTestMessage = $e->getMessage();
+		}
+
+		return $this->DefaultResponse(array(
+			'Result' => '' === $sTestMessage,
+			'Message' => \MailSo\Base\Utils::Utf8Clear($sTestMessage)
+		));
+	}
+
+	public function DoAdminCalendarTest() : array
+	{
+		$this->IsAdminLoggined();
+
+		$oConfig = $this->Config();
+		$this->setConfigFromParams($oConfig, 'PdoDsn', 'calendar', 'pdo_dsn', 'string');
+		$this->setConfigFromParams($oConfig, 'PdoUser', 'calendar', 'pdo_user', 'string');
+		$this->setConfigFromParams($oConfig, 'PdoPassword', 'calendar', 'pdo_password', 'dummy');
+		$this->setConfigFromParams($oConfig, 'PdoType', 'calendar', 'type', 'string', function ($sType) {
+			return Providers\Calendar\PdoCalendar::validPdoType($sType);
+		});
+		$this->setConfigFromParams($oConfig, 'MySQLSSLCA', 'calendar', 'mysql_ssl_ca', 'string');
+		$this->setConfigFromParams($oConfig, 'MySQLSSLVerify', 'calendar', 'mysql_ssl_verify', 'bool');
+		$this->setConfigFromParams($oConfig, 'MySQLSSLCiphers', 'calendar', 'mysql_ssl_ciphers', 'string');
+		$this->setConfigFromParams($oConfig, 'SQLiteGlobal', 'calendar', 'sqlite_global', 'bool');
+
+		$sTestMessage = '';
+		try {
+			$oCalendar = new Providers\Calendar(new Providers\Calendar\PdoCalendar());
+			$sTestMessage = $oCalendar->Test();
+		} catch (\Throwable $e) {
+			\Tachyon\Util\Log::error('Calendar', $e->getMessage()."\n".$e->getTraceAsString());
 			$sTestMessage = $e->getMessage();
 		}
 
@@ -535,6 +595,33 @@ class ActionsAdmin extends Actions
 			$aResult['contactsSuggestionsLimit'] = (int)$oConfig->Get('contacts', 'suggestions_limit', 20);
 			$aResult['contactsComposeLimit'] = (int)$oConfig->Get('contacts', 'compose_recipients_limit', 100);
 			$aResult['contactsBccLimit'] = (int)$oConfig->Get('contacts', 'bcc_recommend_limit', 20);
+
+			$aResult['calendarEnable'] = (bool)$oConfig->Get('calendar', 'enable', false);
+			$aResult['calendarSync'] = (bool)$oConfig->Get('calendar', 'allow_sync', true);
+			$aResult['calendarSyncInterval'] = (int)$oConfig->Get('calendar', 'sync_interval', 20);
+			$aResult['calendarPdoType'] = Providers\Calendar\PdoCalendar::validPdoType($oConfig->Get('calendar', 'type', 'sqlite'));
+			$aResult['calendarPdoDsn'] = (string)$oConfig->Get('calendar', 'pdo_dsn', '');
+			$aResult['calendarPdoUser'] = (string)$oConfig->Get('calendar', 'pdo_user', '');
+			$aResult['calendarPdoPassword'] = static::APP_DUMMY;
+			$aResult['calendarMySQLSSLCA'] = (string)$oConfig->Get('calendar', 'mysql_ssl_ca', '');
+			$aResult['calendarMySQLSSLVerify'] = !!$oConfig->Get('calendar', 'mysql_ssl_verify', true);
+			$aResult['calendarMySQLSSLCiphers'] = (string)$oConfig->Get('calendar', 'mysql_ssl_ciphers', '');
+			$aResult['calendarSQLiteGlobal'] = !!$oConfig->Get('calendar', 'sqlite_global', false);
+			$aResult['calendarMaxRangeDays'] = (int)$oConfig->Get('calendar', 'max_range_days', 400);
+			$aResult['calendarMaxOccurrences'] = (int)$oConfig->Get('calendar', 'max_occurrences', 1000);
+
+			$aResult['logsEnable'] = (bool)$oConfig->Get('logs', 'enable', false);
+			$aResult['logsPath'] = (string)$oConfig->Get('logs', 'path', '');
+			$aResult['logsFilename'] = (string)$oConfig->Get('logs', 'filename', '');
+			$aResult['logsLevel'] = (int)$oConfig->Get('logs', 'level', 4);
+			$aResult['logsTimeZone'] = (string)$oConfig->Get('logs', 'time_zone', 'UTC');
+			$aResult['logsHidePasswords'] = !!$oConfig->Get('logs', 'hide_passwords', true);
+			$aResult['logsAuthLogging'] = !!$oConfig->Get('logs', 'auth_logging', false);
+			$aResult['logsAuthLoggingFilename'] = (string)$oConfig->Get('logs', 'auth_logging_filename', '');
+			$aResult['logsAuthLoggingFormat'] = (string)$oConfig->Get('logs', 'auth_logging_format', '');
+			$aResult['debugEnable'] = (bool)$oConfig->Get('debug', 'enable', false);
+			$aResult['debugJavascript'] = !!$oConfig->Get('debug', 'javascript', false);
+			$aResult['debugCss'] = !!$oConfig->Get('debug', 'css', false);
 
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
 			$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');

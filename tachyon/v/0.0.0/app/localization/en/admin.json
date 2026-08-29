@@ -29,7 +29,9 @@
 		"SECURITY": "Security",
 		"PACKAGES": "Extensions",
 		"CONFIG": "Config",
-		"ABOUT": "About"
+		"ABOUT": "About",
+		"CALENDAR": "Calendar",
+		"LOGGING": "Logging"
 	},
 	"TAB_GENERAL": {
 		"LEGEND_INTERFACE": "Interface",
@@ -46,7 +48,7 @@
 		"LABEL_ALLOW_IDENTITIES": "Allow multiple identities",
 		"ALERT_DATA_ACCESS": "Data folder is accessible. Please configure your web server to hide the data folder from external access. Read more here:",
 		"ALERT_WARNING": "Warning!",
-		"HTML_ALERT_WEAK_PASSWORD": "You are using the default admin passphrase.\n<br>\nFor security reasons please\n<strong><a href=\"#\/security\">change<\/a><\/strong>\npassphrase to something else now.\n"
+		"HTML_ALERT_WEAK_PASSWORD": "You are using the default admin passphrase.\n<br>\nFor security reasons please\n<strong><a href=\"#/security\">change</a></strong>\npassphrase to something else now.\n"
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Login Screen",
@@ -81,7 +83,7 @@
 		"COMPOSE_LIMIT": "Maximum recipients from a selection",
 		"BCC_LIMIT": "Recommend Bcc above this many recipients",
 		"HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "Don't use this database type with a large number of active users.",
-		"HTML_ALERT_DOES_NOT_SUPPORTED": "Your system doesn't support contacts.\n<br>\nYou need to install or enable <strong>PDO (SQLite \/ MySQL \/ PostgreSQL)<\/strong> extension on your server.\n"
+		"HTML_ALERT_DOES_NOT_SUPPORTED": "Your system doesn't support contacts.\n<br>\nYou need to install or enable <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> extension on your server.\n"
 	},
 	"TAB_DOMAINS": {
 		"LEGEND_DOMAINS": "Domains",
@@ -119,7 +121,7 @@
 		"LABEL_ALL_RIGHTS_RESERVED": "All Rights Reserved.",
 		"HINT_READ_CHANGE_LOG": "Please read the change log before updating.",
 		"HINT_IS_UP_TO_DATE": "Tachyon is up to date.",
-		"HTML_NEW_VERSION": "New <b>%VERSION%<\/b> version is available.",
+		"HTML_NEW_VERSION": "New <b>%VERSION%</b> version is available.",
 		"LABEL_UPDATING": "Updating",
 		"LABEL_CHECKING": "Checking for updates",
 		"BUTTON_RELEASES": "Releases"
@@ -152,7 +154,7 @@
 		"LABEL_AUTH_PLAIN_LINE": "Force single command AUTH PLAIN login",
 		"LABEL_USE_PHP_MAIL": "Use php mail() function",
 		"BUTTON_WHITE_LIST": "White List",
-		"NEW_DOMAIN_DESC": "This domain configuration will allow you to work with <strong>%NAME%<\/strong> email addresses.",
+		"NEW_DOMAIN_DESC": "This domain configuration will allow you to work with <strong>%NAME%</strong> email addresses.",
 		"WHITE_LIST_ALERT": "List of domain users webmail is allowed to access.\nUse a space as delimiter.\n",
 		"VALID_SPAM_HEADERS": "Valid SPAM headers",
 		"VALID_VIRUS_HEADERS": "Valid virus headers"
@@ -188,5 +190,49 @@
 		"InvalidPluginPackage": "Invalid extension package",
 		"UnsupportedPluginPackage": "Unsupported extension package",
 		"UnknownError": "Unknown error"
+	},
+	"TAB_CALENDAR": {
+		"ALERT_NOTICE": "Notice",
+		"HTML_ALERT_DOES_NOT_SUPPORTED": "Your PHP installation has no PDO drivers, so the calendar cannot store anything.",
+		"LEGEND_CALENDAR": "Calendar",
+		"LABEL_ENABLE_CALENDAR": "Enable the calendar",
+		"LABEL_ALLOW_SYNC": "Allow users to connect a CalDAV server",
+		"SYNC_INTERVAL": "Sync interval (minutes)",
+		"MAX_RANGE_DAYS": "Largest window (days)",
+		"MAX_OCCURRENCES": "Occurrences per recurring event",
+		"LEGEND_STORAGE": "Storage",
+		"LABEL_STORAGE_TYPE": "Type",
+		"LABEL_STORAGE_DSN": "DSN",
+		"LABEL_STORAGE_USER": "User",
+		"LABEL_STORAGE_PASSWORD": "Password",
+		"SQLITE_GLOBAL": "One shared database for everyone instead of one per user"
+	},
+	"TAB_LOGS": {
+		"LEGEND_LOGGING": "Logging",
+		"LABEL_ENABLE": "Enable logging",
+		"LABEL_HIDE_PASSWORDS": "Hide passwords in the log",
+		"LABEL_LEVEL": "Level",
+		"LABEL_PATH": "Path",
+		"HINT_PATH": "Left empty, logs are written to the data directory.",
+		"LABEL_FILENAME": "Filename",
+		"HINT_FILENAME": "Patterns such as {date:Y-m-d}, {user:email} and {user:domain} are replaced. Use \"syslog\" or \"stderr\" to write there instead.",
+		"LABEL_TIME_ZONE": "Time zone",
+		"LEGEND_AUTH_LOGGING": "Failed authentication",
+		"LABEL_AUTH_LOGGING": "Log failed logins to a separate file",
+		"HINT_AUTH_LOGGING": "Intended for fail2ban and similar.",
+		"LABEL_AUTH_FORMAT": "Format",
+		"LEGEND_DEBUG": "Debug",
+		"HINT_DEBUG": "For development only. Debug logging is verbose and records far more than day to day operation needs.",
+		"LABEL_DEBUG_ENABLE": "Enable debug mode",
+		"LABEL_DEBUG_JS": "Serve unminified JavaScript",
+		"LABEL_DEBUG_CSS": "Serve unminified CSS",
+		"LEVEL_EMERGENCY": "Emergency",
+		"LEVEL_ALERT": "Alert",
+		"LEVEL_CRITICAL": "Critical",
+		"LEVEL_ERROR": "Error",
+		"LEVEL_WARNING": "Warning",
+		"LEVEL_NOTICE": "Notice",
+		"LEVEL_INFO": "Informational",
+		"LEVEL_DEBUG": "Debug"
 	}
 }
