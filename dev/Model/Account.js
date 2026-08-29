@@ -2,6 +2,7 @@ import { AbstractModel } from 'Knoin/AbstractModel';
 import { addObservablesTo } from 'External/ko';
 import Remote from 'Remote/User/Fetch';
 import { SettingsUserStore } from 'Stores/User/Settings';
+import { IdentityUserStore } from 'Stores/User/Identity';
 
 export class AccountModel extends AbstractModel {
 	/**
@@ -29,7 +30,13 @@ export class AccountModel extends AbstractModel {
 	}
 
 	label() {
-		return this.name || IDN.toUnicode(this.email);
+		// Additional accounts are given a name when they are added, but the one
+		// you log in with never had anywhere to put one, so it could only ever
+		// show as a bare address. Its login identity already carries the display
+		// name the user chose, so use that rather than asking for it twice.
+		return this.name
+			|| (this.isAdditional() ? '' : IdentityUserStore.main()?.name())
+			|| IDN.toUnicode(this.email);
 	}
 
 	/**
