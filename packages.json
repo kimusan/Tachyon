@@ -44,16 +44,16 @@
     {
         "author": "Tachyon",
         "category": "Contacts",
-        "description": "Show graphic of sender in message and messages list (supports BIMI, Gravatar, favicon and identicon, Contacts is still TODO)",
-        "file": "https://github.com/kimusan/Tachyon/releases/latest/download/avatars-1.22.tgz",
+        "description": "Show graphic of sender in message and messages list (supports contact photos, BIMI, Gravatar, favicon and identicon)",
+        "file": "https://github.com/kimusan/Tachyon/releases/latest/download/avatars-1.25.tgz",
         "id": "avatars",
         "license": "MIT",
         "name": "Avatars",
-        "release": "2025-03-10",
+        "release": "2026-08-29",
         "required": "2.33.0",
         "type": "plugin",
         "url": "https://github.com/kimusan/Tachyon",
-        "version": "1.22"
+        "version": "1.25"
     },
     {
         "author": "Tachyon",
