@@ -37,7 +37,10 @@ export class UserSettingsAccounts /*extends AbstractViewSettings*/ {
 	}
 
 	editAccount(account) {
-		if (account?.isAdditional()) {
+		// Any account, including the one you log in with. That guard was the last
+		// thing keeping the first row unclickable after it had been given the
+		// class and the popup taught to handle it.
+		if (account) {
 			showScreenPopup(AccountPopupView, [account]);
 		}
 	}
