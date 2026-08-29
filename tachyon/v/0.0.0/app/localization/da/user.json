@@ -242,7 +242,6 @@
 		"TAGS_PLACEHOLDER": "Tilføj et mærke",
     "BUTTON_SHARE_ALL": "Alle",
     "BUTTON_SYNC": "Synkronisering (CardDAV)",
-    "SYNC_SKIPPED": "Synkronisering færdig, men %COUNT% element(er) kunne ikke gemmes. Se loggen for detaljer.",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send til alle kontaktens e-mailadresser",
     "SELECT_ALL": "Vælg alle på denne side",
     "SELECT_PAGE": "Vælg denne side",
@@ -258,6 +257,7 @@
     "COMPOSE_SKIPPED": "%USED% af %TOTAL% valgte kontakter havde en e-mailadresse. De øvrige blev udeladt.",
     "COMPOSE_NONE_USABLE": "Ingen af de %TOTAL% valgte kontakter har en e-mailadresse.",
     "GROUP_NO_MEMBERS": "%NAME% har ingen medlemmer med en e-mailadresse.",
+    "SYNC_SKIPPED": "Synkronisering færdig, men %COUNT% kontakt(er) kunne ikke importeres. Se loggen for detaljer.",
     "BUTTON_DELETE_LOCAL": "Slet lokale kontakter",
     "SYNCED_CONTACT": "Synkroniseret med den eksterne adressebog",
     "CONFIRM_DELETE_LOCAL": "Slet alle lokalt oprettede kontakter? Kontakter synkroniseret fra den eksterne adressebog er markeret og bevares."
@@ -698,6 +698,7 @@
     "BUTTON_TODAY": "I dag",
     "BUTTON_SYNC": "Synkronisér kalendere",
     "VIEW_MONTH": "Måned",
+    "SYNC_SKIPPED": "Synkronisering færdig, men %COUNT% element(er) kunne ikke gemmes. Se loggen for detaljer.",
     "VIEW_WEEK": "Uge",
     "VIEW_DAY": "Dag",
     "VIEW_LIST": "Liste",

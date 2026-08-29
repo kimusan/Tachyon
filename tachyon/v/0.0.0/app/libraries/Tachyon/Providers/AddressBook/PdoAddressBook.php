@@ -12,6 +12,18 @@ class PdoAddressBook
 	extends \Tachyon\Pdo\Base
 	implements AddressBookInterface, \Tachyon\Providers\Suggestions\IGroupSuggestions
 {
+	/** Contacts the last Sync() could not import */
+	private int $iSyncSkipped = 0;
+
+	/**
+	 * Reported so a sync that dropped a contact does not look identical to one
+	 * that imported everything.
+	 */
+	public function SyncSkipped() : int
+	{
+		return $this->iSyncSkipped;
+	}
+
 	use CardDAV;
 
 	private $iUserID = 0;
@@ -136,6 +148,8 @@ class PdoAddressBook
 			\Tachyon\Util\Log::warning('PdoAddressBook', 'Sync() invalid $iUserID');
 			return false;
 		}
+
+		$this->iSyncSkipped = 0;
 
 		try {
 			$oClient = $this->getDavClient();
@@ -302,6 +316,10 @@ class PdoAddressBook
 					$this->ContactSave($oContact);
 					unset($oContact);
 				} else {
+					// Counted, not just logged. A contact that fails to parse is
+					// skipped here while Sync() still returns true, so the sync
+					// reported success and the contact simply never appeared.
+					++$this->iSyncSkipped;
 					\Tachyon\Util\Log::error('PdoAddressBook', "Import remote contact {$sKey} failed");
 				}
 			}

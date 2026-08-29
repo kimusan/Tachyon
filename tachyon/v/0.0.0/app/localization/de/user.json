@@ -242,7 +242,6 @@
 		"TAGS_PLACEHOLDER": "Schlagwort hinzufügen",
     "BUTTON_SHARE_ALL": "Jeder",
     "BUTTON_SYNC": "Synchronisierung (CardDAV)",
-    "SYNC_SKIPPED": "Synchronisierung abgeschlossen, aber %COUNT% Element(e) konnten nicht gespeichert werden. Details im Protokoll.",
     "SEND_TO_ALL_CONTACT_EMAILS": "An alle E-Mail-Adressen schreiben",
     "SELECT_ALL": "Alle auf dieser Seite auswählen",
     "SELECT_PAGE": "Diese Seite auswählen",
@@ -258,6 +257,7 @@
     "COMPOSE_SKIPPED": "%USED% von %TOTAL% ausgewählten Kontakten hatten eine E-Mail-Adresse. Die übrigen wurden ausgelassen.",
     "COMPOSE_NONE_USABLE": "Keiner der %TOTAL% ausgewählten Kontakte hat eine E-Mail-Adresse.",
     "GROUP_NO_MEMBERS": "%NAME% hat keine Mitglieder mit einer E-Mail-Adresse.",
+    "SYNC_SKIPPED": "Synchronisierung abgeschlossen, aber %COUNT% Kontakt(e) konnten nicht importiert werden. Details im Protokoll.",
     "BUTTON_DELETE_LOCAL": "Lokale Kontakte löschen",
     "SYNCED_CONTACT": "Mit dem entfernten Adressbuch synchronisiert",
     "CONFIRM_DELETE_LOCAL": "Alle lokal erstellten Kontakte löschen? Aus dem entfernten Adressbuch synchronisierte Kontakte sind markiert und bleiben erhalten."
@@ -698,6 +698,7 @@
     "BUTTON_TODAY": "Heute",
     "BUTTON_SYNC": "Kalender synchronisieren",
     "VIEW_MONTH": "Monat",
+    "SYNC_SKIPPED": "Synchronisierung abgeschlossen, aber %COUNT% Element(e) konnten nicht gespeichert werden. Details im Protokoll.",
     "VIEW_WEEK": "Woche",
     "VIEW_DAY": "Tag",
     "VIEW_LIST": "Liste",

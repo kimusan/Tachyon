@@ -27,6 +27,16 @@ class AddressBook extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->Sync() : false;
 	}
 
+	/**
+	 * Contacts the last Sync() could not import. Not on AddressBookInterface, so
+	 * a plugin driver written before this keeps working and reports nothing.
+	 */
+	public function SyncSkipped() : int
+	{
+		return ($this->oDriver && \method_exists($this->oDriver, 'SyncSkipped'))
+			? $this->oDriver->SyncSkipped() : 0;
+	}
+
 	public function Export(string $sType = 'vcf') : bool
 	{
 		return $this->IsActive() ? $this->oDriver->Export($sType) : false;

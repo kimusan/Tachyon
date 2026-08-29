@@ -286,6 +286,7 @@
     "COMPOSE_SKIPPED": "%USED% des %TOTAL% contacts sélectionnés avaient une adresse e-mail. Les autres ont été ignorés.",
     "COMPOSE_NONE_USABLE": "Aucun des %TOTAL% contacts sélectionnés n'a d'adresse e-mail.",
     "GROUP_NO_MEMBERS": "%NAME% n'a aucun membre avec une adresse e-mail.",
+    "SYNC_SKIPPED": "Synchronisation terminée, mais %COUNT% contact(s) n'ont pas pu être importés. Voir le journal.",
     "BUTTON_DELETE_LOCAL": "Supprimer les contacts locaux",
     "SYNCED_CONTACT": "Synchronisé avec le carnet d'adresses distant",
     "CONFIRM_DELETE_LOCAL": "Supprimer tous les contacts créés localement ? Les contacts synchronisés depuis le carnet d'adresses distant sont marqués et seront conservés."

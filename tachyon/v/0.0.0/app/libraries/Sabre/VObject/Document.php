@@ -189,9 +189,17 @@ abstract class Document extends Component
         if (is_null($class)) {
             // If a VALUE parameter is supplied, we should use that.
             if (isset($parameters['VALUE'])) {
-                $class = $this->getClassNameForPropertyValue($parameters['VALUE']);
+                // Apple writes BDAY;VALUE=DATE,X-APPLE-OMIT-YEAR=1604 with a
+                // comma where the spec wants a semicolon, so the parser hands
+                // over a multi-valued VALUE parameter. Only the first part names
+                // the value type. Passing the array straight on was a TypeError
+                // under PHP 8, which dropped the whole contact.
+                $valueParam = is_array($parameters['VALUE'])
+                    ? (string) reset($parameters['VALUE'])
+                    : (string) $parameters['VALUE'];
+                $class = $this->getClassNameForPropertyValue($valueParam);
                 if (is_null($class)) {
-                    throw new InvalidDataException('Unsupported VALUE parameter for '.$name.' property. You supplied "'.$parameters['VALUE'].'"');
+                    throw new InvalidDataException('Unsupported VALUE parameter for '.$name.' property. You supplied "'.$valueParam.'"');
                 }
             } else {
                 $class = $this->getClassNameForPropertyName($name);

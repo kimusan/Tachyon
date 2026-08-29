@@ -117,7 +117,10 @@ trait Contacts
 		if (!$oAddressBookProvider->Sync()) {
 			throw new ClientException(\Tachyon\Notifications::ContactsSyncError, null, 'AddressBookProvider->Sync() failed');
 		}
-		return $this->TrueResponse();
+		// Reported rather than a bare true. A contact that fails to parse is
+		// skipped and the sync still succeeded, so the only evidence was a line
+		// in the debug log and a contact that quietly never appeared.
+		return $this->DefaultResponse(['Result' => true, 'Skipped' => $oAddressBookProvider->SyncSkipped()]);
 	}
 
 	/**

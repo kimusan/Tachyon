@@ -405,8 +405,15 @@ export class ContactsPopupView extends AbstractViewPopup {
 	}
 
 	syncCommand() {
-		ContactUserStore.sync(iError => {
-			iError && alert(getNotification(iError));
+		ContactUserStore.sync((iError, line) => {
+			if (iError) {
+				alert(getNotification(iError));
+			} else {
+				// A contact that could not be parsed is skipped while the sync
+				// still succeeds. Saying so beats a contact quietly not arriving.
+				const skipped = line?.Result?.Skipped || 0;
+				skipped && alert(i18n('CONTACTS/SYNC_SKIPPED', { COUNT: skipped }));
+			}
 			this.reloadContactList(true);
 		});
 	}

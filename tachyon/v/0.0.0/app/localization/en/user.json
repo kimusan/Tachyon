@@ -286,6 +286,7 @@
 		"COMPOSE_SKIPPED": "%USED% of %TOTAL% selected contacts had an email address. The others were left out.",
 		"COMPOSE_NONE_USABLE": "None of the %TOTAL% selected contacts has an email address.",
 		"GROUP_NO_MEMBERS": "%NAME% has no members with an email address.",
+		"SYNC_SKIPPED": "Sync finished, but %COUNT% contact(s) could not be imported. See the log for details.",
 		"BUTTON_DELETE_LOCAL": "Delete local contacts",
 		"SYNCED_CONTACT": "Synced with the remote address book",
 		"CONFIRM_DELETE_LOCAL": "Delete all locally created contacts? Contacts synced from the remote address book are marked and will be kept."

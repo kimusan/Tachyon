@@ -242,7 +242,6 @@
 		"TAGS_PLACEHOLDER": "Añadir una etiqueta",
     "BUTTON_SHARE_ALL": "Todos",
     "BUTTON_SYNC": "Sincronización (CardDAV)",
-    "SYNC_SKIPPED": "Sincronización terminada, pero no se pudieron guardar %COUNT% elemento(s). Consulte el registro.",
     "SEND_TO_ALL_CONTACT_EMAILS": "Enviar a todos los correos de contactos",
     "SELECT_ALL": "Seleccionar todo en esta página",
     "SELECT_PAGE": "Seleccionar esta página",
@@ -258,6 +257,7 @@
     "COMPOSE_SKIPPED": "%USED% de %TOTAL% contactos seleccionados tenían dirección de correo. Los demás se han omitido.",
     "COMPOSE_NONE_USABLE": "Ninguno de los %TOTAL% contactos seleccionados tiene dirección de correo.",
     "GROUP_NO_MEMBERS": "%NAME% no tiene miembros con dirección de correo.",
+    "SYNC_SKIPPED": "Sincronización terminada, pero no se pudieron importar %COUNT% contacto(s). Consulte el registro.",
     "BUTTON_DELETE_LOCAL": "Eliminar los contactos locales",
     "SYNCED_CONTACT": "Sincronizado con la libreta de direcciones remota",
     "CONFIRM_DELETE_LOCAL": "¿Eliminar todos los contactos creados localmente? Los contactos sincronizados desde la libreta de direcciones remota están marcados y se conservarán."
@@ -698,6 +698,7 @@
     "BUTTON_TODAY": "Hoy",
     "BUTTON_SYNC": "Sincronizar calendarios",
     "VIEW_MONTH": "Mes",
+    "SYNC_SKIPPED": "Sincronización terminada, pero no se pudieron guardar %COUNT% elemento(s). Consulte el registro.",
     "VIEW_WEEK": "Semana",
     "VIEW_DAY": "Día",
     "VIEW_LIST": "Lista",
