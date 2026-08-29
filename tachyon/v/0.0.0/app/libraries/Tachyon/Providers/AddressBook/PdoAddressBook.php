@@ -1053,29 +1053,55 @@ class PdoAddressBook
 	/**
 	 * @param mixed $mID
 	 */
+	/**
+	 * The contact holding this address, with its vCard.
+	 *
+	 * This used to select DISTINCT id_contact and hand that statement to
+	 * getContactsFromPDO, which reads id_contact_str, changed, etag and jcard.
+	 * None of those were in the result, so the Contact came back with a null
+	 * vCard and anything wanting one, such as the avatar photo lookup, saw
+	 * nothing. It now selects the same columns GetContactByID does.
+	 *
+	 * Matching is on the EMAIL property rather than a LIKE over the whole jCard
+	 * blob, which also matched an address that merely appeared in a note.
+	 */
 	public function GetContactByEmail(string $sEmail) : ?Contact
 	{
+		if (1 > $this->iUserID || !\strlen(\trim($sEmail))) {
+			return null;
+		}
+
 		$sLowerSearch = $this->specialConvertSearchValueLower($sEmail);
 
 		$sSql = 'SELECT
-			DISTINCT id_contact
-		FROM rainloop_ab_properties
-		WHERE id_user = :id_user
-		 AND prop_type = '.PropertyType::JCARD.'
-		 AND ('.
-			'prop_value LIKE :search ESCAPE \'=\''
-				. (\strlen($sLowerSearch) ? ' OR (prop_value_lower <> \'\' AND prop_value_lower LIKE :search_lower ESCAPE \'=\')' : '').
-			')';
+			c.id_contact,
+			c.id_contact_str,
+			c.display,
+			c.changed,
+			c.etag,
+			p.prop_value as jcard
+		FROM rainloop_ab_contacts AS c
+		LEFT JOIN rainloop_ab_properties AS p ON (p.id_contact = c.id_contact AND p.prop_type = :prop_type)
+		WHERE c.id_user = :id_user AND c.deleted = 0
+		 AND EXISTS (SELECT 1 FROM rainloop_ab_properties AS pe
+			WHERE pe.id_contact = c.id_contact AND pe.id_user = :id_user
+			 AND pe.prop_type = :email_type
+			 AND (pe.prop_value LIKE :search ESCAPE \'=\''
+			 . (\strlen($sLowerSearch)
+				? ' OR (pe.prop_value_lower <> \'\' AND pe.prop_value_lower LIKE :search_lower ESCAPE \'=\')'
+				: '')
+			 . '))
+		LIMIT 1';
+
 		$aParams = array(
 			':id_user' => array($this->iUserID, \PDO::PARAM_INT),
+			':prop_type' => array(PropertyType::JCARD, \PDO::PARAM_INT),
+			':email_type' => array(PropertyType::EMAIl, \PDO::PARAM_INT),
 			':search' => array($this->specialConvertSearchValue($sEmail, '='), \PDO::PARAM_STR)
 		);
 		if (\strlen($sLowerSearch)) {
 			$aParams[':search_lower'] = array($sLowerSearch, \PDO::PARAM_STR);
 		}
-
-		$oContact = null;
-		$iIdContact = 0;
 
 		$aContacts = $this->getContactsFromPDO(
 			$this->prepareAndExecute($sSql, $aParams)
