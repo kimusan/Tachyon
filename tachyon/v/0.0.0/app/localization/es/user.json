@@ -314,6 +314,7 @@
     "TITLE_LANGUAGES": "Seleccionar idioma"
   },
   "POPUPS_ADD_ACCOUNT": {
+  	"HINT_MAIN_NAME": "Déjelo vacío para usar el nombre de su identidad, o su dirección si no ha definido ninguno.",
     "TITLE_ADD_ACCOUNT": "Añadir cuenta",
     "BUTTON_ADD_ACCOUNT": "Añadir",
     "TITLE_UPDATE_ACCOUNT": "Actualizar cuenta"

@@ -2,6 +2,9 @@ import { addObservablesTo } from 'External/ko';
 import { getNotification } from 'Common/Translator';
 import { loadAccountsAndIdentities } from 'Common/UtilsUser';
 import { AccountUserStore } from 'Stores/User/Account';
+import { IdentityUserStore } from 'Stores/User/Identity';
+import { Settings } from 'Common/Globals';
+import { addComputablesTo } from 'External/ko';
 
 import Remote from 'Remote/User/Fetch';
 
@@ -25,6 +28,12 @@ export class AccountPopupView extends AbstractViewPopup {
 			submitError: '',
 			submitErrorAdditional: ''
 		});
+
+		addComputablesTo(this, {
+			// Shown as the placeholder, so it is obvious that clearing the field
+			// falls back to this rather than to nothing
+			defaultName: () => (this.isMain() && IdentityUserStore.main()?.name()) || this.email()
+		});
 	}
 
 	hideError() {
@@ -35,9 +44,15 @@ export class AccountPopupView extends AbstractViewPopup {
 		if (this.isMain()) {
 			// Not an account in the accounts list, so there is nothing for
 			// AccountSetup to update. The name is a setting of its own.
-			Remote.saveSettings(null, { MainAccountName: this.name().trim() });
+			const name = this.name().trim();
+			Remote.saveSettings(null, { MainAccountName: name });
+			// SettingsGet reads a snapshot taken at page load, and
+			// loadAccountsAndIdentities rebuilds the main account from it. Without
+			// this the old name came back the next time anything reloaded the
+			// list, which made clearing the field look like it had not worked.
+			Settings.set('mainAccountName', name);
 			AccountUserStore.forEach(item =>
-				item && !item.isAdditional() && (item.name = this.name().trim())
+				item && !item.isAdditional() && (item.name = name)
 			);
 			AccountUserStore.valueHasMutated();
 			this.close();

@@ -343,6 +343,7 @@
     "TITLE_LANGUAGES": "Choisir la langue"
   },
   "POPUPS_ADD_ACCOUNT": {
+  	"HINT_MAIN_NAME": "Laissez vide pour utiliser le nom de votre identité, ou votre adresse si vous n'en avez pas défini.",
     "TITLE_ADD_ACCOUNT": "Ajouter un compte",
     "BUTTON_ADD_ACCOUNT": "Ajouter",
     "TITLE_UPDATE_ACCOUNT": "Mettre à jour le compte"

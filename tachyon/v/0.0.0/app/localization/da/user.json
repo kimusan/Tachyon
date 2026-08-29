@@ -314,6 +314,7 @@
     "TITLE_LANGUAGES": "Vælg sprog"
   },
   "POPUPS_ADD_ACCOUNT": {
+  	"HINT_MAIN_NAME": "Lad feltet stå tomt for at bruge dit identitetsnavn, eller din adresse hvis du ikke har angivet et.",
     "TITLE_ADD_ACCOUNT": "Tilføj konto",
     "BUTTON_ADD_ACCOUNT": "Tilføj",
     "TITLE_UPDATE_ACCOUNT": "Opdater konto"

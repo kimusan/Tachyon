@@ -345,7 +345,8 @@
 	"POPUPS_ADD_ACCOUNT": {
 		"TITLE_ADD_ACCOUNT": "Add Account",
 		"BUTTON_ADD_ACCOUNT": "Add",
-		"TITLE_UPDATE_ACCOUNT": "Edit Account"
+		"TITLE_UPDATE_ACCOUNT": "Edit Account",
+		"HINT_MAIN_NAME": "Leave empty to use your identity name, or your address if you have not set one."
 	},
 	"POPUPS_IDENTITY": {
 		"TITLE_ADD_IDENTITY": "Add Identity",
