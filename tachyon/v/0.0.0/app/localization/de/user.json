@@ -257,6 +257,7 @@
     "COMPOSE_SKIPPED": "%USED% von %TOTAL% ausgewählten Kontakten hatten eine E-Mail-Adresse. Die übrigen wurden ausgelassen.",
     "COMPOSE_NONE_USABLE": "Keiner der %TOTAL% ausgewählten Kontakte hat eine E-Mail-Adresse.",
     "GROUP_NO_MEMBERS": "%NAME% hat keine Mitglieder mit einer E-Mail-Adresse.",
+    "SAVED": "Gespeichert",
     "SYNC_SKIPPED": "Synchronisierung abgeschlossen, aber %COUNT% Kontakt(e) konnten nicht importiert werden. Details im Protokoll.",
     "BUTTON_DELETE_LOCAL": "Lokale Kontakte löschen",
     "SYNCED_CONTACT": "Mit dem entfernten Adressbuch synchronisiert",

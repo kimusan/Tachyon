@@ -364,6 +364,8 @@
 					<span data-i18n="CONTACTS/BUTTON_CREATE_CONTACT" data-bind="visible: !id()"></span>
 					<span data-i18n="GLOBAL/SAVE" data-bind="visible: id"></span>
 				</button>
+				<span class="contact-saved-notice" data-i18n="CONTACTS/SAVED"
+					data-bind="visible: $root.savedNotice"></span>
 			</div>
 			<div class="btn-group dropdown" data-bind="visible: !readOnly(), registerBootstrapDropdown: true">
 				<a id="button-add-prop-dropdown-id" href="#" class="btn dropdown-toggle" data-i18n="CONTACTS/ADD_MENU_LABEL"></a>

@@ -257,6 +257,7 @@
     "COMPOSE_SKIPPED": "%USED% af %TOTAL% valgte kontakter havde en e-mailadresse. De øvrige blev udeladt.",
     "COMPOSE_NONE_USABLE": "Ingen af de %TOTAL% valgte kontakter har en e-mailadresse.",
     "GROUP_NO_MEMBERS": "%NAME% har ingen medlemmer med en e-mailadresse.",
+    "SAVED": "Gemt",
     "SYNC_SKIPPED": "Synkronisering færdig, men %COUNT% kontakt(er) kunne ikke importeres. Se loggen for detaljer.",
     "BUTTON_DELETE_LOCAL": "Slet lokale kontakter",
     "SYNCED_CONTACT": "Synkroniseret med den eksterne adressebog",

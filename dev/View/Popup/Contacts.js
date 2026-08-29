@@ -45,6 +45,7 @@ export class ContactsPopupView extends AbstractViewPopup {
 			contactsPage: 1,
 
 			isSaving: false,
+			savedNotice: false,
 
 			contact: null,
 
@@ -388,15 +389,24 @@ export class ContactsPopupView extends AbstractViewPopup {
 					if (iError) {
 						alert(oData?.message || getNotification(iError));
 					} else if (oData.Result.ResultID) {
-						if (contact.id()) {
-							contact.id(oData.Result.ResultID);
-							contact.jCard = JSON.parse(data.jCard);
-						} else {
+						// The id and the jCard are taken whether or not the contact
+						// had one. The branches used to be the other way round, so a
+						// newly created contact kept an empty id and a stale jCard:
+						// the guard above stayed true and pressing Save again
+						// created a second copy instead of updating the first.
+						const bWasNew = !contact.id();
+						contact.id(oData.Result.ResultID);
+						contact.jCard = JSON.parse(data.jCard);
+						if (bWasNew) {
 							this.reloadContactList(); // TODO: remove when e-contact-foreach is dynamic
 						}
 						// A group invented here should be suggested on the next
 						// contact, not only after the popup is reopened
 						this.loadCategories();
+						// Saving a contact produced no visible change at all, so
+						// there was nothing to tell it apart from a dead button
+						this.savedNotice(true);
+						setTimeout(() => this.savedNotice(false), 2000);
 					}
 					this.isSaving(false);
 				}, data
