@@ -10,7 +10,7 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'Avatars',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '1.23',
+		VERSION  = '1.24',
 		RELEASE  = '2026-08-29',
 		REQUIRED = '2.33.0',
 		CATEGORY = 'Contacts',
@@ -338,25 +338,41 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		try
 		{
 			$oActions = \Tachyon\Api::Actions();
-			$oAccount = $oActions->getAccountFromToken();
+			// false: this runs from a part hook, and a missing token should be a
+			// quiet miss rather than an exception caught below
+			$oAccount = $oActions->getAccountFromToken(false);
 			if (!$oAccount) {
+				\Tachyon\Util\Log::debug('Avatar', 'contact photo: no account from token');
 				return null;
 			}
 			$oAddressBook = $oActions->AddressBookProvider($oAccount);
 			if (!$oAddressBook || !$oAddressBook->IsActive()) {
+				\Tachyon\Util\Log::debug('Avatar', 'contact photo: no active address book');
 				return null;
 			}
 			$oContact = $oAddressBook->GetContactByEmail($sEmail);
-			$oVCard = $oContact ? $oContact->vCard : null;
-			if (!$oVCard || !isset($oVCard->PHOTO)) {
+			if (!$oContact) {
+				\Tachyon\Util\Log::debug('Avatar', "contact photo: no contact for {$sEmail}");
 				return null;
 			}
-			if (\preg_match('#^data:(image/[a-z.+-]+);base64,(.+)$#i', \trim((string) $oVCard->PHOTO), $aMatch)) {
+			$oVCard = $oContact->vCard;
+			if (!$oVCard) {
+				\Tachyon\Util\Log::debug('Avatar', "contact photo: contact for {$sEmail} has no vCard");
+				return null;
+			}
+			if (!isset($oVCard->PHOTO)) {
+				\Tachyon\Util\Log::debug('Avatar', "contact photo: no PHOTO on the contact for {$sEmail}");
+				return null;
+			}
+			$sPhoto = \trim((string) $oVCard->PHOTO);
+			if (\preg_match('#^data:(image/[a-z.+-]+);base64,(.+)$#i', $sPhoto, $aMatch)) {
 				$sBinary = \base64_decode($aMatch[2], true);
 				if ($sBinary) {
 					return [$aMatch[1], $sBinary];
 				}
 			}
+			\Tachyon\Util\Log::debug('Avatar',
+				'contact photo: PHOTO is not a base64 data URI, starts: ' . \substr($sPhoto, 0, 40));
 		}
 		catch (\Throwable $oException)
 		{
