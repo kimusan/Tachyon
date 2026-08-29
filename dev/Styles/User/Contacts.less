@@ -305,3 +305,38 @@
 	margin-left: .6em;
 	opacity: .75;
 }
+
+#V-PopupsContacts {
+	.contact-photo {
+		align-items: center;
+		display: flex;
+		gap: .6em;
+
+		img {
+			border-radius: 4px;
+			height: 64px;
+			object-fit: cover;
+			width: 64px;
+		}
+
+		input[type="file"] {
+			font-size: .85em;
+			max-width: 220px;
+		}
+	}
+
+	/* Each address is its own block, so the parts do not run together when a
+	   contact has both a home and a work one */
+	.adr-group {
+		border-top: 1px solid var(--border-color, #ddd);
+		padding-top: .5em;
+
+		&:first-child {
+			border-top: 0;
+		}
+
+		select {
+			margin-bottom: .3em;
+		}
+	}
+}

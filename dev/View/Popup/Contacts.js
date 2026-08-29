@@ -1,6 +1,6 @@
 import { addObservablesTo, addComputablesTo } from 'External/ko';
 import { ComposeType } from 'Common/EnumsUser';
-import { registerShortcut, SettingsGet, elementById } from 'Common/Globals';
+import { registerShortcut, SettingsGet, elementById, createElement } from 'Common/Globals';
 import { arrayLength, pInt } from 'Common/Utils';
 import { download, computedPaginatorHelper, showMessageComposer } from 'Common/UtilsUser';
 
@@ -362,6 +362,35 @@ export class ContactsPopupView extends AbstractViewPopup {
 		// Knockout swallows the event unless the handler returns true, which
 		// would stop the box accepting any text at all
 		return true;
+	}
+
+	/**
+	 * A contact photo is stored inside the vCard, so it travels with every sync
+	 * and every export. Anything straight off a phone camera would be megabytes
+	 * of base64, so it is scaled to fit a square and re-encoded as JPEG first.
+	 */
+	choosePhoto(contact, event) {
+		const file = event.target.files?.[0];
+		if (!file) {
+			return;
+		}
+		const MAX = 256, reader = new FileReader();
+		reader.onload = () => {
+			const img = new Image();
+			img.onload = () => {
+				const scale = Math.min(1, MAX / Math.max(img.width, img.height)),
+					canvas = createElement('canvas');
+				canvas.width = Math.round(img.width * scale);
+				canvas.height = Math.round(img.height * scale);
+				canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+				this.contact()?.photo(canvas.toDataURL('image/jpeg', 0.85));
+			};
+			img.onerror = () => alert(i18n('CONTACTS/PHOTO_UNREADABLE'));
+			img.src = reader.result;
+		};
+		reader.readAsDataURL(file);
+		// So choosing the same file twice still fires
+		event.target.value = '';
 	}
 
 	focusCategoryInput() {

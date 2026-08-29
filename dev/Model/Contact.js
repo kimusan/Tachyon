@@ -104,6 +104,8 @@ export class ContactModel extends AbstractModel {
 			nameSuffix: '',  // NameSuffix
 			nickname: null,
 			note: null,
+			bday: null,
+			photo: null,
 
 			// Business
 			org: '',
@@ -118,6 +120,7 @@ export class ContactModel extends AbstractModel {
 		this.email      = ko.observableArray();
 		this.tel        = ko.observableArray();
 		this.url        = ko.observableArray();
+		this.impp       = ko.observableArray();
 		this.adr        = ko.observableArray();
 		this.categories = ko.observableArray();
 
@@ -155,9 +158,14 @@ export class ContactModel extends AbstractModel {
 				value && contact[nProps[index]](value)
 			);
 
-			['nickname', 'note', 'title'].forEach(field => {
+			['nickname', 'note', 'title', 'bday'].forEach(field => {
 				props = jCard.getOne(field);
-				props && contact[field](props.value);
+				// A date property can arrive as the parts array, and a partial
+				// date such as Apple's unknown-year birthday has empty leading
+				// parts, so join rather than assume a plain string
+				props && contact[field](Array.isArray(props.value)
+					? props.value.filter(v => v).join('-')
+					: props.value);
 			});
 
 			if ((props = jCard.getOne('org')?.value)) {
@@ -165,7 +173,7 @@ export class ContactModel extends AbstractModel {
 				contact.department(props[1] || '');
 			}
 
-			['email', 'tel', 'url'].forEach(field => {
+			['email', 'tel', 'url', 'impp'].forEach(field => {
 				props = jCard.get(field);
 				props && props.forEach(prop => {
 					contact[field].push({
@@ -196,6 +204,11 @@ export class ContactModel extends AbstractModel {
 					.filter(Boolean)
 					.forEach(cat => contact.categories.push({ value: ko.observable(cat) }));
 			}
+
+			// A data: URI in vCard 4.0. A 3.0 card carries the base64 and a TYPE
+			// instead, but the server converts to 4.0 before we ever see it.
+			props = jCard.getOne('photo');
+			props?.value && contact.photo(props.value);
 
 			props = jCard.getOne('x-crypto');
 			contact.signpref(props?.params.signpref || 'Ask');
@@ -256,9 +269,35 @@ export class ContactModel extends AbstractModel {
 		return true;
 	}
 
+	addImpp() {
+		this.impp.push({ value: ko.observable('') });
+	}
+
+	addBday() {
+		this.bday() || this.bday('');
+	}
+
+	addAdr() {
+		this.adr.push({
+			street: ko.observable(''),
+			street_ext: ko.observable(''),
+			locality: ko.observable(''),
+			region: ko.observable(''),
+			postcode: ko.observable(''),
+			pobox: ko.observable(''),
+			country: ko.observable(''),
+			preferred: ko.observable(''),
+			type: ko.observable('home')
+		});
+	}
+
 	removeEmail(item)    { this.email.remove(item); }
 	removeTel(item)      { this.tel.remove(item); }
 	removeUrl(item)      { this.url.remove(item); }
+	removeImpp(item)     { this.impp.remove(item); }
+	removeAdr(item)      { this.adr.remove(item); }
+	removeBday()         { this.bday(null); }
+	removePhoto()        { this.photo(null); }
 	removeCategory(item) { this.categories.remove(item); }
 	removeNickname()     { this.nickname(null); }
 	removeNote()         { this.note(null); }
@@ -280,7 +319,7 @@ export class ContactModel extends AbstractModel {
 		]/*, params, group*/);
 		jCard.parseFullName({set:true});
 
-		['nickname', 'note', 'title'].forEach(field =>
+		['nickname', 'note', 'title', 'bday', 'photo'].forEach(field =>
 			this[field]() ? jCard.set(field, this[field]()/*, params, group*/) : jCard.remove(field)
 		);
 
@@ -295,7 +334,7 @@ export class ContactModel extends AbstractModel {
 			jCard.remove('');
 		}
 
-		['email', 'tel', 'url'].forEach(field => {
+		['email', 'tel', 'url', 'impp'].forEach(field => {
 			let values = this[field].map(item => item.value());
 			jCard.get(field).forEach(prop => {
 				let i = values.indexOf(prop.value);
@@ -313,6 +352,23 @@ export class ContactModel extends AbstractModel {
 			signpref: this.signpref(),
 			encryptpref: this.encryptpref()
 		}, 'x-crypto');
+
+		// Addresses were parsed but never written back, so the editor could not
+		// change one. The component order is fixed by RFC 6350: post office box,
+		// extended address, street, locality, region, postal code, country.
+		jCard.remove('adr');
+		this.adr().forEach(item => {
+			const parts = [
+				item.pobox(), item.street_ext(), item.street(), item.locality(),
+				item.region(), item.postcode(), item.country()
+			];
+			if (parts.some(part => (part || '').trim())) {
+				const params = {};
+				item.type() && (params.type = item.type());
+				item.preferred() && (params.pref = item.preferred());
+				jCard.add('adr', parts.map(part => part || ''), params);
+			}
+		});
 
 		// Deduplicated case insensitively, matching how the server compares them.
 		// Picking from the suggestion list makes adding the same group twice easy,

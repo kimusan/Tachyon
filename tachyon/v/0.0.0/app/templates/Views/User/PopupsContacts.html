@@ -139,6 +139,18 @@
 					data-i18n="CONTACTS/TAB_CONTACT"></label>
 				<div class="form-horizontal tab-content" role="tabpanel" aria-hidden="false">
 					<div class="control-group">
+						<label class="iconsize24 icon-image" data-i18n="[title]CONTACTS/ADD_MENU_PHOTO"></label>
+						<div class="contact-photo">
+							<img data-bind="visible: photo, attr: { src: photo }" alt="">
+							<span data-bind="visible: !photo()" data-i18n="CONTACTS/PHOTO_NONE"></span>
+							<div data-bind="visible: !readOnly()">
+								<input type="file" accept="image/*" id="contact-photo-input"
+									data-bind="event: { change: $root.choosePhoto.bind($root) }">
+								<a href="#" class="btn icon-x" data-bind="visible: photo, click: removePhoto"></a>
+							</div>
+						</div>
+					</div>
+					<div class="control-group">
 						<label class="iconsize24 icon-user"></label>
 						<div>
 							<div class="property-line" data-i18n="[title]CONTACTS/FIRST_NAME">
@@ -219,6 +231,31 @@
 							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addTel"></a>
 						</div>
 					</div>
+					<div class="control-group" data-bind="visible: impp().length">
+						<label class="iconsize24 icon-message-circle" data-i18n="[title]CONTACTS/ADD_MENU_IMPP"></label>
+						<div>
+							<div data-bind="foreach: impp">
+								<div class="property-line">
+									<span data-bind="text: value"></span>
+									<input type="text"
+										autocomplete="off" autocorrect="off" autocapitalize="off"
+										data-bind="textInput: value">
+									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeImpp.bind($parent, $data)"></a>
+								</div>
+							</div>
+							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addImpp"></a>
+						</div>
+					</div>
+					<div class="control-group" data-bind="visible: null !== bday()">
+						<label class="iconsize24 icon-cake" data-i18n="[title]CONTACTS/ADD_MENU_BDAY"></label>
+						<div>
+							<div class="property-line">
+								<span data-bind="text: bday"></span>
+								<input type="date" data-bind="value: bday">
+								<a href="#" class="btn icon-x" data-bind="visible: !readOnly(), click: removeBday"></a>
+							</div>
+						</div>
+					</div>
 					<div class="control-group" data-bind="visible: url().length">
 						<label class="iconsize24 icon-globe" data-i18n="[title]CONTACTS/ADD_MENU_URL"></label>
 						<div>
@@ -271,7 +308,6 @@
 						</div>
 					</div>
 				</div>
-<!--
 				<input type="radio" name="contacttabs" id="tab-contact-locations">
 				<label for="tab-contact-locations"
 					role="tab"
@@ -279,22 +315,28 @@
 					aria-controls="panel2"
 					tabindex="0"
 					data-i18n="CONTACTS/TAB_LOCATIONS"></label>
-				<div class="form-horizontal tab-content" role="tabpanel" aria-hidden="false">
+				<div class="form-horizontal tab-content" role="tabpanel" aria-hidden="true">
 					<div data-bind="foreach: adr">
-						<div class="control-group">
-							<div data-bind="text: type"></div>
-							<div data-bind="text: street"></div>
-							<div data-bind="text: street_ext"></div>
-							<div data-bind="text: locality"></div>
-							<div data-bind="text: region"></div>
-							<div data-bind="text: postcode"></div>
-							<div data-bind="text: pobox"></div>
-							<div data-bind="text: country"></div>
-							<div data-bind="text: preferred"></div>
+						<div class="control-group adr-group">
+							<label class="iconsize24 icon-map-pin"></label>
+							<div>
+								<select data-bind="value: type, enable: !$parent.readOnly()">
+									<option value="home" data-i18n="CONTACTS/ADR_HOME"></option>
+									<option value="work" data-i18n="CONTACTS/ADR_WORK"></option>
+								</select>
+								<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeAdr.bind($parent, $data)"></a>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_STREET" data-bind="textInput: street"></div>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_STREET_EXT" data-bind="textInput: street_ext"></div>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_POSTCODE" data-bind="textInput: postcode"></div>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_LOCALITY" data-bind="textInput: locality"></div>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_REGION" data-bind="textInput: region"></div>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_COUNTRY" data-bind="textInput: country"></div>
+								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_POBOX" data-bind="textInput: pobox"></div>
+							</div>
 						</div>
 					</div>
+					<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addAdr"></a>
 				</div>
--->
 				<input type="radio" name="contacttabs" id="tab-contact-business">
 				<label for="tab-contact-business"
 					role="tab"
@@ -398,6 +440,24 @@
 						<a href="#" data-bind="click: addNote">
 							<i class="icon-pencil"></i>
 							<span data-i18n="CONTACTS/ADD_MENU_NOTE"></span>
+						</a>
+					</li>
+					<li role="presentation" data-bind="visible: null === bday()">
+						<a href="#" data-bind="click: addBday">
+							<i class="icon-cake"></i>
+							<span data-i18n="CONTACTS/ADD_MENU_BDAY"></span>
+						</a>
+					</li>
+					<li role="presentation">
+						<a href="#" data-bind="click: addImpp">
+							<i class="icon-message-circle"></i>
+							<span data-i18n="CONTACTS/ADD_MENU_IMPP"></span>
+						</a>
+					</li>
+					<li role="presentation">
+						<a href="#" data-bind="click: addAdr">
+							<i class="icon-map-pin"></i>
+							<span data-i18n="CONTACTS/ADD_MENU_ADR"></span>
 						</a>
 					</li>
 					<li role="presentation">
