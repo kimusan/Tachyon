@@ -115,6 +115,39 @@
 		display: inline-block;
 	}
 
+	/**
+	 * The eye only ever appeared on hover, so on a touch screen there was no way
+	 * to reach the preview at all and on a desktop it was easy to miss. A small
+	 * badge marks a previewable attachment at rest; hovering still swaps the
+	 * whole icon for the large eye, so the badge steps out of the way.
+	 */
+	.previewBadge {
+		display: none;
+	}
+
+	.hasPreview .previewBadge {
+		align-items: center;
+		// Its own backdrop, because an image attachment draws its thumbnail
+		// behind this and a bare outline would disappear into a busy picture
+		background: rgba(0, 0, 0, .55);
+		border-radius: 50%;
+		bottom: 1px;
+		color: #fff;
+		display: flex;
+		font-size: 90%;
+		height: 15px;
+		justify-content: center;
+		// Clicks belong to the link underneath
+		pointer-events: none;
+		position: absolute;
+		right: 1px;
+		width: 15px;
+	}
+
+	.hasPreview:hover .previewBadge {
+		display: none;
+	}
+
 	.hasPreplay:hover .iconMain::before {
 		content: "▶";
 	}
