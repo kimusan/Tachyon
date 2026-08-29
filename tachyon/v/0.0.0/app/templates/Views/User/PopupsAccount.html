@@ -16,10 +16,10 @@
 			autofocus="" autocorrect="off" autocapitalize="off"
 			data-bind="visible: isNew, textInput: email, attr: {required: isNew}">
 	</div>
-	<div class="control-group">
+	<div class="control-group" data-bind="visible: !isMain()">
 		<label data-i18n="GLOBAL/PASSWORD"></label>
 		<input name="password" type="password" class="input-xlarge" autocomplete="new-password" autocorrect="off" autocapitalize="off"
-			data-bind="value: password, attr: {required:isNew}">
+			data-bind="value: password, attr: {required: isNew}">
 	</div>
 	<div class="control-group">
 		<label data-i18n="GLOBAL/NAME"></label>

@@ -47,7 +47,7 @@ loadAccountsAndIdentities = () => {
 				? items.map(oValue => new AccountModel(oValue.email, oValue.name))
 				: []
 			);
-			AccountUserStore.unshift(new AccountModel(SettingsGet('mainEmail'), '', false));
+			AccountUserStore.unshift(new AccountModel(SettingsGet('mainEmail'), SettingsGet('mainAccountName') || '', false));
 
 			items = oData.Result.Identities;
 			IdentityUserStore(isArray(items)

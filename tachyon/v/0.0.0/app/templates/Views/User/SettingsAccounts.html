@@ -20,7 +20,9 @@
 			<tr draggable="true" data-bind="attr: {draggable:isAdditional}, sortableItem: { list: $root.accounts, afterMove: $root.accountsAndIdentitiesAfterMove }">
 				<!-- ko if:!isAdditional() -->
 				<td></td>
-				<td colspan="3" data-bind="text: displayName"></td>
+				<td class="e-action" colspan="3">
+					<span class="account-name" data-bind="text: label()"></span>
+				</td>
 				<!-- /ko -->
 				<!-- ko if:isAdditional -->
 				<td>
