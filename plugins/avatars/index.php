@@ -10,7 +10,7 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'Avatars',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '1.24',
+		VERSION  = '1.25',
 		RELEASE  = '2026-08-29',
 		REQUIRED = '2.33.0',
 		CATEGORY = 'Contacts',
@@ -123,8 +123,15 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		if ($sEmail && ($aResult = $this->getAvatar($sEmail, !empty($aBimi[0]), $sBimiSelector))) {
 			\header("Cache-Control: max-age={$maxAge}, private");
 			\header('Expires: '.\gmdate('D, j M Y H:i:s', $maxAge + \time()).' UTC');
-			\header('Content-Type: '.$aResult[0]);
-			echo $aResult[1];
+			if ('text/uri-list' === $aResult[0]) {
+				// The image lives elsewhere. Point the browser at it instead of
+				// fetching it here, so the server never makes a request to an
+				// address that came out of contact data.
+				\header('Location: '.$aResult[1], true, 302);
+			} else {
+				\header('Content-Type: '.$aResult[0]);
+				echo $aResult[1];
+			}
 		} else {
 			\MailSo\Base\Http::StatusHeader(404);
 		}
@@ -329,9 +336,13 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 	/**
 	 * The PHOTO of the contact this address belongs to, if there is one.
 	 *
-	 * vCard 4.0 holds it as a data: URI, and the server converts 3.0 cards to
-	 * 4.0 on import, so that is the only shape to expect here. Anything else is
-	 * left alone rather than guessed at.
+	 * Three shapes turn up. A card written here, or a 3.0 card converted on
+	 * import, holds a data: URI. A 4.0 card that kept the 3.0 ENCODING=b
+	 * parameter, which is what several servers still write, holds bare base64.
+	 * And a card may point at a URL instead of embedding anything at all, which
+	 * is what Nextcloud does. Only the first was handled, so a synced photo
+	 * showed in the contact editor, where the browser loads the value itself,
+	 * and 404'd in the message list.
 	 */
 	private function getContactPhoto(string $sEmail) : ?array
 	{
@@ -365,14 +376,41 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 				return null;
 			}
 			$sPhoto = \trim((string) $oVCard->PHOTO);
+
+			// Embedded, as a data: URI
 			if (\preg_match('#^data:(image/[a-z.+-]+);base64,(.+)$#i', $sPhoto, $aMatch)) {
 				$sBinary = \base64_decode($aMatch[2], true);
 				if ($sBinary) {
 					return [$aMatch[1], $sBinary];
 				}
 			}
+
+			// Embedded, as bare base64 with the type in a parameter
+			if (\preg_match('#^[A-Za-z0-9+/=\s]+$#', $sPhoto)) {
+				$sBinary = \base64_decode(\preg_replace('#\s+#', '', $sPhoto), true);
+				if ($sBinary) {
+					$sMime = \Tachyon\Util\File\MimeType::fromString($sBinary);
+					if ($sMime && \str_starts_with($sMime, 'image/')) {
+						return [$sMime, $sBinary];
+					}
+				}
+			}
+
+			// Somewhere else entirely, which is what Nextcloud writes. Handed back
+			// as a URL for the browser to load rather than fetched here.
+			//
+			// Fetching it would make this service a way to make the server issue
+			// requests to any address a contact names, and blocking private
+			// addresses to prevent that would break the common case, since a self
+			// hosted Nextcloud usually is on a private address. The browser has
+			// to be able to reach it anyway, or the contact editor could not show
+			// it either.
+			if (\preg_match('#^https?://#i', $sPhoto)) {
+				return ['text/uri-list', $sPhoto];
+			}
+
 			\Tachyon\Util\Log::debug('Avatar',
-				'contact photo: PHOTO is not a base64 data URI, starts: ' . \substr($sPhoto, 0, 40));
+				'contact photo: PHOTO is not an image this can serve, starts: ' . \substr($sPhoto, 0, 40));
 		}
 		catch (\Throwable $oException)
 		{
