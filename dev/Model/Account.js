@@ -35,7 +35,8 @@ export class AccountModel extends AbstractModel {
 		// show as a bare address. Its login identity already carries the display
 		// name the user chose, so use that rather than asking for it twice.
 		return this.name
-			|| (this.isAdditional() ? '' : IdentityUserStore.main()?.name())
+			// name is a plain property on EmailModel, not an observable
+			|| (this.isAdditional() ? '' : IdentityUserStore.main()?.name)
 			|| IDN.toUnicode(this.email);
 	}
 

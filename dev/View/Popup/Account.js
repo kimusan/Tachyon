@@ -32,7 +32,10 @@ export class AccountPopupView extends AbstractViewPopup {
 		addComputablesTo(this, {
 			// Shown as the placeholder, so it is obvious that clearing the field
 			// falls back to this rather than to nothing
-			defaultName: () => (this.isMain() && IdentityUserStore.main()?.name()) || this.email()
+			// .name, not .name(): EmailModel keeps it as a plain property, and
+			// calling it threw out of this computed, out of the isMain() that
+			// triggered it, and out of onShow before it had set anything
+			defaultName: () => (this.isMain() && IdentityUserStore.main()?.name) || this.email()
 		});
 	}
 
