@@ -204,6 +204,7 @@
 		"BUTTON_NEXT": "Next",
 		"BUTTON_TODAY": "Today",
 		"BUTTON_SYNC": "Synchronize calendars",
+		"SYNC_SKIPPED": "Sync finished, but %COUNT% item(s) could not be stored. See the log for details.",
 		"VIEW_MONTH": "Month",
 		"VIEW_WEEK": "Week",
 		"VIEW_DAY": "Day",

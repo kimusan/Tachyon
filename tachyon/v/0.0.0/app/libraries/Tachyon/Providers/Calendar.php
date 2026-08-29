@@ -26,6 +26,16 @@ class Calendar extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->Sync() : false;
 	}
 
+	/**
+	 * How much the last Sync() could not store. Not on CalendarInterface, so a
+	 * driver written before this keeps working and simply reports nothing.
+	 */
+	public function SyncSkipped() : int
+	{
+		return ($this->oDriver && \method_exists($this->oDriver, 'SyncSkipped'))
+			? $this->oDriver->SyncSkipped() : 0;
+	}
+
 	public function GetCalendars() : array
 	{
 		return $this->IsActive() ? $this->oDriver->GetCalendars() : array();

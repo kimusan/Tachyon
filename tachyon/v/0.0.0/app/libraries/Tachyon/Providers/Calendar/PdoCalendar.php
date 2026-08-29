@@ -14,6 +14,9 @@ class PdoCalendar
 {
 	use CalDAV;
 
+	/** Events and calendars the last Sync() could not store */
+	private int $iSyncSkipped = 0;
+
 	private int $iUserID = 0;
 
 	private \Tachyon\Pdo\Settings $settings;
@@ -398,17 +401,33 @@ class PdoCalendar
 			return false;
 		}
 
+		$this->iSyncSkipped = 0;
+
 		foreach ($aRemoteCalendars as $sPath => $aInfo) {
 			try {
 				$oCalendar = $this->storeCalendar($sPath, $aInfo);
 				$this->syncCalendar($oClient, $oCalendar);
 			} catch (\Throwable $oException) {
 				// One unreadable calendar must not abandon the rest
+				++$this->iSyncSkipped;
 				$this->logWrite("Sync failed for {$sPath}: " . $oException->getMessage(), \LOG_WARNING, 'Calendar');
 			}
 		}
 
+		if ($this->iSyncSkipped) {
+			$this->logWrite("Sync finished with {$this->iSyncSkipped} skipped", \LOG_WARNING, 'Calendar');
+		}
+
 		return true;
+	}
+
+	/**
+	 * Events and calendars this pass could not store. Reported so a sync that
+	 * quietly lost something does not look identical to a clean one.
+	 */
+	public function SyncSkipped() : int
+	{
+		return $this->iSyncSkipped;
 	}
 
 	private function syncCalendar(\Tachyon\Util\DAV\Client $oClient, Calendar $oCalendar) : void
@@ -455,7 +474,19 @@ class PdoCalendar
 			if (!$oResponse || 200 !== $oResponse->status) {
 				continue;
 			}
-			$this->storeIcal($oCalendar, $sUid, $oResponse->body, $aData['ics'], $aData['etag']);
+			try {
+				$this->storeIcal($oCalendar, $sUid, $oResponse->body, $aData['ics'], $aData['etag']);
+			} catch (\Throwable $oException) {
+				// One event that will not store must not abandon the calendar.
+				// It used to: the exception reached the per calendar catch, so a
+				// single oversized LOCATION or a date past 2038 meant that
+				// calendar never finished syncing, on this pass or any later one.
+				++$this->iSyncSkipped;
+				$this->logWrite(
+					"Skipped event {$sUid} in {$oCalendar->DavPath}: " . $oException->getMessage(),
+					\LOG_WARNING, 'Calendar'
+				);
+			}
 		}
 
 		// Created here and not yet on the server

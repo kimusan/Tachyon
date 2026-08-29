@@ -242,6 +242,7 @@
 		"TAGS_PLACEHOLDER": "Tilføj et mærke",
     "BUTTON_SHARE_ALL": "Alle",
     "BUTTON_SYNC": "Synkronisering (CardDAV)",
+    "SYNC_SKIPPED": "Synkronisering færdig, men %COUNT% element(er) kunne ikke gemmes. Se loggen for detaljer.",
     "SEND_TO_ALL_CONTACT_EMAILS": "Send til alle kontaktens e-mailadresser",
     "SELECT_ALL": "Vælg alle på denne side",
     "SELECT_PAGE": "Vælg denne side",

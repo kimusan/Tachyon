@@ -36,12 +36,12 @@ CREATE TABLE IF NOT EXISTS tachyon_cal_events (
 	uid            varchar(255)     NOT NULL DEFAULT '',
 	summary        varchar(255)     NOT NULL DEFAULT '',
 	description    text             NOT NULL,
-	location       varchar(255)     NOT NULL DEFAULT '',
-	dtstart        int              NOT NULL DEFAULT 0,
-	dtend          int              NOT NULL DEFAULT 0,
+	location       text             NOT NULL,
+	dtstart        bigint           NOT NULL DEFAULT 0,
+	dtend          bigint           NOT NULL DEFAULT 0,
 	all_day        tinyint UNSIGNED NOT NULL DEFAULT 0,
 	rrule          varchar(512)     NOT NULL DEFAULT '',
-	recur_until    int              DEFAULT NULL,
+	recur_until    bigint           DEFAULT NULL,
 	timezone       varchar(64)      CHARACTER SET ascii NOT NULL DEFAULT '',
 	ical           mediumtext       NOT NULL,
 	dav_path       varchar(512)     NOT NULL DEFAULT '',
@@ -88,12 +88,12 @@ CREATE TABLE IF NOT EXISTS tachyon_cal_events (
 	uid          varchar(255) NOT NULL DEFAULT '',
 	summary      varchar(255) NOT NULL DEFAULT '',
 	description  text NOT NULL DEFAULT '',
-	location     varchar(255) NOT NULL DEFAULT '',
-	dtstart      integer NOT NULL DEFAULT 0,
-	dtend        integer NOT NULL DEFAULT 0,
+	location     text NOT NULL DEFAULT '',
+	dtstart      bigint NOT NULL DEFAULT 0,
+	dtend        bigint NOT NULL DEFAULT 0,
 	all_day      integer NOT NULL DEFAULT 0,
 	rrule        varchar(512) NOT NULL DEFAULT '',
-	recur_until  integer DEFAULT NULL,
+	recur_until  bigint DEFAULT NULL,
 	timezone     varchar(64) NOT NULL DEFAULT '',
 	ical         text NOT NULL DEFAULT '',
 	dav_path     varchar(512) NOT NULL DEFAULT '',
@@ -169,11 +169,40 @@ SQLITEINITIAL;
 		$aVersions = [];
 		switch ($sDbType)
 		{
+			// Version 2 widens what version 1 got wrong. A LOCATION longer than
+			// 255 characters, or a date past 2038 in a 4 byte timestamp, made the
+			// write fail and took the whole sync down with it. Legacy calendars
+			// encode "repeats forever" as 99991231T235959, so this is ordinary
+			// data rather than a corner case. SQLite types are dynamic and need
+			// nothing, but it keeps a version 2 so the numbering matches.
 			case 'mysql':
+				$aVersions = [
+					1 => [],
+					2 => [
+						'ALTER TABLE tachyon_cal_events MODIFY location text NOT NULL;',
+						'ALTER TABLE tachyon_cal_events MODIFY dtstart bigint NOT NULL DEFAULT 0;',
+						'ALTER TABLE tachyon_cal_events MODIFY dtend bigint NOT NULL DEFAULT 0;',
+						'ALTER TABLE tachyon_cal_events MODIFY recur_until bigint DEFAULT NULL;'
+					]
+				];
+				break;
+
 			case 'pgsql':
+				$aVersions = [
+					1 => [],
+					2 => [
+						'ALTER TABLE tachyon_cal_events ALTER COLUMN location TYPE text;',
+						'ALTER TABLE tachyon_cal_events ALTER COLUMN dtstart TYPE bigint;',
+						'ALTER TABLE tachyon_cal_events ALTER COLUMN dtend TYPE bigint;',
+						'ALTER TABLE tachyon_cal_events ALTER COLUMN recur_until TYPE bigint;'
+					]
+				];
+				break;
+
 			case 'sqlite':
 				$aVersions = [
-					1 => []
+					1 => [],
+					2 => []
 				];
 				break;
 		}

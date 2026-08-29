@@ -242,6 +242,7 @@
 		"TAGS_PLACEHOLDER": "Añadir una etiqueta",
     "BUTTON_SHARE_ALL": "Todos",
     "BUTTON_SYNC": "Sincronización (CardDAV)",
+    "SYNC_SKIPPED": "Sincronización terminada, pero no se pudieron guardar %COUNT% elemento(s). Consulte el registro.",
     "SEND_TO_ALL_CONTACT_EMAILS": "Enviar a todos los correos de contactos",
     "SELECT_ALL": "Seleccionar todo en esta página",
     "SELECT_PAGE": "Seleccionar esta página",

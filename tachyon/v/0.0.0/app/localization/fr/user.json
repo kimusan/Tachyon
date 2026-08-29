@@ -204,6 +204,7 @@
     "BUTTON_NEXT": "Suivant",
     "BUTTON_TODAY": "Aujourd'hui",
     "BUTTON_SYNC": "Synchroniser les calendriers",
+    "SYNC_SKIPPED": "Synchronisation terminée, mais %COUNT% élément(s) n'ont pas pu être enregistrés. Voir le journal.",
     "VIEW_MONTH": "Mois",
     "VIEW_WEEK": "Semaine",
     "VIEW_DAY": "Jour",

@@ -162,7 +162,12 @@ trait Calendar
 		if (!$oProvider->IsActive()) {
 			return $this->FalseResponse();
 		}
-		return $this->DefaultResponse($oProvider->Sync());
+		// Reported rather than a bare true: a sync that lost events used to look
+		// exactly like a clean one, so the only sign was the debug log.
+		$bResult = $oProvider->Sync();
+		return $this->DefaultResponse($bResult
+			? ['Result' => true, 'Skipped' => $oProvider->SyncSkipped()]
+			: false);
 	}
 
 	public function DoSaveCalendarSyncData() : array

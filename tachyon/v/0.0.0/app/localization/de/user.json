@@ -242,6 +242,7 @@
 		"TAGS_PLACEHOLDER": "Schlagwort hinzufügen",
     "BUTTON_SHARE_ALL": "Jeder",
     "BUTTON_SYNC": "Synchronisierung (CardDAV)",
+    "SYNC_SKIPPED": "Synchronisierung abgeschlossen, aber %COUNT% Element(e) konnten nicht gespeichert werden. Details im Protokoll.",
     "SEND_TO_ALL_CONTACT_EMAILS": "An alle E-Mail-Adressen schreiben",
     "SELECT_ALL": "Alle auf dieser Seite auswählen",
     "SELECT_PAGE": "Diese Seite auswählen",

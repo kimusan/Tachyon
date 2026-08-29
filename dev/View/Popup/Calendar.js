@@ -33,6 +33,23 @@ const
 	toStamp = value => Math.floor(value.getTime() / 1000),
 
 	/**
+	 * An all-day boundary is a date, not an instant. Stored as UTC midnight, it
+	 * became 02:00 local east of Greenwich, so the grid carried every imported
+	 * all-day event into the following day: a holiday on the 8th drew across the
+	 * 8th and the 9th.
+	 *
+	 * Snapped to the nearest UTC midnight first, because events created here
+	 * before this fix stored local midnight as a UTC stamp, which is 22:00 on the
+	 * previous day for UTC+2. Snapping puts those on the day they were meant to
+	 * be, and leaves a value already at midnight alone.
+	 */
+	toAllDayDate = value => {
+		const utc = new Date(Math.round(value / 86400) * 86400000);
+		return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+	},
+	fromAllDayDate = date => Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 1000,
+
+	/**
 	 * Calendar colours come from the CalDAV server, so nothing guarantees a
 	 * fixed label colour stays readable on them. Pick per event from relative
 	 * luminance (WCAG 2.x) instead of hoping.
@@ -148,8 +165,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 					successCallback((data.Result?.Events || []).map(event => ({
 						id: event.id,
 						title: event.title,
-						start: toDate(event.start),
-						end: toDate(event.end),
+						start: event.allDay ? toAllDayDate(event.start) : toDate(event.start),
+						end: event.allDay ? toAllDayDate(event.end) : toDate(event.end),
 						allDay: !!event.allDay,
 						editable: !event.readOnly && !event.recurring,
 						backgroundColor: event.color || DEFAULT_EVENT_COLOR,
@@ -197,9 +214,17 @@ export class CalendarPopupView extends AbstractViewPopup {
 
 	syncCalendars() {
 		this.loading(true);
-		Remote.request('CalendarSync', (iError) => {
+		Remote.request('CalendarSync', (iError, oData) => {
 			this.loading(false);
-			iError ? this.failed(getNotification(iError)) : this.loadCalendars();
+			if (iError) {
+				this.failed(getNotification(iError));
+				return;
+			}
+			// A sync that could not store some events is not a failure, but it is
+			// not a clean run either, and it used to be indistinguishable from one
+			const skipped = oData?.Result?.Skipped || 0;
+			this.failed(skipped ? i18n('CALENDAR/SYNC_SKIPPED', { COUNT: skipped }) : '');
+			this.loadCalendars();
 		});
 	}
 
@@ -333,7 +358,12 @@ export class CalendarPopupView extends AbstractViewPopup {
 	}
 
 	fromInput(value, allDay) {
-		return toStamp(new Date(allDay ? value + 'T00:00' : value));
+		// UTC midnight for an all-day date, which is what iCalendar means by a
+		// DATE value and what every other client writes. Storing local midnight
+		// here is what made events created in Tachyon disagree with imported ones.
+		return allDay
+			? fromAllDayDate(new Date(value + 'T00:00'))
+			: toStamp(new Date(value));
 	}
 
 	/**
