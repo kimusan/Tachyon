@@ -3,7 +3,7 @@
   "title": "Tachyon",
   "description": "Fast, modern & secure web-based email client",
   "private": true,
-  "version": "4.0.5",
+  "version": "4.0.6",
   "homepage": "https://tachyonmail.app/",
   "author": {
     "name": "Kim Schulz",
