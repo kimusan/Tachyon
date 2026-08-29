@@ -54,7 +54,7 @@
 		min-width: 180px;
 		display: flex;
 		flex-direction: column;
-		border-right: 1px solid var(--border-color);
+		border-right: 1px solid var(--border-color, #ddd);
 	}
 
 	.right {
@@ -82,7 +82,7 @@
 			width: .8em;
 			height: .8em;
 			border-radius: 2px;
-			border: 1px solid var(--border-color);
+			border: 1px solid var(--border-color, #ddd);
 			flex: none;
 		}
 
@@ -121,9 +121,9 @@
 	}
 
 	.b-calendar-editor-form {
-		background: var(--dialog-bg-clr);
-		border: 1px solid var(--border-color);
-		border-radius: var(--dialog-border-radius);
+		background: var(--dialog-bg-clr, #fff);
+		border: 1px solid var(--border-color, #ddd);
+		border-radius: var(--dialog-border-radius, 6px);
 		padding: 1em;
 		max-width: 480px;
 		width: 90%;
@@ -133,8 +133,8 @@
 		.b-calendar-editor-note {
 			margin-bottom: .75em;
 			padding: .5em;
-			border-radius: var(--border-radius);
-			background: var(--dropdown-menu-hover-bg-color);
+			border-radius: var(--border-radius, 5px);
+			background: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
 			font-size: .9em;
 		}
 
