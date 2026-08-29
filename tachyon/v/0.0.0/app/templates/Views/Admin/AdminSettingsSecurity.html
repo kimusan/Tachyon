@@ -46,10 +46,12 @@
 		<input type="text" autocomplete="username" autocorrect="off" autocapitalize="off"
 			data-bind="textInput: adminLogin">
 	</div>
-	<div class="control-group">
+	<div class="control-group" data-bind="css: {'error': !adminPassword()}">
 		<label data-i18n="TAB_SECURITY/LABEL_CURRENT_PASSWORD"></label>
 		<input type="password" autocomplete="current-password" autocorrect="off" autocapitalize="off"
-			data-bind="textInput: adminPassword">
+			required data-bind="textInput: adminPassword">
+		<span class="help-block" data-bind="visible: !adminPassword()"
+			data-i18n="TAB_SECURITY/HINT_CURRENT_PASSWORD"></span>
 	</div>
 	<div class="control-group" data-bind="css: {'error': adminPasswordNewError}">
 		<label data-i18n="TAB_SECURITY/LABEL_NEW_PASSWORD"></label>

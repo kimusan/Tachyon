@@ -97,6 +97,7 @@
     "LABEL_SHOW_PHP_INFO": "PHP-Informationen anzeigen",
     "LEGEND_ADMIN_PANEL_ACCESS_CREDENTIALS": "Adminpanel-Zugangsdaten",
     "LABEL_CURRENT_PASSWORD": "Aktuelles Passwort",
+    "HINT_CURRENT_PASSWORD": "Geben Sie Ihr aktuelles Passwort ein, um auf dieser Registerkarte etwas zu speichern.",
     "LABEL_NEW_PASSWORD": "Neues Passwort",
     "LABEL_REPEAT_PASSWORD": "Wiederholen",
     "LABEL_TOTP_CONFIRM": "Bestätigungscode",
