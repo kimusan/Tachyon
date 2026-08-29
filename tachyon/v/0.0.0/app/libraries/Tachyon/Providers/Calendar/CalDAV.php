@@ -154,15 +154,34 @@ trait CalDAV
 			?: $this->detectionPropFind($oClient, $sPath);
 
 		$sCurrentUserPrincipal = '';
+		$aHomeSets = array();
 		if (\is_array($aResponse)) {
-			foreach ($aResponse as $aItem) {
-				if (empty($sCalendarHomeSet) && !empty($aItem['{urn:ietf:params:xml:ns:caldav}calendar-home-set']['{DAV:}href'])) {
-					$sCalendarHomeSet = $aItem['{urn:ietf:params:xml:ns:caldav}calendar-home-set']['{DAV:}href'];
+			// Depth 1, so this is keyed by href and every collection under the
+			// queried path is in here, not only the one that belongs to the user
+			foreach ($aResponse as $sHref => $aItem) {
+				if (!empty($aItem['{urn:ietf:params:xml:ns:caldav}calendar-home-set']['{DAV:}href'])) {
+					$aHomeSets[$sHref] = $aItem['{urn:ietf:params:xml:ns:caldav}calendar-home-set']['{DAV:}href'];
 				}
 				if (empty($sCurrentUserPrincipal) && !empty($aItem['{DAV:}current-user-principal']['{DAV:}href'])) {
 					$sCurrentUserPrincipal = $aItem['{DAV:}current-user-principal']['{DAV:}href'];
 				}
 			}
+		}
+
+		// The home set belonging to this user, not whichever came first. Radicale
+		// redirects /.well-known/caldav to the server root, and that listing
+		// advertises a calendar-home-set of "/", so taking the first match sent
+		// discovery to the root and away from the path the user configured.
+		if (\strlen($sCurrentUserPrincipal)) {
+			foreach ($aHomeSets as $sHref => $sHome) {
+				if (\rtrim($sHref, '/') === \rtrim($sCurrentUserPrincipal, '/')) {
+					$sCalendarHomeSet = $sHome;
+					break;
+				}
+			}
+		}
+		if (empty($sCalendarHomeSet) && $aHomeSets) {
+			$sCalendarHomeSet = \reset($aHomeSets);
 		}
 
 		// The home set is often only advertised on the principal, so follow it
@@ -183,12 +202,22 @@ trait CalDAV
 			$sCalendarHomeSet = $sPath;
 		}
 
+		$oHomeClient = $oClient;
 		if (\preg_match('/^http[s]?:\/\//i', $sCalendarHomeSet)) {
-			$oClient = $this->getDavClientFromUrl($sCalendarHomeSet, $sUser, $sPassword, $sProxy);
-			$sCalendarHomeSet = $oClient->urlPath;
+			$oHomeClient = $this->getDavClientFromUrl($sCalendarHomeSet, $sUser, $sPassword, $sProxy);
+			$sCalendarHomeSet = $oHomeClient->urlPath;
 		}
 
-		return $this->listCalendarCollections($oClient, $sCalendarHomeSet);
+		$aCalendars = $this->listCalendarCollections($oHomeClient, $sCalendarHomeSet);
+
+		// A home set holding no calendars is no better than none at all, and the
+		// configured path is the one place we know the user expects them. Only
+		// worth a second look when discovery actually walked somewhere else.
+		if (!$aCalendars && \rtrim($sCalendarHomeSet, '/') !== \rtrim($sPath, '/')) {
+			$aCalendars = $this->listCalendarCollections($oClient, $sPath);
+		}
+
+		return $aCalendars;
 	}
 
 	protected function listCalendarCollections(DAVClient $oClient, string $sHomeSet) : array
