@@ -1,5 +1,5 @@
 import { SettingsGet, SettingsCapa } from 'Common/Globals';
-import { addObservablesTo, addSubscribablesTo } from 'External/ko';
+import { addObservablesTo, addSubscribablesTo, addComputablesTo } from 'External/ko';
 
 import Remote from 'Remote/Admin/Fetch';
 
@@ -22,6 +22,8 @@ export class AdminSettingsSecurity extends AbstractViewSettings {
 			adminPasswordNew2: '',
 			adminPasswordNewError: false,
 			adminTOTP: '',
+			adminTOTPCode: '',
+			adminTOTPSaved: '',
 
 			saveError: false,
 			saveSuccess: false,
@@ -40,6 +42,12 @@ export class AdminSettingsSecurity extends AbstractViewSettings {
 			this.saveSuccess(false);
 			this.adminPasswordNewError(false);
 		};
+
+		addComputablesTo(this, {
+			// Only a real change to the secret needs confirming. Saving a password
+			// with two factor already on, or already off, asks for nothing.
+			totpChanged: () => this.adminTOTP() !== this.adminTOTPSaved() && !!this.adminTOTP()
+		});
 
 		addSubscribablesTo(this, {
 			adminPassword: () => {
@@ -74,6 +82,9 @@ export class AdminSettingsSecurity extends AbstractViewSettings {
 		});
 
 		this.adminTOTP(SettingsGet('adminTOTP'));
+		// What is actually stored, so the confirmation is asked for only when the
+		// secret is really being changed rather than on every save
+		this.adminTOTPSaved(SettingsGet('adminTOTP'));
 
 		decorateKoCommands(this, {
 			saveAdminUserCommand: self => self.adminLogin().trim() && self.adminPassword()
@@ -120,7 +131,11 @@ export class AdminSettingsSecurity extends AbstractViewSettings {
 			Login: this.adminLogin(),
 			Password: this.adminPassword(),
 			newPassword: this.adminPasswordNew(),
-			TOTP: this.adminTOTP()
+			TOTP: this.adminTOTP(),
+			// Proves the secret was scanned. The server refuses to switch two
+			// factor on without it, so nobody locks themselves out by pressing
+			// Generate and then saving something else.
+			TOTPCode: this.adminTOTPCode()
 		});
 
 		return true;

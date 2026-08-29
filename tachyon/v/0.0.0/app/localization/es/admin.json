@@ -99,6 +99,8 @@
     "LABEL_CURRENT_PASSWORD": "Contraseña actual",
     "LABEL_NEW_PASSWORD": "Nueva contraseña",
     "LABEL_REPEAT_PASSWORD": "Re-ingresar",
+    "LABEL_TOTP_CONFIRM": "Código de confirmación",
+    "HINT_TOTP_CONFIRM": "Escanee el código de arriba con su aplicación de autenticación e introduzca los seis dígitos que muestra. Sin esto, la verificación en dos pasos no se activa.",
     "LABEL_REQUIRE_VERIFICATION": "Requerir verificación del certificado SSL",
     "CRYPTO": "Crypto",
     "LABEL_ALLOW_SELF_SIGNED": "Permitir certificados auto-firmados"

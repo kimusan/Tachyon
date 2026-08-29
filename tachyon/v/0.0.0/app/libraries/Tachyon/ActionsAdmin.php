@@ -255,7 +255,27 @@ class ActionsAdmin extends Actions
 				$oConfig->Set('security', 'admin_login', $sLogin);
 			}
 
-			$oConfig->Set('security', 'admin_totp', $this->GetActionParam('TOTP', ''));
+			// Two factor is only touched when it is actually being changed, and
+			// turning it on has to be proven first.
+			//
+			// This used to write whatever the form posted, every time. The
+			// Generate button fills the field client side just to draw a QR code,
+			// so saving a new password after pressing it silently required codes
+			// for a secret that had never been scanned, and locked the admin out
+			// with no warning and no way back except editing application.ini.
+			$sCurrentTOTP = (string) $oConfig->Get('security', 'admin_totp', '');
+			$sNewTOTP = \trim($this->GetActionParam('TOTP', ''));
+			if ($sNewTOTP !== $sCurrentTOTP) {
+				if (\strlen($sNewTOTP)) {
+					// Enabling: the code proves the secret was scanned and that
+					// this admin can still get in afterwards
+					if (!\Tachyon\Util\TOTP::Verify($sNewTOTP, \trim($this->GetActionParam('TOTPCode', '')))) {
+						throw new ClientException(Notifications::AuthError, null, 'TOTP code does not match the secret');
+					}
+				}
+				// Clearing needs nothing beyond the password already checked above
+				$oConfig->Set('security', 'admin_totp', $sNewTOTP);
+			}
 
 			if (\strlen($oNewPassword)) {
 				$oConfig->SetPassword($oNewPassword);

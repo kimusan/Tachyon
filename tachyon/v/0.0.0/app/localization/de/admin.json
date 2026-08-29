@@ -99,6 +99,8 @@
     "LABEL_CURRENT_PASSWORD": "Aktuelles Passwort",
     "LABEL_NEW_PASSWORD": "Neues Passwort",
     "LABEL_REPEAT_PASSWORD": "Wiederholen",
+    "LABEL_TOTP_CONFIRM": "Bestätigungscode",
+    "HINT_TOTP_CONFIRM": "Scannen Sie den Code oben mit Ihrer Authenticator-App und geben Sie die sechs angezeigten Ziffern ein. Ohne dies wird die Zwei-Faktor-Authentifizierung nicht aktiviert.",
     "LABEL_REQUIRE_VERIFICATION": "Signiertes SSL-Zertifikat erfordern",
     "CRYPTO": "Kryptographie",
     "LABEL_ALLOW_SELF_SIGNED": "Selbst-signiertes Zertifikat akzeptieren"

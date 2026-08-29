@@ -99,6 +99,8 @@
 		"LABEL_CURRENT_PASSWORD": "Current passphrase",
 		"LABEL_NEW_PASSWORD": "New passphrase",
 		"LABEL_REPEAT_PASSWORD": "Repeat passphrase",
+		"LABEL_TOTP_CONFIRM": "Confirmation code",
+		"HINT_TOTP_CONFIRM": "Scan the code above with your authenticator and enter the six digits it shows. Without this, two-factor authentication is not enabled.",
 		"LABEL_REQUIRE_VERIFICATION": "Require verification of SSL certificate",
 		"CRYPTO": "Crypto",
 		"LABEL_ALLOW_SELF_SIGNED": "Allow self signed certificates"

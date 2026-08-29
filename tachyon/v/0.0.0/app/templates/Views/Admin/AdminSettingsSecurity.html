@@ -72,6 +72,12 @@
 		<label></label>
 		<pre data-bind="text: viewQRCode" style="font-family:var(--fontMono);font-size:11px;letter-spacing:-1px;line-height:1;"></pre>
 	</div>
+	<div class="control-group" data-bind="visible: totpChanged">
+		<label data-i18n="TAB_SECURITY/LABEL_TOTP_CONFIRM"></label>
+		<input type="text" autocomplete="off" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+			data-bind="textInput: adminTOTPCode">
+		<span class="help-block" data-i18n="TAB_SECURITY/HINT_TOTP_CONFIRM"></span>
+	</div>
 	<div class="control-group">
 		<label></label>
 		<a class="btn" data-bind="command: saveAdminUserCommand, css: { 'btn-success': saveSuccess, 'btn-danger': saveError }"

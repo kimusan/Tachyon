@@ -99,6 +99,8 @@
     "LABEL_CURRENT_PASSWORD": "Mot de passe actuel",
     "LABEL_NEW_PASSWORD": "Nouveau mot de passe",
     "LABEL_REPEAT_PASSWORD": "Répéter",
+    "LABEL_TOTP_CONFIRM": "Code de confirmation",
+    "HINT_TOTP_CONFIRM": "Scannez le code ci-dessus avec votre application d'authentification et saisissez les six chiffres affichés. Sans cela, la double authentification n'est pas activée.",
     "LABEL_REQUIRE_VERIFICATION": "S'assurer qu'un certificat SSL est utilisé",
     "CRYPTO": "Chiffrement",
     "LABEL_ALLOW_SELF_SIGNED": "Autoriser les certificats auto-signés"

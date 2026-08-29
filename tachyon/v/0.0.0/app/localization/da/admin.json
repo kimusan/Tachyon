@@ -99,6 +99,8 @@
     "LABEL_CURRENT_PASSWORD": "Nuværende adgangskode",
     "LABEL_NEW_PASSWORD": "Ny adgangskode",
     "LABEL_REPEAT_PASSWORD": "Gentag",
+    "LABEL_TOTP_CONFIRM": "Bekræftelseskode",
+    "HINT_TOTP_CONFIRM": "Scan koden ovenfor med din authenticator og indtast de seks cifre, den viser. Uden dette aktiveres tofaktorgodkendelse ikke.",
     "LABEL_REQUIRE_VERIFICATION": "Kræv verifikation af brugt SSL certifikat",
     "CRYPTO": "Crypto",
     "LABEL_ALLOW_SELF_SIGNED": "Tillad selvsignerede certifikater"
