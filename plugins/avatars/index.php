@@ -10,12 +10,12 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'Avatars',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '1.22',
-		RELEASE  = '2025-03-10',
+		VERSION  = '1.23',
+		RELEASE  = '2026-08-29',
 		REQUIRED = '2.33.0',
 		CATEGORY = 'Contacts',
 		LICENSE  = 'MIT',
-		DESCRIPTION = 'Show graphic of sender in message and messages list (supports BIMI, Gravatar, favicon and identicon, Contacts is still TODO)';
+		DESCRIPTION = 'Show graphic of sender in message and messages list (supports contact photos, BIMI, Gravatar, favicon and identicon)';
 
 	public function Init() : void
 	{
@@ -139,6 +139,10 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetAllowedInJs(true)
 				->SetDefaultValue(true),
+			\Tachyon\Plugins\Property::NewInstance('contacts')->SetLabel('Contacts')
+				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
+				->SetDefaultValue(true)
+				->SetDescription('Use the photo on the matching contact, before any external source'),
 			\Tachyon\Plugins\Property::NewInstance('bimi')->SetLabel('BIMI')
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
 				->SetDefaultValue(false)
@@ -235,25 +239,15 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 			return $aResult;
 		}
 
-		// TODO: lookup contacts vCard and return PHOTO value
-		/*
-		if (!$aResult) {
-			$oActions = \Tachyon\Api::Actions();
-			$oAccount = $oActions->getAccountFromToken();
-			if ($oAccount) {
-				$oAddressBookProvider = $oActions->AddressBookProvider($oAccount);
-				if ($oAddressBookProvider) {
-					$oContact = $oAddressBookProvider->GetContactByEmail($sEmail);
-					if ($oContact && $oContact->vCard && $oContact->vCard['PHOTO']) {
-						$aResult = [
-							'text/vcard',
-							$oContact->vCard
-						];
-					}
-				}
+		// A photo the user put on the contact themselves outranks anything fetched
+		// from a third party, so this sits above BIMI, Gravatar and favicon and
+		// below only the avatars an admin dropped in APP_PRIVATE_DATA.
+		if ($this->Config()->Get('plugin', 'contacts', true)) {
+			$aResult = $this->getContactPhoto($sEmail);
+			if ($aResult) {
+				return $aResult;
 			}
 		}
-		*/
 
 		if (!$aResult) {
 			$sDomain = \explode('@', $sEmail);
@@ -330,6 +324,46 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 			$aResult[1]
 		);
 		\MailSo\Base\Http::setLastModified(\time());
+	}
+
+	/**
+	 * The PHOTO of the contact this address belongs to, if there is one.
+	 *
+	 * vCard 4.0 holds it as a data: URI, and the server converts 3.0 cards to
+	 * 4.0 on import, so that is the only shape to expect here. Anything else is
+	 * left alone rather than guessed at.
+	 */
+	private function getContactPhoto(string $sEmail) : ?array
+	{
+		try
+		{
+			$oActions = \Tachyon\Api::Actions();
+			$oAccount = $oActions->getAccountFromToken();
+			if (!$oAccount) {
+				return null;
+			}
+			$oAddressBook = $oActions->AddressBookProvider($oAccount);
+			if (!$oAddressBook || !$oAddressBook->IsActive()) {
+				return null;
+			}
+			$oContact = $oAddressBook->GetContactByEmail($sEmail);
+			$oVCard = $oContact ? $oContact->vCard : null;
+			if (!$oVCard || !isset($oVCard->PHOTO)) {
+				return null;
+			}
+			if (\preg_match('#^data:(image/[a-z.+-]+);base64,(.+)$#i', \trim((string) $oVCard->PHOTO), $aMatch)) {
+				$sBinary = \base64_decode($aMatch[2], true);
+				if ($sBinary) {
+					return [$aMatch[1], $sBinary];
+				}
+			}
+		}
+		catch (\Throwable $oException)
+		{
+			// An avatar is decoration. Never let it break the message list.
+			\Tachyon\Util\Log::warning('Avatar', 'Contact photo lookup failed: ' . $oException->getMessage());
+		}
+		return null;
 	}
 
 	private static function getCachedImage(string $sEmail) : ?array
