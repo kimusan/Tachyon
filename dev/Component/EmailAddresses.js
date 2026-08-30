@@ -384,8 +384,12 @@ export class EmailAddressesComponent {
 				el.append(v.obj.toLine(true));
 				li.append(el);
 
-				el = createElement('a',{href:'#', class:'ficon'});
-				el.append('✖');
+				// The 4.0.0 icon migration missed this one. It was a bare U+2716
+				// in a class that is styled nowhere, so the system emoji font
+				// drew it, in colour on some platforms and at its own size on
+				// all of them. icon-x is the mask the rest of the app uses and
+				// takes its colour from the anchor.
+				el = createElement('a',{href:'#', class:'icon-x'});
 				addEventsListeners(el, {
 					click: e => self._removeTag(e, li),
 					focus: () => li.className = 'emailaddresses-selected',
