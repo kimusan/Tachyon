@@ -265,6 +265,7 @@
     "PHOTO_NONE": "Kein Foto",
     "PHOTO_UNREADABLE": "Diese Datei konnte nicht als Bild gelesen werden.",
     "ADR_HOME": "Privat",
+    "ADR_TYPE": "Typ",
     "ADR_WORK": "Arbeit",
     "ADR_STREET": "Straße",
     "ADR_STREET_EXT": "Adresszusatz",

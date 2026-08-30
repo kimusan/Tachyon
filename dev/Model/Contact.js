@@ -194,7 +194,13 @@ export class ContactModel extends AbstractModel {
 					pobox: ko.observable(prop.value[0]),
 					country: ko.observable(prop.value[6]),
 					preferred: ko.observable(prop.params.pref),
-					type: ko.observable(prop.params.type) // HOME | WORK
+					// vCard writes TYPE=HOME, and a card may carry more than one.
+					// Kept as the lower case text the editor shows, rather than
+					// forced into a fixed list a foreign server never agreed to.
+					type: ko.observable(
+						(Array.isArray(prop.params.type) ? prop.params.type[0] : prop.params.type || '')
+							.toString().toLowerCase()
+					)
 				});
 			});
 

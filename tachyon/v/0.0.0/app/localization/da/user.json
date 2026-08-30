@@ -265,6 +265,7 @@
     "PHOTO_NONE": "Intet billede",
     "PHOTO_UNREADABLE": "Filen kunne ikke læses som et billede.",
     "ADR_HOME": "Hjem",
+    "ADR_TYPE": "Type",
     "ADR_WORK": "Arbejde",
     "ADR_STREET": "Vej",
     "ADR_STREET_EXT": "Adresselinje 2",

@@ -182,8 +182,32 @@
 			color: #999;
 		}
 
+		// The remove button used to wrap onto its own line, because the input is
+		// 400px wide and the row was plain block flow with no room left over
 		.property-line {
+			align-items: flex-start;
+			display: flex;
+			gap: 4px;
 			margin-bottom: 5px;
+
+			> input:not([type='checkbox']), > textarea {
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+
+			> .btn {
+				flex: 0 0 auto;
+			}
+		}
+
+		// Bootstrap right aligns these at a fixed width, so labels of different
+		// lengths start at different places. Reads as ragged rather than aligned
+		.control-group > label:not(.iconsize24) {
+			text-align: left;
+		}
+
+		.adr-type {
+			max-width: 160px;
 		}
 
 		input:not([type='checkbox']), textarea {

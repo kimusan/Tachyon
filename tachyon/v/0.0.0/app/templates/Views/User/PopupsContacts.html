@@ -275,9 +275,8 @@
 						<label class="iconsize24 icon-pencil" data-i18n="[title]CONTACTS/ADD_MENU_NOTE"></label>
 						<div class="property-line">
 							<span data-bind="text: note"></span>
-							<input type="text"
-								autocomplete="off" autocorrect="off" autocapitalize="off"
-								data-bind="textInput: note">
+							<textarea rows="4" autocomplete="off" autocorrect="off" autocapitalize="off"
+								data-bind="textInput: note"></textarea>
 							<a href="#" class="btn icon-x" data-bind="visible: !readOnly(), click: removeNote"></a>
 						</div>
 					</div>
@@ -320,10 +319,10 @@
 						<div class="control-group adr-group">
 							<label class="iconsize24 icon-map-pin"></label>
 							<div>
-								<select data-bind="value: type, enable: !$parent.readOnly()">
-									<option value="home" data-i18n="CONTACTS/ADR_HOME"></option>
-									<option value="work" data-i18n="CONTACTS/ADR_WORK"></option>
-								</select>
+								<input type="text" class="adr-type" list="contact-adr-types"
+									autocomplete="off" autocorrect="off" autocapitalize="off"
+									data-i18n="[placeholder]CONTACTS/ADR_TYPE"
+									data-bind="textInput: type, enable: !$parent.readOnly()">
 								<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeAdr.bind($parent, $data)"></a>
 								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_STREET" data-bind="textInput: street"></div>
 								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_STREET_EXT" data-bind="textInput: street_ext"></div>
@@ -336,6 +335,10 @@
 						</div>
 					</div>
 					<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addAdr"></a>
+					<datalist id="contact-adr-types">
+						<option value="home"></option>
+						<option value="work"></option>
+					</datalist>
 				</div>
 				<input type="radio" name="contacttabs" id="tab-contact-business">
 				<label for="tab-contact-business"

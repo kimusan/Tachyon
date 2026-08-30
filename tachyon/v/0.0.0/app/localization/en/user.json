@@ -295,6 +295,7 @@
 		"PHOTO_NONE": "No photo",
 		"PHOTO_UNREADABLE": "That file could not be read as an image.",
 		"ADR_HOME": "Home",
+		"ADR_TYPE": "Type",
 		"ADR_WORK": "Work",
 		"ADR_STREET": "Street",
 		"ADR_STREET_EXT": "Address line 2",
