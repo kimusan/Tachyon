@@ -5,6 +5,7 @@ import { SettingsGet } from 'Common/Globals';
 import { LanguageStore } from 'Stores/Language';
 import { staticLink } from 'Common/Links';
 import { i18n, getNotification } from 'Common/Translator';
+import { CalendarUserStore } from 'Stores/User/Calendar';
 
 import Remote from 'Remote/User/Fetch';
 
@@ -492,6 +493,10 @@ export class CalendarPopupView extends AbstractViewPopup {
 			},
 			() => this.failed(i18n('CALENDAR/ERROR_LOAD_COMPONENT'))
 		);
+		// Redraw when a background sync brings something in, rather than leaving
+		// the grid showing what the database held when it was opened
+		this.syncedSubscription = this.syncedSubscription
+			|| CalendarUserStore.synced.subscribe(() => this.modalVisible() && this.loadCalendars());
 	}
 
 	onHide() {

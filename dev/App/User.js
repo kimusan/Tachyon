@@ -33,6 +33,7 @@ import { SettingsUserStore } from 'Stores/User/Settings';
 import { NotificationUserStore } from 'Stores/User/Notification';
 import { AccountUserStore } from 'Stores/User/Account';
 import { ContactUserStore } from 'Stores/User/Contact';
+import { CalendarUserStore } from 'Stores/User/Calendar';
 import { FolderUserStore } from 'Stores/User/Folder';
 import { PgpUserStore } from 'Stores/User/Pgp';
 import { SMimeUserStore } from 'Stores/User/SMime';
@@ -183,6 +184,7 @@ export class AppUser extends AbstractApp {
 
 			SettingsUserStore.init();
 			ContactUserStore.init();
+			CalendarUserStore.init();
 
 			loadFolders((success, error) => {
 				try {
