@@ -5,8 +5,8 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME = 'Nextcloud',
 		// Keep upstream metadata if you prefer; this is not functional.
-		VERSION = '2.38.2',
-		RELEASE  = '2026-02-06',
+		VERSION = '2.39.0',
+		RELEASE  = '2026-08-30',
 		CATEGORY = 'Integrations',
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
 		REQUIRED = '2.38.0';
@@ -401,6 +401,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 				->SetDefaultValue(true),
 			\Tachyon\Plugins\Property::NewInstance('ignoreSystemAddressbook')->SetLabel('Ignore system addressbook')
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::BOOL)
+				->SetDescription("Leave every user out of the address suggestions unless someone has saved them as a contact. Nextcloud builds the system addressbook from the user accounts on the server, so with this off a large installation offers every account when composing. The user's own addressbooks are always searched either way.")
 				->SetDefaultValue(true),
 /*
 			\Tachyon\Plugins\Property::NewInstance('storage')->SetLabel('Use Nextcloud user ID in config storage path')

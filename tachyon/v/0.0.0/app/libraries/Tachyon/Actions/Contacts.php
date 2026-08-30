@@ -208,14 +208,34 @@ trait Contacts
 			return $this->DefaultResponse([]);
 		}
 
+		// The admin's compose limit, not a literal 100. A group larger than
+		// that used to expand to its first 100 members with nothing said.
+		$iLimit = \max(1, (int) $this->oConfig->Get('contacts', 'compose_recipients_limit', 100));
+
 		$aResult = [];
 		$oAbp = $this->AddressBookProvider($oAccount);
 		if ($oAbp->IsActive()) {
-			// The admin's compose limit, not a literal 100. A group larger than
-			// that used to expand to its first 100 members with nothing said.
-			$aResult = $oAbp->GetGroup($sGroup, \max(1,
-				(int) $this->oConfig->Get('contacts', 'compose_recipients_limit', 100)
-			));
+			$aResult = $oAbp->GetGroup($sGroup, $iLimit);
+		}
+
+		// Suggestion drivers are now asked for group names too, so a group that
+		// only exists in Nextcloud can be offered here. Without this it would be
+		// offered and then expand to nothing, which is worse than not offering it.
+		if ($iLimit > \count($aResult)) {
+			$aSeen = [];
+			foreach ($aResult as $aItem) {
+				$aSeen[\mb_strtolower(\trim((string) ($aItem[0] ?? '')))] = true;
+			}
+			foreach ($this->SuggestionsProvider()->GetGroup($sGroup, $iLimit) as $aItem) {
+				$sEmail = \mb_strtolower(\trim((string) ($aItem[0] ?? '')));
+				if (\strlen($sEmail) && !isset($aSeen[$sEmail])) {
+					$aSeen[$sEmail] = true;
+					$aResult[] = $aItem;
+					if ($iLimit <= \count($aResult)) {
+						break;
+					}
+				}
+			}
 		}
 
 		return $this->DefaultResponse($aResult);

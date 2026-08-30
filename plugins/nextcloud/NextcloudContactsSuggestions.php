@@ -13,6 +13,28 @@ class NextcloudContactsSuggestions implements
 		$this->ignoreSystemAddressbook = $ignoreSystemAddressbook;
 	}
 
+	/**
+	 * The contacts manager, ready to search, or null when there is nothing to
+	 * search. search() loads every address book the user has and skips the ones
+	 * they have disabled, so the only filtering left to do here is the system
+	 * address book, which is dropped unless the admin asked to keep it.
+	 */
+	private function manager()
+	{
+		$cm = \OC::$server->getContactsManager();
+		if (!$cm || !$cm->isEnabled()) {
+			return null;
+		}
+		if ($this->ignoreSystemAddressbook) {
+			foreach ($cm->getUserAddressBooks() as $addressBook) {
+				if ($addressBook->isSystemAddressBook()) {
+					$cm->unregisterAddressBook($addressBook);
+				}
+			}
+		}
+		return $cm;
+	}
+
 	public function Process(\Tachyon\Model\Account $oAccount, string $sQuery, int $iLimit = 20): array
 	{
 		try
@@ -22,18 +44,9 @@ class NextcloudContactsSuggestions implements
 				return [];
 			}
 
-			$cm = \OC::$server->getContactsManager();
-			if (!$cm || !$cm->isEnabled()) {
+			$cm = $this->manager();
+			if (!$cm) {
 				return [];
-			}
-
-			// Unregister system addressbook so as to return only contacts in user's addressbooks
-			if ($this->ignoreSystemAddressbook) {
-				foreach($cm->getUserAddressBooks() as $addressBook) {
-					if($addressBook->isSystemAddressBook()) {
-						 $cm->unregisterAddressBook($addressBook);
-					}
-				}
 			}
 
 			$aSearchResult = $cm->search($sQuery, array('FN', 'NICKNAME', 'TITLE', 'EMAIL'));
@@ -80,21 +93,85 @@ class NextcloudContactsSuggestions implements
 		return [];
 	}
 
+	/**
+	 * Categories matching what has been typed so far, with how many contacts
+	 * carry each, so the compose box can offer a Nextcloud group by name.
+	 *
+	 * CATEGORIES is one of Nextcloud's indexed properties, so this is a normal
+	 * search rather than reading every card.
+	 */
+	public function GetMatchingCategories(string $sQuery, int $iLimit = 5) : array
+	{
+		try
+		{
+			$sQuery = \trim($sQuery);
+			if ('' === $sQuery) {
+				return [];
+			}
+
+			$cm = $this->manager();
+			if (!$cm) {
+				return [];
+			}
+
+			$aSearchResult = $cm->search($sQuery, ['CATEGORIES']);
+			if (!\is_array($aSearchResult)) {
+				return [];
+			}
+
+			// A search for "fri" matches a contact whose CATEGORIES holds
+			// "friends", but the contact carries every category it belongs to,
+			// so each has to be checked rather than taking the whole field.
+			$aCounts = [];
+			$aNames = [];
+			foreach ($aSearchResult as $aContact) {
+				$aCategories = isset($aContact['CATEGORIES'])
+					? (\is_array($aContact['CATEGORIES'])
+						? $aContact['CATEGORIES']
+						: \explode(',', (string) $aContact['CATEGORIES']))
+					: [];
+				$aSeen = [];
+				foreach ($aCategories as $sCat) {
+					$sCat = \trim($sCat);
+					if (!\strlen($sCat) || false === \mb_stripos($sCat, $sQuery)) {
+						continue;
+					}
+					$sKey = \mb_strtolower($sCat);
+					// One contact counts once per category however often it repeats
+					if (isset($aSeen[$sKey])) {
+						continue;
+					}
+					$aSeen[$sKey] = true;
+					$aNames[$sKey] = $aNames[$sKey] ?? $sCat;
+					$aCounts[$sKey] = ($aCounts[$sKey] ?? 0) + 1;
+				}
+			}
+
+			\arsort($aCounts);
+			$aResult = [];
+			foreach ($aCounts as $sKey => $iCount) {
+				if ($iLimit <= \count($aResult)) {
+					break;
+				}
+				$aResult[] = [$aNames[$sKey], $iCount];
+			}
+			return $aResult;
+		}
+		catch (\Exception $oException)
+		{
+			$this->logException($oException);
+		}
+
+		return [];
+	}
+
 	public function GetGroup(string $sCategoryName, int $iLimit = 20) : array
 	{
 		try
 		{
-			$cm = \OC::$server->getContactsManager();
-			if (!$cm || !$cm->isEnabled()) {
+			$cm = $this->manager();
+			if (!$cm) {
 				return [];
-			}
-
-			if ($this->ignoreSystemAddressbook) {
-				foreach ($cm->getUserAddressBooks() as $addressBook) {
-					if ($addressBook->isSystemAddressBook()) {
-						$cm->unregisterAddressBook($addressBook);
-					}
-				}
 			}
 
 			$aSearchResult = $cm->search($sCategoryName, ['CATEGORIES']);
