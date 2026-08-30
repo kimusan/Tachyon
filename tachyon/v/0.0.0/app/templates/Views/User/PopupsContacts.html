@@ -146,7 +146,7 @@
 							<div data-bind="visible: !readOnly()">
 								<input type="file" accept="image/*" id="contact-photo-input"
 									data-bind="event: { change: $root.choosePhoto.bind($root) }">
-								<a href="#" class="btn icon-x" data-bind="visible: photo, click: removePhoto"></a>
+								<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: photo, click: removePhoto"></a>
 							</div>
 						</div>
 					</div>
@@ -189,7 +189,7 @@
 								<input type="text"
 									autocomplete="off" autocorrect="off" autocapitalize="off"
 									data-bind="textInput: nickname" data-i18n="[placeholder]CONTACTS/NICK_NAME">
-								<a href="#" class="btn icon-x" data-bind="visible: !readOnly(), click: removeNickname"></a>
+								<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !readOnly(), click: removeNickname"></a>
 							</div>
 						</div>
 					</div>
@@ -210,7 +210,7 @@
 									<input type="text"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
-									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeEmail.bind($parent, $data)"></a>
+									<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !$parent.readOnly(), click: $parent.removeEmail.bind($parent, $data)"></a>
 								</div>
 							</div>
 							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addEmail"></a>
@@ -225,7 +225,7 @@
 									<input type="text"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
-									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeTel.bind($parent, $data)"></a>
+									<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !$parent.readOnly(), click: $parent.removeTel.bind($parent, $data)"></a>
 								</div>
 							</div>
 							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addTel"></a>
@@ -240,7 +240,7 @@
 									<input type="text"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
-									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeImpp.bind($parent, $data)"></a>
+									<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !$parent.readOnly(), click: $parent.removeImpp.bind($parent, $data)"></a>
 								</div>
 							</div>
 							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addImpp"></a>
@@ -252,7 +252,7 @@
 							<div class="property-line">
 								<span data-bind="text: bday"></span>
 								<input type="date" data-bind="value: bday">
-								<a href="#" class="btn icon-x" data-bind="visible: !readOnly(), click: removeBday"></a>
+								<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !readOnly(), click: removeBday"></a>
 							</div>
 						</div>
 					</div>
@@ -265,7 +265,7 @@
 									<input type="text" placeholder="https://"
 										autocomplete="off" autocorrect="off" autocapitalize="off"
 										data-bind="textInput: value">
-									<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeUrl.bind($parent, $data)"></a>
+									<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !$parent.readOnly(), click: $parent.removeUrl.bind($parent, $data)"></a>
 								</div>
 							</div>
 							<a href="#" class="btn icon-plus" data-bind="visible: !readOnly(), click: addUrl"></a>
@@ -277,7 +277,7 @@
 							<span data-bind="text: note"></span>
 							<textarea rows="4" autocomplete="off" autocorrect="off" autocapitalize="off"
 								data-bind="textInput: note"></textarea>
-							<a href="#" class="btn icon-x" data-bind="visible: !readOnly(), click: removeNote"></a>
+							<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !readOnly(), click: removeNote"></a>
 						</div>
 					</div>
 					<div class="control-group">
@@ -323,7 +323,7 @@
 									autocomplete="off" autocorrect="off" autocapitalize="off"
 									data-i18n="[placeholder]CONTACTS/ADR_TYPE"
 									data-bind="textInput: type, enable: !$parent.readOnly()">
-								<a href="#" class="btn icon-x" data-bind="visible: !$parent.readOnly(), click: $parent.removeAdr.bind($parent, $data)"></a>
+								<a href="#" class="btn icon-trash-2" data-i18n="[title]GLOBAL/DELETE" data-bind="visible: !$parent.readOnly(), click: $parent.removeAdr.bind($parent, $data)"></a>
 								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_STREET" data-bind="textInput: street"></div>
 								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_STREET_EXT" data-bind="textInput: street_ext"></div>
 								<div class="property-line"><input type="text" data-i18n="[placeholder]CONTACTS/ADR_POSTCODE" data-bind="textInput: postcode"></div>
