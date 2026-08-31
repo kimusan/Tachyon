@@ -21,7 +21,12 @@ class NextcloudContactsSuggestions implements
 	 */
 	private function manager()
 	{
-		$cm = \OC::$server->getContactsManager();
+		// get(IManager::class), not getContactsManager(). Nextcloud 34 stripped
+		// the legacy OC\Server::getXxx() convenience methods, leaving three of
+		// them, so the old call is a fatal there and took every suggestion in
+		// this class down with it. The container and the interface are both
+		// unchanged, and the rest of the plugin has always fetched this way.
+		$cm = \OC::$server->get(\OCP\Contacts\IManager::class);
 		if (!$cm || !$cm->isEnabled()) {
 			return null;
 		}

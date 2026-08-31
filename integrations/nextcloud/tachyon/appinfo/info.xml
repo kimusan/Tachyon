@@ -3,7 +3,7 @@
 	<id>tachyon</id>
 	<name>Tachyon</name>
 	<summary>Tachyon Webmail</summary>
-	<version>3.2.3</version>
+	<version>3.2.4</version>
 	<licence>agpl</licence>
 	<author mail="kim@schulz.dk" homepage="https://github.com/kimusan">Kim Schulz</author>
 	<author>RainLoop Team</author>
