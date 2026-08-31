@@ -577,15 +577,15 @@
         "author": "Tachyon",
         "category": "Integrations",
         "description": "Integrate with Nextcloud v20+",
-        "file": "https://github.com/kimusan/Tachyon/releases/latest/download/nextcloud-2.39.0.tgz",
+        "file": "https://github.com/kimusan/Tachyon/releases/latest/download/nextcloud-2.39.1.tgz",
         "id": "nextcloud",
         "license": "AGPL v3",
         "name": "Nextcloud",
-        "release": "2026-08-30",
+        "release": "2026-08-31",
         "required": "2.38.0",
         "type": "plugin",
         "url": "https://github.com/kimusan/Tachyon",
-        "version": "2.39.0"
+        "version": "2.39.1"
     },
     {
         "author": "Tachyon",
