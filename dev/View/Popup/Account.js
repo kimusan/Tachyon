@@ -2,8 +2,7 @@ import { addObservablesTo } from 'External/ko';
 import { getNotification } from 'Common/Translator';
 import { loadAccountsAndIdentities } from 'Common/UtilsUser';
 import { AccountUserStore } from 'Stores/User/Account';
-import { IdentityUserStore } from 'Stores/User/Identity';
-import { Settings } from 'Common/Globals';
+import { Settings, SettingsGet } from 'Common/Globals';
 import { addComputablesTo } from 'External/ko';
 
 import Remote from 'Remote/User/Fetch';
@@ -31,11 +30,10 @@ export class AccountPopupView extends AbstractViewPopup {
 
 		addComputablesTo(this, {
 			// Shown as the placeholder, so it is obvious that clearing the field
-			// falls back to this rather than to nothing
-			// .name, not .name(): EmailModel keeps it as a plain property, and
-			// calling it threw out of this computed, out of the isMain() that
-			// triggered it, and out of onShow before it had set anything
-			defaultName: () => (this.isMain() && IdentityUserStore.main()?.name) || this.email()
+			// falls back to this rather than to nothing. Comes from the server
+			// rather than IdentityUserStore, which holds the identities of the
+			// account you are currently in, not the main one.
+			defaultName: () => (this.isMain() && SettingsGet('mainIdentityName')) || this.email()
 		});
 	}
 
@@ -54,8 +52,9 @@ export class AccountPopupView extends AbstractViewPopup {
 			// this the old name came back the next time anything reloaded the
 			// list, which made clearing the field look like it had not worked.
 			Settings.set('mainAccountName', name);
+			const label = name || SettingsGet('mainIdentityName') || '';
 			AccountUserStore.forEach(item =>
-				item && !item.isAdditional() && (item.name = name)
+				item && !item.isAdditional() && (item.name = label)
 			);
 			AccountUserStore.valueHasMutated();
 			this.close();
@@ -93,7 +92,11 @@ export class AccountPopupView extends AbstractViewPopup {
 			edit = !!account?.isAdditional();
 		this.isMain(main);
 		this.isNew(!edit && !main);
-		this.name(account && (edit || main) ? account.name : '');
+		// The explicit setting for the main account, not account.name, which has
+		// the identity fallback folded into it already. Putting that in the
+		// field would turn a default into a stored choice the moment you saved,
+		// and the placeholder would never be seen.
+		this.name(main ? (SettingsGet('mainAccountName') || '') : (edit ? account.name : ''));
 		this.email(account && (edit || main) ? account.email : '');
 		this.password('');
 		this.submitError('');

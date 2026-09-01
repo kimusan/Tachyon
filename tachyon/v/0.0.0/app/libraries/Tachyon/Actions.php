@@ -618,6 +618,7 @@ class Actions
 						'UndoSendDelay' => (int) $oConfig->Get('defaults', 'undo_send_delay', 0),
 						'ContactsAutosave' => (bool) $oConfig->Get('defaults', 'contacts_autosave', true),
 						'mainAccountName' => '',
+						'mainIdentityName' => '',
 						'ContactsHideNoEmail' => false
 					],
 					// MainAccount or AdditionalAccount
@@ -717,8 +718,23 @@ class Actions
 					$aResult['ContactsAutosave'] = (bool)$oSettings->GetConf('ContactsAutosave', $aResult['ContactsAutosave']);
 					$aResult['ContactsHideNoEmail'] = (bool)$oSettings->GetConf('ContactsHideNoEmail', $aResult['ContactsHideNoEmail']);
 					// The account you log in with is not in the accounts list, so its
-					// name has nowhere else to live
+					// name has nowhere else to live.
 					$aResult['mainAccountName'] = (string)$oSettings->GetConf('MainAccountName', '');
+					// What it falls back to when nobody has named it: the display
+					// name on its own login identity. Resolved here, against the
+					// main account, because the identities the client holds belong
+					// to whichever account is currently active. Reading them there
+					// made the label change depending on where you were standing.
+					try {
+						foreach ($this->IdentitiesProvider()->GetIdentities($this->getMainAccountFromToken(), false) as $oIdentity) {
+							$aResult['mainIdentityName'] = (string) $oIdentity->Name();
+							break;
+						}
+					} catch (\Throwable $oException) {
+						// An identity driver can be remote, LDAP among them. A
+						// name is not worth failing the whole app data for.
+						$this->logException($oException, \LOG_WARNING);
+					}
 					$aResult['MessagesPerPage'] = \max(10, \intval($oSettings->GetConf('MessagesPerPage', $aResult['MessagesPerPage']) ?: $aResult['MessagesPerPage']));
 					$aResult['messageNewWindow'] = (bool)$oSettings->GetConf('messageNewWindow', $aResult['messageNewWindow']);
 					$aResult['markdown'] = (bool)$oSettings->GetConf('markdown', $aResult['markdown']);

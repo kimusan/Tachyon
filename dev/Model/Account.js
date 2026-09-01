@@ -2,7 +2,6 @@ import { AbstractModel } from 'Knoin/AbstractModel';
 import { addObservablesTo } from 'External/ko';
 import Remote from 'Remote/User/Fetch';
 import { SettingsUserStore } from 'Stores/User/Settings';
-import { IdentityUserStore } from 'Stores/User/Identity';
 
 export class AccountModel extends AbstractModel {
 	/**
@@ -30,14 +29,13 @@ export class AccountModel extends AbstractModel {
 	}
 
 	label() {
-		// Additional accounts are given a name when they are added, but the one
-		// you log in with never had anywhere to put one, so it could only ever
-		// show as a bare address. Its login identity already carries the display
-		// name the user chose, so use that rather than asking for it twice.
-		return this.name
-			// name is a plain property on EmailModel, not an observable
-			|| (this.isAdditional() ? '' : IdentityUserStore.main()?.name)
-			|| IDN.toUnicode(this.email);
+		// Whatever the account is called, or its address. The main account used
+		// to read its name from IdentityUserStore here, which holds the
+		// identities of the account you are currently in rather than the main
+		// one, so the label changed depending on where you were standing. The
+		// server resolves the fallback once now and sends it as
+		// mainIdentityName, which the main account is built with.
+		return this.name || IDN.toUnicode(this.email);
 	}
 
 	/**

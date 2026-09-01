@@ -47,7 +47,11 @@ loadAccountsAndIdentities = () => {
 				? items.map(oValue => new AccountModel(oValue.email, oValue.name))
 				: []
 			);
-			AccountUserStore.unshift(new AccountModel(SettingsGet('mainEmail'), SettingsGet('mainAccountName') || '', false));
+			// mainIdentityName is the login identity's display name, resolved by
+			// the server against the main account. It cannot be read from
+			// IdentityUserStore here, which holds the active account's identities.
+			AccountUserStore.unshift(new AccountModel(SettingsGet('mainEmail'),
+				SettingsGet('mainAccountName') || SettingsGet('mainIdentityName') || '', false));
 
 			items = oData.Result.Identities;
 			IdentityUserStore(isArray(items)
