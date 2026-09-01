@@ -204,7 +204,7 @@
 								<span data-i18n="CONTACTS/SEND_TO_ALL_CONTACT_EMAILS"></span>
 							</label>
 
-							<div data-bind="foreach: email">
+							<div data-bind="foreach: email, i18nUpdate: email">
 								<div class="property-line">
 									<span data-bind="text: value"></span>
 									<input type="text"
@@ -219,7 +219,7 @@
 					<div class="control-group" data-bind="visible: tel().length">
 						<label class="iconsize24 icon-phone" data-i18n="[title]CONTACTS/ADD_MENU_PHONE"></label>
 						<div>
-							<div data-bind="foreach: tel">
+							<div data-bind="foreach: tel, i18nUpdate: tel">
 								<div class="property-line">
 									<span data-bind="text: value"></span>
 									<input type="text"
@@ -234,7 +234,7 @@
 					<div class="control-group" data-bind="visible: impp().length">
 						<label class="iconsize24 icon-message-circle" data-i18n="[title]CONTACTS/ADD_MENU_IMPP"></label>
 						<div>
-							<div data-bind="foreach: impp">
+							<div data-bind="foreach: impp, i18nUpdate: impp">
 								<div class="property-line">
 									<span data-bind="text: value"></span>
 									<input type="text"
@@ -259,7 +259,7 @@
 					<div class="control-group" data-bind="visible: url().length">
 						<label class="iconsize24 icon-globe" data-i18n="[title]CONTACTS/ADD_MENU_URL"></label>
 						<div>
-							<div data-bind="foreach: url">
+							<div data-bind="foreach: url, i18nUpdate: url">
 								<div class="property-line">
 									<span data-bind="text: value"></span>
 									<input type="text" placeholder="https://"
@@ -315,7 +315,7 @@
 					tabindex="0"
 					data-i18n="CONTACTS/TAB_LOCATIONS"></label>
 				<div class="form-horizontal tab-content" role="tabpanel" aria-hidden="true">
-					<div data-bind="foreach: adr">
+					<div data-bind="foreach: adr, i18nUpdate: adr">
 						<div class="control-group adr-group">
 							<label class="iconsize24 icon-map-pin"></label>
 							<div>
