@@ -15,6 +15,15 @@
 	}
 }
 
+/* A cell keeps being a cell. These classes used to live on inline elements
+   only, so inline-block was safe; the icon migration moved them onto table
+   cells that draw the glyph themselves, and inline-block took those cells out
+   of their row, leaving the rest to form an anonymous table below them. */
+td[class^="icon-"], td[class*=" icon-"],
+th[class^="icon-"], th[class*=" icon-"] {
+	display: table-cell;
+}
+
 /* .b-contacts-content .b-view-content */
 .iconsize24 {
 	font-size: 171%;
