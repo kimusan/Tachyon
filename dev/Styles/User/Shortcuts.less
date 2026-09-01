@@ -1,6 +1,14 @@
 #V-PopupsKeyboardShortcutsHelp {
 	max-width: 700px;
 
+	/* The table is width:100% on auto layout, so the icon column is given more
+	   room than the 1em glyph in it and the icons sat against the left padding.
+	   Only the cells that carry an icon: the first column of the last two tabs
+	   holds label text, which stays where it is. */
+	td[class^="icon-"] {
+		text-align: center;
+	}
+
 	.tab-content {
 		grid-column-end: 5;
 	}
