@@ -337,16 +337,15 @@ export class MailMessageList extends AbstractViewRight {
 				item => sFolder === item?.folder && iUid == item?.uid
 			);
 
-			if ('INBOX' === sFolder) {
-				hasher.setHash(mailBox(sFolder));
-			}
-
+			// Only go to the folder when the message is not already in front of
+			// us. mailBox(sFolder) carries no page and no search, so navigating
+			// threw away a filtered list, and this event is also how deleting a
+			// message asks for the next one to be selected: deleting inside a
+			// search dropped you back into the unfiltered folder every time.
 			if (message) {
 				this.selector.selectMessageItem(message);
 			} else {
-				if ('INBOX' !== sFolder) {
-					hasher.setHash(mailBox(sFolder));
-				}
+				hasher.setHash(mailBox(sFolder));
 				if (sFolder && iUid) {
 					let message = new MessageModel;
 					message.folder = sFolder;

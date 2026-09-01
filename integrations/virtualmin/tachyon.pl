@@ -20,7 +20,7 @@ return "Tachyon Webmail is a browser-based multilingual IMAP client with an appl
 # script_tachyon_versions()
 sub script_tachyon_versions
 {
-return ( "4.0.39" );
+return ( "4.0.40" );
 }
 
 sub script_tachyon_version_desc

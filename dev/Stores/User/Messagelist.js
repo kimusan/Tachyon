@@ -254,7 +254,13 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 		fCallback = (iError, oData, bCached) => {
 			let error = '';
 			if (iError) {
-				if ('reload' != oData?.name) {
+				// An aborted list request is never the user's problem: whatever
+				// cancelled it is already fetching a replacement, and loading
+				// stays true so the spinner carries across. The reason we pass
+				// is 'reload', but an abort that lands while the body is being
+				// read rejects with a plain AbortError instead, which is how
+				// "request is aborted" reached the list.
+				if ('reload' != oData?.name && Notifications.RequestAborted != iError) {
 					error = getNotification(iError);
 					MessagelistUserStore.loading(false);
 //					if (Notifications.RequestAborted !== iError) {
