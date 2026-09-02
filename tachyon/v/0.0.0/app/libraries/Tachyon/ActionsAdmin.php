@@ -114,6 +114,7 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'logsAuthLogging', 'logs', 'auth_logging', 'bool');
 		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFilename', 'logs', 'auth_logging_filename', 'string');
 		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFormat', 'logs', 'auth_logging_format', 'string');
+		$this->setConfigFromParams($oConfig, 'logsSyslogIdent', 'logs', 'syslog_ident', 'string');
 		$this->setConfigFromParams($oConfig, 'debugEnable', 'debug', 'enable', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugJavascript', 'debug', 'javascript', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugCss', 'debug', 'css', 'bool');
@@ -619,6 +620,7 @@ class ActionsAdmin extends Actions
 			$aResult['logsAuthLogging'] = !!$oConfig->Get('logs', 'auth_logging', false);
 			$aResult['logsAuthLoggingFilename'] = (string)$oConfig->Get('logs', 'auth_logging_filename', '');
 			$aResult['logsAuthLoggingFormat'] = (string)$oConfig->Get('logs', 'auth_logging_format', '');
+			$aResult['logsSyslogIdent'] = (string)$oConfig->Get('logs', 'syslog_ident', 'tachyon');
 			$aResult['debugEnable'] = (bool)$oConfig->Get('debug', 'enable', false);
 			$aResult['debugJavascript'] = !!$oConfig->Get('debug', 'javascript', false);
 			$aResult['debugCss'] = !!$oConfig->Get('debug', 'css', false);

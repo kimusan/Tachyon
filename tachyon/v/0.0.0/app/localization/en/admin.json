@@ -208,6 +208,8 @@
 		"SQLITE_GLOBAL": "One shared database for everyone instead of one per user"
 	},
 	"TAB_LOGS": {
+		"LABEL_SYSLOG_IDENT": "Syslog name",
+		"HINT_SYSLOG_IDENT": "Name this instance reports to syslog. Set it per instance when more than one runs on a host, and match it in your fail2ban filter.",
 		"LEGEND_LOGGING": "Logging",
 		"LABEL_ENABLE": "Enable logging",
 		"LABEL_HIDE_PASSWORDS": "Hide passwords in the log",

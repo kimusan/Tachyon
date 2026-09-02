@@ -208,6 +208,8 @@
 		"SQLITE_GLOBAL": "Une base de données partagée pour tous au lieu d’une par utilisateur"
 	},
 	"TAB_LOGS": {
+		"LABEL_SYSLOG_IDENT": "Nom dans syslog",
+		"HINT_SYSLOG_IDENT": "Nom sous lequel cette instance écrit dans syslog. À définir par instance lorsque plusieurs tournent sur un hôte, et à reprendre dans votre filtre fail2ban.",
 		"LEGEND_LOGGING": "Journalisation",
 		"LABEL_ENABLE": "Activer la journalisation",
 		"LABEL_HIDE_PASSWORDS": "Masquer les mots de passe dans le journal",

@@ -208,6 +208,8 @@
 		"SQLITE_GLOBAL": "Una base de datos compartida para todos en lugar de una por usuario"
 	},
 	"TAB_LOGS": {
+		"LABEL_SYSLOG_IDENT": "Nombre en syslog",
+		"HINT_SYSLOG_IDENT": "Nombre con el que esta instancia informa a syslog. Defínalo por instancia cuando se ejecute más de una en un host, y úselo en su filtro de fail2ban.",
 		"LEGEND_LOGGING": "Registro",
 		"LABEL_ENABLE": "Activar el registro",
 		"LABEL_HIDE_PASSWORDS": "Ocultar las contraseñas en el registro",

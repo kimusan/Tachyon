@@ -23,6 +23,23 @@ abstract class Log
 
 	public static function emergency(string $prefix, string $msg)  { self::log(\LOG_EMERG, $prefix, $msg); }
 
+	/**
+	 * The name this instance reports to syslog and to authpriv.
+	 *
+	 * Configurable because several instances on one host were previously
+	 * indistinguishable in the log, and because a fail2ban filter matches on it.
+	 */
+	public static function ident() : string
+	{
+		// Goes straight into the log line, and readers split that line on the
+		// colon after the name, so a space or a colon here would quietly corrupt
+		// every entry and any filter reading them. Admin set, but still a value
+		// crossing into another system, so it is narrowed rather than trusted.
+		$sIdent = \preg_replace('/[^A-Za-z0-9._-]/', '',
+			(string) \Tachyon\Api::Config()->Get('logs', 'syslog_ident', 'tachyon'));
+		return \strlen($sIdent) ? \substr($sIdent, 0, 32) : 'tachyon';
+	}
+
 	private static
 		$levels = [
 			\LOG_EMERG   => 'EMERGENCY',
@@ -47,7 +64,7 @@ abstract class Log
 				$log_level = \max(3, \Tachyon\Api::Config()->Get('logs', 'level', \LOG_WARNING));
 			}
 			if ($level <= $log_level) {
-				if (\Tachyon\Api::Config()->Get('logs', 'syslog') && \openlog('tachyon', \LOG_ODELAY, \LOG_USER)) {
+				if (\Tachyon\Api::Config()->Get('logs', 'syslog') && \openlog(self::ident(), \LOG_ODELAY, \LOG_USER)) {
 					\syslog($level, "{$prefix} {$msg}");
 					\closelog();
 				}

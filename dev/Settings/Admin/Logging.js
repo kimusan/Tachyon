@@ -16,6 +16,7 @@ export class AdminSettingsLogging extends AbstractViewSettings {
 			'logsAuthLogging',
 			'logsAuthLoggingFilename',
 			'logsAuthLoggingFormat',
+			'logsSyslogIdent',
 			'debugEnable',
 			'debugJavascript',
 			'debugCss'

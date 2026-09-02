@@ -208,6 +208,8 @@
 		"SQLITE_GLOBAL": "Én fælles database for alle i stedet for én pr. bruger"
 	},
 	"TAB_LOGS": {
+		"LABEL_SYSLOG_IDENT": "Syslog-navn",
+		"HINT_SYSLOG_IDENT": "Navnet som denne instans rapporterer til syslog under. Sæt det per instans, når der kører flere på samme vært, og brug det samme i dit fail2ban-filter.",
 		"LEGEND_LOGGING": "Logning",
 		"LABEL_ENABLE": "Aktivér logning",
 		"LABEL_HIDE_PASSWORDS": "Skjul adgangskoder i loggen",

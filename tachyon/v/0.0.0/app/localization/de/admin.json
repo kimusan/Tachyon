@@ -208,6 +208,8 @@
 		"SQLITE_GLOBAL": "Eine gemeinsame Datenbank für alle statt einer je Benutzer"
 	},
 	"TAB_LOGS": {
+		"LABEL_SYSLOG_IDENT": "Syslog-Name",
+		"HINT_SYSLOG_IDENT": "Name, unter dem diese Instanz an Syslog meldet. Bei mehreren Instanzen auf einem Host pro Instanz setzen und im fail2ban-Filter entsprechend angeben.",
 		"LEGEND_LOGGING": "Protokollierung",
 		"LABEL_ENABLE": "Protokollierung aktivieren",
 		"LABEL_HIDE_PASSWORDS": "Passwörter im Protokoll verbergen",
