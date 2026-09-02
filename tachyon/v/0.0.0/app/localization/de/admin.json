@@ -93,6 +93,7 @@
 		"HTML_DOMAINS_HELPER": "Liste der Domains, die Webmail-Nutzer verwenden dürfen.\n<br>\nKlicken Sie auf den Namen, um die Domain zu konfigurieren."
 	},
 	"TAB_SECURITY": {
+		"LABEL_TOTP_CLEAR": "Entfernen",
 		"LEGEND_SECURITY": "Sicherheit",
 		"LABEL_USE_IMAGE_PROXY": "Lokalen Proxy für externe Bilder verwenden",
 		"LABEL_AUTO_VERIFY": "Signaturen automatisch überprüfen",

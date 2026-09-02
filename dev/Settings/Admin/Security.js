@@ -92,13 +92,23 @@ export class AdminSettingsSecurity extends AbstractViewSettings {
 	}
 
 	generateTOTP() {
-		let CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
-			length = 16,
-			secret = '';
-		while (0 < length--) {
-			secret += CHARS[Math.floor(Math.random() * 32)];
-		}
-		this.adminTOTP(secret);
+		// getRandomValues, not Math.random: this is a shared secret guarding the
+		// admin panel, and Math.random is seeded predictably and is not meant to
+		// be unguessable. 32 divides 256 exactly, so the modulo is unbiased.
+		const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
+			bytes = new Uint8Array(16);
+		crypto.getRandomValues(bytes);
+		this.adminTOTP([...bytes].map(b => CHARS[b % 32]).join(''));
+	}
+
+	clearTOTP() {
+		// Generate only shows itself when the field is empty, so without this
+		// there was no way to turn two factor off or rotate to a new secret
+		// short of selecting the field by hand. Clearing takes effect on save,
+		// and the server asks only for the current password to do it: a code
+		// cannot be required from someone who has lost their authenticator.
+		this.adminTOTP('');
+		this.adminTOTPCode('');
 	}
 
 	saveAdminUserCommand() {

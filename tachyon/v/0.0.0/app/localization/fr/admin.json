@@ -93,6 +93,7 @@
 		"HTML_DOMAINS_HELPER": "Liste des domaines autorisés.\n<br>\nCliquez sur le nom pour configurer le domaine."
 	},
 	"TAB_SECURITY": {
+		"LABEL_TOTP_CLEAR": "Effacer",
 		"LEGEND_SECURITY": "Sécurité",
 		"LABEL_USE_IMAGE_PROXY": "Utiliser un proxy local pour les images externes",
 		"LABEL_AUTO_VERIFY": "Vérifier automatiquement les signatures",

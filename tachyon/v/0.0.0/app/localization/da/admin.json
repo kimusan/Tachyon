@@ -93,6 +93,7 @@
 		"HTML_DOMAINS_HELPER": "Liste over domæner webmail er tilladt adgang til.\n<br>\nKlik på navnet for at konfigurere domænet.\n"
 	},
 	"TAB_SECURITY": {
+		"LABEL_TOTP_CLEAR": "Ryd",
 		"LEGEND_SECURITY": "Sikkerhed",
 		"LABEL_USE_IMAGE_PROXY": "Brug lokal proxy til eksterne billeder",
 		"LABEL_AUTO_VERIFY": "Verificér signaturer automatisk",

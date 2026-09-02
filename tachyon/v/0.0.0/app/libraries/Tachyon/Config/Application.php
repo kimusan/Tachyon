@@ -253,7 +253,10 @@ Warning: only enable when server does not do this, else double compression error
 				'allow_admin_panel'       => array(true, 'Access settings'),
 				'admin_login'             => array('admin', 'Login and password for web admin panel'),
 				'admin_password'          => array(''),
-				'admin_totp'              => array(''),
+				'admin_totp'              => array('', 'Two factor secret for the admin panel. Empty disables it.
+Lost the authenticator? Blank this line, save the file, and log in with the password
+alone, then set a new secret under Security. Clearing it from the admin panel needs
+only the current password, so the code is never what keeps you out.'),
 				'insecure_cryptkey'       => array(false, 'Use email address instead of login password for encrypting sensitive data (like account passwords)'),
 
 				'force_https'             => array(false),

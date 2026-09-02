@@ -69,6 +69,8 @@
 			pattern="[A-Z2-7]{16,}"
 			data-bind="textInput: adminTOTP">
 		<button type="button" data-bind="visible:!adminTOTP(), click:generateTOTP">Generate</button>
+		<button type="button" data-bind="visible:adminTOTP(), click:clearTOTP"
+			data-i18n="TAB_SECURITY/LABEL_TOTP_CLEAR"></button>
 	</div>
 	<div class="control-group">
 		<label></label>

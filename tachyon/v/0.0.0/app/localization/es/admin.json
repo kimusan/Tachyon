@@ -93,6 +93,7 @@
 		"HTML_DOMAINS_HELPER": "Lista de los dominios de correo al que se permite ingresar.\n<br>\nHaz click en el nombre de un dominio para modificarlo.\n"
 	},
 	"TAB_SECURITY": {
+		"LABEL_TOTP_CLEAR": "Borrar",
 		"LEGEND_SECURITY": "Seguridad",
 		"LABEL_USE_IMAGE_PROXY": "Utilizar un proxy local para mostrar imágenes externas",
 		"LABEL_AUTO_VERIFY": "Verificar las firmas automáticamente",
