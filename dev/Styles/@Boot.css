@@ -77,3 +77,12 @@ body#rl-app {
 	height: 1em;
 	width: 1em;
 }
+
+/* Sized in em so it tracks the 214% above, and stroke rather than fill so the
+   whole mark is one colour, taken from --loading-color like the text. */
+#rl-loading-logo {
+	display: block;
+	height: 2.5em;
+	margin: 0 auto 0.3em;
+	width: 2.5em;
+}

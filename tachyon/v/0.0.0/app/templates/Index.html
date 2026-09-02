@@ -21,6 +21,17 @@
 </head>
 <body id="rl-app" data-admin='{{BaseAppAdmin}}' spellcheck="false">
 	<div id="rl-loading">
+		<!-- Drawn inline rather than pulled from the icon sheet: this shows before
+		     anything else has resolved, and a mask cannot take currentColor, which
+		     is how it follows --loading-color the way the icons follow text. -->
+		<svg id="rl-loading-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<rect x="9" y="6" width="13" height="12" rx="2"/>
+			<path d="M10.2 8.4 15.5 12l5.3-3.6"/>
+			<path d="M6 9H3"/>
+			<path d="M6 12H1"/>
+			<path d="M6 15H4"/>
+		</svg>
 		<div id="rl-loading-desc">{{LoadingDescriptionEsc}}</div>
 		<i class="icon-spinner"></i>
 		<noscript><div class="error-desc">{{NO_SCRIPT_DESC}}</div></noscript>
