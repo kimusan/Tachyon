@@ -1,4 +1,31 @@
-
 #V-Settings-Branding {
 
+	.logo-preview {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 8px;
+	}
+
+	/* Fixed swatches rather than theme colours: the point is to show the logo
+	   against both extremes, whatever the admin panel itself is wearing. */
+	.logo-preview-tile {
+		border: 1px solid var(--btn-border-clr, rgba(0, 0, 0, 0.2));
+		border-radius: 4px;
+		padding: 6px;
+
+		&.is-light {
+			background-color: #fff;
+		}
+
+		&.is-dark {
+			background-color: #222;
+		}
+
+		img {
+			display: block;
+			max-height: 80px;
+			max-width: 300px;
+		}
+	}
 }
