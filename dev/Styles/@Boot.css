@@ -78,11 +78,13 @@ body#rl-app {
 	width: 1em;
 }
 
-/* Sized in em so it tracks the 214% above, and stroke rather than fill so the
-   whole mark is one colour, taken from --loading-color like the text. */
+/* Height in em so it tracks the 214% above, width left to the viewBox: the mark
+   is a little over twice as wide as it is tall, and pinning both would letterbox
+   it. max-width keeps it on the screen on a narrow phone. */
 #rl-loading-logo {
 	display: block;
-	height: 2.5em;
-	margin: 0 auto 0.3em;
-	width: 2.5em;
+	height: 2.4em;
+	margin: 0 auto 0.4em;
+	max-width: 80vw;
+	width: auto;
 }
