@@ -133,6 +133,31 @@ export class CalendarPopupView extends AbstractViewPopup {
 			visibleCalendarUuids: () => this.calendars().filter(cal => cal.visible()).map(cal => cal.uuid)
 		});
 
+		// editStart and editEnd stay the canonical "YYYY-MM-DDTHH:mm", so save and
+		// validation are untouched; these only split it for the two controls.
+		['Start', 'End'].forEach(which => {
+			const field = this['edit' + which];
+			this['edit' + which + 'Date'] = ko.computed({
+				read: () => (field() || '').split('T')[0] || '',
+				write: value => {
+					const time = (field() || '').split('T')[1];
+					field(value + (time ? 'T' + time : ''));
+				}
+			});
+			this['edit' + which + 'Time'] = ko.computed({
+				read: () => this.displayTime((field() || '').split('T')[1] || ''),
+				write: value => {
+					const parsed = this.parseTime(value),
+						date = (field() || '').split('T')[0];
+					// An unreadable entry keeps the old time rather than blanking it
+					field(date + 'T' + (parsed || (field() || '').split('T')[1] || '00:00'));
+					// Redraw even when the text is unchanged, so a rejected entry
+					// snaps back instead of sitting there looking accepted
+					field.valueHasMutated();
+				}
+			});
+		});
+
 		decorateKoCommands(this, {
 			newEventCommand: self => self.hasWritableCalendar(),
 			/**
@@ -366,6 +391,68 @@ export class CalendarPopupView extends AbstractViewPopup {
 	/**
 	 * datetime-local and date inputs both want local time, not UTC
 	 */
+	/**
+	 * A time typed by hand, read generously. Accepts 9, 930, 9:3, 9.30, 09:30,
+	 * "9:30 pm" and "21:30", and returns "HH:mm" in 24 hour form or '' if it
+	 * cannot make sense of it.
+	 */
+	parseTime(text) {
+		const raw = String(text || '').trim().toLowerCase();
+		if (!raw) {
+			return '';
+		}
+		const pm = /p\.?m\.?$/.test(raw),
+			am = /a\.?m\.?$/.test(raw),
+			digits = raw.replace(/[^0-9]/g, '');
+		let hour, minute;
+		if (raw.includes(':') || raw.includes('.')) {
+			const parts = raw.split(/[:.]/);
+			hour = parseInt(parts[0], 10);
+			minute = parseInt(parts[1], 10) || 0;
+		} else if (3 > digits.length) {
+			hour = parseInt(digits, 10);
+			minute = 0;
+		} else {
+			// 930 and 0930 both mean half past nine
+			hour = parseInt(digits.slice(0, digits.length - 2), 10);
+			minute = parseInt(digits.slice(-2), 10);
+		}
+		if (!isFinite(hour) || !isFinite(minute) || 59 < minute) {
+			return '';
+		}
+		if (pm && 12 > hour) {
+			hour += 12;
+		} else if (am && 12 === hour) {
+			hour = 0;
+		}
+		if (0 > hour || 23 < hour) {
+			return '';
+		}
+		const pad = v => String(v).padStart(2, '0');
+		return pad(hour) + ':' + pad(minute);
+	}
+
+	/**
+	 * "HH:mm" shown the way the rest of the interface shows times.
+	 *
+	 * This exists because a native datetime-local or time input picks its format
+	 * from the browser's locale and ignores both the document language and this
+	 * application's own setting, so an install set to 24 hour still rendered
+	 * AM/PM. Fixing the grid's formats did nothing for the editor for that
+	 * reason. The control is ours now, so the setting is actually obeyed.
+	 */
+	displayTime(value) {
+		if (!value) {
+			return '';
+		}
+		const [hour, minute] = value.split(':').map(Number),
+			date = new Date(2000, 0, 1, hour, minute);
+		return date.toLocaleTimeString(
+			LanguageStore.hourCycle() ? undefined : navigator.language,
+			this.timeFormatOptions()
+		);
+	}
+
 	toInput(date, allDay) {
 		const pad = value => String(value).padStart(2, '0'),
 			ymd = date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());

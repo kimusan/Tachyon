@@ -155,11 +155,18 @@
 
 		input[type="text"],
 		input[type="date"],
-		input[type="datetime-local"],
 		select,
 		textarea {
 			width: 100%;
 			box-sizing: border-box;
+		}
+
+		/* Date and time share a row when the event is not all day, so neither
+		   can take the full width the rule above gives them. */
+		.b-calendar-date {
+			width: auto;
+			flex: 1 1 auto;
+			min-width: 0;
 		}
 
 		.b-calendar-editor-error {
@@ -204,4 +211,18 @@
 	/* Event colours and their label colour are chosen per event in JS, from the
 	   calendar's own colour, so no fixed pair is assumed here. */
 	--ec-bg-event-color: var(--border-color, rgba(128, 128, 128, .35));
+}
+
+/* The time field is ours rather than a native time input, whose format follows
+   the browser locale and ignores the hour cycle set in this app. */
+.b-calendar-editor-form .b-calendar-time {
+	flex: 0 0 auto;
+	margin-left: 6px;
+	text-align: center;
+	width: 7em;
+}
+
+.b-calendar-editor-form .b-calendar-when {
+	display: flex;
+	align-items: center;
 }

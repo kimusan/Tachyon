@@ -97,7 +97,13 @@
 					<input type="date" data-bind="value: editStart, enable: !editReadOnly()">
 					<!-- /ko -->
 					<!-- ko ifnot: editAllDay -->
-					<input type="datetime-local" data-bind="value: editStart, enable: !editReadOnly()">
+					<div class="b-calendar-when">
+					<input type="date" class="b-calendar-date" data-bind="value: editStartDate, enable: !editReadOnly()">
+					<!-- a text field, not type="time": a native time control takes its
+					     format from the browser locale and ignores this app's hour cycle -->
+					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
+						data-bind="value: editStartTime, enable: !editReadOnly()">
+					</div>
 					<!-- /ko -->
 				</div>
 
@@ -107,7 +113,13 @@
 					<input type="date" data-bind="value: editEnd, enable: !editReadOnly()">
 					<!-- /ko -->
 					<!-- ko ifnot: editAllDay -->
-					<input type="datetime-local" data-bind="value: editEnd, enable: !editReadOnly()">
+					<div class="b-calendar-when">
+					<input type="date" class="b-calendar-date" data-bind="value: editEndDate, enable: !editReadOnly()">
+					<!-- a text field, not type="time": a native time control takes its
+					     format from the browser locale and ignores this app's hour cycle -->
+					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
+						data-bind="value: editEndTime, enable: !editReadOnly()">
+					</div>
 					<!-- /ko -->
 				</div>
 
