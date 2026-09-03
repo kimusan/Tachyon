@@ -15,26 +15,66 @@
 
 	<div class="legend" data-i18n="TAB_BRANDING/LEGEND_LOGO"></div>
 	<div class="control-group">
-		<label data-i18n="TAB_BRANDING/LABEL_LOGIN_LOGO"></label>
+		<label data-i18n="TAB_BRANDING/LABEL_LOGO_MODE"></label>
 		<div>
-			<div data-bind="visible: logoFile()" style="display:none; margin-bottom: 8px;">
-				<!-- Shown on light and on dark. A login logo is normally transparent,
-				     and the only question worth answering here is whether it will read
-				     on the page it lands on; one white swatch hid a white logo. -->
-				<div class="logo-preview">
-					<div class="logo-preview-tile is-light"><img data-bind="attr: { src: logoUrl }" alt="Logo"></div>
-					<div class="logo-preview-tile is-dark"><img data-bind="attr: { src: logoUrl }" alt="Logo"></div>
+			<div data-bind="component: {
+				name: 'Select',
+				params: {
+					options: logoModeOptions,
+					value: loginLogoMode,
+					trigger: loginLogoModeTrigger,
+					optionsText: 'name',
+					optionsValue: 'id'
+				}
+			}"></div>
+			<span class="help-block" data-i18n="TAB_BRANDING/HINT_LOGO_MODE"></span>
+		</div>
+	</div>
+
+	<div data-bind="visible: logoCustom">
+		<div class="control-group">
+			<label data-i18n="TAB_BRANDING/LABEL_LOGO_LIGHT"></label>
+			<div>
+				<div data-bind="visible: logoFile()" style="display:none; margin-bottom: 8px;">
+					<div class="logo-preview">
+						<div class="logo-preview-tile is-light"><img data-bind="attr: { src: logoUrl }" alt="Logo"></div>
+					</div>
+					<a href="#" class="btn btn-danger btn-small" data-bind="click: deleteLogo" data-i18n="TAB_BRANDING/BUTTON_DELETE_LOGO"></a>
 				</div>
-				<a href="#" class="btn btn-danger btn-small" data-bind="click: deleteLogo" data-i18n="TAB_BRANDING/BUTTON_DELETE_LOGO"></a>
+				<p data-bind="visible: !logoFile()" style="color: #999; margin-bottom: 8px;" data-i18n="TAB_BRANDING/LABEL_NO_LOGO"></p>
+				<label class="btn btn-small" data-bind="css: { disabled: logoUploading() }">
+					<input type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" style="display:none"
+						data-bind="event: { change: uploadLogo }, disable: logoUploading">
+					<span data-bind="visible: logoUploading()" data-i18n="GLOBAL/LOADING" style="display:none"></span>
+					<span data-bind="visible: !logoUploading()" data-i18n="TAB_BRANDING/BUTTON_UPLOAD_LOGO"></span>
+				</label>
+				<span class="help-block" data-i18n="TAB_BRANDING/HINT_LOGO_LIGHT"></span>
 			</div>
-			<p data-bind="visible: !logoFile()" style="color: #999; margin-bottom: 8px;" data-i18n="TAB_BRANDING/LABEL_NO_LOGO"></p>
-			<label class="btn btn-small" data-bind="css: { disabled: logoUploading() }">
-				<input type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" style="display:none"
-					data-bind="event: { change: uploadLogo }, disable: logoUploading">
-				<span data-bind="visible: logoUploading()" data-i18n="GLOBAL/LOADING" style="display:none"></span>
-				<span data-bind="visible: !logoUploading()" data-i18n="TAB_BRANDING/BUTTON_UPLOAD_LOGO"></span>
-			</label>
-			<p class="text-error" style="display:none; margin-top: 6px;" data-bind="visible: logoError(), text: logoError"></p>
+		</div>
+
+		<div class="control-group">
+			<label data-i18n="TAB_BRANDING/LABEL_LOGO_DARK"></label>
+			<div>
+				<div data-bind="visible: logoFileDark()" style="display:none; margin-bottom: 8px;">
+					<div class="logo-preview">
+						<div class="logo-preview-tile is-dark"><img data-bind="attr: { src: logoDarkUrl }" alt="Logo"></div>
+					</div>
+					<a href="#" class="btn btn-danger btn-small" data-bind="click: deleteLogoDark" data-i18n="TAB_BRANDING/BUTTON_DELETE_LOGO"></a>
+				</div>
+				<p data-bind="visible: !logoFileDark()" style="color: #999; margin-bottom: 8px;" data-i18n="TAB_BRANDING/LABEL_NO_LOGO"></p>
+				<label class="btn btn-small" data-bind="css: { disabled: logoUploading() }">
+					<input type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" style="display:none"
+						data-bind="event: { change: uploadLogoDark }, disable: logoUploading">
+					<span data-bind="visible: logoUploading()" data-i18n="GLOBAL/LOADING" style="display:none"></span>
+					<span data-bind="visible: !logoUploading()" data-i18n="TAB_BRANDING/BUTTON_UPLOAD_LOGO"></span>
+				</label>
+				<span class="help-block" data-i18n="TAB_BRANDING/HINT_LOGO_DARK"></span>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label></label>
+			<p class="text-error" style="display:none;" data-bind="visible: logoError(), text: logoError"></p>
 		</div>
 	</div>
 </div>

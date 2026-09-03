@@ -13,6 +13,10 @@
 :root {
 	--border-color: var(--nc-color-border);
 	--dialog-border-clr: var(--nc-color-border);
+	/* Nextcloud flips this between #222222 and #D8D8D8 with its own light and
+	   dark blocks, so the loading text and the login logo follow the server's
+	   scheme instead of falling back to black on a dark background. */
+	--loading-color: var(--nc-color-main-text);
 }
 
 :not([data-themes~="dark"]) {

@@ -58,6 +58,16 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Sprache des Benutzers automatisch ermitteln"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGO_MODE": "Logo der Anmeldeseite",
+		"HINT_LOGO_MODE": "Das Tachyon-Logo übernimmt die Farbe des Themas und bleibt so auf hellem wie auf dunklem Hintergrund lesbar. Wählen Sie \"Eigenes Logo\" für eigene Grafiken oder \"Kein Logo\", um nur den Ladetext anzuzeigen.",
+		"LOGO_MODE_DEFAULT": "Tachyon-Logo",
+		"LOGO_MODE_CUSTOM": "Eigenes Logo",
+		"LOGO_MODE_NONE": "Kein Logo",
+		"LABEL_LOGO_LIGHT": "Logo für helle Hintergründe",
+		"LABEL_LOGO_DARK": "Logo für dunkle Hintergründe",
+		"HINT_LOGO_LIGHT": "Dunkle Grafik, wird auf hellen Themen angezeigt.",
+		"HINT_LOGO_DARK": "Helle Grafik, wird auf dunklen Themen angezeigt. Ohne Angabe wird die obige verwendet.",
+		"ERROR_LOGO_UPLOAD": "Hochladen fehlgeschlagen. Nur PNG, JPG, GIF, SVG und WebP werden akzeptiert.",
 		"LEGEND_BRANDING": "Branding",
 		"LABEL_PAGE_TITLE": "Seitentitel",
 		"LABEL_LOADING_DESCRIPTION": "Beschreibungstext für Ladevorgang",

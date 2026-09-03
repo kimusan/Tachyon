@@ -58,6 +58,16 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Intentar definir el idioma del usuari"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGO_MODE": "Logotipo de la página de acceso",
+		"HINT_LOGO_MODE": "El logotipo de Tachyon toma el color del tema, por lo que sigue siendo legible tanto en claro como en oscuro. Elija \"Logotipo propio\" para usar su propia imagen, o \"Sin logotipo\" para mostrar solo el texto de carga.",
+		"LOGO_MODE_DEFAULT": "Logotipo de Tachyon",
+		"LOGO_MODE_CUSTOM": "Logotipo propio",
+		"LOGO_MODE_NONE": "Sin logotipo",
+		"LABEL_LOGO_LIGHT": "Logotipo para fondos claros",
+		"LABEL_LOGO_DARK": "Logotipo para fondos oscuros",
+		"HINT_LOGO_LIGHT": "Imagen oscura, se muestra en temas claros.",
+		"HINT_LOGO_DARK": "Imagen clara, se muestra en temas oscuros. Si se deja vacío se usa el anterior.",
+		"ERROR_LOGO_UPLOAD": "Error al subir. Solo se aceptan PNG, JPG, GIF, SVG y WebP.",
 		"LEGEND_BRANDING": "Personalización",
 		"LABEL_PAGE_TITLE": "Título de la página",
 		"LABEL_LOADING_DESCRIPTION": "Descripción",

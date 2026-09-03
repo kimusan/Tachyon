@@ -179,7 +179,11 @@ class Application extends \Tachyon\Config\AbstractConfig
 				'title'                       => array('Tachyon Webmail', 'Text displayed as page title'),
 				'loading_description'         => array('Tachyon', 'Text displayed on startup'),
 				'favicon_url'                 => array(''),
-				'logo_file'                   => array(''),
+				'logo_file'                   => array('', 'Login logo for light backgrounds, uploaded from the admin panel'),
+				'logo_file_dark'              => array('', 'Login logo for dark backgrounds. Falls back to logo_file when empty'),
+				'login_logo_mode'             => array('default', 'Login page logo: default, custom or none.
+default draws the built in Tachyon logo, which takes its colour from the theme.
+custom uses the uploaded files above. none shows no logo at all.'),
 				'app_path'                    => array(''),
 
 				'theme'                       => array('Tachyon', 'Theme used by default'),

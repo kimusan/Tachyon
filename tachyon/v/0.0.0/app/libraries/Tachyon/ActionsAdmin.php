@@ -115,6 +115,7 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFilename', 'logs', 'auth_logging_filename', 'string');
 		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFormat', 'logs', 'auth_logging_format', 'string');
 		$this->setConfigFromParams($oConfig, 'logsSyslogIdent', 'logs', 'syslog_ident', 'string');
+		$this->setConfigFromParams($oConfig, 'loginLogoMode', 'webmail', 'login_logo_mode', 'string');
 		$this->setConfigFromParams($oConfig, 'debugEnable', 'debug', 'enable', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugJavascript', 'debug', 'javascript', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugCss', 'debug', 'css', 'bool');
@@ -137,6 +138,20 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'pluginsEnable', 'plugins', 'enable', 'bool');
 
 		return $this->DefaultResponse($oConfig->Save());
+	}
+
+	/**
+	 * Which of the two login logos an upload or delete is aimed at.
+	 * 'dark' means the artwork for a dark background, so light ink.
+	 */
+	private function logoVariant() : string
+	{
+		return 'dark' === $this->GetActionParam('variant', '') ? 'dark' : 'light';
+	}
+
+	private function logoConfigKey(string $sVariant) : string
+	{
+		return 'dark' === $sVariant ? 'logo_file_dark' : 'logo_file';
 	}
 
 	public function DoAdminUploadLogo(): array
@@ -170,22 +185,30 @@ class ActionsAdmin extends Actions
 			$this->logWrite("UploadLogo: cannot create directory {$dir}", \LOG_ERR);
 			return $this->FalseResponse(__FUNCTION__);
 		}
-		foreach (\glob($dir . 'logo*.*') ?: [] as $old) {
+		$sVariant = $this->logoVariant();
+		foreach (\glob($dir . 'logo-' . $sVariant . '-*.*') ?: [] as $old) {
 			\unlink($old);
+		}
+		// Anything from before the light/dark split, which was a bare logo.<ext>
+		if ('light' === $sVariant) {
+			foreach (\glob($dir . 'logo.*') ?: [] as $old) {
+				\unlink($old);
+			}
 		}
 		// The name carries a digest of the contents. It used to be a bare
 		// logo.<ext>, so replacing a logo reused the URL it was already cached
 		// under, and ServiceLogo sends a day of Cache-Control: the upload worked
 		// and the browser kept showing the old picture. Same bytes give the same
 		// name, which is what we want, since that really is the same image.
-		$filename = 'logo-' . \substr(\sha1_file($tmp) ?: \bin2hex(\random_bytes(4)), 0, 8)
+		$filename = 'logo-' . $sVariant . '-'
+			. \substr(\sha1_file($tmp) ?: \bin2hex(\random_bytes(4)), 0, 8)
 			. '.' . $extMap[$mime];
 		if (!\move_uploaded_file($tmp, $dir . $filename)) {
 			$this->logWrite("UploadLogo: move_uploaded_file failed to {$dir}{$filename}", \LOG_ERR);
 			return $this->FalseResponse(__FUNCTION__);
 		}
 		$oConfig = $this->Config();
-		$oConfig->Set('webmail', 'logo_file', $filename);
+		$oConfig->Set('webmail', $this->logoConfigKey($sVariant), $filename);
 		$oConfig->Save();
 		return $this->DefaultResponse($filename);
 	}
@@ -193,14 +216,20 @@ class ActionsAdmin extends Actions
 	public function DoAdminDeleteLogo(): array
 	{
 		$oConfig = $this->Config();
-		$filename = $oConfig->Get('webmail', 'logo_file', '');
+		$sVariant = $this->logoVariant();
+		$sKey = $this->logoConfigKey($sVariant);
+		$filename = $oConfig->Get('webmail', $sKey, '');
 		if ($filename) {
-			// glob rather than the one name, so a logo written under the old
-			// logo.<ext> scheme is cleared out as well
-			foreach (\glob(APP_PRIVATE_DATA . 'branding/logo*.*') ?: [] as $old) {
+			$dir = APP_PRIVATE_DATA . 'branding/';
+			$aOld = \glob($dir . 'logo-' . $sVariant . '-*.*') ?: [];
+			if ('light' === $sVariant) {
+				// clears anything left by the pre split naming too
+				$aOld = \array_merge($aOld, \glob($dir . 'logo.*') ?: []);
+			}
+			foreach ($aOld as $old) {
 				\unlink($old);
 			}
-			$oConfig->Set('webmail', 'logo_file', '');
+			$oConfig->Set('webmail', $sKey, '');
 			$oConfig->Save();
 		}
 		return $this->DefaultResponse(true);
@@ -636,6 +665,8 @@ class ActionsAdmin extends Actions
 
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
 			$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');
+			$aResult['logoFileDark'] = $oConfig->Get('webmail', 'logo_file_dark', '');
+			$aResult['loginLogoMode'] = $oConfig->Get('webmail', 'login_logo_mode', 'default');
 
 			$aResult['weakPassword'] = \is_file(APP_PRIVATE_DATA.'admin_password.txt');
 

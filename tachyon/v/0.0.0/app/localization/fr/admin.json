@@ -58,6 +58,16 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Deviner la langue de l'utilisateur"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGO_MODE": "Logo de la page de connexion",
+		"HINT_LOGO_MODE": "Le logo Tachyon reprend la couleur du thème et reste donc lisible aussi bien en clair qu'en sombre. Choisissez « Logo personnalisé » pour votre propre image, ou « Aucun logo » pour n'afficher que le texte de chargement.",
+		"LOGO_MODE_DEFAULT": "Logo Tachyon",
+		"LOGO_MODE_CUSTOM": "Logo personnalisé",
+		"LOGO_MODE_NONE": "Aucun logo",
+		"LABEL_LOGO_LIGHT": "Logo pour fonds clairs",
+		"LABEL_LOGO_DARK": "Logo pour fonds sombres",
+		"HINT_LOGO_LIGHT": "Image sombre, affichée sur les thèmes clairs.",
+		"HINT_LOGO_DARK": "Image claire, affichée sur les thèmes sombres. Reprend celui du dessus si vide.",
+		"ERROR_LOGO_UPLOAD": "Échec de l'envoi. Seuls PNG, JPG, GIF, SVG et WebP sont acceptés.",
 		"LEGEND_BRANDING": "Favicône & Titre",
 		"LABEL_PAGE_TITLE": "Titre de la page",
 		"LABEL_LOADING_DESCRIPTION": "Description pendant le chargement",

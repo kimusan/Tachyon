@@ -261,8 +261,21 @@ class ServiceActions
 
 	public function ServiceLogo() : void
 	{
-		$filename = $this->Config()->Get('webmail', 'logo_file', '');
-		$path = $filename ? APP_PRIVATE_DATA . 'branding/' . \basename($filename) : '';
+		// There are two logos now, one per background, so the name in the URL
+		// finally has to mean something. It is matched against the two the config
+		// holds rather than sanitised: only a name we wrote is ever served, which
+		// leaves no room for traversal or for reading anything else in the folder.
+		$oConfig = $this->Config();
+		$aAllowed = \array_filter([
+			$oConfig->Get('webmail', 'logo_file', ''),
+			$oConfig->Get('webmail', 'logo_file_dark', '')
+		]);
+		$sWanted = empty($this->aPaths[1]) ? '' : \rawurldecode($this->aPaths[1]);
+		// No name asked for keeps the old behaviour of serving the light one
+		$filename = \strlen($sWanted)
+			? (\in_array($sWanted, $aAllowed, true) ? $sWanted : '')
+			: (string) \reset($aAllowed);
+		$path = $filename ? APP_PRIVATE_DATA . 'branding/' . $filename : '';
 		if (!$path || !\is_file($path)) {
 			\MailSo\Base\Http::StatusHeader(404);
 			return;

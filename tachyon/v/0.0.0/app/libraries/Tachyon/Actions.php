@@ -566,6 +566,8 @@ class Actions
 			'title' => $oConfig->Get('webmail', 'title', 'Tachyon Webmail'),
 			'loadingDescription' => $oConfig->Get('webmail', 'loading_description', 'Tachyon'),
 			'logoFile' => $oConfig->Get('webmail', 'logo_file', ''),
+			'logoFileDark' => $oConfig->Get('webmail', 'logo_file_dark', ''),
+			'loginLogoMode' => $oConfig->Get('webmail', 'login_logo_mode', 'default'),
 			'Plugins' => array(),
 			'System' => array(
 				'version' => APP_VERSION,

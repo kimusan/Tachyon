@@ -24,8 +24,21 @@ export class LoginUserView extends AbstractViewLogin {
 	constructor() {
 		super();
 
-		const logoFile = SettingsGet('logoFile');
-		this.logoUrl = logoFile ? ('?/Logo/' + encodeURIComponent(logoFile)) : '';
+		// Three modes. 'default' draws the built in logo inline, so it can take
+		// its colour from the theme; 'custom' uses the uploaded artwork, which
+		// comes as a light background and a dark background variant; 'none'
+		// leaves the description text on its own.
+		// Whichever variant is missing falls back to the other, so a single
+		// upload still works exactly as it did before there were two.
+		const mode = SettingsGet('loginLogoMode') || 'default',
+			url = file => file ? ('?/Logo/' + encodeURIComponent(file)) : '',
+			light = url(SettingsGet('logoFile')),
+			dark = url(SettingsGet('logoFileDark'));
+
+		this.logoDefault = 'default' === mode;
+		this.logoLightUrl = 'custom' === mode ? (light || dark) : '';
+		this.logoDarkUrl = 'custom' === mode ? (dark || light) : '';
+		this.hasLogo = this.logoDefault || !!this.logoLightUrl;
 
 		addObservablesTo(this, {
 			loadingDesc: SettingsGet('loadingDescription'),

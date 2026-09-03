@@ -1,6 +1,7 @@
 import { AbstractViewSettings } from 'Knoin/AbstractViews';
 import { SettingsGet } from 'Common/Globals';
-import { addObservablesTo, addComputablesTo } from 'External/ko';
+import { addObservablesTo, addComputablesTo, koComputable } from 'External/ko';
+import { i18n, translateTrigger } from 'Common/Translator';
 import Remote from 'Remote/Admin/Fetch';
 
 export class AdminSettingsBranding extends AbstractViewSettings {
@@ -9,19 +10,38 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 		this.addSetting('title');
 		this.addSetting('loadingDescription');
 		this.addSetting('faviconUrl');
+		this.addSetting('loginLogoMode');
 
 		addObservablesTo(this, {
 			logoFile: SettingsGet('logoFile') || '',
+			logoFileDark: SettingsGet('logoFileDark') || '',
 			logoUploading: false,
 			logoError: ''
 		});
 
 		addComputablesTo(this, {
-			logoUrl: () => this.logoFile() ? ('?/Logo/' + encodeURIComponent(this.logoFile())) : ''
+			logoUrl: () => this.logoFile() ? ('?/Logo/' + encodeURIComponent(this.logoFile())) : '',
+			logoDarkUrl: () => this.logoFileDark() ? ('?/Logo/' + encodeURIComponent(this.logoFileDark())) : '',
+			// The upload rows are only worth showing when the uploads are what
+			// the login page is actually going to use
+			logoCustom: () => 'custom' === this.loginLogoMode()
+		});
+
+		this.logoModeOptions = koComputable(() => {
+			translateTrigger();
+			return [
+				{ id: 'default', name: i18n('TAB_BRANDING/LOGO_MODE_DEFAULT') },
+				{ id: 'custom', name: i18n('TAB_BRANDING/LOGO_MODE_CUSTOM') },
+				{ id: 'none', name: i18n('TAB_BRANDING/LOGO_MODE_NONE') }
+			];
 		});
 	}
 
-	uploadLogo(vm, event) {
+	/**
+	 * @param {string} variant 'light' or 'dark', naming the background the
+	 *                         artwork is meant to sit on, not its own colour
+	 */
+	upload(variant, event) {
 		const file = event.target.files[0];
 		if (!file) return;
 		event.target.value = '';
@@ -29,22 +49,26 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 		this.logoUploading(true);
 		const fd = new FormData();
 		fd.append('logo', file);
+		fd.append('variant', variant);
 		Remote.request('AdminUploadLogo', (iError, data) => {
 			this.logoUploading(false);
 			if (iError || !data?.Result) {
-				this.logoError('Upload failed. Only PNG, JPG, GIF, SVG and WebP are accepted.');
+				this.logoError(i18n('TAB_BRANDING/ERROR_LOGO_UPLOAD'));
 			} else {
-				this.logoFile(data.Result);
+				('dark' === variant ? this.logoFileDark : this.logoFile)(data.Result);
 			}
 		}, fd);
 	}
 
-	deleteLogo() {
+	remove(variant) {
 		this.logoError('');
-		Remote.request('AdminDeleteLogo', (iError) => {
-			if (!iError) {
-				this.logoFile('');
-			}
-		});
+		Remote.request('AdminDeleteLogo', iError => {
+			iError || ('dark' === variant ? this.logoFileDark : this.logoFile)('');
+		}, { variant: variant });
 	}
+
+	uploadLogo(vm, event) { this.upload('light', event); }
+	uploadLogoDark(vm, event) { this.upload('dark', event); }
+	deleteLogo() { this.remove('light'); }
+	deleteLogoDark() { this.remove('dark'); }
 }

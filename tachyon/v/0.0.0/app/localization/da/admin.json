@@ -58,6 +58,16 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Forsøg at bestemme brugerens sprog"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGO_MODE": "Logo på loginsiden",
+		"HINT_LOGO_MODE": "Tachyon-logoet henter sin farve fra temaet og forbliver derfor læsbart på både lys og mørk baggrund. Vælg \"Eget logo\" for egne billeder, eller \"Intet logo\" for kun at vise indlæsningsteksten.",
+		"LOGO_MODE_DEFAULT": "Tachyon-logo",
+		"LOGO_MODE_CUSTOM": "Eget logo",
+		"LOGO_MODE_NONE": "Intet logo",
+		"LABEL_LOGO_LIGHT": "Logo til lys baggrund",
+		"LABEL_LOGO_DARK": "Logo til mørk baggrund",
+		"HINT_LOGO_LIGHT": "Mørkt billede, vises på lyse temaer.",
+		"HINT_LOGO_DARK": "Lyst billede, vises på mørke temaer. Bruger det ovenstående, hvis feltet er tomt.",
+		"ERROR_LOGO_UPLOAD": "Upload mislykkedes. Kun PNG, JPG, GIF, SVG og WebP accepteres.",
 		"LEGEND_BRANDING": "Branding",
 		"LABEL_PAGE_TITLE": "Sidetitel",
 		"LABEL_LOADING_DESCRIPTION": "Indlæsningsbeskrivelse",

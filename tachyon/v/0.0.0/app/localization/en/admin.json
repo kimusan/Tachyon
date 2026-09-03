@@ -58,6 +58,16 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Try to determine user language"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGO_MODE": "Login page logo",
+		"HINT_LOGO_MODE": "The Tachyon logo takes its colour from the theme, so it stays readable on light and dark alike. Choose Custom to use your own artwork, or No logo to show only the loading text.",
+		"LOGO_MODE_DEFAULT": "Tachyon logo",
+		"LOGO_MODE_CUSTOM": "Custom upload",
+		"LOGO_MODE_NONE": "No logo",
+		"LABEL_LOGO_LIGHT": "Logo for light backgrounds",
+		"LABEL_LOGO_DARK": "Logo for dark backgrounds",
+		"HINT_LOGO_LIGHT": "Dark artwork, shown on light themes.",
+		"HINT_LOGO_DARK": "Light artwork, shown on dark themes. Falls back to the one above when empty.",
+		"ERROR_LOGO_UPLOAD": "Upload failed. Only PNG, JPG, GIF, SVG and WebP are accepted.",
 		"LEGEND_BRANDING": "Branding",
 		"LABEL_PAGE_TITLE": "Page Title",
 		"LABEL_LOADING_DESCRIPTION": "Loading Description",

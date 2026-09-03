@@ -27,6 +27,32 @@
 			max-height: var(--login-logo-max-height, 100px);
 			max-width: var(--login-logo-max-width, 280px);
 		}
+
+		/* The built in logo. Stroke free artwork filled with currentColor, so it
+		   picks up whatever ink the theme uses for the text beside it and needs
+		   no light and dark variants of its own. */
+		.login-logo-default {
+			color: var(--loading-color, #000);
+			display: inline-block;
+			max-height: var(--login-logo-max-height, 100px);
+			max-width: var(--login-logo-max-width, 280px);
+			width: 100%;
+		}
+
+		/* Uploaded artwork comes in two files, one per background. Both are in
+		   the markup and one is hidden, rather than a picture element, because
+		   the app has its own colour scheme override that a media query alone
+		   would not see. */
+		.for-dark {
+			display: none;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.login-logo {
+			.for-light { display: none; }
+			.for-dark { display: inline; }
+		}
 	}
 
 	form {
@@ -181,4 +207,16 @@
 
 html.rl-started-trigger .LoginView {
 	opacity: 0.5;
+}
+
+/* The explicit choice wins over the system preference, matching how
+   data-color-scheme is handled elsewhere. Outside #rl-app because the attribute
+   sits on the html element. */
+html[data-color-scheme="light"] .login-logo {
+	.for-light { display: inline; }
+	.for-dark { display: none; }
+}
+html[data-color-scheme="dark"] .login-logo {
+	.for-light { display: none; }
+	.for-dark { display: inline; }
 }
