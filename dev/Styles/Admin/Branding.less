@@ -27,5 +27,13 @@
 			max-height: 80px;
 			max-width: 300px;
 		}
+
+		/* A favicon is only ever seen small, so show it small rather than
+		   blown up to the height the logo tiles allow. */
+		.favicon-preview {
+			height: 32px;
+			width: 32px;
+			object-fit: contain;
+		}
 	}
 }

@@ -11,10 +11,12 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 		this.addSetting('loadingDescription');
 		this.addSetting('faviconUrl');
 		this.addSetting('loginLogoMode');
+		this.addSetting('faviconMode');
 
 		addObservablesTo(this, {
 			logoFile: SettingsGet('logoFile') || '',
 			logoFileDark: SettingsGet('logoFileDark') || '',
+			faviconFile: SettingsGet('faviconFile') || '',
 			logoUploading: false,
 			logoError: ''
 		});
@@ -24,7 +26,19 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 			logoDarkUrl: () => this.logoFileDark() ? ('?/Logo/' + encodeURIComponent(this.logoFileDark())) : '',
 			// The upload rows are only worth showing when the uploads are what
 			// the login page is actually going to use
-			logoCustom: () => 'custom' === this.loginLogoMode()
+			logoCustom: () => 'custom' === this.loginLogoMode(),
+			faviconUploadUrl: () => this.faviconFile() ? ('?/Logo/' + encodeURIComponent(this.faviconFile())) : '',
+			faviconCustom: () => 'custom' === this.faviconMode(),
+			faviconExternal: () => 'url' === this.faviconMode()
+		});
+
+		this.faviconModeOptions = koComputable(() => {
+			translateTrigger();
+			return [
+				{ id: 'default', name: i18n('TAB_BRANDING/FAVICON_MODE_DEFAULT') },
+				{ id: 'custom', name: i18n('TAB_BRANDING/FAVICON_MODE_CUSTOM') },
+				{ id: 'url', name: i18n('TAB_BRANDING/FAVICON_MODE_URL') }
+			];
 		});
 
 		this.logoModeOptions = koComputable(() => {
@@ -65,6 +79,29 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 		Remote.request('AdminDeleteLogo', iError => {
 			iError || ('dark' === variant ? this.logoFileDark : this.logoFile)('');
 		}, { variant: variant });
+	}
+
+	uploadFavicon(vm, event) {
+		const file = event.target.files[0];
+		if (!file) return;
+		event.target.value = '';
+		this.logoError('');
+		this.logoUploading(true);
+		const fd = new FormData();
+		fd.append('logo', file);
+		Remote.request('AdminUploadFavicon', (iError, data) => {
+			this.logoUploading(false);
+			if (iError || !data?.Result) {
+				this.logoError(i18n('TAB_BRANDING/ERROR_LOGO_UPLOAD'));
+			} else {
+				this.faviconFile(data.Result);
+			}
+		}, fd);
+	}
+
+	deleteFavicon() {
+		this.logoError('');
+		Remote.request('AdminDeleteFavicon', iError => iError || this.faviconFile(''));
 	}
 
 	uploadLogo(vm, event) { this.upload('light', event); }

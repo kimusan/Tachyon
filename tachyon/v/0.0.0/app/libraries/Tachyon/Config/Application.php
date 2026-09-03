@@ -178,7 +178,11 @@ class Application extends \Tachyon\Config\AbstractConfig
 
 				'title'                       => array('Tachyon Webmail', 'Text displayed as page title'),
 				'loading_description'         => array('Tachyon', 'Text displayed on startup'),
-				'favicon_url'                 => array(''),
+				'favicon_url'                 => array('', 'External favicon URL, used when favicon_mode is url'),
+				'favicon_file'                => array('', 'Favicon uploaded from the admin panel'),
+				'favicon_mode'                => array('default', 'Favicon source: default, custom or url.
+default is the bundled Tachyon icon, which follows the browser colour scheme.
+custom is the uploaded file. url points at favicon_url.'),
 				'logo_file'                   => array('', 'Login logo for light backgrounds, uploaded from the admin panel'),
 				'logo_file_dark'              => array('', 'Login logo for dark backgrounds. Falls back to logo_file when empty'),
 				'login_logo_mode'             => array('default', 'Login page logo: default, custom or none.

@@ -58,6 +58,13 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Deviner la langue de l'utilisateur"
 	},
 	"TAB_BRANDING": {
+		"LABEL_FAVICON": "Favicon",
+		"HINT_FAVICON": "L'icône Tachyon suit le schéma de couleurs du navigateur. Envoyez la vôtre ou indiquez-en une hébergée ailleurs.",
+		"FAVICON_MODE_DEFAULT": "Icône Tachyon",
+		"FAVICON_MODE_CUSTOM": "Envoyer un fichier",
+		"FAVICON_MODE_URL": "URL externe",
+		"LABEL_FAVICON_FILE": "Fichier de favicon",
+		"HINT_FAVICON_FILE": "Le SVG est recommandé : c'est le seul format qui s'adapte à toutes les tailles demandées par le navigateur et le seul qui puisse suivre le schéma de couleurs. PNG, ICO, GIF et WebP sont acceptés mais utilisés à la taille envoyée.",
 		"LABEL_LOGO_MODE": "Logo de la page de connexion",
 		"HINT_LOGO_MODE": "Le logo Tachyon reprend la couleur du thème et reste donc lisible aussi bien en clair qu'en sombre. Choisissez « Logo personnalisé » pour votre propre image, ou « Aucun logo » pour n'afficher que le texte de chargement.",
 		"LOGO_MODE_DEFAULT": "Logo Tachyon",

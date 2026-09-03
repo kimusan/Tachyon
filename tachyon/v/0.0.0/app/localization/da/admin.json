@@ -58,6 +58,13 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Forsøg at bestemme brugerens sprog"
 	},
 	"TAB_BRANDING": {
+		"LABEL_FAVICON": "Favicon",
+		"HINT_FAVICON": "Tachyon-ikonet følger browserens farveskema. Upload dit eget, eller peg på et, der ligger et andet sted.",
+		"FAVICON_MODE_DEFAULT": "Tachyon-ikon",
+		"FAVICON_MODE_CUSTOM": "Upload en fil",
+		"FAVICON_MODE_URL": "Ekstern URL",
+		"LABEL_FAVICON_FILE": "Favicon-fil",
+		"HINT_FAVICON_FILE": "SVG anbefales: det er det eneste format, der skalerer til alle de størrelser en browser beder om, og det eneste der kan følge farveskemaet. PNG, ICO, GIF og WebP accepteres, men bruges i den størrelse du uploader.",
 		"LABEL_LOGO_MODE": "Logo på loginsiden",
 		"HINT_LOGO_MODE": "Tachyon-logoet henter sin farve fra temaet og forbliver derfor læsbart på både lys og mørk baggrund. Vælg \"Eget logo\" for egne billeder, eller \"Intet logo\" for kun at vise indlæsningsteksten.",
 		"LOGO_MODE_DEFAULT": "Tachyon-logo",

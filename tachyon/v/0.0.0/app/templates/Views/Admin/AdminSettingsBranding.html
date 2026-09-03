@@ -9,8 +9,44 @@
 		<input class="span5" type="text" autocorrect="off" data-bind="textInput: loadingDescription, saveTrigger: loadingDescriptionTrigger">
 	</div>
 	<div class="control-group">
+		<label data-i18n="TAB_BRANDING/LABEL_FAVICON"></label>
+		<div>
+			<div data-bind="component: {
+				name: 'Select',
+				params: {
+					options: faviconModeOptions,
+					value: faviconMode,
+					trigger: faviconModeTrigger,
+					optionsText: 'name',
+					optionsValue: 'id'
+				}
+			}"></div>
+			<span class="help-block" data-i18n="TAB_BRANDING/HINT_FAVICON"></span>
+		</div>
+	</div>
+	<div class="control-group" data-bind="visible: faviconExternal">
 		<label data-i18n="TAB_BRANDING/LABEL_FAVICON_URL"></label>
 		<input class="span5" type="text" placeholder="https://" autocorrect="off" data-bind="textInput: faviconUrl, saveTrigger: faviconUrlTrigger">
+	</div>
+	<div class="control-group" data-bind="visible: faviconCustom">
+		<label data-i18n="TAB_BRANDING/LABEL_FAVICON_FILE"></label>
+		<div>
+			<div data-bind="visible: faviconFile()" style="display:none; margin-bottom: 8px;">
+				<div class="logo-preview">
+					<div class="logo-preview-tile is-light"><img class="favicon-preview" data-bind="attr: { src: faviconUploadUrl }" alt="Favicon"></div>
+					<div class="logo-preview-tile is-dark"><img class="favicon-preview" data-bind="attr: { src: faviconUploadUrl }" alt="Favicon"></div>
+				</div>
+				<a href="#" class="btn btn-danger btn-small" data-bind="click: deleteFavicon" data-i18n="TAB_BRANDING/BUTTON_DELETE_LOGO"></a>
+			</div>
+			<p data-bind="visible: !faviconFile()" style="color: #999; margin-bottom: 8px;" data-i18n="TAB_BRANDING/LABEL_NO_LOGO"></p>
+			<label class="btn btn-small" data-bind="css: { disabled: logoUploading() }">
+				<input type="file" accept="image/svg+xml,image/png,image/x-icon,image/vnd.microsoft.icon,image/gif,image/webp" style="display:none"
+					data-bind="event: { change: uploadFavicon }, disable: logoUploading">
+				<span data-bind="visible: logoUploading()" data-i18n="GLOBAL/LOADING" style="display:none"></span>
+				<span data-bind="visible: !logoUploading()" data-i18n="TAB_BRANDING/BUTTON_UPLOAD_LOGO"></span>
+			</label>
+			<span class="help-block" data-i18n="TAB_BRANDING/HINT_FAVICON_FILE"></span>
+		</div>
 	</div>
 
 	<div class="legend" data-i18n="TAB_BRANDING/LEGEND_LOGO"></div>

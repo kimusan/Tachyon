@@ -116,6 +116,7 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'logsAuthLoggingFormat', 'logs', 'auth_logging_format', 'string');
 		$this->setConfigFromParams($oConfig, 'logsSyslogIdent', 'logs', 'syslog_ident', 'string');
 		$this->setConfigFromParams($oConfig, 'loginLogoMode', 'webmail', 'login_logo_mode', 'string');
+		$this->setConfigFromParams($oConfig, 'faviconMode', 'webmail', 'favicon_mode', 'string');
 		$this->setConfigFromParams($oConfig, 'debugEnable', 'debug', 'enable', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugJavascript', 'debug', 'javascript', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugCss', 'debug', 'css', 'bool');
@@ -154,63 +155,113 @@ class ActionsAdmin extends Actions
 		return 'dark' === $sVariant ? 'logo_file_dark' : 'logo_file';
 	}
 
-	public function DoAdminUploadLogo(): array
+	/**
+	 * Everything the logo and the favicon uploads have in common: sniff the
+	 * type, make the folder, clear what was there, and store under a name
+	 * carrying a digest of the contents so a replacement is never served from
+	 * the cache of the file it replaced.
+	 *
+	 * @param string $sPrefix  filename stem, also the glob used to clear old ones
+	 * @param array  $aExtMap  accepted mime types mapped to the extension to store
+	 * @return string  the stored filename, or '' on any failure
+	 */
+	private function storeBrandingUpload(string $sPrefix, array $aExtMap, string $sLabel) : string
 	{
 		if (empty($_FILES['logo']['tmp_name'])) {
-			$this->logWrite('UploadLogo: no file in $_FILES[logo]', \LOG_WARNING);
-			return $this->FalseResponse(__FUNCTION__);
+			$this->logWrite("{$sLabel}: no file in \$_FILES[logo]", \LOG_WARNING);
+			return '';
 		}
 		$tmp = $_FILES['logo']['tmp_name'];
 		$mime = \Tachyon\Util\File\MimeType::fromFile($tmp);
-		// SVG detection fallback: finfo and mime_content_type often misidentify SVGs as text/xml or text/html
-		if (!$mime || \in_array($mime, ['text/xml', 'text/html', 'application/xml'])) {
+		// finfo and mime_content_type routinely call an SVG text/xml or text/html,
+		// and an .ico anything from image/vnd.microsoft.icon to application/octet-stream
+		if (!$mime || \in_array($mime, ['text/xml', 'text/html', 'application/xml', 'application/octet-stream'])) {
 			$ext = \strtolower(\pathinfo($_FILES['logo']['name'] ?? '', PATHINFO_EXTENSION));
 			if ('svg' === $ext) {
 				$mime = 'image/svg+xml';
+			} else if ('ico' === $ext) {
+				$mime = 'image/x-icon';
 			}
 		}
-		$extMap = [
+		if (!isset($aExtMap[$mime])) {
+			$this->logWrite("{$sLabel}: rejected mime '{$mime}'", \LOG_WARNING);
+			return '';
+		}
+		$dir = APP_PRIVATE_DATA . 'branding/';
+		if (!\is_dir($dir) && !\mkdir($dir, 0755, true)) {
+			$this->logWrite("{$sLabel}: cannot create directory {$dir}", \LOG_ERR);
+			return '';
+		}
+		foreach (\glob($dir . $sPrefix . '*.*') ?: [] as $old) {
+			\unlink($old);
+		}
+		$filename = $sPrefix . \substr(\sha1_file($tmp) ?: \bin2hex(\random_bytes(4)), 0, 8)
+			. '.' . $aExtMap[$mime];
+		if (!\move_uploaded_file($tmp, $dir . $filename)) {
+			$this->logWrite("{$sLabel}: move_uploaded_file failed to {$dir}{$filename}", \LOG_ERR);
+			return '';
+		}
+		return $filename;
+	}
+
+	public function DoAdminUploadLogo(): array
+	{
+		$sVariant = $this->logoVariant();
+		$filename = $this->storeBrandingUpload('logo-' . $sVariant . '-', [
 			'image/png'     => 'png',
 			'image/jpeg'    => 'jpg',
 			'image/gif'     => 'gif',
 			'image/svg+xml' => 'svg',
 			'image/webp'    => 'webp',
-		];
-		if (!isset($extMap[$mime])) {
-			$this->logWrite("UploadLogo: rejected mime '{$mime}'", \LOG_WARNING);
+		], 'UploadLogo');
+		if (!\strlen($filename)) {
 			return $this->FalseResponse(__FUNCTION__);
-		}
-		$dir = APP_PRIVATE_DATA . 'branding/';
-		if (!\is_dir($dir) && !\mkdir($dir, 0755, true)) {
-			$this->logWrite("UploadLogo: cannot create directory {$dir}", \LOG_ERR);
-			return $this->FalseResponse(__FUNCTION__);
-		}
-		$sVariant = $this->logoVariant();
-		foreach (\glob($dir . 'logo-' . $sVariant . '-*.*') ?: [] as $old) {
-			\unlink($old);
 		}
 		// Anything from before the light/dark split, which was a bare logo.<ext>
 		if ('light' === $sVariant) {
-			foreach (\glob($dir . 'logo.*') ?: [] as $old) {
+			foreach (\glob(APP_PRIVATE_DATA . 'branding/logo.*') ?: [] as $old) {
 				\unlink($old);
 			}
-		}
-		// The name carries a digest of the contents. It used to be a bare
-		// logo.<ext>, so replacing a logo reused the URL it was already cached
-		// under, and ServiceLogo sends a day of Cache-Control: the upload worked
-		// and the browser kept showing the old picture. Same bytes give the same
-		// name, which is what we want, since that really is the same image.
-		$filename = 'logo-' . $sVariant . '-'
-			. \substr(\sha1_file($tmp) ?: \bin2hex(\random_bytes(4)), 0, 8)
-			. '.' . $extMap[$mime];
-		if (!\move_uploaded_file($tmp, $dir . $filename)) {
-			$this->logWrite("UploadLogo: move_uploaded_file failed to {$dir}{$filename}", \LOG_ERR);
-			return $this->FalseResponse(__FUNCTION__);
 		}
 		$oConfig = $this->Config();
 		$oConfig->Set('webmail', $this->logoConfigKey($sVariant), $filename);
 		$oConfig->Save();
 		return $this->DefaultResponse($filename);
+	}
+
+	public function DoAdminUploadFavicon(): array
+	{
+		// ICO and SVG alongside the raster types. SVG is the one worth
+		// recommending: it is the only one that scales to every slot the browser
+		// asks for, and the only one that can follow the colour scheme.
+		$filename = $this->storeBrandingUpload('favicon-', [
+			'image/png'            => 'png',
+			'image/svg+xml'        => 'svg',
+			'image/x-icon'         => 'ico',
+			'image/vnd.microsoft.icon' => 'ico',
+			'image/gif'            => 'gif',
+			'image/webp'           => 'webp',
+		], 'UploadFavicon');
+		if (!\strlen($filename)) {
+			return $this->FalseResponse(__FUNCTION__);
+		}
+		$oConfig = $this->Config();
+		$oConfig->Set('webmail', 'favicon_file', $filename);
+		$oConfig->Save();
+		return $this->DefaultResponse($filename);
+	}
+
+	public function DoAdminDeleteFavicon(): array
+	{
+		$oConfig = $this->Config();
+		if ($oConfig->Get('webmail', 'favicon_file', '')) {
+			foreach (\glob(APP_PRIVATE_DATA . 'branding/favicon-*.*') ?: [] as $old) {
+				\unlink($old);
+			}
+			$oConfig->Set('webmail', 'favicon_file', '');
+			$oConfig->Save();
+		}
+		return $this->DefaultResponse(true);
 	}
 
 	public function DoAdminDeleteLogo(): array
@@ -666,6 +717,8 @@ class ActionsAdmin extends Actions
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
 			$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');
 			$aResult['logoFileDark'] = $oConfig->Get('webmail', 'logo_file_dark', '');
+			$aResult['faviconFile'] = $oConfig->Get('webmail', 'favicon_file', '');
+			$aResult['faviconMode'] = $oConfig->Get('webmail', 'favicon_mode', 'default');
 			$aResult['loginLogoMode'] = $oConfig->Get('webmail', 'login_logo_mode', 'default');
 
 			$aResult['weakPassword'] = \is_file(APP_PRIVATE_DATA.'admin_password.txt');

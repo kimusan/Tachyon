@@ -165,9 +165,41 @@ abstract class Service
 			$sAppCssMin = $bAppDebug || $oConfig->Get('debug', 'css', false) ? '' : '.min';
 
 			$sFaviconUrl = (string) $oConfig->Get('webmail', 'favicon_url', '');
+			$sFaviconFile = (string) $oConfig->Get('webmail', 'favicon_file', '');
+			$sFaviconMode = (string) $oConfig->Get('webmail', 'favicon_mode', 'default');
+			// An install that set favicon_url before there was a mode keeps it,
+			// rather than silently reverting to the bundled icon on upgrade
+			if ('default' === $sFaviconMode && \strlen($sFaviconUrl)) {
+				$sFaviconMode = 'url';
+			}
+			if ('custom' === $sFaviconMode && !\strlen($sFaviconFile)) {
+				$sFaviconMode = 'default';
+			}
 
-			$sFaviconPngLink = $sFaviconUrl ?: Utils::WebStaticPath('apple-touch-icon.png');
-			$sAppleTouchLink = $sFaviconUrl ? '' : Utils::WebStaticPath('apple-touch-icon.png');
+			// One uploaded file has to cover every slot: there is no image
+			// processing here to derive sizes from it, and GD is optional
+			// throughout this app. An SVG is the only upload that scales to all
+			// of them and the only one that can follow the colour scheme, which
+			// is why the admin panel recommends it.
+			$sCustomIcon = 'custom' === $sFaviconMode
+				? Utils::WebPath() . '?/Logo/' . \rawurlencode($sFaviconFile)
+				: '';
+			$bCustomSvg = $sCustomIcon && \str_ends_with(\strtolower($sFaviconFile), '.svg');
+
+			if ('url' === $sFaviconMode) {
+				$sFaviconPngLink = $sFaviconUrl;
+				$sAppleTouchLink = '';
+				$sFaviconSvgLink = '';
+			} else if ($sCustomIcon) {
+				// An SVG goes in the svg icon slot; anything else is the raster one
+				$sFaviconPngLink = $bCustomSvg ? '' : $sCustomIcon;
+				$sAppleTouchLink = $bCustomSvg ? '' : $sCustomIcon;
+				$sFaviconSvgLink = $bCustomSvg ? $sCustomIcon : '';
+			} else {
+				$sFaviconPngLink = Utils::WebStaticPath('apple-touch-icon.png');
+				$sAppleTouchLink = Utils::WebStaticPath('apple-touch-icon.png');
+				$sFaviconSvgLink = Utils::WebStaticPath('favicon.svg');
+			}
 
 			$oActions = Api::Actions();
 
@@ -178,7 +210,11 @@ abstract class Service
 				'{{BaseAppFaviconPngLinkTag}}' => $sFaviconPngLink ? '<link type="image/png" rel="shortcut icon" href="'.$sFaviconPngLink.'">' : '',
 				'{{BaseAppFaviconTouchLinkTag}}' => $sAppleTouchLink ? '<link type="image/png" rel="apple-touch-icon" href="'.$sAppleTouchLink.'">' : '',
 				'{{BaseAppManifestLink}}' => Utils::WebStaticPath('manifest.json'),
-				'{{BaseFavIconSvg}}' => $sFaviconUrl ? '' : Utils::WebStaticPath('favicon.svg'),
+				// The whole tag or nothing. It used to be the href alone, so with no
+				// SVG to point at the browser was handed href="", which resolves to
+				// the page itself and has it fetch the document as an icon.
+				'{{BaseAppFaviconSvgLinkTag}}' => $sFaviconSvgLink
+					? '<link rel="icon" href="'.$sFaviconSvgLink.'" type="image/svg+xml">' : '',
 				'{{LoadingDescriptionEsc}}' => \htmlspecialchars($oConfig->Get('webmail', 'loading_description', 'Tachyon'), ENT_QUOTES|ENT_IGNORE, 'UTF-8'),
 				'{{BaseAppAdmin}}' => $bAdmin ? 1 : 0
 			);

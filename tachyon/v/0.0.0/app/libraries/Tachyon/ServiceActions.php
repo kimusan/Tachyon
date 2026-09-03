@@ -268,7 +268,8 @@ class ServiceActions
 		$oConfig = $this->Config();
 		$aAllowed = \array_filter([
 			$oConfig->Get('webmail', 'logo_file', ''),
-			$oConfig->Get('webmail', 'logo_file_dark', '')
+			$oConfig->Get('webmail', 'logo_file_dark', ''),
+			$oConfig->Get('webmail', 'favicon_file', '')
 		]);
 		$sWanted = empty($this->aPaths[1]) ? '' : \rawurldecode($this->aPaths[1]);
 		// No name asked for keeps the old behaviour of serving the light one
