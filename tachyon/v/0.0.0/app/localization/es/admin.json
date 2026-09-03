@@ -58,6 +58,8 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Intentar definir el idioma del usuari"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGIN_FOOTER": "Pie de la página de acceso",
+		"HINT_LOGIN_FOOTER": "Se muestra bajo el formulario de acceso, por ejemplo para el aviso legal o el contacto de soporte. Texto sin formato: las direcciones http(s) se convierten en enlaces y nada se interpreta como HTML.",
 		"LABEL_FAVICON": "Favicon",
 		"HINT_FAVICON": "El icono de Tachyon sigue el esquema de color del navegador. Suba el suyo o indique uno alojado en otro sitio.",
 		"FAVICON_MODE_DEFAULT": "Icono de Tachyon",

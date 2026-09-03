@@ -58,6 +58,8 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Forsøg at bestemme brugerens sprog"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGIN_FOOTER": "Sidefod på loginsiden",
+		"HINT_LOGIN_FOOTER": "Vises under loginformularen, f.eks. til kolofon eller supportkontakt. Ren tekst: http(s)-adresser bliver til links, og intet fortolkes som HTML.",
 		"LABEL_FAVICON": "Favicon",
 		"HINT_FAVICON": "Tachyon-ikonet følger browserens farveskema. Upload dit eget, eller peg på et, der ligger et andet sted.",
 		"FAVICON_MODE_DEFAULT": "Tachyon-ikon",

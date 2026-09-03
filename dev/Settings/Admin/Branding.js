@@ -12,6 +12,7 @@ export class AdminSettingsBranding extends AbstractViewSettings {
 		this.addSetting('faviconUrl');
 		this.addSetting('loginLogoMode');
 		this.addSetting('faviconMode');
+		this.addSetting('loginFooter');
 
 		addObservablesTo(this, {
 			logoFile: SettingsGet('logoFile') || '',

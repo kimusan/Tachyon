@@ -58,6 +58,8 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Deviner la langue de l'utilisateur"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGIN_FOOTER": "Pied de page de la connexion",
+		"HINT_LOGIN_FOOTER": "Affiché sous le formulaire de connexion, par exemple pour les mentions légales ou un contact d'assistance. Texte brut : les adresses http(s) deviennent des liens et rien n'est interprété comme du HTML.",
 		"LABEL_FAVICON": "Favicon",
 		"HINT_FAVICON": "L'icône Tachyon suit le schéma de couleurs du navigateur. Envoyez la vôtre ou indiquez-en une hébergée ailleurs.",
 		"FAVICON_MODE_DEFAULT": "Icône Tachyon",

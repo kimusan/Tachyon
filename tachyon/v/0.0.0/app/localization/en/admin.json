@@ -58,6 +58,8 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Try to determine user language"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGIN_FOOTER": "Login page footer",
+		"HINT_LOGIN_FOOTER": "Shown under the login form, for an imprint or a support contact. Plain text: any http(s) address in it becomes a link, and nothing is treated as HTML.",
 		"LABEL_FAVICON": "Favicon",
 		"HINT_FAVICON": "The Tachyon icon follows the browser colour scheme. Upload your own, or point at one hosted elsewhere.",
 		"FAVICON_MODE_DEFAULT": "Tachyon icon",

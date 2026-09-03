@@ -6,10 +6,14 @@ import Remote from 'Remote/Admin/Fetch';
 
 import { decorateKoCommands } from 'Knoin/Knoin';
 import { AbstractViewLogin } from 'Knoin/AbstractViews';
+import { loginLogo, loginFooter } from 'Common/LoginBranding';
 
 export class AdminLoginView extends AbstractViewLogin {
 	constructor() {
 		super('AdminLogin');
+
+		Object.assign(this, loginLogo());
+		this.footerParts = loginFooter();
 
 		addObservablesTo(this, {
 			login: '',

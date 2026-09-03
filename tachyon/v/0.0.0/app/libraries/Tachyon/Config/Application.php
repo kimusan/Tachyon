@@ -188,6 +188,9 @@ custom is the uploaded file. url points at favicon_url.'),
 				'login_logo_mode'             => array('default', 'Login page logo: default, custom or none.
 default draws the built in Tachyon logo, which takes its colour from the theme.
 custom uses the uploaded files above. none shows no logo at all.'),
+				'login_footer'                => array('', 'Plain text shown under the login form, for an imprint or a support contact.
+Any http(s) URL in it becomes a link. It is not HTML: the login page is where people type passwords,
+so nothing here is ever interpreted as markup.'),
 				'app_path'                    => array(''),
 
 				'theme'                       => array('Tachyon', 'Theme used by default'),

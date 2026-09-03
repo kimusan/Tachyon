@@ -117,6 +117,7 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'logsSyslogIdent', 'logs', 'syslog_ident', 'string');
 		$this->setConfigFromParams($oConfig, 'loginLogoMode', 'webmail', 'login_logo_mode', 'string');
 		$this->setConfigFromParams($oConfig, 'faviconMode', 'webmail', 'favicon_mode', 'string');
+		$this->setConfigFromParams($oConfig, 'loginFooter', 'webmail', 'login_footer', 'string');
 		$this->setConfigFromParams($oConfig, 'debugEnable', 'debug', 'enable', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugJavascript', 'debug', 'javascript', 'bool');
 		$this->setConfigFromParams($oConfig, 'debugCss', 'debug', 'css', 'bool');
@@ -659,6 +660,12 @@ class ActionsAdmin extends Actions
 			'allowed' => (bool)$oConfig->Get('security', 'allow_admin_panel', true)
 		];
 
+		// Outside the Auth gate on purpose: the admin login screen draws the same
+		// logo the user login does, and it is by definition not logged in yet.
+		$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');
+		$aResult['logoFileDark'] = $oConfig->Get('webmail', 'logo_file_dark', '');
+		$aResult['loginLogoMode'] = $oConfig->Get('webmail', 'login_logo_mode', 'default');
+
 		$aResult['Auth'] = $oActions->IsAdminLoggined(false);
 		if ($aResult['Auth']) {
 			$aResult['adminLogin'] = (string)$oConfig->Get('security', 'admin_login', '');
@@ -715,11 +722,9 @@ class ActionsAdmin extends Actions
 			$aResult['debugCss'] = !!$oConfig->Get('debug', 'css', false);
 
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
-			$aResult['logoFile'] = $oConfig->Get('webmail', 'logo_file', '');
-			$aResult['logoFileDark'] = $oConfig->Get('webmail', 'logo_file_dark', '');
 			$aResult['faviconFile'] = $oConfig->Get('webmail', 'favicon_file', '');
 			$aResult['faviconMode'] = $oConfig->Get('webmail', 'favicon_mode', 'default');
-			$aResult['loginLogoMode'] = $oConfig->Get('webmail', 'login_logo_mode', 'default');
+			$aResult['loginFooter'] = $oConfig->Get('webmail', 'login_footer', '');
 
 			$aResult['weakPassword'] = \is_file(APP_PRIVATE_DATA.'admin_password.txt');
 

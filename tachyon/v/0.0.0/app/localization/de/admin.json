@@ -58,6 +58,8 @@
 		"LABEL_DETERMINE_USER_LANGUAGE": "Sprache des Benutzers automatisch ermitteln"
 	},
 	"TAB_BRANDING": {
+		"LABEL_LOGIN_FOOTER": "Fußzeile der Anmeldeseite",
+		"HINT_LOGIN_FOOTER": "Wird unter dem Anmeldeformular angezeigt, etwa für Impressum oder Support-Kontakt. Reiner Text: enthaltene http(s)-Adressen werden zu Links, HTML wird nicht ausgewertet.",
 		"LABEL_FAVICON": "Favicon",
 		"HINT_FAVICON": "Das Tachyon-Symbol folgt dem Farbschema des Browsers. Laden Sie ein eigenes hoch oder verweisen Sie auf eines an anderer Stelle.",
 		"FAVICON_MODE_DEFAULT": "Tachyon-Symbol",

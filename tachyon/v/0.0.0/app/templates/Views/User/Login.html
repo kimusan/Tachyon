@@ -53,3 +53,9 @@
 			data-i18n="LOGIN/BUTTON_SIGN_IN"></button>
 	</div>
 </form>
+<!-- ko if: footerParts.length -->
+<div class="login-footer" data-bind="foreach: footerParts">
+	<!-- ko if: url --><a data-bind="text: text, attr: { href: url }" target="_blank" rel="noopener noreferrer"></a><!-- /ko -->
+	<!-- ko ifnot: url --><span data-bind="text: text"></span><!-- /ko -->
+</div>
+<!-- /ko -->

@@ -568,6 +568,7 @@ class Actions
 			'logoFile' => $oConfig->Get('webmail', 'logo_file', ''),
 			'logoFileDark' => $oConfig->Get('webmail', 'logo_file_dark', ''),
 			'loginLogoMode' => $oConfig->Get('webmail', 'login_logo_mode', 'default'),
+			'loginFooter' => $oConfig->Get('webmail', 'login_footer', ''),
 			'Plugins' => array(),
 			'System' => array(
 				'version' => APP_VERSION,

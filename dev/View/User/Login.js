@@ -12,6 +12,7 @@ import Remote from 'Remote/User/Fetch';
 
 import { decorateKoCommands, showScreenPopup } from 'Knoin/Knoin';
 import { AbstractViewLogin } from 'Knoin/AbstractViews';
+import { loginLogo, loginFooter } from 'Common/LoginBranding';
 
 import { LanguagesPopupView } from 'View/Popup/Languages';
 
@@ -24,21 +25,8 @@ export class LoginUserView extends AbstractViewLogin {
 	constructor() {
 		super();
 
-		// Three modes. 'default' draws the built in logo inline, so it can take
-		// its colour from the theme; 'custom' uses the uploaded artwork, which
-		// comes as a light background and a dark background variant; 'none'
-		// leaves the description text on its own.
-		// Whichever variant is missing falls back to the other, so a single
-		// upload still works exactly as it did before there were two.
-		const mode = SettingsGet('loginLogoMode') || 'default',
-			url = file => file ? ('?/Logo/' + encodeURIComponent(file)) : '',
-			light = url(SettingsGet('logoFile')),
-			dark = url(SettingsGet('logoFileDark'));
-
-		this.logoDefault = 'default' === mode;
-		this.logoLightUrl = 'custom' === mode ? (light || dark) : '';
-		this.logoDarkUrl = 'custom' === mode ? (dark || light) : '';
-		this.hasLogo = this.logoDefault || !!this.logoLightUrl;
+		Object.assign(this, loginLogo());
+		this.footerParts = loginFooter();
 
 		addObservablesTo(this, {
 			loadingDesc: SettingsGet('loadingDescription'),
