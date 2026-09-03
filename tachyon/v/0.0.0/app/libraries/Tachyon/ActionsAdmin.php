@@ -170,10 +170,16 @@ class ActionsAdmin extends Actions
 			$this->logWrite("UploadLogo: cannot create directory {$dir}", \LOG_ERR);
 			return $this->FalseResponse(__FUNCTION__);
 		}
-		foreach (\glob($dir . 'logo.*') ?: [] as $old) {
+		foreach (\glob($dir . 'logo*.*') ?: [] as $old) {
 			\unlink($old);
 		}
-		$filename = 'logo.' . $extMap[$mime];
+		// The name carries a digest of the contents. It used to be a bare
+		// logo.<ext>, so replacing a logo reused the URL it was already cached
+		// under, and ServiceLogo sends a day of Cache-Control: the upload worked
+		// and the browser kept showing the old picture. Same bytes give the same
+		// name, which is what we want, since that really is the same image.
+		$filename = 'logo-' . \substr(\sha1_file($tmp) ?: \bin2hex(\random_bytes(4)), 0, 8)
+			. '.' . $extMap[$mime];
 		if (!\move_uploaded_file($tmp, $dir . $filename)) {
 			$this->logWrite("UploadLogo: move_uploaded_file failed to {$dir}{$filename}", \LOG_ERR);
 			return $this->FalseResponse(__FUNCTION__);
@@ -189,8 +195,11 @@ class ActionsAdmin extends Actions
 		$oConfig = $this->Config();
 		$filename = $oConfig->Get('webmail', 'logo_file', '');
 		if ($filename) {
-			$path = APP_PRIVATE_DATA . 'branding/' . \basename($filename);
-			\is_file($path) && \unlink($path);
+			// glob rather than the one name, so a logo written under the old
+			// logo.<ext> scheme is cleared out as well
+			foreach (\glob(APP_PRIVATE_DATA . 'branding/logo*.*') ?: [] as $old) {
+				\unlink($old);
+			}
 			$oConfig->Set('webmail', 'logo_file', '');
 			$oConfig->Save();
 		}
