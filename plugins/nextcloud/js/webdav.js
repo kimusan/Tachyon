@@ -139,7 +139,7 @@ const
 						|| fetchFiles(item.name).then(items => buildTree(view, ul, items, item.name));
 					});
 					summary.textContent = item.name.replace(/^.*\/([^/]+)$/, '$1');
-					summary.dataset.icon = '📁';
+					summary.dataset.icon = 'folder';
 					if (!view.files()) {
 						let btn = document.createElement('button');
 						btn.name = 'select';
@@ -163,7 +163,7 @@ const
 
 						li.item = item;
 						li.textContent = item.name.replace(/^.*\/([^/]+)$/, '$1');
-						li.dataset.icon = '🗎';
+						li.dataset.icon = 'file';
 
 						cb.type = 'checkbox';
 						li.append(cb);

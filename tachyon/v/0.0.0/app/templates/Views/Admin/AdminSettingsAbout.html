@@ -45,7 +45,7 @@
 					<a class="btn" href="https://github.com/kimusan/Tachyon/releases/latest" data-bind="visible: !coreUpdatable()" data-i18n="GLOBAL/UPDATE"></a>
 				</div>
 				<div data-bind="visible: 'up-to-date' === statusType()">
-					<i style="color: green">✔</i>
+					<i class="icon-check iconcolor-green"></i>
 					<span data-i18n="TAB_ABOUT/HINT_IS_UP_TO_DATE"></span>
 				</div>
 				<div data-bind="visible: 'updating' === statusType()">
@@ -87,7 +87,7 @@
 			</tr></thead><tbody data-bind="foreach: phpextensions">
 				<tr>
 					<td data-bind="text: name"></td>
-					<td data-bind="text: loaded ? '✔' : '❌'"></td>
+					<td data-bind="css: loaded ? 'icon-check iconcolor-green' : 'icon-x iconcolor-red'"></td>
 				</tr>
 			</tbody>
 			</table>

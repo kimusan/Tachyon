@@ -2599,7 +2599,7 @@ html.rl-mobile #rl-app #V-AdminPane>.b-toolbar {
 
 /* ── Tachyon color-scheme toggle support ────────────────────────────────── */
 /* These mirror the @media (prefers-color-scheme: dark) block above so the
-   ☀/⊙/☾ toggle works even when the OS preference doesn't match. */
+   light/system/dark toggle works even when the OS preference does not match. */
 
 html[data-color-scheme="dark"] :not([data-themes~="light"]) {
 	--nc-color-main-background: var(--color-main-background, #171717);

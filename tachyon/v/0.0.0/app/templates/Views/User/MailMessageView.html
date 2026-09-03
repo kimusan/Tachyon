@@ -256,7 +256,13 @@
 									</div>
 									<div class="attachmentNameParent">
 										<div class="attachmentName" data-bind="text: fileName"></div>
-										<div class="attachmentSize" data-bind="text: friendlySize()"></div>
+										<div class="attachmentSize">
+											<span data-bind="text: friendlySize()"></span>
+											<!-- the link marker used to be an emoji glued onto the size
+											     string; it cannot live inside the span above, whose text
+											     binding would overwrite it -->
+											<i class="icon-link" data-bind="visible: isLinked"></i>
+										</div>
 									</div>
 									<div class="checkboxAttachment"
 										data-bind="visible: download, css: checked() ? 'icon-square-check' : 'icon-square', click: toggleChecked"></div>

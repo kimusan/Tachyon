@@ -58,7 +58,7 @@ export class AttachmentModel extends AbstractModel {
 	}
 
 	friendlySize() {
-		return FileInfo.friendlySize(this.estimatedSize) + (this.isLinked() ? ' 🔗' : '');
+		return FileInfo.friendlySize(this.estimatedSize);
 	}
 
 	contentId() {

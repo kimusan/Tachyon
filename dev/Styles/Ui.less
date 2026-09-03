@@ -38,13 +38,13 @@
 		width: 11px;
 	}
 	&.success::after {
+		.icon-mask(check);
 		color: #080;
-		content: "✔";
 		opacity: 1;
 	}
 	&.error::after {
+		.icon-mask(x);
 		color: #F00;
-		content: "✖";
 		opacity: 1;
 	}
 }
