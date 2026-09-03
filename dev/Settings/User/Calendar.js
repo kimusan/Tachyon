@@ -4,6 +4,7 @@ import { koComputable } from 'External/ko';
 import { SettingsGet } from 'Common/Globals';
 import { i18n, translateTrigger, getErrorMessage } from 'Common/Translator';
 import Remote from 'Remote/User/Fetch';
+import { SettingsUserStore } from 'Stores/User/Settings';
 
 export class UserSettingsCalendar /*extends AbstractViewSettings*/ {
 	constructor() {
@@ -17,6 +18,23 @@ export class UserSettingsCalendar /*extends AbstractViewSettings*/ {
 		this.syncError = ko.observable('');
 		this.syncSuccess = ko.observable(false);
 		this.testing = ko.observable(false);
+
+		// Display preferences, saved on change like the rest of the user settings.
+		// The sync block below has its own endpoint because it writes four fields
+		// at once and needs testing before it is trusted.
+		this.weekNumbers = SettingsUserStore.calendarWeekNumbers;
+		this.firstDay = SettingsUserStore.calendarFirstDay;
+		this.weekNumbers.subscribe(value => Remote.saveSetting('calendarWeekNumbers', value ? 1 : 0));
+		this.firstDay.subscribe(value => Remote.saveSetting('calendarFirstDay', parseInt(value, 10) || 0));
+
+		this.firstDayOptions = koComputable(() => {
+			translateTrigger();
+			return [
+				{ id: 1, name: i18n('SETTINGS_CALENDAR/DAY_MONDAY') },
+				{ id: 0, name: i18n('SETTINGS_CALENDAR/DAY_SUNDAY') },
+				{ id: 6, name: i18n('SETTINGS_CALENDAR/DAY_SATURDAY') }
+			];
+		});
 
 		this.syncModeOptions = koComputable(() => {
 			translateTrigger();

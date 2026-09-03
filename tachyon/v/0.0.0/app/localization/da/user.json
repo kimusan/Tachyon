@@ -739,6 +739,12 @@
     "ERROR_NO_CALENDAR": "Vælg en kalender til begivenheden"
   },
   "SETTINGS_CALENDAR": {
+    "LEGEND_DISPLAY": "Visning",
+    "LABEL_FIRST_DAY": "Ugens første dag",
+    "LABEL_WEEK_NUMBERS": "Vis ugenumre",
+    "DAY_MONDAY": "Mandag",
+    "DAY_SUNDAY": "Søndag",
+    "DAY_SATURDAY": "Lørdag",
     "LEGEND_CALENDAR_SYNC": "Synkronisering (CalDAV)",
     "LABEL_CALENDAR_SYNC_ENABLE": "Aktivér synkronisering",
     "LABEL_CALENDAR_SYNC_URL": "CalDAV-adresse",

@@ -739,6 +739,12 @@
     "ERROR_NO_CALENDAR": "Elija un calendario para el evento"
   },
   "SETTINGS_CALENDAR": {
+    "LEGEND_DISPLAY": "Visualización",
+    "LABEL_FIRST_DAY": "Primer día de la semana",
+    "LABEL_WEEK_NUMBERS": "Mostrar números de semana",
+    "DAY_MONDAY": "Lunes",
+    "DAY_SUNDAY": "Domingo",
+    "DAY_SATURDAY": "Sábado",
     "LEGEND_CALENDAR_SYNC": "Sincronización remota (CalDAV)",
     "LABEL_CALENDAR_SYNC_ENABLE": "Activar la sincronización remota",
     "LABEL_CALENDAR_SYNC_URL": "URL de CalDAV",

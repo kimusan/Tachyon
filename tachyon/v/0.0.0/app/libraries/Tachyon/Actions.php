@@ -622,7 +622,10 @@ class Actions
 						'ContactsAutosave' => (bool) $oConfig->Get('defaults', 'contacts_autosave', true),
 						'mainAccountName' => '',
 						'mainIdentityName' => '',
-						'ContactsHideNoEmail' => false
+						'ContactsHideNoEmail' => false,
+						'calendarWeekNumbers' => false,
+						// 1 is Monday, which is both ISO 8601 and what the grid already did
+						'calendarFirstDay' => 1
 					],
 					// MainAccount or AdditionalAccount
 					$this->getAccountData($oAccount)
@@ -720,6 +723,8 @@ class Actions
 					$aResult['listGrouped'] = (bool)$oSettings->GetConf('listGrouped', $aResult['listGrouped']);
 					$aResult['ContactsAutosave'] = (bool)$oSettings->GetConf('ContactsAutosave', $aResult['ContactsAutosave']);
 					$aResult['ContactsHideNoEmail'] = (bool)$oSettings->GetConf('ContactsHideNoEmail', $aResult['ContactsHideNoEmail']);
+					$aResult['calendarWeekNumbers'] = (bool)$oSettings->GetConf('calendarWeekNumbers', $aResult['calendarWeekNumbers']);
+					$aResult['calendarFirstDay'] = (int)$oSettings->GetConf('calendarFirstDay', $aResult['calendarFirstDay']);
 					// The account you log in with is not in the accounts list, so its
 					// name has nowhere else to live.
 					$aResult['mainAccountName'] = (string)$oSettings->GetConf('MainAccountName', '');

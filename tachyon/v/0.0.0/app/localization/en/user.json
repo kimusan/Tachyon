@@ -595,6 +595,12 @@
 		"HTML_TO_MD": "Convert HTML to Markdown instead of plain text"
 	},
 	"SETTINGS_CALENDAR": {
+		"LEGEND_DISPLAY": "Display",
+		"LABEL_FIRST_DAY": "First day of week",
+		"LABEL_WEEK_NUMBERS": "Show week numbers",
+		"DAY_MONDAY": "Monday",
+		"DAY_SUNDAY": "Sunday",
+		"DAY_SATURDAY": "Saturday",
 		"LEGEND_CALENDAR_SYNC": "Remote Synchronization (CalDAV)",
 		"LABEL_CALENDAR_SYNC_ENABLE": "Enable remote synchronization",
 		"LABEL_CALENDAR_SYNC_URL": "CalDAV URL",

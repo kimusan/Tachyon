@@ -1,3 +1,27 @@
+<form class="form-horizontal" spellcheck="false">
+	<div class="legend" data-i18n="SETTINGS_CALENDAR/LEGEND_DISPLAY"></div>
+	<div class="control-group">
+		<label data-i18n="SETTINGS_CALENDAR/LABEL_FIRST_DAY"></label>
+		<div data-bind="component: {
+			name: 'Select',
+			params: {
+				options: firstDayOptions,
+				value: firstDay,
+				optionsText: 'name',
+				optionsValue: 'id'
+			}
+		}"></div>
+	</div>
+	<div class="control-group">
+		<div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: { value: weekNumbers, label: 'SETTINGS_CALENDAR/LABEL_WEEK_NUMBERS' }
+			}"></div>
+		</div>
+	</div>
+</form>
+
 <form class="form-horizontal" spellcheck="false" data-bind="visible: allowCalendarSync">
 	<div class="legend" data-i18n="SETTINGS_CALENDAR/LEGEND_CALENDAR_SYNC"></div>
 	<div class="control-group">

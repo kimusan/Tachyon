@@ -6,6 +6,7 @@ import { LanguageStore } from 'Stores/Language';
 import { staticLink } from 'Common/Links';
 import { i18n, getNotification } from 'Common/Translator';
 import { CalendarUserStore } from 'Stores/User/Calendar';
+import { SettingsUserStore } from 'Stores/User/Settings';
 
 import Remote from 'Remote/User/Fetch';
 
@@ -267,7 +268,10 @@ export class CalendarPopupView extends AbstractViewPopup {
 			view: this.currentView(),
 			headerToolbar: { start: '', center: '', end: '' },
 			height: '100%',
-			firstDay: 1,
+			// Both are the user's, from Settings > Calendar. Monday and no week
+			// numbers is what the grid did before they were configurable.
+			firstDay: SettingsUserStore.calendarFirstDay(),
+			weekNumbers: !!SettingsUserStore.calendarWeekNumbers(),
 			nowIndicator: true,
 			editable: true,
 			selectable: this.hasWritableCalendar(),
@@ -279,6 +283,16 @@ export class CalendarPopupView extends AbstractViewPopup {
 			eventResize: info => this.persistMove(info)
 		});
 		this.title(this.ec.getView().title);
+
+		// setOption rather than rebuilding, so changing either in settings while
+		// the calendar is open redraws the grid in place
+		this.calendarOptionSubs?.forEach(sub => sub.dispose());
+		this.calendarOptionSubs = [
+			SettingsUserStore.calendarFirstDay.subscribe(v =>
+				this.ec?.setOption('firstDay', parseInt(v, 10) || 0)),
+			SettingsUserStore.calendarWeekNumbers.subscribe(v =>
+				this.ec?.setOption('weekNumbers', !!v))
+		];
 	}
 
 	setView(view) {
@@ -500,6 +514,11 @@ export class CalendarPopupView extends AbstractViewPopup {
 	}
 
 	onHide() {
+		// Dropped with the calendar they were driving. createCalendar runs again
+		// on every open, so without this each cycle leaves another subscriber
+		// holding a setOption call against a destroyed instance.
+		this.calendarOptionSubs?.forEach(sub => sub.dispose());
+		this.calendarOptionSubs = null;
 		if (this.ec) {
 			EventCalendar.destroy(this.ec);
 			this.ec = null;
