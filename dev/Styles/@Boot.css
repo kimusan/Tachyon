@@ -78,13 +78,16 @@ body#rl-app {
 	width: 1em;
 }
 
-/* Height in em so it tracks the 214% above, width left to the viewBox: the mark
-   is a little over twice as wide as it is tall, and pinning both would letterbox
-   it. max-width keeps it on the screen on a narrow phone. */
+/* Sized by width, height left to the viewBox, so a narrow screen scales the whole
+   mark down instead of letterboxing it inside a fixed height. The em tracks the
+   214% above; vw takes over on a phone.
+
+   It needs this much room. At half the size the speed lines behind the T are a
+   couple of pixels thick and read as specks, so the mark looks like a bare T and
+   the part that says what it means is lost. */
 #rl-loading-logo {
 	display: block;
-	height: 2.4em;
-	margin: 0 auto 0.4em;
-	max-width: 80vw;
-	width: auto;
+	height: auto;
+	margin: 0 auto 0.5em;
+	width: min(11em, 78vw);
 }
