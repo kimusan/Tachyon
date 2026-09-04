@@ -78,10 +78,13 @@ const cssCalendarBuild = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
+// The theme mapping is concatenated after the library's own variables rather
+// than living in app.css. This stylesheet is injected at runtime, so it lands
+// later in the cascade than app.css and would otherwise override it.
 const cssDatePickerBuild = () => {
 	return gulp
-		.src('vendors/air-datepicker/air-datepicker.css')
-		.pipe(rename('datepicker.css'))
+		.src(['vendors/air-datepicker/air-datepicker.css', 'dev/Styles/DatePickerTheme.css'])
+		.pipe(concat('datepicker.css', { separator: '\n\n' }))
 		.pipe(eol('\n', true))
 		.pipe(gulp.dest(config.paths.staticCSS));
 };

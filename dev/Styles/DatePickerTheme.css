@@ -1,0 +1,47 @@
+/*
+ * air-datepicker ships one light palette and no dark handling at all, so on any
+ * dark theme it arrived as a white card. Everything it draws comes from --adp-*
+ * custom properties though, so it only needs pointing at ours.
+ *
+ * The dropdown and selection variables are the ones to aim at: a picker is a
+ * floating panel like a menu, and those are defined by 21 of the 23 themes,
+ * where --dialog-bg-clr and --btn-border-clr manage only ten. Every one still
+ * ends in a literal, because two themes define none of this and a var() with no
+ * fallback resolves to nothing rather than to something sensible.
+ */
+.air-datepicker {
+	--adp-font-family: var(--fontSans, inherit);
+	--adp-background-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
+	--adp-color: var(--dropdown-menu-color, var(--main-color, #4a4a4a));
+	--adp-color-secondary: var(--dropdown-menu-disable-color, #9c9c9c);
+	--adp-accent-color: var(--folders-selected-bg-color, #4eb5e6);
+	--adp-color-current-date: var(--folders-selected-bg-color, #4eb5e6);
+	--adp-color-other-month: var(--dropdown-menu-disable-color, #dedede);
+	--adp-color-disabled: var(--dropdown-menu-disable-color, #aeaeae);
+	--adp-day-name-color: var(--dropdown-menu-color, var(--main-color, #ff9a19));
+
+	--adp-border-color: var(--border-color, var(--btn-border-clr, rgba(128, 128, 128, .35)));
+	--adp-border-color-inner: var(--border-color, var(--btn-border-clr, rgba(128, 128, 128, .25)));
+	--adp-border-color-inline: var(--border-color, var(--btn-border-clr, rgba(128, 128, 128, .35)));
+
+	--adp-cell-background-color-hover: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+	--adp-cell-background-color-selected: var(--folders-selected-bg-color, #5cc4ef);
+	--adp-cell-background-color-selected-hover: var(--folders-selected-bg-color, #45bced);
+	--adp-background-color-hover: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+	--adp-background-color-active: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .24));
+
+	--adp-btn-color: var(--dropdown-menu-color, var(--main-color, #4a4a4a));
+	--adp-btn-color-hover: var(--dropdown-menu-hover-color, var(--main-color, #4a4a4a));
+	--adp-btn-background-color-hover: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+	--adp-btn-background-color-active: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .24));
+
+	--adp-nav-color-secondary: var(--dropdown-menu-disable-color, #9c9c9c);
+	--adp-nav-arrow-color: var(--dropdown-menu-color, var(--main-color, #4a4a4a));
+
+	/* The selected cell takes the accent as its background, so its text has to
+	   be the colour that pairs with it rather than the panel's own. */
+	.air-datepicker-cell.-selected-,
+	.air-datepicker-cell.-selected-.-focus- {
+		color: var(--folders-selected-color, #fff);
+	}
+}
