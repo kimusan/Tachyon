@@ -289,20 +289,23 @@ export class CalendarPopupView extends AbstractViewPopup {
 	 * switcher sets, so scrollbars and form controls inside the grid match.
 	 */
 	applyColorScheme() {
-		const mode = document.documentElement.getAttribute('data-color-scheme'),
-			list = this.calendarEl.classList;
-		// An explicit choice wins. Without one, judge by the surface the grid is
-		// actually sitting on rather than by the system preference.
+		const list = this.calendarEl.classList;
+		// The surface decides, and nothing else. Two earlier attempts asked
+		// something that only sometimes agrees with it:
 		//
-		// ec-auto-dark lives inside a prefers-color-scheme media query, so it used
-		// to hand the decision to the operating system while every other panel
-		// followed the chosen theme. A light theme on a dark desktop therefore got
-		// a grey calendar in the middle of a white dialog.
+		// ec-auto-dark sits inside a prefers-color-scheme media query, so it asked
+		// the desktop while every other panel followed the theme.
 		//
-		// The text colour is the signal, not the background: the Default theme
-		// paints a dark slate page behind light panels, so --main-bg-color says
-		// dark while the grid is plainly sitting on white.
-		list.toggle('ec-dark', mode ? 'dark' === mode : this.onDarkSurface());
+		// data-color-scheme was no better. Only 3 of the 23 themes respond to that
+		// attribute at all, so on the other 20 setting it to dark left the theme
+		// light and turned the grid grey underneath it. For the 3 that do respond,
+		// their text colour changes with the attribute, so reading the surface
+		// gets the same answer without having to special case them.
+		//
+		// Text rather than background, because the Default theme paints a dark
+		// slate page behind light panels: --main-bg-color says dark while the grid
+		// is plainly sitting on white.
+		list.toggle('ec-dark', this.onDarkSurface());
 		list.toggle('ec-auto-dark', false);
 	}
 
