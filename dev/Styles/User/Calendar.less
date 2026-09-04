@@ -161,12 +161,29 @@
 			box-sizing: border-box;
 		}
 
-		/* Date and time share a row when the event is not all day, so neither
-		   can take the full width the rule above gives them. */
-		.b-calendar-date {
-			width: auto;
+		/* Date and time share a row when the event is not all day, so neither can
+		   take the full width the rule above gives them. The element is in the
+		   selector deliberately: input[type="date"] there is one step more
+		   specific than a bare class, so a class alone quietly lost and the date
+		   filled the row while the time hung out of the modal. */
+		.b-calendar-when {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		input.b-calendar-date {
 			flex: 1 1 auto;
 			min-width: 0;
+			width: auto;
+		}
+
+		/* Ours rather than a native time input, whose format follows the browser
+		   locale and ignores the hour cycle set in this app. */
+		input.b-calendar-time {
+			flex: 0 0 auto;
+			text-align: center;
+			width: 6.5em;
 		}
 
 		.b-calendar-editor-error {
@@ -213,16 +230,3 @@
 	--ec-bg-event-color: var(--border-color, rgba(128, 128, 128, .35));
 }
 
-/* The time field is ours rather than a native time input, whose format follows
-   the browser locale and ignores the hour cycle set in this app. */
-.b-calendar-editor-form .b-calendar-time {
-	flex: 0 0 auto;
-	margin-left: 6px;
-	text-align: center;
-	width: 7em;
-}
-
-.b-calendar-editor-form .b-calendar-when {
-	display: flex;
-	align-items: center;
-}

@@ -102,7 +102,7 @@
 					<!-- a text field, not type="time": a native time control takes its
 					     format from the browser locale and ignores this app's hour cycle -->
 					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
-						data-bind="value: editStartTime, enable: !editReadOnly()">
+						list="calendar-times" data-bind="value: editStartTime, enable: !editReadOnly()">
 					</div>
 					<!-- /ko -->
 				</div>
@@ -118,7 +118,7 @@
 					<!-- a text field, not type="time": a native time control takes its
 					     format from the browser locale and ignores this app's hour cycle -->
 					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
-						data-bind="value: editEndTime, enable: !editReadOnly()">
+						list="calendar-times" data-bind="value: editEndTime, enable: !editReadOnly()">
 					</div>
 					<!-- /ko -->
 				</div>
@@ -132,6 +132,10 @@
 					<label data-i18n="CALENDAR/LABEL_DESCRIPTION"></label>
 					<textarea class="span5" rows="3" data-bind="value: editDescription, enable: !editReadOnly()"></textarea>
 				</div>
+
+				<datalist id="calendar-times" data-bind="foreach: timeSuggestions">
+					<option data-bind="attr: { value: $data }"></option>
+				</datalist>
 
 				<div class="alert alert-error b-calendar-editor-error" data-bind="visible: !!editError(), text: editError"></div>
 

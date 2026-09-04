@@ -133,6 +133,18 @@ export class CalendarPopupView extends AbstractViewPopup {
 			visibleCalendarUuids: () => this.calendars().filter(cal => cal.visible()).map(cal => cal.uuid)
 		});
 
+		// Half hours, offered as a pick list so the field is not a bare box. The
+		// native time control had a spinner but took its format from the browser
+		// locale, which is what this whole change is about.
+		this.timeSuggestions = ko.computed(() => {
+			const pad = v => String(v).padStart(2, '0'),
+				out = [];
+			for (let h = 0; 24 > h; ++h) {
+				out.push(this.displayTime(pad(h) + ':00'), this.displayTime(pad(h) + ':30'));
+			}
+			return out;
+		});
+
 		// editStart and editEnd stay the canonical "YYYY-MM-DDTHH:mm", so save and
 		// validation are untouched; these only split it for the two controls.
 		['Start', 'End'].forEach(which => {
