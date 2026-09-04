@@ -114,7 +114,10 @@ ko.bindingHandlers.datePicker = {
 		});
 
 		const sub = ko.computed(render);
-		ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+		// ko.addDisposeCallback, not ko.utils.domNodeDisposal: this is a trimmed
+		// Knockout build with no ko.utils at all, and reaching for it threw while
+		// the binding was being applied, which took the whole editor down with it.
+		ko.addDisposeCallback(element, () => {
 			sub.dispose();
 			picker?.destroy();
 		});
