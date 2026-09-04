@@ -62,6 +62,10 @@ import {
 	setRefreshFoldersInterval
 } from 'Common/Folders';
 import { loadFolders } from 'Model/FolderCollection';
+// Side effect import: registers the datePicker binding used by the calendar
+// and contact editors. Not in External/ko.js because that is shared with the
+// admin bundle, which has no date fields and no user settings store.
+import 'Common/DatePicker';
 
 export class AppUser extends AbstractApp {
 	constructor() {

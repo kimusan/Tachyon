@@ -519,6 +519,8 @@
     "LABEL_STORED_PASS": "Gemt adgangssætning"
   },
   "SETTINGS_GENERAL": {
+    "DATE_FORMAT": "Datoformat",
+    "DATE_FORMAT_HINT": "Den første mulighed følger dit sprogvalg.",
     "LANGUAGE": "Sprog",
     "HOUR_FORMAT": "Timeformat",
     "IDENTITY": "Identitet",

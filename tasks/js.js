@@ -50,6 +50,14 @@ const jsCalendar = () => {
 		.pipe(gulp.dest(config.paths.staticJS));
 };
 
+// Date picker (loaded on demand by whichever editor needs a date first)
+const jsDatePicker = () => {
+	return gulp
+		.src(['vendors/air-datepicker/air-datepicker.js', 'vendors/air-datepicker/locales.js'])
+		.pipe(concat('datepicker.js', { separator: '\n\n' }))
+		.pipe(gulp.dest(config.paths.staticJS));
+};
+
 // libs
 const jsLibs = () => {
 	const src = config.paths.js.libs.src;
@@ -138,6 +146,6 @@ exports.jsLint = jsLint;
 exports.js = gulp.series(
 	jsClean,
 	jsLint,
-	gulp.parallel(jsBoot, jsServiceWorker, jsOpenPGP, jsCalendar, jsLibs, jsSieve, jsApp, jsAdmin),
+	gulp.parallel(jsBoot, jsServiceWorker, jsOpenPGP, jsCalendar, jsDatePicker, jsLibs, jsSieve, jsApp, jsAdmin),
 	jsMin
 );

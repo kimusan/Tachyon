@@ -1,4 +1,5 @@
 import ko from 'ko';
+import { dateFormatOptions } from 'Common/DatePicker';
 
 import { SMAudio } from 'Common/Audio';
 import { SaveSettingStatus } from 'Common/Enums';
@@ -34,6 +35,10 @@ export class UserSettingsGeneral extends AbstractViewSettings {
 		this.language = LanguageStore.language;
 		this.languages = LanguageStore.languages;
 		this.hourCycle = LanguageStore.hourCycle;
+		this.dateFormat = SettingsUserStore.dateFormat;
+		// The first entry is whatever the interface language uses, so 'default'
+		// shows the actual format rather than the word
+		this.dateFormatOptions = dateFormatOptions();
 
 		this.soundNotification = SMAudio.notifications;
 		this.notificationSound = ko.observable(SettingsGet('NotificationSound'));
@@ -188,6 +193,9 @@ export class UserSettingsGeneral extends AbstractViewSettings {
 
 			hourCycle: value =>
 				Remote.saveSetting('hourCycle', value),
+
+			dateFormat: value =>
+				Remote.saveSetting('dateFormat', value),
 
 			notificationSound: value => {
 				Remote.saveSetting('NotificationSound', value);

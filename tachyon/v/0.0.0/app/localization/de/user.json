@@ -519,6 +519,8 @@
     "LABEL_STORED_PASS": "Passphrase gespeichert"
   },
   "SETTINGS_GENERAL": {
+    "DATE_FORMAT": "Datumsformat",
+    "DATE_FORMAT_HINT": "Der erste Eintrag folgt Ihrer Oberflächensprache.",
     "LANGUAGE": "Sprache",
     "HOUR_FORMAT": "Stundenformat",
     "IDENTITY": "Identität",

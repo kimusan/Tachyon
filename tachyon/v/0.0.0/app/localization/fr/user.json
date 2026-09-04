@@ -548,6 +548,8 @@
     "LABEL_STORED_PASS": "Phrase secrète mémorisée"
   },
   "SETTINGS_GENERAL": {
+    "DATE_FORMAT": "Format de date",
+    "DATE_FORMAT_HINT": "La première entrée suit la langue de l'interface.",
     "LANGUAGE": "Langue",
     "HOUR_FORMAT": "Format horaire",
     "IDENTITY": "Identité",

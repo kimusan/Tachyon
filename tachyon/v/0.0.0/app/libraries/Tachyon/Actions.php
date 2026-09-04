@@ -625,7 +625,10 @@ class Actions
 						'ContactsHideNoEmail' => false,
 						'calendarWeekNumbers' => false,
 						// 1 is Monday, which is both ISO 8601 and what the grid already did
-						'calendarFirstDay' => 1
+						'calendarFirstDay' => 1,
+						// Empty follows the interface language, the way dates are already
+						// formatted everywhere else through documentElement.lang
+						'dateFormat' => ''
 					],
 					// MainAccount or AdditionalAccount
 					$this->getAccountData($oAccount)
@@ -725,6 +728,7 @@ class Actions
 					$aResult['ContactsHideNoEmail'] = (bool)$oSettings->GetConf('ContactsHideNoEmail', $aResult['ContactsHideNoEmail']);
 					$aResult['calendarWeekNumbers'] = (bool)$oSettings->GetConf('calendarWeekNumbers', $aResult['calendarWeekNumbers']);
 					$aResult['calendarFirstDay'] = (int)$oSettings->GetConf('calendarFirstDay', $aResult['calendarFirstDay']);
+					$aResult['dateFormat'] = (string)$oSettings->GetConf('dateFormat', $aResult['dateFormat']);
 					// The account you log in with is not in the accounts list, so its
 					// name has nowhere else to live.
 					$aResult['mainAccountName'] = (string)$oSettings->GetConf('MainAccountName', '');

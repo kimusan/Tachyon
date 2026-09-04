@@ -94,11 +94,11 @@
 				<div class="control-group">
 					<label data-i18n="CALENDAR/LABEL_START"></label>
 					<!-- ko if: editAllDay -->
-					<input type="date" data-bind="value: editStart, enable: !editReadOnly()">
+					<input type="date" data-bind="datePicker: editStart, enable: !editReadOnly()">
 					<!-- /ko -->
 					<!-- ko ifnot: editAllDay -->
 					<div class="b-calendar-when">
-					<input type="date" class="b-calendar-date" data-bind="value: editStartDate, enable: !editReadOnly()">
+					<input type="date" class="b-calendar-date" data-bind="datePicker: editStartDate, enable: !editReadOnly()">
 					<!-- a text field, not type="time": a native time control takes its
 					     format from the browser locale and ignores this app's hour cycle -->
 					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
@@ -111,11 +111,11 @@
 				<div class="control-group">
 					<label data-i18n="CALENDAR/LABEL_END"></label>
 					<!-- ko if: editAllDay -->
-					<input type="date" data-bind="value: editEnd, enable: !editReadOnly()">
+					<input type="date" data-bind="datePicker: editEnd, enable: !editReadOnly()">
 					<!-- /ko -->
 					<!-- ko ifnot: editAllDay -->
 					<div class="b-calendar-when">
-					<input type="date" class="b-calendar-date" data-bind="value: editEndDate, enable: !editReadOnly()">
+					<input type="date" class="b-calendar-date" data-bind="datePicker: editEndDate, enable: !editReadOnly()">
 					<!-- a text field, not type="time": a native time control takes its
 					     format from the browser locale and ignores this app's hour cycle -->
 					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"

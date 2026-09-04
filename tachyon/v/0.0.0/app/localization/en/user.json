@@ -548,6 +548,8 @@
 		"LABEL_STORED_PASS": "Remembered Passphrase"
 	},
 	"SETTINGS_GENERAL": {
+		"DATE_FORMAT": "Date format",
+		"DATE_FORMAT_HINT": "The first entry follows your interface language.",
 		"LANGUAGE": "Language",
 		"HOUR_FORMAT": "Hour format",
 		"IDENTITY": "Identity",

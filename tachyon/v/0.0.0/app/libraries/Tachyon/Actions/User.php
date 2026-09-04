@@ -190,6 +190,7 @@ trait User
 		$this->setSettingsFromParams($oSettings, 'ContactsHideNoEmail', 'bool');
 		$this->setSettingsFromParams($oSettings, 'calendarWeekNumbers', 'bool');
 		$this->setSettingsFromParams($oSettings, 'calendarFirstDay', 'int');
+		$this->setSettingsFromParams($oSettings, 'dateFormat', 'string');
 		$this->setSettingsFromParams($oSettings, 'MainAccountName', 'string');
 		$this->setSettingsFromParams($oSettings, 'DesktopNotifications', 'bool');
 		$this->setSettingsFromParams($oSettings, 'SoundNotification', 'bool');

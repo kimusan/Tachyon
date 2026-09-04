@@ -78,6 +78,14 @@ const cssCalendarBuild = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
+const cssDatePickerBuild = () => {
+	return gulp
+		.src('vendors/air-datepicker/air-datepicker.css')
+		.pipe(rename('datepicker.css'))
+		.pipe(eol('\n', true))
+		.pipe(gulp.dest(config.paths.staticCSS));
+};
+
 const cssBootMin = () => {
 	return gulp
 		.src(config.paths.staticCSS + config.paths.css.boot.name)
@@ -107,6 +115,14 @@ const cssAdminMin = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
+const cssDatePickerMin = () => {
+	return gulp
+		.src(config.paths.staticCSS + 'datepicker.css')
+		.pipe(cleanCss())
+		.pipe(rename({ suffix: '.min' }))
+		.pipe(gulp.dest(config.paths.staticCSS));
+};
+
 const cssCalendarMin = () => {
 	return gulp
 		.src(config.paths.staticCSS + 'calendar.css')
@@ -116,8 +132,8 @@ const cssCalendarMin = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
-const cssBuild = gulp.parallel(cssBootBuild, cssMainBuild, cssAdminBuild, cssCalendarBuild);
-const cssMin = gulp.parallel(cssBootMin, cssMainMin, cssAdminMin, cssCalendarMin);
+const cssBuild = gulp.parallel(cssBootBuild, cssMainBuild, cssAdminBuild, cssCalendarBuild, cssDatePickerBuild);
+const cssMin = gulp.parallel(cssBootMin, cssMainMin, cssAdminMin, cssCalendarMin, cssDatePickerMin);
 
 const cssLint = (done) => done();
 

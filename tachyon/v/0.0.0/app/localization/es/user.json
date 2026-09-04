@@ -519,6 +519,8 @@
     "LABEL_STORED_PASS": "Contraseña recordada"
   },
   "SETTINGS_GENERAL": {
+    "DATE_FORMAT": "Formato de fecha",
+    "DATE_FORMAT_HINT": "La primera opción sigue el idioma de la interfaz.",
     "LANGUAGE": "Idioma",
     "HOUR_FORMAT": "Formato de hora",
     "IDENTITY": "Identidad",
