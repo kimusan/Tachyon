@@ -70,10 +70,12 @@ const cssAdminBuild = () => {
 		.pipe(gulp.dest(config.paths.staticCSS));
 };
 
+// Same reason as the date picker: the theme mapping has to come after the
+// library's own variables, and this sheet is injected at runtime.
 const cssCalendarBuild = () => {
 	return gulp
-		.src('vendors/event-calendar/dist/event-calendar.min.css')
-		.pipe(rename('calendar.css'))
+		.src(['vendors/event-calendar/dist/event-calendar.min.css', 'dev/Styles/CalendarTheme.css'])
+		.pipe(concat('calendar.css', { separator: '\n\n' }))
 		.pipe(eol('\n', true))
 		.pipe(gulp.dest(config.paths.staticCSS));
 };

@@ -1,0 +1,31 @@
+/*
+ * event-calendar carries its own greyscale ramp and semantic colours, so the
+ * grid only ever matched itself. These point the semantic ones at the theme so
+ * it matches the panel it sits in.
+ *
+ * Concatenated after the library's own stylesheet rather than living in
+ * app.css: this sheet is injected at runtime and would otherwise lose to the
+ * defaults it is trying to override.
+ *
+ * The ramp (--ec-color-50 to 400) is deliberately left alone. It is used for
+ * borders, hovers and disabled states, it is generated in oklch, and the light
+ * and dark variants already track each other; replacing it piecemeal with theme
+ * colours that were never designed as a ramp looked worse than leaving it.
+ *
+ * Every value ends in a literal, because two of the 23 themes define none of
+ * these and a var() with no fallback resolves to nothing at all.
+ */
+.ec {
+	--ec-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
+	--ec-text-color: var(--dropdown-menu-color, var(--main-color, currentcolor));
+	--ec-popup-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
+
+	--ec-button-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
+	--ec-button-text-color: var(--dropdown-menu-color, var(--main-color, currentcolor));
+	--ec-button-active-bg-color: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+	--ec-button-active-text-color: var(--dropdown-menu-hover-color, var(--main-color, currentcolor));
+
+	--ec-event-bg-color: var(--folders-selected-bg-color, #3788d8);
+	--ec-event-text-color: var(--folders-selected-color, #fff);
+	--ec-highlight-color: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+}

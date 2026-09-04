@@ -291,9 +291,36 @@ export class CalendarPopupView extends AbstractViewPopup {
 	applyColorScheme() {
 		const mode = document.documentElement.getAttribute('data-color-scheme'),
 			list = this.calendarEl.classList;
-		list.toggle('ec-dark', 'dark' === mode);
-		// No explicit choice means follow the system, which is what ec-auto-dark does
-		list.toggle('ec-auto-dark', !mode);
+		// An explicit choice wins. Without one, judge by the surface the grid is
+		// actually sitting on rather than by the system preference.
+		//
+		// ec-auto-dark lives inside a prefers-color-scheme media query, so it used
+		// to hand the decision to the operating system while every other panel
+		// followed the chosen theme. A light theme on a dark desktop therefore got
+		// a grey calendar in the middle of a white dialog.
+		//
+		// The text colour is the signal, not the background: the Default theme
+		// paints a dark slate page behind light panels, so --main-bg-color says
+		// dark while the grid is plainly sitting on white.
+		list.toggle('ec-dark', mode ? 'dark' === mode : this.onDarkSurface());
+		list.toggle('ec-auto-dark', false);
+	}
+
+	/**
+	 * Light text means a dark surface. Relative luminance per WCAG 2.x, the same
+	 * measure readableOn uses for event labels.
+	 */
+	onDarkSurface() {
+		const m = /(\d+)[,\s]+(\d+)[,\s]+(\d+)/.exec(getComputedStyle(this.calendarEl).color);
+		if (!m) {
+			return false;
+		}
+		const channel = value => {
+				const c = value / 255;
+				return 0.03928 >= c ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+			},
+			luminance = 0.2126 * channel(+m[1]) + 0.7152 * channel(+m[2]) + 0.0722 * channel(+m[3]);
+		return 0.5 < luminance;
 	}
 
 	/**
