@@ -824,6 +824,7 @@ class Actions
 		}
 
 		$aResult['Theme'] = $this->GetTheme($bAdmin);
+		$aResult['ThemeWasDark'] = $this->ThemeWasDark();
 
 		$aResult['language'] = $this->GetLanguage();
 		$aResult['clientLanguage'] = $this->ValidateLanguage($this->detectClientLanguage($bAdmin), '', false, true);

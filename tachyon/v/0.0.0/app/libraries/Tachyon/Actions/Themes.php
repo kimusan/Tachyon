@@ -6,6 +6,35 @@ use Tachyon\Enumerations\Capa;
 
 trait Themes
 {
+	/**
+	 * Themes that were a light and a dark build of one design, now merged into a
+	 * single theme that carries both. Retiring a name would otherwise drop
+	 * everyone using it onto Default, because ValidateTheme falls back rather
+	 * than failing. The value is the theme that replaced it.
+	 */
+	public const MERGED_THEMES = array(
+		'StripesDark' => 'Stripes',
+		'LoveDark'    => 'Love',
+		'SnowDarkV1'  => 'Snow',
+		'BlurredDark' => 'Blurred',
+		'SquaresDark' => 'Squares',
+		'BlackWood'   => 'Wood',
+		'NightShine'  => 'Shine',
+		'DarkShine'   => 'Shine'
+	);
+
+	/**
+	 * True when the theme this account had saved was the dark half of such a
+	 * pair, so the client can put it into dark mode once and keep the look it
+	 * chose rather than dropping it into the light half.
+	 */
+	private bool $bThemeWasDark = false;
+
+	public function ThemeWasDark(): bool
+	{
+		return $this->bThemeWasDark;
+	}
+
 	public function GetTheme(bool $bAdmin): string
 	{
 		static $sTheme;
@@ -98,6 +127,12 @@ trait Themes
 
 	public function ValidateTheme(string $sTheme): string
 	{
+		if (isset(static::MERGED_THEMES[$sTheme]) && !\in_array($sTheme, $this->GetThemes())) {
+			// 'DarkShine' was the light half despite the name, so only the ones
+			// that really were dark ask the client to switch mode
+			$this->bThemeWasDark = 'DarkShine' !== $sTheme;
+			$sTheme = static::MERGED_THEMES[$sTheme];
+		}
 		if (!\in_array($sTheme, $this->GetThemes())) {
 			$sTheme = $this->Config()->Get('webmail', 'theme', 'Default');
 			if (!\in_array($sTheme, $this->GetThemes())) {

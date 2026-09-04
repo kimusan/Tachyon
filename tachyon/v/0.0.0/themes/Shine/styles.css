@@ -1,6 +1,6 @@
 /*
- * Snow covers both colour schemes. It used to be two themes, Snow and
- * SnowDarkV1, which meant the light and dark versions of one design showed up
+ * Shine covers both colour schemes. It used to be two themes, DarkShine and
+ * NightShine, which meant the light and dark versions of one design showed up
  * as separate entries and switching between them was a theme change rather
  * than a mode change.
  *
@@ -14,17 +14,17 @@
 :root {
 	/* MAIN */
 	--main-color: #333;
-	--main-bg-color: #48525C;
+	--main-bg-color: #AD455C;
 	--main-bg-image: url("images/background.jpg");
 	--main-bg-size: cover;
 
 	/* LOADING */
-	--loading-color: #fff;
+	--loading-color: #ddd;
 	--loading-text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
 
 	/* LOGIN */
 	--login-color: #eee;
-	--login-bg-color: rgba(0,0,0,0.6);
+	--login-bg-color: rgba(0,0,0,0.5);
 	--login-box-shadow: 0px 2px 10px rgba(0,0,0,0.5);
 	--login-border: none;
 	--login-border-radius: 7px;
@@ -40,20 +40,20 @@
 	--folders-color: #fff;
 	--folders-disabled-color: #aaa;
 	--folders-selected-color: #fff;
-	--folders-selected-bg-color: rgba(0,0,0,0.5);
+	--folders-selected-bg-color: rgba(255,255,255,0.3);
 	--folders-focused-color: #fff;
-	--folders-focused-bg-color: rgba(0,0,0,0.7);
+	--folders-focused-bg-color: rgba(255,255,255,0.3);
 	--folders-hover-color: #fff;
-	--folders-hover-bg-color: rgba(0,0,0,0.5);
+	--folders-hover-bg-color: rgba(255,255,255,0.3);
 	--folders-drop-color: #fff;
-	--folders-drop-bg-color: rgba(0,0,0,0.5);
+	--folders-drop-bg-color: rgba(255,255,255,0.3);
 
 	/* SETTINGS */
 	--settings-menu-color: #fff;
 	--settings-menu-selected-color: #fff;
-	--settings-menu-selected-bg-color: rgba(0,0,0,0.5);
+	--settings-menu-selected-bg-color: rgba(255,255,255,0.3);
 	--settings-menu-hover-color: #fff;
-	--settings-menu-hover-bg-color: rgba(0,0,0,0.5);
+	--settings-menu-hover-bg-color: rgba(255,255,255,0.3);
 
 	/* MESSAGE LIST */
 	--message-list-toolbar-bg-color: #eee;
@@ -124,6 +124,7 @@
 		--dialog-clr: #fff;
 		--dialog-bg-clr: #333;
 		--dialog-border-clr: #555;
+
 
 		/* FORMS */
 		--btn-clr: #fff;
@@ -269,6 +270,7 @@
 	--dialog-clr: #fff;
 	--dialog-bg-clr: #333;
 	--dialog-border-clr: #555;
+
 
 	/* FORMS */
 	--btn-clr: #fff;

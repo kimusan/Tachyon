@@ -33,9 +33,10 @@
 	 * paints it is the only mapping that cannot disagree with it.
 	 *
 	 * An earlier attempt read the dropdown menu instead and got the dark themes
-	 * backwards: Magnetic and SquaresDark put a white menu on a black dialog, so
-	 * the cells came out white inside a black panel. A dropdown is a floating
-	 * menu and is under no obligation to match the surface behind it.
+	 * backwards: Magnetic and Squares in dark mode put a white menu on a black
+	 * dialog, so the cells came out white inside a black panel. A dropdown
+	 * floats above the interface and is under no obligation to match the
+	 * surface behind it.
 	 */
 	--ec-bg-color: var(--dialog-bg-clr, #fff);
 	--ec-text-color: var(--dialog-clr, #333);
