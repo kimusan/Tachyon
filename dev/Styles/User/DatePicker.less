@@ -1,0 +1,22 @@
+/* The picker's opener and the field it belongs to. The field is filled by the
+   picker rather than typed into, so it has to look like something you press. */
+.b-date-open {
+	background: none;
+	border: 1px solid var(--btn-border-clr, rgba(0, 0, 0, 0.2));
+	border-radius: 3px;
+	color: inherit;
+	cursor: pointer;
+	flex: 0 0 auto;
+	line-height: 1;
+	margin-left: 4px;
+	padding: 4px 6px;
+
+	&:hover {
+		background-color: var(--dropdown-menu-hover-bg-color, rgba(0, 0, 0, 0.08));
+	}
+}
+
+input[readonly].b-calendar-date,
+input[readonly].b-date-field {
+	cursor: pointer;
+}

@@ -96,12 +96,27 @@ ko.bindingHandlers.datePicker = {
 			}
 		};
 
+		// A button, because the native input had one and its absence reads as a
+		// dead field. It also gives the picker something to open from that is
+		// unambiguously clickable.
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'b-date-open icon-calendar';
+		button.tabIndex = -1;
+		element.after(button);
+
 		loadPicker().then(() => {
 			const locale = localeFor(),
 				chosen = SettingsUserStore.dateFormat();
 			picker = new window.AirDatepicker(element, {
 				locale: locale,
 				dateFormat: chosen || (locale && locale.dateFormat),
+				// Popups here are dialog elements opened with showModal, which puts
+				// them in the browser's top layer. A picker left on document.body
+				// is painted underneath that and cannot be clicked, so it looked
+				// like the field itself was dead. Rendering inside the dialog keeps
+				// it in the same layer.
+				container: element.closest('dialog') || undefined,
 				// The reading week starts on whichever day the calendar settings
 				// say, rather than on the locale's own idea of it
 				firstDay: parseInt(SettingsUserStore.calendarFirstDay(), 10) || 0,
@@ -110,6 +125,7 @@ ko.bindingHandlers.datePicker = {
 				isMobile: 500 > innerWidth,
 				onSelect: ({ date }) => observable(toISO(date))
 			});
+			button.addEventListener('click', () => picker.show());
 			render();
 		});
 
@@ -119,6 +135,7 @@ ko.bindingHandlers.datePicker = {
 		// the binding was being applied, which took the whole editor down with it.
 		ko.addDisposeCallback(element, () => {
 			sub.dispose();
+			button.remove();
 			picker?.destroy();
 		});
 	}
