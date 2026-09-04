@@ -15,7 +15,18 @@
  * Every value ends in a literal, because two of the 23 themes define none of
  * these and a var() with no fallback resolves to nothing at all.
  */
-.ec {
+/*
+ * All three selectors, not just .ec. The library sets its own values under
+ * .ec-dark .ec and .ec-auto-dark .ec, which are two classes to the one of a
+ * bare .ec and therefore won: any route that put the dark class on the element
+ * brought back --ec-color-100, an oklch 20.5% grey, as the month cell
+ * background regardless of the theme. Matching their specificity and coming
+ * later in the file makes the theme the answer in every state, so the grid
+ * cannot end up grey inside a white panel whatever decides the class.
+ */
+.ec,
+.ec-dark .ec,
+.ec-auto-dark .ec {
 	--ec-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
 	--ec-text-color: var(--dropdown-menu-color, var(--main-color, currentcolor));
 	--ec-popup-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
@@ -28,4 +39,17 @@
 	--ec-event-bg-color: var(--folders-selected-bg-color, #3788d8);
 	--ec-event-text-color: var(--folders-selected-color, #fff);
 	--ec-highlight-color: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+
+	/*
+	 * Translucent rather than a colour, because these compose over whatever the
+	 * theme paints behind them and so one value is right on all 23. The library
+	 * took them from its grey ramp, which meant they were only ever correct for
+	 * the light or the dark half and needed something to choose between the two.
+	 * --ec-today-bg-color was a fixed pale yellow, invisible as a highlight on a
+	 * dark panel and the wrong hue on most light ones.
+	 */
+	--ec-border-color: var(--border-color, rgba(128, 128, 128, .32));
+	--ec-last-line-color: var(--border-color, rgba(128, 128, 128, .32));
+	--ec-today-bg-color: rgba(128, 128, 128, .1);
+	--ec-bg-event-color: rgba(128, 128, 128, .24);
 }

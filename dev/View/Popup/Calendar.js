@@ -283,48 +283,6 @@ export class CalendarPopupView extends AbstractViewPopup {
 		});
 	}
 
-	/**
-	 * .ec-dark and .ec-auto-dark are the component's own way of switching its
-	 * greys and color-scheme. Drive them from the same attribute the theme
-	 * switcher sets, so scrollbars and form controls inside the grid match.
-	 */
-	applyColorScheme() {
-		const list = this.calendarEl.classList;
-		// The surface decides, and nothing else. Two earlier attempts asked
-		// something that only sometimes agrees with it:
-		//
-		// ec-auto-dark sits inside a prefers-color-scheme media query, so it asked
-		// the desktop while every other panel followed the theme.
-		//
-		// data-color-scheme was no better. Only 3 of the 23 themes respond to that
-		// attribute at all, so on the other 20 setting it to dark left the theme
-		// light and turned the grid grey underneath it. For the 3 that do respond,
-		// their text colour changes with the attribute, so reading the surface
-		// gets the same answer without having to special case them.
-		//
-		// Text rather than background, because the Default theme paints a dark
-		// slate page behind light panels: --main-bg-color says dark while the grid
-		// is plainly sitting on white.
-		list.toggle('ec-dark', this.onDarkSurface());
-		list.toggle('ec-auto-dark', false);
-	}
-
-	/**
-	 * Light text means a dark surface. Relative luminance per WCAG 2.x, the same
-	 * measure readableOn uses for event labels.
-	 */
-	onDarkSurface() {
-		const m = /(\d+)[,\s]+(\d+)[,\s]+(\d+)/.exec(getComputedStyle(this.calendarEl).color);
-		if (!m) {
-			return false;
-		}
-		const channel = value => {
-				const c = value / 255;
-				return 0.03928 >= c ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-			},
-			luminance = 0.2126 * channel(+m[1]) + 0.7152 * channel(+m[2]) + 0.0722 * channel(+m[3]);
-		return 0.5 < luminance;
-	}
 
 	/**
 	 * The component formats its own times, so it has to be told the same hour
@@ -342,7 +300,6 @@ export class CalendarPopupView extends AbstractViewPopup {
 	}
 
 	createCalendar() {
-		this.applyColorScheme();
 		const el = document.documentElement;
 		this.ec = EventCalendar.create(this.calendarEl, {
 			locale: el.dataset.dateLang || el.lang || undefined,
@@ -659,7 +616,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 	onShow() {
 		loadAssets().then(
 			() => {
-				this.ec ? this.applyColorScheme() : this.createCalendar();
+				this.ec || this.createCalendar();
 				this.loadCalendars();
 			},
 			() => this.failed(i18n('CALENDAR/ERROR_LOAD_COMPONENT'))
