@@ -27,29 +27,38 @@
 .ec,
 .ec-dark .ec,
 .ec-auto-dark .ec {
-	--ec-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
-	--ec-text-color: var(--dropdown-menu-color, var(--main-color, currentcolor));
-	--ec-popup-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
+	/*
+	 * The same expressions the dialog rule in Main.less uses, deliberately
+	 * character for character. The grid sits inside that dialog, so copying what
+	 * paints it is the only mapping that cannot disagree with it.
+	 *
+	 * An earlier attempt read the dropdown menu instead and got the dark themes
+	 * backwards: Magnetic and SquaresDark put a white menu on a black dialog, so
+	 * the cells came out white inside a black panel. A dropdown is a floating
+	 * menu and is under no obligation to match the surface behind it.
+	 */
+	--ec-bg-color: var(--dialog-bg-clr, #fff);
+	--ec-text-color: var(--dialog-clr, #333);
+	--ec-popup-bg-color: var(--dialog-bg-clr, #fff);
 
-	--ec-button-bg-color: var(--dropdown-menu-bg-color, var(--main-bg-color, #fff));
-	--ec-button-text-color: var(--dropdown-menu-color, var(--main-color, currentcolor));
-	--ec-button-active-bg-color: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
-	--ec-button-active-text-color: var(--dropdown-menu-hover-color, var(--main-color, currentcolor));
-
-	--ec-event-bg-color: var(--folders-selected-bg-color, #3788d8);
-	--ec-event-text-color: var(--folders-selected-color, #fff);
-	--ec-highlight-color: var(--dropdown-menu-hover-bg-color, rgba(128, 128, 128, .16));
+	--ec-button-bg-color: var(--dialog-bg-clr, #fff);
+	--ec-button-text-color: var(--dialog-clr, #333);
 
 	/*
-	 * Translucent rather than a colour, because these compose over whatever the
-	 * theme paints behind them and so one value is right on all 23. The library
-	 * took them from its grey ramp, which meant they were only ever correct for
-	 * the light or the dark half and needed something to choose between the two.
-	 * --ec-today-bg-color was a fixed pale yellow, invisible as a highlight on a
-	 * dark panel and the wrong hue on most light ones.
+	 * Translucent so they read as a tint of whichever surface is underneath,
+	 * rather than as a colour that has to be correct on all 23 themes.
 	 */
+	--ec-button-active-bg-color: rgba(128, 128, 128, .24);
+	--ec-button-active-text-color: var(--dialog-clr, #333);
+	--ec-highlight-color: rgba(128, 128, 128, .16);
 	--ec-border-color: var(--border-color, rgba(128, 128, 128, .32));
 	--ec-last-line-color: var(--border-color, rgba(128, 128, 128, .32));
 	--ec-today-bg-color: rgba(128, 128, 128, .1);
 	--ec-bg-event-color: rgba(128, 128, 128, .24);
+
+	/* Events carry their own colour from the calendar they belong to, set in JS;
+	   this only covers one that has none. */
+	--ec-event-bg-color: var(--folders-selected-bg-color, #3788d8);
+	--ec-event-text-color: var(--folders-selected-color, #fff);
 }
+
