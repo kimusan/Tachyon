@@ -117,6 +117,22 @@ export class CalendarPopupView extends AbstractViewPopup {
 			this.editEnd(this.reformatForAllDay(this.editEnd(), allDay));
 		});
 
+		// Moving the start past the end drags the end along, rather than leaving
+		// a form that only complains once it is submitted. An end at or after the
+		// start is left alone, so a deliberate duration survives editing the start.
+		//
+		// Only when the two are the same shape. The all day subscribe above
+		// rewrites them one after the other, and mid way through, a date only
+		// start sits beside a date and time end; comparing those would clamp on
+		// the strings rather than on the moment they represent. The pass finishes
+		// consistently a line later, so skipping that instant costs nothing.
+		this.editStart.subscribe(start => {
+			const end = this.editEnd();
+			if (start && end && start.includes('T') === end.includes('T') && end < start) {
+				this.editEnd(start);
+			}
+		});
+
 		addComputablesTo(this, {
 			hasWritableCalendar: () => this.calendars().some(cal => !cal.readOnly),
 
