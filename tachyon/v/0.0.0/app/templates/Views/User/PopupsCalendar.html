@@ -102,7 +102,8 @@
 					<!-- a text field, not type="time": a native time control takes its
 					     format from the browser locale and ignores this app's hour cycle -->
 					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
-						list="calendar-times" data-bind="value: editStartTime, enable: !editReadOnly()">
+						list="calendar-times"
+						data-bind="value: editStartTime, enable: !editReadOnly(), event: { focus: openTimeList }">
 					</div>
 					<!-- /ko -->
 				</div>
@@ -118,7 +119,8 @@
 					<!-- a text field, not type="time": a native time control takes its
 					     format from the browser locale and ignores this app's hour cycle -->
 					<input type="text" class="b-calendar-time" inputmode="numeric" autocomplete="off"
-						list="calendar-times" data-bind="value: editEndTime, enable: !editReadOnly()">
+						list="calendar-times"
+						data-bind="value: editEndTime, enable: !editReadOnly(), event: { focus: openTimeList }">
 					</div>
 					<!-- /ko -->
 				</div>

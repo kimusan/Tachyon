@@ -404,6 +404,18 @@ export class CalendarPopupView extends AbstractViewPopup {
 	 * datetime-local and date inputs both want local time, not UTC
 	 */
 	/**
+	 * A datalist filters its options against what the field already contains, and
+	 * this field always contains a time, so the list could only ever offer the one
+	 * value already in it. Emptying the box on focus lets the whole list show;
+	 * typing then filters it as usual, and leaving without choosing anything falls
+	 * through to the write handler below, which keeps the previous time when it
+	 * cannot read what it was given.
+	 */
+	openTimeList(vm, event) {
+		event.target.value = '';
+	}
+
+	/**
 	 * A time typed by hand, read generously. Accepts 9, 930, 9:3, 9.30, 09:30,
 	 * "9:30 pm" and "21:30", and returns "HH:mm" in 24 hour form or '' if it
 	 * cannot make sense of it.
