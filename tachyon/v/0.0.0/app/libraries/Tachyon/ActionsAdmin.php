@@ -65,6 +65,7 @@ class ActionsAdmin extends Actions
 		});
 
 		$this->setConfigFromParams($oConfig, 'proxyExternalImages', 'labs', 'use_local_proxy_for_external_images', 'bool');
+		$this->setConfigFromParams($oConfig, 'allowUpdate', 'admin_panel', 'allow_update', 'bool');
 		$this->setConfigFromParams($oConfig, 'autoVerifySignatures', 'security', 'auto_verify_signatures', 'bool');
 
 		$this->setConfigFromParams($oConfig, 'allowLanguagesOnSettings', 'webmail', 'allow_languages_on_settings', 'bool');
@@ -474,33 +475,28 @@ class ActionsAdmin extends Actions
 	{
 		$this->IsAdminLoggined();
 
+		$oConfig = $this->Config();
 		$info = \Tachyon\Util\Repository::getLatestCoreInfo();
 
 		$sVersion = $info?->version ?? '';
 
-		$bShowWarning = false;
-		if ($info && !empty($info->warnings) && !TACHYON_DEV) {
-			foreach ($info->warnings as $sWarningVersion) {
-				$sWarningVersion = \trim($sWarningVersion);
-
-				if (\version_compare(APP_VERSION, $sWarningVersion, '<')
-				 && \version_compare($sVersion, $sWarningVersion, '>='))
-				{
-					$bShowWarning = true;
-					break;
-				}
-			}
-		}
-
+		// Why the update cannot run, for the admin to read. Mirrors the checks in
+		// Repository::canUpdateCore, which returns a bare bool.
 		$aWarnings = [];
-		if (!\version_compare(APP_VERSION, '2.0', '>')) {
-			$aWarnings[] = APP_VERSION;
+		if (!$oConfig->Get('admin_panel', 'allow_update', false)) {
+			$aWarnings[] = 'Updating from the admin panel is turned off';
 		}
+		if (!\version_compare(APP_VERSION, '2.0', '>')) {
+			$aWarnings[] = 'Version ' . APP_VERSION . ' is too old to update in place';
+		}
+		// Not writable almost always means the files belong to a package manager
+		// or to root, in which case updating is that installer's job and doing it
+		// here would be overwritten or would break the package database
 		if (!\is_writable(\dirname(APP_VERSION_ROOT_PATH))) {
-			$aWarnings[] = 'Can not write into: ' . \dirname(APP_VERSION_ROOT_PATH);
+			$aWarnings[] = 'Not writable: ' . \dirname(APP_VERSION_ROOT_PATH);
 		}
 		if (!\is_writable(APP_INDEX_ROOT_PATH . 'index.php')) {
-			$aWarnings[] = 'Can not edit: ' . APP_INDEX_ROOT_PATH . 'index.php';
+			$aWarnings[] = 'Not writable: ' . APP_INDEX_ROOT_PATH . 'index.php';
 		}
 
 		$aResult = [
@@ -509,7 +505,6 @@ class ActionsAdmin extends Actions
 			],
 			'core' => [
 				 'updatable' => \Tachyon\Util\Repository::canUpdateCore(),
-				 'warning' => $bShowWarning,
 				 'version' => $sVersion,
 				 'versionCompare' => \version_compare(APP_VERSION, $sVersion),
 				 'warnings' => $aWarnings
@@ -671,6 +666,7 @@ class ActionsAdmin extends Actions
 			$aResult['adminLogin'] = (string)$oConfig->Get('security', 'admin_login', '');
 			$aResult['adminTOTP'] = (string)$oConfig->Get('security', 'admin_totp', '');
 			$aResult['pluginsEnable'] = (bool)$oConfig->Get('plugins', 'enable', false);
+			$aResult['allowUpdate'] = (bool)$oConfig->Get('admin_panel', 'allow_update', false);
 
 			$aResult['loginDefaultDomain'] = $oConfig->Get('login', 'default_domain', '');
 			$aResult['determineUserLanguage'] = (bool)$oConfig->Get('login', 'determine_user_language', true);

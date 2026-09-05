@@ -136,6 +136,8 @@
 		"ALERT_CANNOT_ACCESS_REPOSITORY": "No se puede acceder al repositorio en estos momentos."
 	},
 	"TAB_ABOUT": {
+		"LABEL_ALLOW_UPDATE": "Permitir la actualización desde este panel",
+		"HINT_ALLOW_UPDATE": "Solo es posible cuando el servidor web puede escribir los archivos de la aplicación. Una instalación por paquete (deb, rpm, cPanel) se actualiza mediante ese gestor de paquetes.",
 		"LEGEND_ABOUT": "Acerca",
 		"LABEL_TAG_HINT": "Moderno, simple y rápido cliente web de correo electrónico",
 		"LABEL_ALL_RIGHTS_RESERVED": "Todos los Derechos Reservados.",

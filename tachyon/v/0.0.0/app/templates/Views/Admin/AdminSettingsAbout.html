@@ -24,6 +24,11 @@
 
 			<div>
 				<hr>
+				<div data-bind="component: {
+					name: 'Checkbox',
+					params: { value: allowUpdate, label: 'TAB_ABOUT/LABEL_ALLOW_UPDATE' }
+				}"></div>
+				<span class="help-block" data-i18n="TAB_ABOUT/HINT_ALLOW_UPDATE"></span>
 				<div data-bind="visible: 'error' === statusType()">
 					<i class="icon-triangle-alert" style="color:red"></i>
 					<span data-bind="text: errorDesc"></span>
@@ -32,17 +37,15 @@
 					<i class="icon-triangle-alert" style="color:orange"></i>
 					<span data-bind="html: coreVersionHtmlDesc"></span>
 					<br />
-					<span data-bind="if: coreWarning">
-						<br />
-						<i class="icon-triangle-alert" style="color:red"></i>
-						<b data-i18n="HINTS/WARNING"></b>
-						<span data-i18n="TAB_ABOUT/HINT_READ_CHANGE_LOG"></span>
-						<br />
-					</span>
+					<span data-i18n="TAB_ABOUT/HINT_READ_CHANGE_LOG"></span>
+					<br />
+					<ul style="display:none; margin: 8px 0 0 20px;" data-bind="visible: !coreUpdatable() && coreWarnings().length, foreach: coreWarnings">
+						<li data-bind="text: $data"></li>
+					</ul>
 					<br />
 					<a class="btn" href="https://github.com/kimusan/Tachyon/releases" target="_blank" data-i18n="TAB_ABOUT/BUTTON_RELEASES"></a>
 					<a class="btn" data-bind="visible: coreUpdatable, click: updateCoreData" data-i18n="GLOBAL/UPDATE"></a>
-					<a class="btn" href="https://github.com/kimusan/Tachyon/releases/latest" data-bind="visible: !coreUpdatable()" data-i18n="GLOBAL/UPDATE"></a>
+					<a class="btn" href="https://github.com/kimusan/Tachyon/releases/latest" target="_blank" data-bind="visible: !coreUpdatable()" data-i18n="GLOBAL/UPDATE"></a>
 				</div>
 				<div data-bind="visible: 'up-to-date' === statusType()">
 					<i class="icon-check iconcolor-green"></i>

@@ -136,6 +136,8 @@
 		"ALERT_CANNOT_ACCESS_REPOSITORY": "Cannot access the repository at the moment."
 	},
 	"TAB_ABOUT": {
+		"LABEL_ALLOW_UPDATE": "Allow updating from this panel",
+		"HINT_ALLOW_UPDATE": "Only possible when the web server can write the application files. A package install (deb, rpm, cPanel) is updated by that package manager instead.",
 		"LEGEND_ABOUT": "About",
 		"LABEL_TAG_HINT": "Simple, modern & fast web-based email client",
 		"LABEL_ALL_RIGHTS_RESERVED": "All Rights Reserved.",

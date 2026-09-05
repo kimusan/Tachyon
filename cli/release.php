@@ -116,9 +116,6 @@ if ($options['docker']) {
 	$tar->buildFromDirectory('./', "@tachyon/v/{$package->version}@");
 }
 
-//$zip->addFile('cli/upgrade.sh');
-//$tar->addFile('cli/upgrade.sh');
-
 $zip->addFile('data/.htaccess');
 $tar->addFile('data/.htaccess');
 
@@ -178,12 +175,6 @@ rename("tachyon/v/{$package->version}", 'tachyon/v/0.0.0');
 echo "\x1b[33;1m === Plugins === \x1b[0m\n";
 $options['release-tag'] = "v{$package->version}";
 require(ROOT_DIR . '/build/plugins.php');
-
-file_put_contents("{$destPath}core.json", '{
-	"version": "'.$package->version.'",
-	"file": "../latest.tar.gz",
-	"warnings": []
-}');
 
 // Arch User Repository
 if ($options['aur']) {

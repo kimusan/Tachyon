@@ -1,5 +1,5 @@
 import ko from 'ko';
-import { Settings } from 'Common/Globals';
+import { Settings, SettingsGet } from 'Common/Globals';
 import { addObservablesTo } from 'External/ko';
 import Remote from 'Remote/Admin/Fetch';
 
@@ -9,11 +9,21 @@ export class AdminSettingsAbout /*extends AbstractViewSettings*/ {
 	constructor() {
 		this.version = Settings.app('version');
 		this.phpextensions = ko.observableArray();
+		// Why the update cannot run. It was already being sent and never shown,
+		// which left an admin with a missing button and no way to find out why.
+		this.coreWarnings = ko.observableArray();
+
+		this.allowUpdate = ko.observable(!!SettingsGet('allowUpdate'));
+		this.allowUpdate.subscribe(value => {
+			Remote.saveSetting('allowUpdate', value);
+			// updatable is decided server side and this is one of its inputs, so
+			// the button appears on the answer rather than on the click
+			this.checkVersion();
+		});
 
 		addObservablesTo(this, {
 			coreReal: true,
 			coreUpdatable: true,
-			coreWarning: false,
 			coreVersion: '',
 			coreVersionCompare: -2,
 			php64: true,
@@ -56,6 +66,10 @@ export class AdminSettingsAbout /*extends AbstractViewSettings*/ {
 
 	onBuild() {
 //	beforeShow() {
+		this.checkVersion();
+	}
+
+	checkVersion() {
 		this.coreChecking(true);
 		Remote.request('AdminInfo', (iError, data) => {
 			this.coreChecking(false);
@@ -67,13 +81,13 @@ export class AdminSettingsAbout /*extends AbstractViewSettings*/ {
 				this.phpextensions(data.php);
 				this.coreReal(true);
 				this.coreUpdatable(!!data.core.updatable);
-				this.coreWarning(!!data.core.warning);
+				this.coreWarnings(data.core.warnings || []);
 				this.coreVersion(data.core.version || '');
 				this.coreVersionCompare(data.core.versionCompare);
 				this.php64(data.php[1].loaded);
 			} else {
 				this.coreReal(false);
-				this.coreWarning(false);
+				this.coreWarnings([]);
 				this.coreVersion('');
 				this.coreVersionCompare(-2);
 			}

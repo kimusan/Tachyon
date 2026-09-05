@@ -136,6 +136,8 @@
 		"ALERT_CANNOT_ACCESS_REPOSITORY": "Impossible d'accéder au dépôt pour l'instant."
 	},
 	"TAB_ABOUT": {
+		"LABEL_ALLOW_UPDATE": "Autoriser la mise à jour depuis ce panneau",
+		"HINT_ALLOW_UPDATE": "Possible uniquement si le serveur web peut écrire les fichiers de l'application. Une installation par paquet (deb, rpm, cPanel) est mise à jour par ce gestionnaire de paquets.",
 		"LEGEND_ABOUT": "À propos",
 		"LABEL_TAG_HINT": "Un client webmail simple, moderne et rapide",
 		"LABEL_ALL_RIGHTS_RESERVED": "Tous droits réservés.",

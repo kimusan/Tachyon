@@ -136,6 +136,8 @@
 		"ALERT_CANNOT_ACCESS_REPOSITORY": "Kan ikke tilgå depotet lige nu."
 	},
 	"TAB_ABOUT": {
+		"LABEL_ALLOW_UPDATE": "Tillad opdatering fra dette panel",
+		"HINT_ALLOW_UPDATE": "Kun muligt når webserveren kan skrive til programfilerne. En pakkeinstallation (deb, rpm, cPanel) opdateres i stedet af den pakkemanager.",
 		"LEGEND_ABOUT": "Om",
 		"LABEL_TAG_HINT": "Simpel, moderne & hurtig web-baseret e-mail klient",
 		"LABEL_ALL_RIGHTS_RESERVED": "alle rettigheder forbeholdes.",

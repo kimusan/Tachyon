@@ -163,21 +163,28 @@ abstract class Repository
 			return null;
 		}
 
+		$sVersion = \ltrim($data->tag_name, 'v');
+
+		// By exact name. A release carries several .tar.gz assets, and the
+		// cPanel, Nextcloud and ownCloud packages sort ahead of the core one, so
+		// taking the first match downloaded a cPanel bundle that unpacks under
+		// /usr/local/cpanel and has no tachyon/ entry to extract at all.
+		$sWanted = "tachyon-{$sVersion}.tar.gz";
 		$downloadUrl = null;
 		foreach ($data->assets ?? [] as $asset) {
-			if (\str_ends_with($asset->name ?? '', '.tar.gz')) {
+			if ($sWanted === ($asset->name ?? '')) {
 				$downloadUrl = $asset->browser_download_url;
 				break;
 			}
 		}
 		if (!$downloadUrl) {
+			\Tachyon\Util\Log::error('UPDATER', "Release {$data->tag_name} has no {$sWanted} asset");
 			return null;
 		}
 
 		$info = new \stdClass();
-		$info->version = \ltrim($data->tag_name, 'v');
+		$info->version = $sVersion;
 		$info->file = $downloadUrl;
-		$info->warnings = [];
 		return $info;
 	}
 

@@ -136,6 +136,8 @@
 		"ALERT_CANNOT_ACCESS_REPOSITORY": "Momentan kann nicht auf das Repository zugegriffen werden."
 	},
 	"TAB_ABOUT": {
+		"LABEL_ALLOW_UPDATE": "Aktualisierung über dieses Panel erlauben",
+		"HINT_ALLOW_UPDATE": "Nur möglich, wenn der Webserver die Programmdateien schreiben kann. Eine Paketinstallation (deb, rpm, cPanel) wird stattdessen von der Paketverwaltung aktualisiert.",
 		"LEGEND_ABOUT": "Über",
 		"LABEL_TAG_HINT": "Einfacher, moderner und schneller webbasierter E-Mail-Client",
 		"LABEL_ALL_RIGHTS_RESERVED": "Alle Rechte vorbehalten.",
