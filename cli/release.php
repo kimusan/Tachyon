@@ -24,8 +24,7 @@ file_put_contents($file, preg_replace('/<upstream>[^<]*</', "<upstream>{$package
 $file = ROOT_DIR . '/integrations/virtualmin/tachyon.pl';
 file_put_contents($file, preg_replace('/return \\( "[0-9]+\\.[0-9]+\\.[0-9]+" \\)/', "return ( \"{$package->version}\" )", file_get_contents($file)));
 
-// Arch User Repository
-// https://aur.archlinux.org/packages/snappymail/
+// Arch User Repository, see build/arch/PKGBUILD
 $options['aur'] = isset($options['aur']);
 
 // Docker build
@@ -190,31 +189,36 @@ if ($options['aur']) {
 
 	$b2sums = function_exists('b2sum') ? [
 		b2sum($tar_destination),
-		b2sum(ROOT_DIR . '/build/arch/snappymail.sysusers'),
-		b2sum(ROOT_DIR . '/build/arch/snappymail.tmpfiles')
+		b2sum(ROOT_DIR . '/build/arch/tachyon.sysusers'),
+		b2sum(ROOT_DIR . '/build/arch/tachyon.tmpfiles')
 	] : [];
 
-	file_put_contents('build/arch/.SRCINFO', 'pkgbase = snappymail
-	pkgdesc = modern PHP webmail client
+	// Describes build/arch/PKGBUILD, so the two have to say the same thing.
+	// It described the upstream snappymail package while PKGBUILD had already
+	// been rewritten for Tachyon, which left the AUR metadata pointing at
+	// another project entirely.
+	file_put_contents('build/arch/.SRCINFO', 'pkgbase = tachyon
+	pkgdesc = Fast, secure, modern PHP webmail client
 	pkgver = '.$package->version.'
 	pkgrel = 1
-	url = https://github.com/the-djmaze/snappymail
+	url = https://github.com/kimusan/Tachyon
 	arch = any
 	license = AGPL3
 	makedepends = php
 	makedepends = nodejs
 	makedepends = yarn
 	makedepends = gulp
+	makedepends = rollup
 	depends = php-fpm
 	optdepends = mariadb: storage backend for contacts
 	optdepends = php-pgsql: storage backend for contacts
 	optdepends = php-sqlite: storage backend for contacts
-	source = snappymail-'.$package->version.'.tar.gz::https://github.com/the-djmaze/snappymail/archive/v'.$package->version.'.tar.gz
-	source = snappymail.sysusers
-	source = snappymail.tmpfiles
+	source = tachyon-'.$package->version.'.tar.gz::https://github.com/kimusan/Tachyon/archive/v'.$package->version.'.tar.gz
+	source = tachyon.sysusers
+	source = tachyon.tmpfiles
 	b2sums = '.implode("\n	b2sums = ", $b2sums).'
 
-pkgname = snappymail
+pkgname = tachyon
 ');
 
 	$file = ROOT_DIR . '/build/arch/PKGBUILD';
