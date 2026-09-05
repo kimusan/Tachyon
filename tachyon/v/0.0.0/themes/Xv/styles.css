@@ -67,7 +67,6 @@
 		--main-color: #fff;
 		--main-bg-color: #48525C;
 		--main-bg-image: linear-gradient(rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.68)), url("images/background.jpg");
-		--main-bg-size: cover;
 		--link-color: #6AE;
 		--border-color: #555;
 		--hr-color: #666;
@@ -218,7 +217,6 @@
 	--main-color: #fff;
 	--main-bg-color: #48525C;
 	--main-bg-image: linear-gradient(rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.68)), url("images/background.jpg");
-	--main-bg-size: cover;
 	--link-color: #6AE;
 	--border-color: #555;
 	--hr-color: #666;

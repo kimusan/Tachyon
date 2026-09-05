@@ -70,7 +70,6 @@
 		--main-color: #fff;
 		--main-bg-color: #48525C;
 		--main-bg-image: url("images/background.jpg");
-		--main-bg-size: cover;
 		--link-color: #6AE;
 		--border-color: #555;
 		--hr-color: #666;
@@ -221,7 +220,6 @@
 	--main-color: #fff;
 	--main-bg-color: #48525C;
 	--main-bg-image: url("images/background.jpg");
-	--main-bg-size: cover;
 	--link-color: #6AE;
 	--border-color: #555;
 	--hr-color: #666;
