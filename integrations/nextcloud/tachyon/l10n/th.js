@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "snappymail",
+    "tachyon",
     {
     "Email" : "อีเมล",
     "Error" : "ข้อผิดพลาด",

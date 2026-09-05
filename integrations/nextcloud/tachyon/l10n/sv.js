@@ -1,9 +1,9 @@
 OC.L10N.register(
-    "snappymail",
+    "tachyon",
     {
     "Email" : "E-post",
     "Error" : "Fel",
-    "Go to RainLoop Webmail admin panel" : "Gå till administrationsdelen i Rainloop webbmejl",
+    "Go to Tachyon Webmail admin panel" : "Gå till administrationsdelen i Rainloop webbmejl",
     "Save" : "Spara",
     "Password" : "Lösenord"
 },

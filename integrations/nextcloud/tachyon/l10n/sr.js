@@ -1,12 +1,12 @@
 OC.L10N.register(
-    "snappymail",
+    "tachyon",
     {
     "Email" : "Е-пошта",
     "Error" : "Грешка",
     "Invalid argument(s)" : "Неисправни аргумент(и)",
     "Saved successfully" : "Успешно сачувано",
-    "RainLoop" : "RainLoop",
-    "RainLoop Webmail" : "RainLoop веб пошта",
+    "Tachyon" : "Tachyon",
+    "Tachyon Webmail" : "Tachyon веб пошта",
     "Save" : "Сачувај",
     "Password" : "Лозинка"
 },
