@@ -92,7 +92,7 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 			rename("{$tar_destination}.gz", $tgz_destination);
 
 			if (isset($options['sign'])) {
-				passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($tgz_destination), $return_var);
+				passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '.escapeshellarg($tgz_destination), $return_var);
 				$manifest_item['pgp_sig'] = trim(preg_replace('/-----(BEGIN|END) PGP SIGNATURE-----/', '', file_get_contents($tgz_destination.'.asc')));
 			}
 			ksort($manifest_item);

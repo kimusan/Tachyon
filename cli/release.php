@@ -13,6 +13,15 @@ if (!$gulp) {
 $package = json_decode(file_get_contents('package.json'));
 
 /**
+ * The key --sign signs with. It was the upstream maintainer's fingerprint,
+ * repeated at each call, so anyone else building a signed release either
+ * edited eight lines or produced artifacts attributed to someone who had not
+ * signed them. Set TACHYON_SIGNING_KEY to use another key without touching
+ * this file.
+ */
+define('SIGNING_KEY', getenv('TACHYON_SIGNING_KEY') ?: '2AF665D52CE22BDEFC606AD1DAD08242CFE59866');
+
+/**
  * Update files that contain version
  */
 // cloudron
@@ -173,6 +182,13 @@ rename("tachyon/v/{$package->version}", 'tachyon/v/0.0.0');
 
 echo "\x1b[33;1m === Plugins === \x1b[0m\n";
 $options['release-tag'] = "v{$package->version}";
+// plugins.php is required into this scope and reuses $tar_destination for each
+// plugin it builds, unlinking it as it goes. Everything below still means the
+// core archive, so it keeps its own reference: --sign was signing the last
+// plugin tar, which no longer existed, and the AUR b2sums hashed the same
+// missing file.
+$core_tar = $tar_destination;
+$core_zip = $zip_destination;
 require(ROOT_DIR . '/build/plugins.php');
 
 // Arch User Repository
@@ -188,7 +204,7 @@ if ($options['aur']) {
 	}
 
 	$b2sums = function_exists('b2sum') ? [
-		b2sum($tar_destination),
+		b2sum($core_tar),
 		b2sum(ROOT_DIR . '/build/arch/tachyon.sysusers'),
 		b2sum(ROOT_DIR . '/build/arch/tachyon.tmpfiles')
 	] : [];
@@ -247,28 +263,34 @@ else if ($options['docker']) {
 
 if (isset($options['sign'])) {
 	echo "\x1b[33;1m === PGP Sign === \x1b[0m\n";
-	passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($tar_destination), $return_var);
-	passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($zip_destination), $return_var);
+	// Checked once here rather than letting each gpg call fail on its own, which
+	// leaves a release directory of unsigned artifacts and a run of identical errors
+	exec('gpg --list-secret-keys ' . escapeshellarg(SIGNING_KEY) . ' 2>&1', $out, $code);
+	if ($code) {
+		exit('No secret key for ' . SIGNING_KEY . " in this keyring, nothing signed.\n");
+	}
+	passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '.escapeshellarg($core_tar), $return_var);
+	passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '.escapeshellarg($core_zip), $return_var);
 	if (isset($options['nextcloud'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			.escapeshellarg("{$destPath}tachyon-{$package->version}-nextcloud.tar.gz"), $return_var);
 	}
 	if (isset($options['owncloud'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			.escapeshellarg("{$destPath}tachyon-{$package->version}-owncloud.tar.gz"), $return_var);
 	}
 	if (isset($options['cpanel'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			.escapeshellarg("{$destPath}tachyon-{$package->version}-cpanel.tar.gz"), $return_var);
 	}
 	if (isset($options['debian'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/" . basename(DEB_DEST_DIR.'.deb')), $return_var);
 		// https://github.com/the-djmaze/snappymail/issues/185#issuecomment-1059420588
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --digest-algo SHA512 --clearsign --output '
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --digest-algo SHA512 --clearsign --output '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/InRelease") . ' '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/Release"), $return_var);
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --digest-algo SHA512 -abs --output '
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --digest-algo SHA512 -abs --output '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/Release.gpg") . ' '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/Release"), $return_var);
 	}
