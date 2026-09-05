@@ -251,6 +251,32 @@
 	#V-PopupsContacts {
 		width: 100%;
 	}
+
+	/*
+	 * The toolbar wraps once there is no room for every control, and a menu
+	 * anchored to its own button then opens wherever that button landed. The
+	 * right-edge menus align their right side to the button, so a button that
+	 * wrapped to the start of the second line put most of the menu off the left
+	 * of the screen: at 360px the ☰ menu measured -112px to 50px.
+	 *
+	 * Anchoring to the header instead of the button removes the dependency on
+	 * where the button ended up. position: static on the group hands the menu's
+	 * containing block to the header, and pinning both edges makes it span the
+	 * width whatever opened it.
+	 */
+	#V-PopupsContacts .b-header-toolbar {
+		position: relative;
+	}
+
+	#V-PopupsContacts .b-header-toolbar .btn-group.dropdown {
+		position: static;
+	}
+
+	#V-PopupsContacts .b-header-toolbar .dropdown-menu {
+		left: 8px;
+		right: 8px;
+		max-width: none;
+	}
 }
 
 #V-PopupsContacts .e-selection-count {
