@@ -283,7 +283,11 @@ if (isset($options['sign'])) {
 		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			.escapeshellarg("{$destPath}tachyon-{$package->version}-cpanel.tar.gz"), $return_var);
 	}
-	if (isset($options['debian'])) {
+	// The constant rather than the option: --aur, --debian and --docker sit in
+	// one if/elseif chain further up, so passing --debian alongside --aur never
+	// runs deb.php and there is no .deb here to sign. Asking whether it was
+	// built beats crashing on an undefined constant.
+	if (defined('DEB_DEST_DIR')) {
 		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/" . basename(DEB_DEST_DIR.'.deb')), $return_var);
 		// https://github.com/the-djmaze/snappymail/issues/185#issuecomment-1059420588
