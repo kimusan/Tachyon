@@ -59,8 +59,61 @@ jobs:
           echo "Version: $PKG_VERSION"
           echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
 
+      # Optional on purpose. Without the secret the release still builds, just
+      # unsigned, rather than failing on a fork or before the key is configured.
+      - name: Import the signing key
+        id: gpg
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY_PASSPHRASE: ${{ secrets.SIGNING_KEY_PASSPHRASE }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::warning::No SIGNING_KEY secret, this release will be unsigned"
+            exit 0
+          fi
+          mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+          printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
+          # The fingerprint is read back from the imported key rather than
+          # written down anywhere, so there is one source of truth for which
+          # key this is and no second secret to keep in step with the first.
+          FPR=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
+          if [ -z "$FPR" ]; then
+            echo "::error::SIGNING_KEY imported no secret key"
+            exit 1
+          fi
+          # release.php shells out to gpg with no way to pass a passphrase, so
+          # the agent has to answer without a terminal to prompt on
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --reload gpg-agent || true
+          if [ -n "$SIGNING_KEY_PASSPHRASE" ]; then
+            printf '%s' "$SIGNING_KEY_PASSPHRASE" > ~/.gnupg/passphrase
+            chmod 600 ~/.gnupg/passphrase
+            printf 'batch\npinentry-mode loopback\npassphrase-file %s/.gnupg/passphrase\n' "$HOME" >> ~/.gnupg/gpg.conf
+          fi
+          echo "fpr=$FPR" >> $GITHUB_OUTPUT
+          echo "sign=--sign" >> $GITHUB_OUTPUT
+          echo "Signing as $FPR"
+
       - name: Build release (JS/CSS + PHP archive + plugins)
-        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian --nextcloud --owncloud --cpanel
+        env:
+          TACHYON_SIGNING_KEY: ${{ steps.gpg.outputs.fpr }}
+        run: PATH="$PATH:node_modules/.bin" php cli/release.php --debian --nextcloud --owncloud --cpanel ${{ steps.gpg.outputs.sign }}
+
+      # gpg failing leaves the build green and the artifacts unsigned, which is
+      # only discovered by whoever tries to verify one. Checked here instead.
+      - name: Verify the signatures and export the public key
+        if: steps.gpg.outputs.sign != ''
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          D="build/dist/releases/webmail/$V"
+          for f in "$D/tachyon-$V.tar.gz" "$D/tachyon-$V.zip"; do
+            gpg --verify "$f.asc" "$f"
+          done
+          [ -f "$D/InRelease" ] && gpg --verify "$D/InRelease"
+          [ -f "$D/Release.gpg" ] && gpg --verify "$D/Release.gpg" "$D/Release"
+          # Shipped with the release it signs, so a user always has the key that
+          # matches the artifacts they just downloaded
+          gpg --armor --export "${{ steps.gpg.outputs.fpr }}" > "$D/tachyon-archive-keyring.asc"
 
       # The wiki and integrations/hestiacp/bin/v-add-sys-tachyon both fetch
       # tachyon-latest.tar.gz from releases/latest/download, which 404s while
@@ -106,8 +159,16 @@ jobs:
             build/dist/releases/webmail/*/tachyon-*-nextcloud.tar.gz
             build/dist/releases/webmail/*/tachyon-*-owncloud.tar.gz
             build/dist/releases/webmail/*/tachyon-*-translation-status.txt
+            build/dist/releases/webmail/*/tachyon-archive-keyring.asc
             build/dist/releases/plugins/*.tgz
             packages.json
+            build/dist/releases/webmail/*/*.asc
+            build/dist/releases/plugins/*.asc
+            build/dist/releases/webmail/*/InRelease
+            build/dist/releases/webmail/*/Release
+            build/dist/releases/webmail/*/Release.gpg
+            build/dist/releases/webmail/*/Packages
+            build/dist/releases/webmail/*/Packages.gz
 
   publish-appstore:
     name: Publish to Nextcloud App Store
