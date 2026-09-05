@@ -1,5 +1,241 @@
+/*
+ * Magnetic covers both colour schemes. It shipped as dark only, and the light
+ * half is new: the same layout with panels turned over and the backdrop
+ * washed pale, rather than a different design.
+ *
+ * Light is the base, below. Dark is applied twice: once for people who have
+ * not chosen a mode and whose system asks for dark, and once for people who
+ * picked dark explicitly. The media query carries
+ * :not([data-color-scheme="light"]) so that choosing light on a machine set to
+ * dark actually stays light, which a bare media query cannot do.
+ */
 
 :root {
+	color-scheme: light;
+
+	/* MAIN */
+	--main-color: #333;
+	--main-bg-color: #dfe3e6;
+	/* Magnetic's backdrop is a near black texture, 15% mean brightness, so in
+	   light mode it is washed with white rather than swapped for another file.
+	   The grain stays, the glare does not. */
+	--main-bg-image: linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)), url("images/background.png");
+	--link-color: #0A58CA;
+	--border-color: #ccc;
+	--hr-color: #ddd;
+
+	--panel-bg-clr: #fff;
+
+	/* LOADING */
+	--loading-color: #333;
+	--loading-text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.5);
+
+	/* LOGIN */
+	--login-color: #333;
+	--login-bg-color: rgba(255,255,255,0.7);
+	--login-box-shadow: 0px 2px 10px rgba(0,0,0,0.2);
+	--login-border: none;
+	--login-border-radius: 7px;
+
+	/* MENU */
+	--dropdown-menu-color: #333;
+	--dropdown-menu-bg-color: #fff;
+	--dropdown-menu-hover-bg-color: #dfe3e6;
+	--dropdown-menu-hover-color: #333;
+	--dropdown-menu-disable-color: #999;
+
+	/* FOLDERS */
+	--folders-color: #333;
+	--folders-disabled-color: #999;
+	--folders-selected-color: #333;
+	--folders-selected-bg-color: rgba(0,0,0,0.10);
+	--folders-focused-color: #333;
+	--folders-focused-bg-color: rgba(0,0,0,0.16);
+	--folders-hover-color: #333;
+	--folders-hover-bg-color: rgba(0,0,0,0.08);
+	--folders-drop-color: #333;
+	--folders-drop-bg-color: rgba(0,0,0,0.10);
+
+	/* SETTINGS */
+	--settings-menu-color: #333;
+	--settings-menu-selected-color: #333;
+	--settings-menu-selected-bg-color: rgba(0,0,0,0.10);
+	--settings-menu-hover-color: #333;
+	--settings-menu-hover-bg-color: rgba(0,0,0,0.08);
+
+	/* MESSAGES */
+	--message-list-toolbar-bg-color: #eee;
+	--message-header-bg-clr: #f6f6f6;
+
+	/* DIALOGS */
+	--dialog-clr: #333;
+	--dialog-bg-clr: #fff;
+	--dialog-border-clr: #ccc;
+
+	/* FORMS */
+	--btn-clr: #333;
+	--btn-bg-clr: #fff;
+	--btn-border-clr: rgba(0,0,0,.20);
+
+	--input-clr: #333;
+	--input-bg-clr: #fff;
+	--input-border-clr: #aaa;
+}
+
+::-webkit-scrollbar {
+	width: 0.8em;
+}
+::-webkit-scrollbar-track {
+	background-color: #eee;
+}
+::-webkit-scrollbar-thumb {
+	background: #bbb;
+	border-radius: 5px;
+	box-shadow: inset 0 0 3px #999;
+}
+
+.thm-message-list-top-toolbar, .thm-message-list-bottom-toolbar {
+	background-image: linear-gradient(to bottom, #f4f4f4, #dfdfdf) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-color-scheme="light"]) {
+		color-scheme: dark;
+
+		/* MAIN */
+		--main-color: #fff;
+		--main-bg-color: #3C454D;
+		--main-bg-image: url("images/background.png");
+		--link-color: #6AE;
+		--border-color: #555;
+		--hr-color: #666;
+
+		--panel-bg-clr: #000;
+
+		/* LOADING */
+		--loading-color: #ddd;
+		--loading-text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
+
+		/* LOGIN */
+		--login-color: #eee;
+		--login-bg-color: rgba(0,0,0,0.5);
+		--login-box-shadow: 0px 2px 10px rgba(0,0,0,0.5);
+		--login-border: none;
+		--login-border-radius: 7px;
+
+		/* MENU */
+		--dropdown-menu-color: #333;
+		--dropdown-menu-bg-color: #fff;
+		--dropdown-menu-hover-bg-color: #48525C;
+		--dropdown-menu-hover-color: #eee;
+		--dropdown-menu-disable-color: #999;
+
+		/* FOLDERS */
+		--folders-color: #fff;
+		--folders-disabled-color: #aaa;
+		--folders-selected-color: #fff;
+		--folders-selected-bg-color: rgba(0,0,0,0.5);
+		--folders-focused-color: #fff;
+		--folders-focused-bg-color: rgba(0,0,0,0.7);
+		--folders-hover-color: #fff;
+		--folders-hover-bg-color: rgba(0,0,0,0.5);
+		--folders-drop-color: #fff;
+		--folders-drop-bg-color: rgba(0,0,0,0.5);
+
+		/* SETTINGS */
+		--settings-menu-color: #fff;
+		--settings-menu-selected-color: #fff;
+		--settings-menu-selected-bg-color: rgba(0,0,0,0.5);
+		--settings-menu-hover-color: #fff;
+		--settings-menu-hover-bg-color: rgba(0,0,0,0.5);
+
+		/* MESSAGES */
+		--message-list-toolbar-bg-color: #222;
+		--message-header-bg-clr: #222;
+
+		/* DIALOGS */
+		--dialog-clr: #fff;
+		--dialog-bg-clr: #000;
+		--dialog-border-clr: #555;
+
+		/* FORMS */
+		--btn-clr: #fff;
+		--btn-bg-clr: #000;
+		--btn-border-clr: rgba(255,255,255,.20);
+
+		--input-clr: #fff;
+		--input-bg-clr: #000;
+		--input-border-clr: #aaa;
+	}
+
+	:root:not([data-color-scheme="light"]) ::-webkit-scrollbar {
+		width: 0.8em;
+	}
+
+	:root:not([data-color-scheme="light"]) ::-webkit-scrollbar-track {
+		background-color: #000;
+	}
+
+	:root:not([data-color-scheme="light"]) ::-webkit-scrollbar-thumb {
+		background: #666;
+		border-radius: 5px;
+		box-shadow: inset 0 0 3px #000;
+	}
+
+	:root:not([data-color-scheme="light"]) .thm-message-list-top-toolbar,
+	:root:not([data-color-scheme="light"]) .thm-message-list-bottom-toolbar {
+		background-image: linear-gradient(to bottom,#444,#111) !important;
+	}
+
+	:root:not([data-color-scheme="light"]) .btn:not(.btn-success):not(.btn-warning):not(.btn-danger) {
+		box-shadow: inset 0 1px 0 rgba(0,0,0,.2), 0 1px 2px rgba(255,255,255,.05);
+		text-shadow: 0 -1px 0 rgba(255,255,255,.25);
+	}
+
+	:root:not([data-color-scheme="light"]) .btn:not(.btn-success):not(.btn-warning):not(.btn-danger).active,
+	:root:not([data-color-scheme="light"]) .btn:not(.btn-success):not(.btn-warning):not(.btn-danger):active {
+		box-shadow: inset 0 2px 4px rgba(255,255,255,.5), 0 1px 2px rgba(255,255,255,.25);
+	}
+
+	:root:not([data-color-scheme="light"]) .btn .icon-spinner {
+		border-color: #333;
+		border-top-color: #ccc;
+	}
+
+	:root:not([data-color-scheme="light"]) .messageListItem {
+		border-left-color: #111;
+	}
+
+	:root:not([data-color-scheme="light"]) .table-hover tbody tr:hover td,
+	:root:not([data-color-scheme="light"]) .table-hover tbody tr:hover th {
+		background-color: #333;
+	}
+
+	:root:not([data-color-scheme="light"]) .table-striped tbody tr:nth-child(2n+1) td,
+	:root:not([data-color-scheme="light"]) .table-striped tbody tr:nth-child(2n+1) th {
+		background-color: #111;
+	}
+
+	:root:not([data-color-scheme="light"]) #V-Settings-About .rl-logo {
+		filter: invert(1);
+	}
+
+	:root:not([data-color-scheme="light"]) .tabs [id^="tab"]:checked + label {
+		background: linear-gradient(#555 0%, #000 100%);
+	}
+
+	:root:not([data-color-scheme="light"]) .select,
+	:root:not([data-color-scheme="light"]) select {
+		background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIGhlaWdodD0nMTBweCcgd2lkdGg9JzE1cHgnPjx0ZXh0IHg9JzAnIHk9JzEwJyBmaWxsPSdyZ2IoMjU1LDI1NSwyNTUpJz7ilr48L3RleHQ+PC9zdmc+);
+	}
+
+	:root:not([data-color-scheme="light"]) #messageItem .b-text-part blockquote,
+	:root:not([data-color-scheme="light"]) .b-settings-general .editMainIdentity {
+		border-color: #999;
+	}
+}
+
+:root[data-color-scheme="dark"] {
 	color-scheme: dark;
 
 	/* MAIN */
@@ -68,62 +304,68 @@
 	--input-border-clr: #aaa;
 }
 
-::-webkit-scrollbar {
+:root[data-color-scheme="dark"] ::-webkit-scrollbar {
 	width: 0.8em;
 }
-::-webkit-scrollbar-track {
+
+:root[data-color-scheme="dark"] ::-webkit-scrollbar-track {
 	background-color: #000;
 }
-::-webkit-scrollbar-thumb {
+
+:root[data-color-scheme="dark"] ::-webkit-scrollbar-thumb {
 	background: #666;
 	border-radius: 5px;
 	box-shadow: inset 0 0 3px #000;
 }
 
-.thm-message-list-top-toolbar, .thm-message-list-bottom-toolbar {
+:root[data-color-scheme="dark"] .thm-message-list-top-toolbar,
+:root[data-color-scheme="dark"] .thm-message-list-bottom-toolbar {
 	background-image: linear-gradient(to bottom,#444,#111) !important;
 }
 
-.btn:not(.btn-success):not(.btn-warning):not(.btn-danger) {
+:root[data-color-scheme="dark"] .btn:not(.btn-success):not(.btn-warning):not(.btn-danger) {
 	box-shadow: inset 0 1px 0 rgba(0,0,0,.2), 0 1px 2px rgba(255,255,255,.05);
 	text-shadow: 0 -1px 0 rgba(255,255,255,.25);
 }
-.btn:not(.btn-success):not(.btn-warning):not(.btn-danger).active,
-.btn:not(.btn-success):not(.btn-warning):not(.btn-danger):active {
+
+:root[data-color-scheme="dark"] .btn:not(.btn-success):not(.btn-warning):not(.btn-danger).active,
+:root[data-color-scheme="dark"] .btn:not(.btn-success):not(.btn-warning):not(.btn-danger):active {
 	box-shadow: inset 0 2px 4px rgba(255,255,255,.5), 0 1px 2px rgba(255,255,255,.25);
 }
-.btn .icon-spinner {
+
+:root[data-color-scheme="dark"] .btn .icon-spinner {
 	border-color: #333;
 	border-top-color: #ccc;
 }
 
-.messageListItem {
+:root[data-color-scheme="dark"] .messageListItem {
 	border-left-color: #111;
 }
 
-.table-hover tbody tr:hover td,
-.table-hover tbody tr:hover th {
+:root[data-color-scheme="dark"] .table-hover tbody tr:hover td,
+:root[data-color-scheme="dark"] .table-hover tbody tr:hover th {
 	background-color: #333;
 }
 
-.table-striped tbody tr:nth-child(2n+1) td,
-.table-striped tbody tr:nth-child(2n+1) th {
+:root[data-color-scheme="dark"] .table-striped tbody tr:nth-child(2n+1) td,
+:root[data-color-scheme="dark"] .table-striped tbody tr:nth-child(2n+1) th {
 	background-color: #111;
 }
 
-#V-Settings-About .rl-logo {
+:root[data-color-scheme="dark"] #V-Settings-About .rl-logo {
 	filter: invert(1);
 }
 
-.tabs [id^="tab"]:checked + label {
+:root[data-color-scheme="dark"] .tabs [id^="tab"]:checked + label {
 	background: linear-gradient(#555 0%, #000 100%);
 }
 
-.select, select {
+:root[data-color-scheme="dark"] .select,
+:root[data-color-scheme="dark"] select {
 	background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIGhlaWdodD0nMTBweCcgd2lkdGg9JzE1cHgnPjx0ZXh0IHg9JzAnIHk9JzEwJyBmaWxsPSdyZ2IoMjU1LDI1NSwyNTUpJz7ilr48L3RleHQ+PC9zdmc+);
 }
 
-#messageItem .b-text-part blockquote,
-.b-settings-general .editMainIdentity {
+:root[data-color-scheme="dark"] #messageItem .b-text-part blockquote,
+:root[data-color-scheme="dark"] .b-settings-general .editMainIdentity {
 	border-color: #999;
 }

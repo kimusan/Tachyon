@@ -208,6 +208,12 @@
 	:root:not([data-color-scheme="light"]) .b-settings-general .editMainIdentity {
 		border-color: #999;
 	}
+
+	:root:not([data-color-scheme="light"]) .thm-message-list-top-toolbar,
+	:root:not([data-color-scheme="light"]) .thm-message-list-bottom-toolbar {
+		background-image: linear-gradient(to bottom, #444, #111) !important;
+		background-repeat: repeat-x !important;
+	}
 }
 
 :root[data-color-scheme="dark"] {
@@ -352,4 +358,10 @@
 :root[data-color-scheme="dark"] #messageItem .b-text-part blockquote,
 :root[data-color-scheme="dark"] .b-settings-general .editMainIdentity {
 	border-color: #999;
+}
+
+:root[data-color-scheme="dark"] .thm-message-list-top-toolbar,
+:root[data-color-scheme="dark"] .thm-message-list-bottom-toolbar {
+	background-image: linear-gradient(to bottom, #444, #111) !important;
+	background-repeat: repeat-x !important;
 }
