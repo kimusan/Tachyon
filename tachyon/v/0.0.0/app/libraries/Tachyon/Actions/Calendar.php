@@ -7,6 +7,9 @@ use Tachyon\Exceptions\ClientException;
 
 trait Calendar
 {
+	/** A calendar file is text; past this it is not one. */
+	private const IMPORT_MAX_BYTES = 5242880;
+
 	protected ?\Tachyon\Providers\Calendar $oCalendarProvider = null;
 
 	public function CalendarProvider(?\Tachyon\Model\Account $oAccount = null): \Tachyon\Providers\Calendar
@@ -110,6 +113,17 @@ trait Calendar
 		if (\strlen($sIcal)) {
 			// The client sent a whole iCalendar body, so keep it verbatim
 			$oEvent->setIcal($sIcal);
+			// The body carries its own UID and everything downstream reads one or
+			// the other: metaFromVCalendar prefers the body's, while the uid column
+			// and the DAV filename come from this property. Minting a fresh one
+			// here would store a row that disagrees with its own contents, so the
+			// body wins whenever the caller did not name an event to overwrite.
+			if (!\strlen($sUid)) {
+				$sBodyUid = static::uidFromVCalendar($oEvent->VCalendar());
+				if (\strlen($sBodyUid)) {
+					$oEvent->Uid = $sBodyUid;
+				}
+			}
 		} else {
 			$oEvent->setVCalendar($this->vCalendarFromParams($oEvent->Uid, $sCalendarUuid, $oProvider));
 		}
@@ -128,6 +142,165 @@ trait Calendar
 		}
 
 		return $this->TrueResponse(array('Uid' => $oEvent->Uid));
+	}
+
+	/**
+	 * A whole iCalendar file into one calendar. Separate from EventSave because
+	 * importing is not saving one event: a file holds any number of them, the
+	 * UID has to come from the body rather than the caller, and the caller wants
+	 * to know how many of them landed.
+	 */
+	public function DoCalendarImport() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$oProvider = $this->CalendarProvider($oAccount);
+		if (!$oProvider->IsActive()) {
+			return $this->FalseResponse();
+		}
+
+		$sCalendarUuid = (string) $this->GetActionParam('Calendar', '');
+		$sIcal = (string) $this->GetActionParam('Ical', '');
+
+		if (!\strlen(\trim($sIcal))) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Empty iCalendar body');
+		}
+		// A calendar file is text. Anything of this size is not one, and parsing
+		// it would cost real memory before finding that out.
+		if (self::IMPORT_MAX_BYTES < \strlen($sIcal)) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'iCalendar body too large');
+		}
+
+		try {
+			$oParsed = \Sabre\VObject\Reader::read($sIcal, \Sabre\VObject\Reader::OPTION_FORGIVING);
+		} catch (\Throwable $oException) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, $oException, 'Unreadable iCalendar file');
+		}
+		if (!($oParsed instanceof \Sabre\VObject\Component\VCalendar)) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Not an iCalendar file');
+		}
+
+		$aEvents = static::splitVCalendar($oParsed);
+		if (!$aEvents) {
+			// Forgiving mode parses a file with no VEVENT in it quite happily, and
+			// EventSave would then fail per event with something far less clear
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null,
+				'The file contains no events');
+		}
+
+		$iImported = 0;
+		$aFailed = array();
+		foreach ($aEvents as $sUid => $oVCalendar) {
+			$oEvent = new \Tachyon\Providers\Calendar\Classes\Event;
+			$oEvent->Uid = $sUid;
+			$oEvent->setVCalendar($oVCalendar);
+			try {
+				if ($oProvider->EventSave($sCalendarUuid, $oEvent)) {
+					++$iImported;
+				} else {
+					$aFailed[] = $sUid;
+				}
+			} catch (\ValueError $oException) {
+				// An unknown or read only calendar fails identically for every
+				// event, so there is nothing to learn from trying the rest
+				throw new ClientException(\Tachyon\Notifications::CantSaveMessage, $oException, $oException->getMessage());
+			} catch (\Throwable $oException) {
+				\Tachyon\Util\Log::warning('Calendar', "Import of {$sUid} failed: " . $oException->getMessage());
+				$aFailed[] = $sUid;
+			}
+		}
+
+		if (!$iImported) {
+			throw new ClientException(\Tachyon\Notifications::CantSaveMessage, null,
+				'No event could be imported');
+		}
+
+		return $this->TrueResponse(array(
+			'Imported' => $iImported,
+			'Failed' => \count($aFailed)
+		));
+	}
+
+	/**
+	 * One VCALENDAR per UID, keyed by it.
+	 *
+	 * A file can hold many unrelated events, and an event can be several
+	 * components: a master plus one override per modified occurrence, which share
+	 * a UID and have to stay together to mean anything. Each result carries the
+	 * VTIMEZONEs its own components reference, because a DTSTART with a TZID
+	 * whose definition was left behind in the original file resolves to the wrong
+	 * moment rather than to an error.
+	 */
+	private static function splitVCalendar(\Sabre\VObject\Component\VCalendar $oSource) : array
+	{
+		$aTimezones = array();
+		foreach ($oSource->VTIMEZONE ?? array() as $oTimezone) {
+			if (isset($oTimezone->TZID)) {
+				$aTimezones[(string) $oTimezone->TZID] = $oTimezone;
+			}
+		}
+
+		$aByUid = array();
+		foreach ($oSource->VEVENT ?? array() as $oVEvent) {
+			$sUid = isset($oVEvent->UID) ? \trim((string) $oVEvent->UID) : '';
+			if (!\strlen($sUid)) {
+				continue;
+			}
+			$aByUid[$sUid][] = $oVEvent;
+		}
+
+		$aResult = array();
+		foreach ($aByUid as $sUid => $aComponents) {
+			// Built fresh rather than by pruning a copy of the source, which is
+			// also how METHOD is dropped: REQUEST means "an invitation in flight"
+			// and what gets stored is a calendar entry, one some CalDAV servers
+			// refuse to accept while the method is still on it.
+			$oTarget = new \Sabre\VObject\Component\VCalendar();
+			$aNeeded = array();
+			foreach ($aComponents as $oVEvent) {
+				$oTarget->add(clone $oVEvent);
+				foreach (static::timezoneIdsOf($oVEvent) as $sTzid) {
+					$aNeeded[$sTzid] = true;
+				}
+			}
+			foreach (\array_keys($aNeeded) as $sTzid) {
+				if (isset($aTimezones[$sTzid])) {
+					$oTarget->add(clone $aTimezones[$sTzid]);
+				}
+			}
+			$aResult[$sUid] = $oTarget;
+		}
+
+		return $aResult;
+	}
+
+	/**
+	 * Every TZID named by the date properties of one component.
+	 */
+	private static function timezoneIdsOf(\Sabre\VObject\Component $oComponent) : array
+	{
+		$aIds = array();
+		foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID', 'EXDATE', 'RDATE') as $sName) {
+			foreach ($oComponent->select($sName) as $oProperty) {
+				$sTzid = (string) $oProperty['TZID'];
+				if (\strlen($sTzid)) {
+					$aIds[] = $sTzid;
+				}
+			}
+		}
+		return \array_unique($aIds);
+	}
+
+	/**
+	 * The UID of the master VEVENT, the one without a RECURRENCE-ID.
+	 */
+	private static function uidFromVCalendar(?\Sabre\VObject\Component\VCalendar $oVCalendar) : string
+	{
+		foreach ($oVCalendar->VEVENT ?? array() as $oVEvent) {
+			if (!isset($oVEvent->{'RECURRENCE-ID'}) && isset($oVEvent->UID)) {
+				return \trim((string) $oVEvent->UID);
+			}
+		}
+		return '';
 	}
 
 	public function DoCalendarEventDelete() : array
