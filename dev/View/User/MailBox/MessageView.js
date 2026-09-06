@@ -694,11 +694,17 @@ export class MailMessageView extends AbstractViewRight {
 		if ('pass' === currentMessage().dkim[0]?.[0]) txt += '+dkim';
 		if ('pass' === currentMessage().dmarc[0]?.[0]) txt += '+dmarc';
 */
-		// Only the new sender. Sending the whole list meant replaying a snapshot
-		// taken at login, which silently dropped whatever a session on another
-		// machine had added since, so entries kept going missing. The server
-		// merges and answers with what it stored, which also stops this session
-		// drifting further from it.
+		// showExternalImages below matches against the store as it stands, so the
+		// entry has to be in it now rather than a round trip later
+		SettingsUserStore.viewImagesWhitelist(
+			(SettingsUserStore.viewImagesWhitelist().trim() + '\n' + txt).trim()
+		);
+		// Only the new sender goes to the server. Sending the whole list meant
+		// replaying a snapshot taken at login, which silently dropped whatever a
+		// session on another machine had added since, so entries kept going
+		// missing. The server merges and answers with what it stored, and this
+		// session adopts that, so the local guess above is corrected rather than
+		// carried forward.
 		Remote.saveSetting('ViewImagesWhitelistAdd', txt, (iError, data) =>
 			iError || SettingsUserStore.viewImagesWhitelist(data?.ViewImagesWhitelist || '')
 		);
