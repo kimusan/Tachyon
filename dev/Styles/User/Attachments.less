@@ -35,9 +35,29 @@
 	 */
 	.attachmentCalendar {
 		cursor: pointer;
+		font-size: 1.5em;
 		position: absolute;
-		right: 6px;
-		top: 6px;
+		right: 8px;
+		top: 8px;
+
+		/*
+		 * The glyph is sized to be read, this is sized to be hit: a finger needs
+		 * roughly 40px and the icon is 24. Padding cannot do it, because the mask
+		 * is sized `contain` and would simply scale the glyph up to fill it.
+		 *
+		 * Kept within the row on purpose. .attachmentItem clips its overflow, so
+		 * a target spilling past the edge would not receive those clicks anyway,
+		 * and 40px centred on the icon is exactly the height of the shortest row.
+		 */
+		&::after {
+			content: "";
+			height: 40px;
+			left: 50%;
+			position: absolute;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			width: 40px;
+		}
 	}
 
 	&.error {
@@ -188,10 +208,16 @@
 		margin-left:.5em;
 	}
 
+	/*
+	 * The compact list is a single line, so there is no room above or below to
+	 * grow into. It gets width instead, which is the axis a thumb misses on.
+	 */
 	.attachmentCalendar {
 		cursor: pointer;
-		position: initial;
+		font-size: 1.4em;
 		margin-left: .5em;
+		padding-inline: 6px;
+		position: initial;
 	}
 }
 
