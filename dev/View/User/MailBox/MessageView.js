@@ -411,6 +411,14 @@ export class MailMessageView extends AbstractViewRight {
 				return;
 			}
 
+			// Controls drawn on top of an attachment row, whose own click hands the
+			// file to the browser. Knockout's click binding suppresses the default
+			// action but not the bubble, so without this, adding an invitation to a
+			// calendar also saved it to disk.
+			if (eqs(event, '.attachmentCalendar')) {
+				return;
+			}
+
 			el = eqs(event, '.attachmentItem');
 			if (el) {
 				const attachment = ko.dataFor(el), url = attachment?.linkDownload();
@@ -633,7 +641,9 @@ export class MailMessageView extends AbstractViewRight {
 			.then(response => response.ok ? response.text() : Promise.reject(new Error('download')))
 			.then(ical => new Promise((resolve, reject) =>
 				Remote.request('CalendarImport', (iError, data) =>
-					iError ? reject(iError) : resolve(data.Result),
+					// Imported sits beside Result rather than inside it: TrueResponse
+					// merges its extras into the top level of the payload
+					iError ? reject(iError) : resolve(data),
 					{ Calendar: uuid, Ical: ical }
 				)
 			))
