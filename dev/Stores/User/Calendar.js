@@ -27,6 +27,16 @@ CalendarUserStore.sync = () => {
 	}
 };
 
+/**
+ * The calendar list, for callers that need somewhere to put an event. The
+ * popup keeps its own decorated copy because it hangs per calendar visibility
+ * observables off it; this is the plain list.
+ */
+CalendarUserStore.fetchCalendars = fCallback =>
+	Remote.request('Calendars', (iError, data) =>
+		fCallback(iError, iError ? [] : (data.Result?.Calendars || []))
+	);
+
 CalendarUserStore.init = () => {
 	const config = SettingsGet('CalendarSync');
 	// Mode 0 is "no server connected", so there is nothing to poll for

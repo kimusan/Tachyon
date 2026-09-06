@@ -30,13 +30,14 @@ import { isFullscreen, exitFullscreen, toggleFullscreen } from 'Common/Fullscree
 
 import { SMAudio } from 'Common/Audio';
 
-import { i18n } from 'Common/Translator';
+import { i18n, getNotification } from 'Common/Translator';
 
 import { AppUserStore } from 'Stores/User/App';
 import { SettingsUserStore } from 'Stores/User/Settings';
 import { AccountUserStore } from 'Stores/User/Account';
 import { FolderUserStore, isAllowedKeyword } from 'Stores/User/Folder';
 import { MessageUserStore } from 'Stores/User/Message';
+import { CalendarUserStore } from 'Stores/User/Calendar';
 import { MessagelistUserStore } from 'Stores/User/Messagelist';
 
 import * as Local from 'Storage/Client';
@@ -132,8 +133,17 @@ export class MailMessageView extends AbstractViewRight {
 			dkimData: ['none', '', ''],
 			spfData: ['none', '', ''],
 			dmarcData: ['none', '', ''],
-			nowTracking: false
+			nowTracking: false,
+			// Adding an invitation to a calendar. The attachment is held so the
+			// picker knows what it is about to import once a calendar is chosen.
+			calendarImportAttachment: null,
+			calendarImportBusy: false,
+			calendarImportMessage: '',
+			calendarImportFailed: false
 		});
+
+		this.calendarImportChoices = ko.observableArray();
+		this.capaCalendar = SettingsCapa('Calendar');
 
 		this.moveAction = moveAction;
 
@@ -565,6 +575,88 @@ export class MailMessageView extends AbstractViewRight {
 			() => this.downloadAsZipError(true),
 			this.downloadAsZipLoading
 		);
+	}
+
+	/**
+	 * Put the events in a calendar attachment onto a calendar.
+	 *
+	 * The file is handed to the server as it arrived rather than parsed here:
+	 * the server already reads iCalendar to store an event at all, and a second
+	 * parser in the browser is a second thing to disagree with the first.
+	 */
+	addToCalendar(attachment) {
+		if (this.calendarImportBusy()) {
+			return;
+		}
+		this.calendarImportBusy(true);
+		this.calendarImportFailed(false);
+		this.calendarImportMessage('');
+		this.calendarImportAttachment(null);
+		this.calendarImportChoices([]);
+
+		CalendarUserStore.fetchCalendars((iError, calendars) => {
+			if (iError) {
+				this.calendarImportBusy(false);
+				this.calendarImportError(getNotification(iError));
+				return;
+			}
+			// Saving into one of these throws server side, so they are not offered
+			const writable = calendars.filter(cal => !cal.readOnly);
+			if (!writable.length) {
+				this.calendarImportBusy(false);
+				this.calendarImportError(i18n('CALENDAR/ERROR_NO_WRITABLE_CALENDAR'));
+			} else if (1 === writable.length) {
+				this.importIcalInto(attachment, writable[0].uuid);
+			} else {
+				// Asking is only worth it when there is a choice to make
+				this.calendarImportBusy(false);
+				this.calendarImportAttachment(attachment);
+				this.calendarImportChoices(writable);
+			}
+		});
+	}
+
+	/**
+	 * Called from the picker, so the calendar is the bound row and the
+	 * attachment is whichever one opened it.
+	 */
+	importIcalIntoChoice(calendar) {
+		const attachment = this.calendarImportAttachment();
+		this.calendarImportChoices([]);
+		this.calendarImportAttachment(null);
+		attachment && this.importIcalInto(attachment, calendar.uuid);
+	}
+
+	importIcalInto(attachment, uuid) {
+		this.calendarImportBusy(true);
+		rl.fetch(attachment.linkDownload())
+			.then(response => response.ok ? response.text() : Promise.reject(new Error('download')))
+			.then(ical => new Promise((resolve, reject) =>
+				Remote.request('CalendarImport', (iError, data) =>
+					iError ? reject(iError) : resolve(data.Result),
+					{ Calendar: uuid, Ical: ical }
+				)
+			))
+			.then(result => {
+				this.calendarImportBusy(false);
+				this.calendarImportFailed(false);
+				this.calendarImportMessage(
+					i18n('CALENDAR/IMPORT_SUCCEEDED', { COUNT: result?.Imported || 0 })
+				);
+				// So an open calendar shows it without waiting for the next sync
+				CalendarUserStore.synced(Date.now());
+			})
+			.catch(err => {
+				this.calendarImportBusy(false);
+				this.calendarImportError(
+					Number.isInteger(err) ? getNotification(err) : i18n('CALENDAR/ERROR_IMPORT_FAILED')
+				);
+			});
+	}
+
+	calendarImportError(text) {
+		this.calendarImportFailed(true);
+		this.calendarImportMessage(text);
 	}
 
 	/**

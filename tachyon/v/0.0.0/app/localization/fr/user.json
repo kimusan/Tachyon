@@ -199,7 +199,12 @@
     "SEARCHING_DESC": "Recherche..."
   },
   "CALENDAR": {
-    "BUTTON_NEW_EVENT": "Nouvel événement",
+    "BUTTON_ADD_TO_CALENDAR": "Ajouter au calendrier",
+    "LABEL_CHOOSE_CALENDAR": "Quel calendrier ?",
+    "IMPORT_SUCCEEDED": "%COUNT% évènement(s) ajouté(s) au calendrier.",
+    "ERROR_NO_WRITABLE_CALENDAR": "Aucun calendrier accessible en écriture.",
+    "ERROR_IMPORT_FAILED": "L'évènement n'a pas pu être ajouté.",
+"BUTTON_NEW_EVENT": "Nouvel événement",
     "BUTTON_PREV": "Précédent",
     "BUTTON_NEXT": "Suivant",
     "BUTTON_TODAY": "Aujourd'hui",

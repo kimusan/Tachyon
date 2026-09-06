@@ -101,6 +101,18 @@ export class AttachmentModel extends AbstractModel {
 	}
 
 	/**
+	 * An invitation or a calendar file. The mime type is what a well behaved
+	 * sender puts on it, but plenty attach a .ics with a generic type, and a
+	 * text/calendar part with no filename at all is common in invitations, so
+	 * both are accepted.
+	 * @returns {boolean}
+	 */
+	isCalendar() {
+		return 'text/calendar' === this.mimeType.toLowerCase()
+			|| /\.ics$/i.test(this.fileName || '');
+	}
+
+	/**
 	 * @returns {boolean}
 	 */
 	pdfPreview() {

@@ -264,6 +264,10 @@
 											<i class="icon-link" data-bind="visible: isLinked"></i>
 										</div>
 									</div>
+									<div class="attachmentCalendar icon-calendar-arrow-down"
+										data-i18n="[title]CALENDAR/BUTTON_ADD_TO_CALENDAR"
+										data-bind="visible: $parent.capaCalendar && isCalendar() && download,
+											click: () => $parent.addToCalendar($data)"></div>
 									<div class="checkboxAttachment"
 										data-bind="visible: download, css: checked() ? 'icon-square-check' : 'icon-square', click: toggleChecked"></div>
 								</li>
@@ -273,11 +277,26 @@
 							<ul class="attachmentListSimple" data-bind="foreach: listAttachments">
 								<li class="attachmentItem" data-bind="attr: { title: fileName }, css: {checked: checked}">
 									<span class="attachmentName" data-bind="text: fileName"></span>
+									<i class="attachmentCalendar icon-calendar-arrow-down"
+										data-i18n="[title]CALENDAR/BUTTON_ADD_TO_CALENDAR"
+										data-bind="visible: $parent.capaCalendar && isCalendar() && download,
+											click: () => $parent.addToCalendar($data)"></i>
 									<i class="checkboxAttachment"
 										data-bind="visible: download, css: checked() ? 'icon-square-check' : 'icon-square', click: toggleChecked"></i>
 								</li>
 							</ul>
 							<!-- /ko -->
+							<div class="attachmentCalendarImport" style="display:none"
+								data-bind="visible: calendarImportBusy() || calendarImportMessage() || calendarImportChoices().length">
+								<i class="icon-spinner" style="display:none" data-bind="visible: calendarImportBusy"></i>
+								<span data-bind="text: calendarImportMessage, css: { 'text-error': calendarImportFailed }"></span>
+								<!-- ko if: calendarImportChoices().length -->
+								<span data-i18n="CALENDAR/LABEL_CHOOSE_CALENDAR"></span>
+								<ul class="calendarChoices" data-bind="foreach: calendarImportChoices">
+									<li><a href="#" data-bind="text: name, click: () => $parent.importIcalIntoChoice($data)"></a></li>
+								</ul>
+								<!-- /ko -->
+							</div>
 							<i class="controls-handle icon-settings" data-bind="visible: allowAttachmentControls, click: toggleAttachmentControls"></i>
 							<div class="attachmentsControls" data-bind="visible: showAttachmentControls">
 								<span data-bind="visible: downloadAsZipAllowed">

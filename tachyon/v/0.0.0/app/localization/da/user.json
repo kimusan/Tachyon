@@ -712,7 +712,12 @@
     "CalendarSyncError": "Kalendersynkronisering mislykkedes"
   },
   "CALENDAR": {
-    "BUTTON_NEW_EVENT": "Ny begivenhed",
+    "BUTTON_ADD_TO_CALENDAR": "Tilføj til kalender",
+    "LABEL_CHOOSE_CALENDAR": "Hvilken kalender?",
+    "IMPORT_SUCCEEDED": "Tilføjede %COUNT% begivenhed(er) til kalenderen.",
+    "ERROR_NO_WRITABLE_CALENDAR": "Ingen kalender du kan skrive til.",
+    "ERROR_IMPORT_FAILED": "Begivenheden kunne ikke tilføjes.",
+"BUTTON_NEW_EVENT": "Ny begivenhed",
     "BUTTON_PREV": "Forrige",
     "BUTTON_NEXT": "Næste",
     "BUTTON_TODAY": "I dag",

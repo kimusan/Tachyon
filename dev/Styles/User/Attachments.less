@@ -28,6 +28,18 @@
 		right: 6px;
 	}
 
+	/*
+	 * Top right rather than beside the checkbox, which lives bottom right and
+	 * only appears in selection mode. This one is always there for a calendar
+	 * attachment, so the two must not share a corner.
+	 */
+	.attachmentCalendar {
+		cursor: pointer;
+		position: absolute;
+		right: 6px;
+		top: 6px;
+	}
+
 	&.error {
 		.iconMain, .iconPreview, .attachmentSize, .attachmentName {
 			color: red;
@@ -174,5 +186,25 @@
 	.checkboxAttachment {
 		position: initial;
 		margin-left:.5em;
+	}
+
+	.attachmentCalendar {
+		cursor: pointer;
+		position: initial;
+		margin-left: .5em;
+	}
+}
+
+/* The result of an import, and the calendar picker when there is a choice */
+.attachmentCalendarImport {
+	padding: 5px 8px;
+
+	.calendarChoices {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: .75em;
+		list-style: none;
+		margin: 0 0 0 .5em;
+		padding: 0;
 	}
 }

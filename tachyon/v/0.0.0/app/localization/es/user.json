@@ -712,7 +712,12 @@
     "CalendarSyncError": "Falló la sincronización del calendario"
   },
   "CALENDAR": {
-    "BUTTON_NEW_EVENT": "Nuevo evento",
+    "BUTTON_ADD_TO_CALENDAR": "Añadir al calendario",
+    "LABEL_CHOOSE_CALENDAR": "¿Qué calendario?",
+    "IMPORT_SUCCEEDED": "Se añadieron %COUNT% evento(s) al calendario.",
+    "ERROR_NO_WRITABLE_CALENDAR": "No hay ningún calendario con permiso de escritura.",
+    "ERROR_IMPORT_FAILED": "No se pudo añadir el evento.",
+"BUTTON_NEW_EVENT": "Nuevo evento",
     "BUTTON_PREV": "Anterior",
     "BUTTON_NEXT": "Siguiente",
     "BUTTON_TODAY": "Hoy",
