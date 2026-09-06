@@ -2,38 +2,63 @@
   <img src="docs/logo.png" alt="Tachyon" width="480">
   <p><em>Named after the theoretical particle that moves faster than light.</em></p>
   <p>Fast, secure, modern web-based email client.</p>
-  <p>
-    A fork of <a href="https://github.com/the-djmaze/snappymail">SnappyMail</a>,
-    which itself forked <a href="https://github.com/RainLoop/rainloop-webmail">RainLoop Webmail Community edition</a>.
-  </p>
-  <p>Existing SnappyMail installations can upgrade directly to Tachyon.</p>
   <p><strong><a href="https://tachyonmail.app/">tachyonmail.app</a></strong></p>
   <br>
 </div>
 
-## What Tachyon adds
+Tachyon is self-hosted webmail: mail, contacts and calendars in one PHP
+application, with no database to install. Extract one archive into a web root
+and point it at your IMAP server. It speaks SMTP, Sieve, CardDAV and CalDAV,
+runs behind Nextcloud or on its own, and sends nothing to anyone but your own
+servers.
+
+The whole interface loads in about 120 KB over the wire. There is no tracking,
+no third party fonts or scripts, and no external avatar service.
+
+## Features
+
+**Mail**
+- Search a whole folder subtree, using IMAP MULTISEARCH where the server has it and searching each folder in turn where it does not
+- Undo send, with a configurable delay before the message reaches SMTP
+- Unread count per account on the account switcher
+- Remote images stay blocked until you allow them, per sender, and that list is kept on the server rather than in one browser
 
 **Calendar**
-- CalDAV support: month, week, day and list views, drag to move, and an editor for creating and changing events
+- CalDAV, with month, week, day and list views, drag to move, and an editor for creating and changing events
+- Add an invitation to a calendar straight from the message it arrived in, including files holding several events and recurring series with moved occurrences
+- Import an `.ics` file into a calendar
 - Several calendars per account, each with the colour and read-only state the server reports
 - Recurring events expand correctly across timezones and DST, and all-day events stay date-only
+- Week numbers and first day of the week are per user, as is the date format
+- Syncs in the background rather than only when opened
 - Off by default; enable `[calendar] enable` and point it at a server in Settings, Calendar
 
 **Contacts**
-- Contact groups using the standard vCard `CATEGORIES` field, so they survive a CardDAV round trip. Typing a group name while composing inserts a chip that expands to its members when the mail is sent
+- Groups using the standard vCard `CATEGORIES` field, so they survive a CardDAV round trip. Typing a group name while composing inserts a chip that expands to its members when the mail is sent
+- Postal address, birthday, instant messaging and photo, alongside the usual fields
+- Contact photos are used as avatars in the message list and message view
 - Bulk operations: select a page or everything matching the current filter, and keep that selection while paging
 - Writing to a selection can target To, Cc or Bcc, and suggests Bcc past a configurable threshold so a large To does not hand every address to every recipient
-- Three DAV bugs fixed that affected calendars and address books alike: credentials are now sent with the first request rather than only after a 401, permissions are read correctly, and the connection test no longer authenticates with an encrypted copy of the password
 
-**Mail**
-- Subfolder search across a whole folder subtree, using IMAP MULTISEARCH where the server has it and falling back to searching each folder in turn where it does not
-- Undo send, with a configurable delay before SMTP delivery
-- Unread count badge per account on the account switcher
-
-**Interface**
+**Appearance**
+- A light, dark and follow-the-system toggle that applies without reloading. All 16 bundled themes carry both schemes, so switching mode is a mode change rather than picking a different theme
 - Vector icons throughout, drawn in the current text colour so they follow the active theme. The interface previously drew most of its icons as emoji, which ignored theming entirely
-- Dracula theme, with the Alucard light variant and a toggle that applies without reloading
+- A date picker in place of the browser's, which rendered in its own locale and ignored everything the application asked of it
 - Tables in the HTML editor: insert, add and remove rows and columns
+
+**Branding**
+- Upload a login logo, separately for light and dark backgrounds, or turn it off. The built-in default takes its colour from the theme
+- Upload a favicon rather than only pointing at a URL. PWA icons ship from the
+  Tachyon mark, and the web manifest is still a static file, so app name, icons
+  and theme colour do not yet follow custom branding
+- The admin login page carries the same logo, and the login page can carry a footer
+
+**Administration**
+- Update from the admin panel when the files are writable, which is also how it declines to fight a package manager for control of the install
+- Calendar, logging and branding each have their own tab
+- Clear the admin TOTP secret, which is generated from a real CSPRNG
+- Configurable syslog identity, so several instances on one host stay apart in the log and in a fail2ban filter
+- The account you log in with can be named like any other
 
 **Nextcloud**
 - Published on the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon), supporting Nextcloud 26 through 35
@@ -49,10 +74,12 @@
 - PHP 8.1 enums replacing abstract constants: `ResponseType`, `StoreAction`, `MessagePriority`, `SignMeType`, `Layout`, `DkimStatus`
 
 **Security**
+- Release artifacts are signed, and the public key ships with them as `tachyon-archive-keyring.asc`
 - Content-Security-Policy: fixed `report-to` with a `Reporting-Endpoints` header, `report-uri` kept as fallback
 - `Permissions-Policy` denying camera, microphone, geolocation, payment and USB
 - Subresource Integrity hashes for all static JS and CSS
 - S/MIME signing fixed for identities whose private key has no passphrase
+- Three DAV faults fixed that affected calendars and address books alike: credentials are sent with the first request rather than only after a 401, permissions are read correctly, and the connection test no longer authenticates with an encrypted copy of the password
 
 **Build and toolchain**
 - Rollup v4, ESLint v9 flat config
@@ -93,7 +120,17 @@ Copyright (c) 2025 - present Tachyon
 Copyright (c) 2020 - 2024 SnappyMail
 Copyright (c) 2013 - 2022 RainLoop
 
-## What SnappyMail changed from RainLoop
+## Lineage
+
+Tachyon began as a fork of [SnappyMail](https://github.com/the-djmaze/snappymail),
+which itself forked the [RainLoop Webmail Community edition](https://github.com/RainLoop/rainloop-webmail).
+Both are the reason this project had somewhere to start, and a good deal of what
+is listed above sits on their work.
+
+Existing SnappyMail installations upgrade directly to Tachyon, data directory
+and configuration unchanged.
+
+### What SnappyMail changed from RainLoop
 
 - Privacy/GDPR friendly (no: Social, Gravatar, Facebook, Google, Twitter, DropBox, X-Mailer)
 - Admin uses password_hash/password_verify
@@ -144,24 +181,25 @@ No Internet Explorer. No Edge Legacy.
 
 ### JavaScript size comparison (RainLoop 1.17 vs SnappyMail vs Tachyon)
 
-|js/min/*        |RainLoop  |SnappyMail|  Tachyon | Tachyon gz |
-|----------------|--------: |--------: |--------: |----------: |
-|admin.min.js    |  256,831 |   41,719 |   42,225 |     14,182 |
-|app.min.js      |  515,367 |  202,101 |  221,355 |     74,075 |
-|boot.min.js     |   84,659 |    2,231 |    2,273 |      1,295 |
-|libs.min.js     |  584,772 |  110,646 |  113,032 |     40,243 |
-|sieve.min.js    |        0 |   45,504 |   45,377 |     11,092 |
-|calendar.min.js |        0 |        0 |  129,224 |     41,429 |
-|polyfills.min.js|   32,837 |        0 |        0 |          0 |
+|js/min/*         |RainLoop  |SnappyMail|  Tachyon | Tachyon gz |
+|-----------------|--------: |--------: |--------: |----------: |
+|admin.min.js     |  256,831 |   41,719 |   47,567 |     15,357 |
+|app.min.js       |  515,367 |  202,101 |  234,162 |     78,278 |
+|boot.min.js      |   84,659 |    2,231 |    2,273 |      1,295 |
+|libs.min.js      |  584,772 |  110,646 |  113,032 |     40,243 |
+|sieve.min.js     |        0 |   45,504 |   45,377 |     11,092 |
+|calendar.min.js  |        0 |        0 |  129,224 |     41,429 |
+|datepicker.min.js|        0 |        0 |   51,097 |     14,316 |
+|polyfills.min.js |   32,837 |        0 |        0 |          0 |
 
-What a browser fetches on load is `boot`, `libs` and `app`, so about 337 KB
-minified or 116 KB over gzip, about 70% less than RainLoop.
+What a browser fetches on load is `boot`, `libs` and `app`, so about 349 KB
+minified or 120 KB over gzip, about 70% less than RainLoop.
 
-`sieve.min.js` loads only when the filters screen is opened, and
-`calendar.min.js` only when the calendar is, so neither is part of that figure.
-The calendar component is the single largest file in the project and is
-deliberately kept out of the initial payload for the many installations that
-will never enable it.
+Everything else is fetched only when it is needed: `sieve.min.js` when the
+filters screen opens, `calendar.min.js` when the calendar does, and
+`datepicker.min.js` the first time a date field is used. The calendar component
+is the largest file in the project and is deliberately kept out of the initial
+payload, since most installations never enable it.
 
 ### PGP
 
