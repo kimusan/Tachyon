@@ -689,14 +689,19 @@ export class MailMessageView extends AbstractViewRight {
 	}
 
 	whitelistText(txt) {
-		let value = (SettingsUserStore.viewImagesWhitelist().trim() + '\n' + txt).trim();
 /*
-		if ('pass' === currentMessage().spf[0]?.[0]) value += '+spf';
-		if ('pass' === currentMessage().dkim[0]?.[0]) value += '+dkim';
-		if ('pass' === currentMessage().dmarc[0]?.[0]) value += '+dmarc';
+		if ('pass' === currentMessage().spf[0]?.[0]) txt += '+spf';
+		if ('pass' === currentMessage().dkim[0]?.[0]) txt += '+dkim';
+		if ('pass' === currentMessage().dmarc[0]?.[0]) txt += '+dmarc';
 */
-		SettingsUserStore.viewImagesWhitelist(value);
-		Remote.saveSetting('ViewImagesWhitelist', value);
+		// Only the new sender. Sending the whole list meant replaying a snapshot
+		// taken at login, which silently dropped whatever a session on another
+		// machine had added since, so entries kept going missing. The server
+		// merges and answers with what it stored, which also stops this session
+		// drifting further from it.
+		Remote.saveSetting('ViewImagesWhitelistAdd', txt, (iError, data) =>
+			iError || SettingsUserStore.viewImagesWhitelist(data?.ViewImagesWhitelist || '')
+		);
 		currentMessage().showExternalImages(1);
 	}
 

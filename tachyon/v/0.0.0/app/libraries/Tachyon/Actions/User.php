@@ -179,6 +179,20 @@ trait User
 		$this->setSettingsFromParams($oSettings, 'ViewHTML', 'bool');
 		$this->setSettingsFromParams($oSettings, 'ViewImages', 'string');
 		$this->setSettingsFromParams($oSettings, 'ViewImagesWhitelist', 'string');
+		// Adding one sender merges here rather than the client sending the whole
+		// list back. Every session reads the list once at login and never again, so
+		// a whole list write replays a snapshot that can be days old and drops
+		// whatever another session added meanwhile. That is why entries kept
+		// disappearing for anyone using two machines. The textarea in settings
+		// still overwrites, because editing it by hand means what it says.
+		if ($this->HasActionParam('ViewImagesWhitelistAdd')) {
+			$sAdd = \trim((string) $this->GetActionParam('ViewImagesWhitelistAdd', ''));
+			if (\strlen($sAdd)) {
+				$oSettings->SetConf('ViewImagesWhitelist', static::addToWhitelist(
+					(string) $oSettings->GetConf('ViewImagesWhitelist', ''), $sAdd
+				));
+			}
+		}
 		$this->setSettingsFromParams($oSettings, 'RemoveColors', 'bool');
 		$this->setSettingsFromParams($oSettings, 'AllowStyles', 'bool');
 		$this->setSettingsFromParams($oSettings, 'ListInlineAttachments', 'bool');
@@ -221,7 +235,13 @@ trait User
 		$this->setSettingsFromParams($oSettingsLocal, 'ShowUnreadCount', 'bool');
 		$this->setSettingsFromParams($oSettingsLocal, 'CheckMailInterval', 'int');
 
-		return $this->DefaultResponse($oSettings->save() && $oSettingsLocal->save());
+		$bSaved = $oSettings->save() && $oSettingsLocal->save();
+
+		// Handed back so the caller can replace its snapshot with what is actually
+		// stored, rather than carrying on from the copy it had
+		return $this->DefaultResponse($bSaved, array(
+			'ViewImagesWhitelist' => (string) $oSettings->GetConf('ViewImagesWhitelist', '')
+		));
 	}
 
 	public function DoQuota() : array
@@ -274,6 +294,25 @@ trait User
 		}
 
 		return $this->DefaultResponse($oAccount && $oSettings ? $oSettings->save() : false);
+	}
+
+	/**
+	 * One entry into a newline separated list, keeping what is there.
+	 * Case insensitive on the comparison because a host is, and the entries can
+	 * carry a suffix like "+dkim" that is not part of the host.
+	 */
+	private static function addToWhitelist(string $sList, string $sAdd) : string
+	{
+		$aLines = \preg_split('/\\R/', $sList, -1, PREG_SPLIT_NO_EMPTY) ?: array();
+		$aLines = \array_map('trim', $aLines);
+		$aLines = \array_filter($aLines, 'strlen');
+		foreach ($aLines as $sLine) {
+			if (0 === \strcasecmp($sLine, $sAdd)) {
+				return \implode("\n", $aLines);
+			}
+		}
+		$aLines[] = $sAdd;
+		return \implode("\n", $aLines);
 	}
 
 	private function setSettingsFromParams(\Tachyon\Settings $oSettings, string $sConfigName, string $sType = 'string', ?callable $cCallback = null) : void
