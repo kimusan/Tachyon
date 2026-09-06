@@ -1,3 +1,155 @@
+## 4.2.0 - 2026-09-06
+
+### Added
+- Add an invitation to a calendar from the message it arrived in. Handles files holding several events, and recurring series with moved occurrences
+- Import a whole `.ics` file into a calendar
+- A date picker in place of the native one, which rendered in the browser's locale and ignored everything Tachyon asked of it, plus a date format setting that follows the interface language by default
+- Week numbers and first day of the week are user settings
+- Release artifacts are signed, and the public key ships alongside them
+
+### Changed
+- Seven designs that shipped as a light theme and a dark theme are now one theme each, switched with the light/dark toggle: Stripes, Love, Snow, Blurred, Squares, Wood, and Shine (formerly DarkShine and NightShine). A saved theme migrates on its own, and an account on a dark build lands on the merged theme already in dark mode
+- Default, Linen, A, Xv and Clear gained a dark mode; Magnetic gained a light one. All 16 themes now answer the toggle
+
+### Fixed
+- The admin panel's update button downloaded the cPanel package rather than the webmail one, so updating always failed
+- Image whitelist entries were being overwritten by whichever session wrote last, rather than expiring as it appeared
+- The Contacts menu opened partly off screen on phones (#50)
+- The calendar grid was dark grey on light themes and white on some dark ones
+- The event editor honours a 24-hour clock, keeps its fields inside the dialog, and moving the start past the end carries the end with it
+- Nextcloud translation catalogues registered under the old app id, so none of them loaded
+- fail2ban filters, AUR package metadata and release signing still described SnappyMail
+
+---
+
+## 4.1.0 - 2026-09-03
+
+### Added
+- Branding: theme-aware default login logo, separate light and dark uploads, and an off switch
+- Branding: favicon upload rather than only a URL, plus PWA icons generated from the Tachyon mark
+- Branding: logo on the admin login page, and a configurable login page footer
+- The Tachyon mark on the loading screen
+- Admin can clear the TOTP secret, which is now generated from a real CSPRNG
+- Configurable syslog name (#46)
+
+### Fixed
+- Logo upload appeared to fail because the previous image was still cached
+- Logo paths were being closed by the template filter, losing most of the mark
+- Remaining colour emoji in the interface replaced with real icons, including logout (#48)
+
+---
+
+## 4.0.9 - 2026-09-02
+
+### Fixed
+- Main account label followed the active account instead of the main one
+- An icon class on a table cell broke the row (#45)
+- Deleting inside a search dropped the filter
+- Rows added after a contact loaded were left untranslated (#44)
+- Integration version stamps restored after a release run overwrote them
+
+---
+
+## 4.0.8 - 2026-08-31
+
+### Fixed
+- Nextcloud: use the DI container rather than the `OC\Server` getters removed in Nextcloud 34 (#42)
+
+---
+
+## 4.0.7 - 2026-08-30
+
+### Added
+- Calendar syncs in the background, as contacts already did (#43)
+- Nextcloud contact groups are offered and expanded (#42)
+
+### Fixed
+- Four layout and input faults in the contact form (#44)
+
+---
+
+## 4.0.6 - 2026-08-29
+
+### Added
+- Calendar and logging get their own admin tabs
+- The login account can be named like any other, and its name is shown rather than its address (#41)
+- Contacts hold address, birthday, instant messaging and photo (#40)
+- Contact photos are used as avatars in the message list and view
+
+### Fixed
+- Saving a new contact twice created two contacts (#39)
+- Pressing Generate and saving locked the admin out
+- Reopening a popup during its fade out kept the previous contents
+- The security tab's Save button failed silently
+
+---
+
+## 4.0.5 - 2026-08-29
+
+### Fixed
+- PGP: decrypted text was decoded twice, mangling every non-ASCII character (#32)
+- PGP: keyserver searches name the server queried and the one that answered (#25)
+- Calendar: discovery took the wrong calendar-home-set (#34)
+- Calendar: one bad event no longer aborts the whole sync, and all-day events span one day (#35, #38)
+- Calendar: the editor card had no background or border (#36)
+- Contacts: an Apple birthday no longer discards the whole contact (#37)
+- A timestamp lost its vCard form on the way back from jCard (#30)
+- Previewable attachments are marked without needing hover (#31)
+
+---
+
+## 4.0.4 - 2026-08-26
+
+### Added
+- Contact tags render as chips, with existing groups suggested while tagging (#27)
+- Release ships stable "latest" filenames and a cPanel artifact
+
+### Fixed
+- A contact in several groups showed only the first (#26)
+
+---
+
+## 4.0.3 - 2026-08-25
+
+### Changed
+- Recipient fields stop truncating, expand groups on insert, and allow copying out
+
+### Fixed
+- Compose rebuilt every chip once per address
+- Nextcloud settings moved out of "Additional settings" into their own section
+
+---
+
+## 4.0.2 - 2026-08-25
+
+### Added
+- Optional filter for contacts without an email address
+- A translation status report attached to each release
+
+### Fixed
+- The LineEndings stream filter corrupted UTF-8 byte 0x85
+- Contacts: select all sent identifiers as strings rather than numbers, ordered pages deterministically, and each selection choice says how many it covers (#18)
+
+---
+
+## 4.0.1 - 2026-08-24
+
+### Added
+- Calendar: CalDAV connection settings, sync, range queries, and an event editor
+- Contacts: select all, synced marker, delete local contacts, and choose To, Cc or Bcc when composing to a selection (#14, #18)
+- A vector icon set in place of emoji throughout the interface
+
+### Changed
+- The vendored icon font is gone, including from plugins, integrations and the Nextcloud theme
+- Danish, German and Spanish translations completed
+
+### Fixed
+- Nextcloud: never let Tachyon break a logout (#13)
+- DAV authenticates up front and reads privileges correctly
+- The Squire table size picker was being clipped away
+
+---
+
 ## 3.1.0 – 2026-07-02
 
 ### Added
