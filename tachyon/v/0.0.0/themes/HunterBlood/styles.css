@@ -128,8 +128,12 @@
 
 #V-Login,
 #V-AdminLogin {
-	max-width: 1120px;
-	width: calc(100% - 64px);
+	max-width: 512px;
+	width: calc(100% - 48px);
+}
+
+.LoginView .login-logo {
+	margin-bottom: 32px;
 }
 
 .LoginView .login-logo .login-logo-default {
@@ -144,7 +148,7 @@
 }
 
 .LoginView form {
-	padding: 40px;
+	padding: 40px 32px 32px;
 }
 
 .LoginView .controls,
@@ -215,7 +219,7 @@
 	border-radius: 2px;
 	box-shadow: none;
 	font-weight: 500;
-	min-height: 32px;
+	min-height: 34px;
 	text-shadow: none;
 	transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
@@ -282,7 +286,7 @@
 }
 
 #rl-left .buttonCompose {
-	min-height: 38px;
+	min-height: 40px;
 }
 
 .b-folders hr {
@@ -304,6 +308,7 @@
 .b-folders li a.selectable {
 	border-left-width: 1px;
 	line-height: 2.5em;
+	margin: 2px 8px;
 	transition: background-color 150ms ease, color 150ms ease;
 }
 
@@ -419,54 +424,17 @@
 	border-radius: 8px;
 }
 
-@media screen and (min-width: 901px) {
-	#V-Login,
-	#V-AdminLogin {
-		display: grid;
-		grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
-		grid-template-rows: auto auto auto;
-		column-gap: clamp(48px, 6vw, 88px);
-		align-items: center;
-	}
-
-	#V-Login::after,
-	#V-AdminLogin::after {
-		background: url("./images/reception.webp") center / cover no-repeat;
-		border-radius: 2px;
-		content: "";
-		grid-column: 2;
-		grid-row: 1 / 4;
-		height: clamp(480px, 76vh, 680px);
-		min-width: 0;
-	}
-
-	.LoginView .login-logo,
-	.LoginView form,
-	.LoginView .login-footer {
-		grid-column: 1;
-	}
-
-	.LoginView .login-logo {
-		align-self: end;
-		margin-bottom: 26px;
-	}
-
-	.LoginView form {
-		align-self: center;
-	}
-
-	.LoginView .login-footer {
-		align-self: start;
-	}
-}
-
 @media screen and (max-width: 480px) {
 	#V-Login,
 	#V-AdminLogin {
 		width: calc(100% - 28px);
 	}
 
+	.LoginView .login-logo {
+		margin-bottom: 24px;
+	}
+
 	.LoginView form {
-		padding: 30px 6vw 20px;
+		padding: 32px 6vw 24px;
 	}
 }
