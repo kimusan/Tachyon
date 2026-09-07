@@ -11,7 +11,7 @@
 
 	--fontSans: "Inter", ui-sans-serif, system-ui, sans-serif;
 	--fontSerif: "Inter", ui-sans-serif, system-ui, sans-serif;
-	--main-font-size: 14px;
+	--main-font-size: 15px;
 
 	/* Clinically: warm stone structure with one teal action colour. */
 	--main-color: #1c1917;
@@ -266,6 +266,7 @@
 .b-folders li a.selectable {
 	border-left-width: 1px;
 	border-radius: 6px;
+	line-height: 2.5em;
 	margin: 2px 8px;
 	transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -285,6 +286,25 @@
 .messageListItem {
 	border-bottom-color: #e7e5e4;
 	border-left-width: 1px;
+	font-size: 100%;
+	line-height: 1.5;
+	min-height: 44px;
+}
+
+.messageListItem > div + div {
+	align-items: center;
+	padding-bottom: 10px;
+	padding-top: 10px;
+}
+
+.messageListItem .messageCheckbox {
+	align-self: center;
+	padding-top: 0;
+}
+
+.sm-msgView-side .messageListItem .subjectParent,
+.rl-mobile .messageListItem .subjectParent {
+	line-height: 1.45;
 }
 
 .messageListItem.focused {
@@ -330,6 +350,14 @@
 .thm-message-list-top-toolbar,
 .thm-message-list-bottom-toolbar {
 	background: #fafaf9 !important;
+}
+
+@media screen and (min-width: 781px) {
+	.sm-msgView-side #V-MailMessageList .messageList {
+		max-width: 55vw;
+		min-width: 380px;
+		width: 40vw;
+	}
 }
 
 .tabs > label {

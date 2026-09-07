@@ -35,7 +35,7 @@
 
 	--fontSans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 	--fontSerif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
-	--main-font-size: 14px;
+	--main-font-size: 15px;
 
 	/* Hunter Blood Group palette */
 	--main-color: #2c2c2c;
@@ -68,14 +68,14 @@
 	--dropdown-menu-disable-color: #8a7d6a;
 	--dropdown-menu-border-clr: #e8e0d4;
 
-	--folders-color: #fdfbf8;
-	--folders-disabled-color: #a9a398;
+	--folders-color: #2c2c2c;
+	--folders-disabled-color: #6b6557;
 	--folders-selected-color: #fdfbf8;
 	--folders-selected-bg-color: #6b8f71;
 	--folders-focused-color: #fdfbf8;
 	--folders-focused-bg-color: #4e6b53;
-	--folders-hover-color: #fdfbf8;
-	--folders-hover-bg-color: #3b3b37;
+	--folders-hover-color: #2c2c2c;
+	--folders-hover-bg-color: #f2ede4;
 	--folders-drop-color: #fdfbf8;
 	--folders-drop-bg-color: #6b8f71;
 	--unread-count-color: #2c2c2c;
@@ -249,10 +249,13 @@
 }
 
 #rl-left {
-	background: #2c2c2c;
+	background: #e8e0d4;
+	border-right: 1px solid #d7ccbd;
+	color: #2c2c2c;
 }
 
 #rl-left .b-toolbar {
+	color: #2c2c2c;
 	padding-bottom: 16px;
 }
 
@@ -261,16 +264,34 @@
 }
 
 .b-folders hr {
-	border-color: #4b4a45;
+	border-color: #d7ccbd;
+}
+
+.b-folders .b-content,
+.b-folders .b-footer,
+.b-folders li a,
+.b-folders li a * {
+	color: #2c2c2c;
+}
+
+.b-folders li a:not(.selectable),
+.b-folders li a:not(.selectable) * {
+	color: #6b6557;
 }
 
 .b-folders li a.selectable {
 	border-left-width: 1px;
+	line-height: 2.5em;
 	transition: background-color 150ms ease, color 150ms ease;
 }
 
 .b-folders li a.selectable.selected {
 	font-weight: 500;
+}
+
+.b-folders li a.selectable.selected,
+.b-folders li a.selectable.selected * {
+	color: #fdfbf8;
 }
 
 .messageListItem.focused {
@@ -280,6 +301,25 @@
 
 .messageListItem {
 	border-left-width: 1px;
+	font-size: 100%;
+	line-height: 1.5;
+	min-height: 44px;
+}
+
+.messageListItem > div + div {
+	align-items: center;
+	padding-bottom: 10px;
+	padding-top: 10px;
+}
+
+.messageListItem .messageCheckbox {
+	align-self: center;
+	padding-top: 0;
+}
+
+.sm-msgView-side .messageListItem .subjectParent,
+.rl-mobile .messageListItem .subjectParent {
+	line-height: 1.45;
 }
 
 .messageListItem.unseen {
@@ -318,6 +358,14 @@
 .thm-message-list-top-toolbar,
 .thm-message-list-bottom-toolbar {
 	background: #f2ede4 !important;
+}
+
+@media screen and (min-width: 781px) {
+	.sm-msgView-side #V-MailMessageList .messageList {
+		max-width: 55vw;
+		min-width: 380px;
+		width: 40vw;
+	}
 }
 
 .tabs > label {
