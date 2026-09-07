@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Tachyon has no external services or per-orb authentication to restore.
+printf 'Tachyon orb is ready.\n'

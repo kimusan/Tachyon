@@ -25,6 +25,7 @@
 .env
 /test
 /public_html
+/.amp/portals/*
 /vendors/knockout/spec
 /vendors/openpgp-5
 !/vendors/openpgp-5/dist

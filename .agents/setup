@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+step() {
+	local label=$1
+	shift
+	printf '\n==> %s\n' "$label"
+	time "$@"
+}
+
+required_packages=(php-cli php-mbstring php-xml php-zip brotli dpkg-dev gzip)
+missing_packages=()
+
+for package in "${required_packages[@]}"; do
+	if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed'; then
+		missing_packages+=("$package")
+	fi
+done
+
+if ((${#missing_packages[@]})); then
+	step "Refresh apt metadata" sudo apt-get update
+	step "Install system dependencies" sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing_packages[@]}"
+else
+	printf 'System dependencies are already installed.\n'
+fi
+
+if [[ $(node --version 2>/dev/null || true) != v20.* ]]; then
+	step "Install the Node 20 toolchain" sudo npm install --global n
+	step "Activate Node 20" sudo n 20
+	hash -r
+fi
+
+printf 'Using Node %s and PHP %s.\n' "$(node --version)" "$(php -r 'echo PHP_VERSION;')"
+step "Install JavaScript dependencies" npm ci
