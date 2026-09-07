@@ -248,6 +248,28 @@
 	box-shadow: 0 10px 30px rgba(44, 44, 44, 0.1);
 }
 
+#V-PopupsCompose > header {
+	background-color: #e8e0d4;
+	border-bottom-color: #d7ccbd;
+	color: #2c2c2c;
+}
+
+#V-PopupsCompose > header .saved-text {
+	color: #6b6557;
+}
+
+#V-PopupsCompose > header .close,
+#V-PopupsCompose > header .minimize-custom {
+	border-color: #6b6557;
+	color: #4e6b53;
+}
+
+#V-PopupsCompose .b-header {
+	background-color: #f2ede4;
+	border-bottom: 1px solid #d7ccbd;
+	color: #2c2c2c;
+}
+
 #rl-left {
 	background: #e8e0d4;
 	border-right: 1px solid #d7ccbd;
