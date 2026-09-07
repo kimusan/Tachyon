@@ -8,7 +8,7 @@ step() {
 	time "$@"
 }
 
-required_packages=(php-cli php-mbstring php-zip brotli dpkg-dev gzip)
+required_packages=(php-cli php-mbstring php-xml php-zip brotli dpkg-dev gzip)
 missing_packages=()
 
 for package in "${required_packages[@]}"; do
