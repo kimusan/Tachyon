@@ -1,0 +1,402 @@
+@font-face {
+	font-display: swap;
+	font-family: "Cormorant Garamond";
+	font-style: normal;
+	font-weight: 400;
+	src: url("./fonts/cormorant-garamond-400.woff2") format("woff2");
+}
+
+@font-face {
+	font-display: swap;
+	font-family: "Cormorant Garamond";
+	font-style: normal;
+	font-weight: 600;
+	src: url("./fonts/cormorant-garamond-600.woff2") format("woff2");
+}
+
+@font-face {
+	font-display: swap;
+	font-family: "DM Sans";
+	font-style: normal;
+	font-weight: 400;
+	src: url("./fonts/dm-sans-400.woff2") format("woff2");
+}
+
+@font-face {
+	font-display: swap;
+	font-family: "DM Sans";
+	font-style: normal;
+	font-weight: 500;
+	src: url("./fonts/dm-sans-500.woff2") format("woff2");
+}
+
+:root {
+	color-scheme: light;
+
+	--fontSans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+	--fontSerif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+	--main-font-size: 14px;
+
+	/* Hunter Blood Group palette */
+	--main-color: #2c2c2c;
+	--main-bg-color: #f2ede4;
+	--main-bg-image: none;
+	--main-bg-size: auto;
+	--main-bg-repeat: no-repeat;
+	--link-color: #4e6b53;
+	--border-color: #e8e0d4;
+	--border-radius: 2px;
+	--hr-color: #e8e0d4;
+	--panel-bg-clr: #fdfbf8;
+
+	--loading-color: #2c2c2c;
+	--loading-text-shadow: none;
+	--spinner-color: #6b8f71;
+
+	--login-color: #2c2c2c;
+	--login-bg-color: #fdfbf8;
+	--login-box-shadow: 0 18px 50px rgba(44, 44, 44, 0.12);
+	--login-border: 0;
+	--login-border-radius: 2px;
+	--login-logo-max-height: 80px;
+	--login-logo-max-width: 294px;
+
+	--dropdown-menu-color: #2c2c2c;
+	--dropdown-menu-bg-color: #fdfbf8;
+	--dropdown-menu-hover-bg-color: #f2ede4;
+	--dropdown-menu-hover-color: #4e6b53;
+	--dropdown-menu-disable-color: #8a7d6a;
+	--dropdown-menu-border-clr: #e8e0d4;
+
+	--folders-color: #fdfbf8;
+	--folders-disabled-color: #a9a398;
+	--folders-selected-color: #fdfbf8;
+	--folders-selected-bg-color: #6b8f71;
+	--folders-focused-color: #fdfbf8;
+	--folders-focused-bg-color: #4e6b53;
+	--folders-hover-color: #fdfbf8;
+	--folders-hover-bg-color: #3b3b37;
+	--folders-drop-color: #fdfbf8;
+	--folders-drop-bg-color: #6b8f71;
+	--unread-count-color: #2c2c2c;
+	--unread-count-bg-color: #d4e2d6;
+
+	--settings-menu-color: #2c2c2c;
+	--settings-menu-selected-color: #4e6b53;
+	--settings-menu-selected-bg-color: #d4e2d6;
+	--settings-menu-hover-color: #2c2c2c;
+	--settings-menu-hover-bg-color: #e8e0d4;
+
+	--message-list-toolbar-bg-color: #f2ede4;
+	--message-header-bg-clr: #f2ede4;
+
+	--dialog-clr: #2c2c2c;
+	--dialog-bg-clr: #fdfbf8;
+	--dialog-border-clr: #e8e0d4;
+	--dialog-border-radius: 2px;
+
+	--btn-clr: #2c2c2c;
+	--btn-bg-clr: #fdfbf8;
+	--btn-border-clr: #e8e0d4;
+	--btn-border-radius: 2px;
+	--btn-success-bg-clr: #6b8f71;
+	--btn-danger-bg-clr: #b91c1c;
+
+	--input-clr: #2c2c2c;
+	--input-bg-clr: #fdfbf8;
+	--input-border-clr: #d7ccbd;
+	--input-border-radius: 2px;
+	--input-focus-border-clr: #6b8f71;
+
+	--tr-hover-bg-clr: #f2ede4;
+	--tr-odd-bg-clr: #faf7f2;
+	--tab-active-bg-clr: #fdfbf8;
+	--tab-hover-border-clr: #e8e0d4;
+
+	--warning-clr: #6b6557;
+	--warning-bg-clr: #f2ede4;
+	--warning-border-clr: #a89880;
+	--error-clr: #991b1b;
+	--error-bg-clr: #fef2f2;
+	--error-border-clr: #fecaca;
+	--info-clr: #4e6b53;
+	--info-bg-clr: #edf4ee;
+	--info-border-clr: #d4e2d6;
+
+	--smMainShadow: 0 8px 28px rgba(44, 44, 44, 0.08);
+}
+
+#V-Login,
+#V-AdminLogin {
+	max-width: 1120px;
+	width: calc(100% - 64px);
+}
+
+.LoginView .login-logo .login-logo-default {
+	background: url("./images/logo.webp") no-repeat center / contain;
+	color: transparent;
+	height: 80px;
+	width: 294px;
+}
+
+.LoginView .login-logo .login-logo-default path {
+	display: none;
+}
+
+.LoginView form {
+	padding: 40px;
+}
+
+.LoginView .controls,
+.LoginView .control-group {
+	margin-bottom: 22px;
+}
+
+.LoginView input,
+.LoginView .btn {
+	background: #fdfbf8;
+	border-color: #c9bda9;
+	box-shadow: none;
+}
+
+.LoginView input {
+	caret-color: #4e6b53;
+	height: 44px;
+}
+
+.LoginView input::placeholder {
+	color: #6b6557;
+	opacity: 0.78;
+}
+
+.LoginView input:focus,
+.LoginView input:hover {
+	border-color: #6b8f71;
+}
+
+.LoginView input:focus {
+	border-width: 2px;
+	outline: 0;
+}
+
+.LoginView .e-checkbox {
+	align-items: center;
+	display: inline-flex;
+	margin-bottom: 0;
+	min-height: 44px;
+	padding: 0 8px 0 0;
+}
+
+.LoginView .language-button {
+	align-items: center;
+	display: inline-flex;
+	justify-content: center;
+	min-height: 44px;
+	min-width: 44px;
+	padding: 0;
+}
+
+.LoginView .buttonLogin {
+	background: #6b8f71;
+	border-color: #6b8f71;
+	color: #fdfbf8;
+	font-weight: 500;
+	height: 44px;
+	letter-spacing: 0.08em;
+}
+
+.LoginView .buttonLogin:hover,
+.LoginView .buttonLogin:active {
+	background: #4e6b53;
+	border-color: #4e6b53;
+}
+
+.btn {
+	border-radius: 2px;
+	box-shadow: none;
+	font-weight: 500;
+	min-height: 32px;
+	text-shadow: none;
+	transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.btn-success {
+	border-color: #6b8f71;
+	text-shadow: none;
+}
+
+.btn-success:hover,
+.btn-success:active {
+	background-color: #4e6b53;
+	border-color: #4e6b53;
+}
+
+.legend,
+.modal-header h3,
+.messageView .subjectParent {
+	font-family: var(--fontSerif);
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+.legend {
+	color: #2c2c2c;
+	font-size: 170%;
+}
+
+.dropdown-menu {
+	box-shadow: 0 10px 30px rgba(44, 44, 44, 0.1);
+}
+
+#rl-left {
+	background: #2c2c2c;
+}
+
+#rl-left .b-toolbar {
+	padding-bottom: 16px;
+}
+
+#rl-left .buttonCompose {
+	min-height: 38px;
+}
+
+.b-folders hr {
+	border-color: #4b4a45;
+}
+
+.b-folders li a.selectable {
+	border-left-width: 1px;
+	transition: background-color 150ms ease, color 150ms ease;
+}
+
+.b-folders li a.selectable.selected {
+	font-weight: 500;
+}
+
+.messageListItem.focused {
+	background-color: #f2ede4;
+	border-left-color: #e8e0d4;
+}
+
+.messageListItem {
+	border-left-width: 1px;
+}
+
+.messageListItem.unseen {
+	background-color: #edf4ee;
+	border-left-color: #d4e2d6;
+	border-right-color: #d4e2d6 !important;
+}
+
+.messageListItem.unseen.focused {
+	background-color: #e4eee6;
+	border-left-color: #d4e2d6;
+	border-right-color: #d4e2d6 !important;
+}
+
+.messageListItem.selected,
+.messageListItem.checked {
+	background-color: #d4e2d6;
+	border-bottom-color: #b8ccb9;
+	border-left-color: #b8ccb9;
+	border-right-color: #b8ccb9 !important;
+}
+
+.messageListItem [data-unseen] {
+	background-color: #edf4ee;
+	border-color: #6b8f71;
+}
+
+.messageList .groupLabel {
+	background: #f2ede4;
+	color: #6b6557;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.thm-message-list-top-toolbar,
+.thm-message-list-bottom-toolbar {
+	background: #f2ede4 !important;
+}
+
+.tabs > label {
+	border-radius: 2px 2px 0 0;
+}
+
+::selection {
+	background: #d4e2d6;
+	color: #2c2c2c;
+}
+
+:focus-visible {
+	outline: 2px solid #6b8f71;
+	outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+	height: 10px;
+	width: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f2ede4;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #a89880;
+	border: 2px solid #f2ede4;
+	border-radius: 8px;
+}
+
+@media screen and (min-width: 901px) {
+	#V-Login,
+	#V-AdminLogin {
+		display: grid;
+		grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
+		grid-template-rows: auto auto auto;
+		column-gap: clamp(48px, 6vw, 88px);
+		align-items: center;
+	}
+
+	#V-Login::after,
+	#V-AdminLogin::after {
+		background: url("./images/reception.webp") center / cover no-repeat;
+		border-radius: 2px;
+		content: "";
+		grid-column: 2;
+		grid-row: 1 / 4;
+		height: clamp(480px, 76vh, 680px);
+		min-width: 0;
+	}
+
+	.LoginView .login-logo,
+	.LoginView form,
+	.LoginView .login-footer {
+		grid-column: 1;
+	}
+
+	.LoginView .login-logo {
+		align-self: end;
+		margin-bottom: 26px;
+	}
+
+	.LoginView form {
+		align-self: center;
+	}
+
+	.LoginView .login-footer {
+		align-self: start;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	#V-Login,
+	#V-AdminLogin {
+		width: calc(100% - 28px);
+	}
+
+	.LoginView form {
+		padding: 30px 6vw 20px;
+	}
+}
