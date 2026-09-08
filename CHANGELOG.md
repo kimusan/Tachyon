@@ -1,10 +1,11 @@
-## 4.2.1 - 2026-09-08
+## 4.2.2 - 2026-09-08
 
 ### Fixed
 - The SnappyMail logo was still shipping in nine places, including desktop notifications, the admin About tab and both the Nextcloud and ownCloud integrations. Its Braille dots read SNAPPY (#51)
 - Search filters were shared by every account on the install, so a rule filing mail into a folder that exists in one mailbox ran against all of them. Because the rules run during login, the resulting failure was reported as a failed login. Filters are now per address, and an existing list stays with the account that created it
 - Deleting a search filter appeared to do nothing while actually deleting it
 - Search filters moved messages out of INBOX even when they were found elsewhere
+- Editing an account at an internationalised domain failed with "Unknown error". The account list is sent to the client in unicode while accounts are stored under the ASCII form, and the address was not converted back on the way in, so the lookup found nothing
 - A sender with no avatar answered 404, which logged a console error for most of a normal message list, and was the one response carrying no cache headers, so every render asked again and redid the lookups behind it
 
 ---
