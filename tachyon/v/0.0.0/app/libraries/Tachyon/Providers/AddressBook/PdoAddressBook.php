@@ -224,8 +224,16 @@ class PdoAddressBook
 			foreach ($aLocalSyncData as $sKey => $aData) {
 				if ((empty($aData['etag']) && !isset($aRemoteSyncData[$sKey])) // new
 				 // newer
+				 //
+				 // Deliberately not also requiring the etags to differ. Tachyon
+				 // stores the etag its own PUT returned, so after a clean sync the
+				 // local and remote etags are equal -- and requiring them to differ
+				 // meant an edited contact could never be uploaded at all. A
+				 // differing etag says the remote changed too, which is a conflict
+				 // signal, not the definition of a local edit. Timestamps decide who
+				 // wins: this pushes only when the remote copy is older, and the pull
+				 // loop below takes the remote when it is newer.
 				 || (!empty($aData['etag']) && isset($aRemoteSyncData[$sKey]) &&
-						$aRemoteSyncData[$sKey]['etag'] !== $aData['etag'] &&
 						$aRemoteSyncData[$sKey]['changed'] < $aData['changed']
 					)
 				) {

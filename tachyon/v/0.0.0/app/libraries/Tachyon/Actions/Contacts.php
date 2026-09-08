@@ -298,6 +298,19 @@ trait Contacts
 						$oContact = new \Tachyon\Providers\AddressBook\Classes\Contact();
 					}
 					$oContact->setVCard($vCard);
+
+					// Editing loads the existing row, so Changed arrives holding the
+					// stored timestamp, and setVCard does not advance it: its REV
+					// parsing is disabled, and it is shared with the sync pull path
+					// (PdoAddressBook::Sync) where stamping a local "now" would make a
+					// freshly pulled contact look locally newer and push it straight
+					// back. Without this line Sync() never sees
+					// remote.changed < local.changed, so an edit is never PUT -- and
+					// the pull branch then overwrites it, losing the edit silently.
+					// Creating a contact was unaffected, because a fresh Contact's
+					// constructor already stamps time().
+					$oContact->Changed = \time();
+
 					$bResult = $oAddressBookProvider->ContactSave($oContact);
 				}
 			}
