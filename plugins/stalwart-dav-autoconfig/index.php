@@ -51,6 +51,8 @@ class StalwartDavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 				return;
 			}
 
+			// Contacts are pinned to one named collection; calendars are not.
+			// See writeSyncConfig() and the URL settings below for why they differ.
 			$this->writeSyncConfig($oAccount, 'contacts_sync',
 				(string) $this->Config()->Get('plugin', 'carddav_url', ''), $sPassword);
 
@@ -72,7 +74,8 @@ class StalwartDavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 			return;
 		}
 
-		$aData = Rules::payload($oAccount->Email(), $sPassword, $sUrl);
+		$aData = Rules::payload($oAccount->Email(), $sPassword,
+			Rules::collectionUrl($sUrl, $oAccount->Email()));
 
 		$sCryptKey = $oAccount->CryptKey();
 		$aData['Password'] = \Tachyon\Util\Crypt::EncryptToJSON($aData['Password'], $sCryptKey);
@@ -98,16 +101,26 @@ class StalwartDavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 				->SetDescription('Addresses or domains to configure, separated by commas or whitespace. Empty configures nobody.')
 				->SetDefaultValue(''),
 
+			// Pinned to one collection on purpose. Given only a base URL, Tachyon
+			// discovers the address book, and when none is named
+			// contacts/default/addressbook/address book it takes whichever the
+			// server listed first. Migrated accounts here have two, both named
+			// with an email suffix so neither matches, and a sync landing on the
+			// empty one deletes every local contact as deleted-elsewhere.
 			\Tachyon\Plugins\Property::NewInstance('carddav_url')
-				->SetLabel('CardDAV base URL')
+				->SetLabel('CardDAV collection URL')
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
-				->SetDescription('Discovery starts here; the per-user collection is found from it. Empty leaves contacts_sync alone.')
-				->SetDefaultValue('https://mail.clinically.com.au/dav/card'),
+				->SetDescription('Full collection URL. {email} is replaced with the percent-encoded address. Naming the collection skips discovery, which is not deterministic when an account has more than one address book. Empty leaves contacts_sync alone.')
+				->SetDefaultValue('https://mail.clinically.com.au/dav/card/{email}/default/'),
 
+			// Deliberately NOT pinned. Calendar sync enumerates and syncs every
+			// collection it finds rather than choosing one, so there is no
+			// selection hazard -- and pinning would hide events that live in an
+			// account's other calendar.
 			\Tachyon\Plugins\Property::NewInstance('caldav_url')
 				->SetLabel('CalDAV base URL')
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::STRING)
-				->SetDescription('Discovery starts here; the per-user collection is found from it. Empty leaves calendar_sync alone.')
+				->SetDescription('Base URL. Calendar sync discovers and syncs every collection on the account, so this is not pinned. Empty leaves calendar_sync alone.')
 				->SetDefaultValue('https://mail.clinically.com.au/dav/cal')
 		);
 	}

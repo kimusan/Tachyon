@@ -13,13 +13,26 @@ password and so exists only inside an authenticated session.
 | Key | Meaning |
 |---|---|
 | `allow_list` | Addresses or domains, comma or whitespace separated. Empty configures nobody. |
-| `carddav_url` | CardDAV base URL. Empty leaves `contacts_sync` alone. |
-| `caldav_url` | CalDAV base URL. Empty leaves `calendar_sync` alone. |
+| `carddav_url` | Full collection URL. `{email}` becomes the percent-encoded address. Empty leaves `contacts_sync` alone. |
+| `caldav_url` | CalDAV **base** URL. Empty leaves `calendar_sync` alone. |
 
-The URLs are **base** URLs, not per-user ones. Tachyon discovers the account's
-own collection from them via `current-user-principal` and the home set, so one
-constant serves every account. `test/dav-discovery.php` in this repository shows
-what that discovery returns for a given server and credential.
+The two are deliberately different shapes.
+
+**Contacts are pinned to a named collection.** Given only a base URL, Tachyon
+discovers the address book — and when no collection is named `contacts`,
+`default`, `addressbook` or `address book`, it falls through to taking whichever
+the server listed first. Accounts migrated onto this server have *two* address
+books whose display names both carry an email suffix, so neither matches, and the
+order is not guaranteed stable between syncs. A sync landing on the empty one
+sees every local contact as deleted-elsewhere and removes it. Naming the
+collection outright skips discovery entirely.
+
+**Calendars are not pinned.** Calendar sync enumerates and syncs *every*
+collection on the account rather than choosing one, so there is no selection
+hazard — and pinning would hide events living in an account's other calendar.
+
+`test/dav-discovery.php` shows what discovery returns for a given server and
+credential, which is how the duplicate collections were found.
 
 ## Behaviour worth knowing
 

@@ -48,6 +48,18 @@ check('an empty address matches nothing',
 check('a bare domain string matches its own entry',
 	Rules::isAllowed('hunterblood.au', array('hunterblood.au')), true);
 
+check('expands {email} into a percent-encoded collection URL',
+	Rules::collectionUrl('https://mail.example.com/dav/card/{email}/default/', 'wojt@hunterblood.au'),
+	'https://mail.example.com/dav/card/wojt%40hunterblood.au/default/');
+check('encodes the @ so the path segment stays one segment',
+	Rules::collectionUrl('https://h/dav/card/{email}/default/', 'a@b.com'),
+	'https://h/dav/card/a%40b.com/default/');
+check('a template without the placeholder is returned unchanged',
+	Rules::collectionUrl('https://mail.example.com/dav/card', 'wojt@hunterblood.au'),
+	'https://mail.example.com/dav/card');
+check('an empty template stays empty, so an operator can disable one half',
+	Rules::collectionUrl('', 'wojt@hunterblood.au'), '');
+
 check('payload is read+write and carries the address as the DAV user',
 	Rules::payload('wojt@hunterblood.au', 'secret', 'https://mail.clinically.com.au/dav/card'),
 	array(

@@ -48,6 +48,34 @@ abstract class Rules
 	}
 
 	/**
+	 * Expands a collection URL template for one account.
+	 *
+	 * `{email}` is replaced with the account's address, percent-encoded, so
+	 * "https://host/dav/card/{email}/default/" becomes
+	 * "https://host/dav/card/wojt%40example.com/default/".
+	 *
+	 * The point is to name the collection outright rather than let Tachyon
+	 * discover it. Given only a base URL, getDavClient() runs discovery and,
+	 * when no collection is named contacts/default/addressbook/address book,
+	 * falls through to taking whichever the server listed first. Accounts
+	 * migrated onto this server have two address books whose display names
+	 * both carry an email suffix, so neither matches -- and the "first" one is
+	 * whatever order the server happened to return. A sync that lands on the
+	 * empty one sees every local contact as deleted-elsewhere and removes it.
+	 *
+	 * A template with no placeholder is returned unchanged, so a literal URL
+	 * still works.
+	 */
+	public static function collectionUrl(string $sTemplate, string $sEmail) : string
+	{
+		if (!\str_contains($sTemplate, '{email}')) {
+			return $sTemplate;
+		}
+
+		return \str_replace('{email}', \rawurlencode($sEmail), $sTemplate);
+	}
+
+	/**
 	 * The sync config as stored, before the password is encrypted.
 	 *
 	 * Mode 1 is read+write. That is deliberate and is what performs the
