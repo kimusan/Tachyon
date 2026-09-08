@@ -298,6 +298,14 @@ trait Contacts
 						$oContact = new \Tachyon\Providers\AddressBook\Classes\Contact();
 					}
 					$oContact->setVCard($vCard);
+
+					// An edit loads the stored row, so Changed still holds the old
+					// timestamp, and setVCard leaves it alone because Sync() shares it
+					// for pulled contacts. Without a fresh stamp Sync() never sees the
+					// local copy as newer, so the edit is never uploaded and the next
+					// pull overwrites it. PdoCalendar::EventSave does the same.
+					$oContact->Changed = \time();
+
 					$bResult = $oAddressBookProvider->ContactSave($oContact);
 				}
 			}
