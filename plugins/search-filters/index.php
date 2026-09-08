@@ -6,8 +6,8 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME = 'Search Filters',
 		AUTHOR = 'AbdoBnHesham',
 		URL    = 'https://github.com/the-djmaze/snappymail/pull/1673',
-		VERSION = '0.2',
-		RELEASE = '2024-06-28',
+		VERSION = '0.3',
+		RELEASE = '2026-09-08',
 		REQUIRED = '2.36.3',
 		CATEGORY = 'General',
 		LICENSE = 'MIT',
@@ -31,6 +31,66 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$this->addJsonHook('SDeleteFilter', 'DeleteFilter');
 	}
 
+
+	/**
+	 * Filters belong to one mailbox.
+	 *
+	 * They used to be a single flat list. Plugin user settings resolve through
+	 * FileStorage, which maps an additional account to its ParentEmail, so that
+	 * one list was the same list for every account and every one of them ran all
+	 * of it on login. A rule filing mail into a folder that exists in one mailbox
+	 * fails in the others, and because the hook runs during login, the failure
+	 * surfaced as a login failure rather than as a broken rule.
+	 *
+	 * Now keyed by address. A list left over from before belongs to the account
+	 * that owns the settings file, which is the main one, and is moved into its
+	 * bucket the first time that account writes.
+	 */
+	private function allFilters() : array
+	{
+		$aSettings = $this->getUserSettings();
+		$aAll = $aSettings['SFilters'] ?? [];
+		return \is_array($aAll) ? $aAll : [];
+	}
+
+	private function filtersFor(string $sEmail) : array
+	{
+		$aAll = $this->allFilters();
+		if ($aAll && \array_is_list($aAll)) {
+			// Legacy flat list: only the settings owner ever had it
+			return $sEmail === $this->ownerEmail() ? $aAll : [];
+		}
+		return isset($aAll[$sEmail]) && \is_array($aAll[$sEmail]) ? $aAll[$sEmail] : [];
+	}
+
+	private function saveFiltersFor(string $sEmail, array $aFilters) : bool
+	{
+		$aAll = $this->allFilters();
+		if ($aAll && \array_is_list($aAll)) {
+			// Rewrite the legacy list as the owner's, then apply this change on top
+			$aAll = [$this->ownerEmail() => $aAll];
+		}
+		$aAll[$sEmail] = \array_values($aFilters);
+
+		$aSettings = $this->getUserSettings();
+		$aSettings['SFilters'] = $aAll;
+		return $this->saveUserSettings($aSettings);
+	}
+
+	/** The account the settings file belongs to. */
+	private function ownerEmail() : string
+	{
+		$oMain = $this->Manager()->Actions()->getMainAccountFromToken(false);
+		return $oMain ? $oMain->Email() : '';
+	}
+
+	/** The account acting right now, which is the one a filter is being edited for. */
+	private function currentEmail() : string
+	{
+		$oAccount = $this->Manager()->Actions()->getAccountFromToken(false);
+		return $oAccount ? $oAccount->Email() : '';
+	}
+
 	public function ApplyFilters(
 		\Tachyon\Model\Account $oAccount,
 		\MailSo\Imap\ImapClient $oImapClient,
@@ -41,22 +101,20 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 			return;
 		}
 
-		$aSettings = $this->getUserSettings();
-		if (empty($aSettings['SFilters'])) {
-			$aSettings['SFilters'] = [];
-			$this->saveUserSettings($aSettings);
+		$Filters = $this->filtersFor($oAccount->Email());
+		if (!$Filters) {
 			return;
 		}
 
-		$Filters = $aSettings['SFilters'];
-
 		foreach ($Filters as $filter) {
-			$this->Manager()->logWrite(json_encode(['filter' => $filter]), LOG_WARNING);
-
+			if (empty($filter['searchQ'])) {
+				continue;
+			}
 			$searchQ = $filter['searchQ'];
 
-			// obsługa keyword (multi-folder)
-			if (stripos($searchQ, 'keyword=') !== false) {
+			try {
+			// keyword rules look in every top level folder
+			if (\stripos($searchQ, 'keyword=') !== false) {
 				$oMailClient = $this->Manager()->Actions()->MailClient();
 
 				// Pobieramy wszystkie foldery top-level
@@ -71,13 +129,23 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 					}
 				}
 
-				continue; // przechodzimy do następnego filtra
+				continue;
 			}
 
-			// normalny search w INBOX
 			$uids = $this->searchMessages($oImapClient, $searchQ, 'INBOX');
 			if (!empty($uids)) {
 				$this->applyActions($oImapClient, $filter, $uids, 'INBOX');
+			}
+			} catch (\Throwable $oException) {
+				// This runs inside imap.after-login. Letting it out reports the
+				// whole login as failed, which is how a rule naming a folder that
+				// does not exist in this mailbox turned into "authentication
+				// failed" for an account that had authenticated perfectly well.
+				$this->Manager()->logWrite(
+					'SearchFilters rule "' . $searchQ . '" failed for '
+					. $oAccount->Email() . ': ' . $oException->getMessage(),
+					\LOG_ERR
+				);
 			}
 		}
 	}
@@ -144,15 +212,17 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 		if (!empty($filter['fFolder']) && $filter['fFolder'] !== -1) {
 			foreach ($uids as $uid) {
 				$oRange = new \MailSo\Imap\SequenceSet([$uid]);
-				$imapClient->MessageMove('INBOX', $filter['fFolder'], $oRange);
+				// The folder it was found in. Hardcoding INBOX moved whatever
+				// happened to hold that uid there instead, for keyword rules that
+				// search every folder.
+				$imapClient->MessageMove($folder, $filter['fFolder'], $oRange);
 			}
 		}
 	}
 
 	public function GetFilters()
 	{
-		$aSettings = $this->getUserSettings();
-		$Filters = $aSettings['SFilters'] ?? [];
+		$Filters = $this->filtersFor($this->currentEmail());
 
 		$Search = $this->jsonParam('SSearchQ');
 		if (!$Search) {
@@ -160,7 +230,7 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 		}
 
 		$Filter = null;
-		foreach ($aSettings['SFilters'] as $filter) {
+		foreach ($Filters as $filter) {
 			if ($filter['searchQ'] == $Search) {
 				$Filter = $filter;
 			}
@@ -180,14 +250,14 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 			'fFlag' => $SFilter['fFlag'],
 		];
 
-		$aSettings = $this->getUserSettings();
-		$aSettings['SFilters'] = $aSettings['SFilters'] ?? [];
+		$sEmail = $this->currentEmail();
+		$aFilters = $this->filtersFor($sEmail);
 
 		$foundIndex = null;
-		foreach ($aSettings['SFilters'] as $index => $filter) {
+		foreach ($aFilters as $index => $filter) {
 			if ($filter['searchQ'] == $SFilter['searchQ']) {
 				if ($filter['priority'] != $SFilter['priority']) {
-					array_splice($aSettings['SFilters'], $index, 1);
+					\array_splice($aFilters, $index, 1);
 				} else {
 					$foundIndex = $index;
 				}
@@ -196,51 +266,51 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 		if ($foundIndex === null) {
 			$insertIndex = 0;
-			foreach ($aSettings['SFilters'] as $index => $filter)
+			foreach ($aFilters as $index => $filter)
 				if ($filter['priority'] >= $newFilter['priority'])
 					$insertIndex = $index + 1;
 				else
 					break;
 
-			array_splice($aSettings['SFilters'], $insertIndex, 0, [$newFilter]);
+			\array_splice($aFilters, $insertIndex, 0, [$newFilter]);
 		} else {
-			$aSettings['SFilters'][$foundIndex] = $newFilter;
+			$aFilters[$foundIndex] = $newFilter;
 		}
 
-		return $this->jsonResponse(__FUNCTION__, $this->saveUserSettings($aSettings));
+		return $this->jsonResponse(__FUNCTION__, $this->saveFiltersFor($sEmail, $aFilters));
 	}
 
 	public function UpdateSearchQ()
 	{
 		$SFilter = $this->jsonParam('SFilter');
 
-		$aSettings = $this->getUserSettings();
-		$aSettings['SFilters'] = $aSettings['SFilters'] ?? [];
+		$sEmail = $this->currentEmail();
+		$aFilters = $this->filtersFor($sEmail);
 
-		foreach ($aSettings['SFilters'] as $index => $filter) {
+		foreach ($aFilters as $index => $filter) {
 			if ($filter['searchQ'] == $SFilter['oldSearchQ']) {
 				$filter['searchQ'] = $SFilter['searchQ'];
-				$aSettings['SFilters'][$index] = $filter;
+				$aFilters[$index] = $filter;
 				break;
 			}
 		}
 
-		return $this->jsonResponse(__FUNCTION__, $this->saveUserSettings($aSettings));
+		return $this->jsonResponse(__FUNCTION__, $this->saveFiltersFor($sEmail, $aFilters));
 	}
 
 	public function DeleteFilter()
 	{
 		$Search = $this->jsonParam('SSearchQ');
 
-		$aSettings = $this->getUserSettings();
-		$aSettings['SFilters'] = $aSettings['SFilters'] ?? [];
+		$sEmail = $this->currentEmail();
+		$aFilters = $this->filtersFor($sEmail);
 
-		foreach ($aSettings['SFilters'] as $index => $filter) {
+		foreach ($aFilters as $index => $filter) {
 			if ($filter['searchQ'] == $Search) {
-				array_splice($aSettings['SFilters'], $index, 1);
+				\array_splice($aFilters, $index, 1);
 			}
 		}
 
-		return $this->jsonResponse(__FUNCTION__, $this->saveUserSettings($aSettings));
+		return $this->jsonResponse(__FUNCTION__, $this->saveFiltersFor($sEmail, $aFilters));
 	}
 }

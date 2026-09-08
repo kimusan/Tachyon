@@ -99,8 +99,14 @@
 			rl.pluginRemoteRequest(
 				(iError, oData) => {
 					if (iError) return console.error(iError, oData);
-					const index = ioFilters().findIndex((f) => f.searchQ() === searchQToRemove);
-					ioFilters.splice(index, 1);
+					// Each entry is an observable wrapping a plain object, so the
+					// searchQ has to be read through it. Calling f.searchQ() threw,
+					// and the throw landed before the splice, which is why the row
+					// stayed on screen after the server had already deleted it.
+					const index = ioFilters().findIndex((f) => f().searchQ === searchQToRemove);
+					if (0 <= index) {
+						ioFilters.splice(index, 1);
+					}
 				},
 				'SDeleteFilter',
 				{
