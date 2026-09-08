@@ -223,9 +223,11 @@ class PdoAddressBook
 		if ($bReadWrite) {
 			foreach ($aLocalSyncData as $sKey => $aData) {
 				if ((empty($aData['etag']) && !isset($aRemoteSyncData[$sKey])) // new
-				 // newer
+				 // newer. The etags are not compared: after a clean sync the local
+				 // etag is the one our own PUT returned, so they are equal, and a
+				 // local edit could never be uploaded. A differing etag is a
+				 // conflict signal, and timestamps decide those either way.
 				 || (!empty($aData['etag']) && isset($aRemoteSyncData[$sKey]) &&
-						$aRemoteSyncData[$sKey]['etag'] !== $aData['etag'] &&
 						$aRemoteSyncData[$sKey]['changed'] < $aData['changed']
 					)
 				) {
