@@ -56,6 +56,7 @@
 		"BUTTON_ADD_ACCOUNT": "Add Account"
 	},
 	"SEARCH": {
+		"ALSO_CC": "Also search Cc",
 		"TITLE_ADV": "Advanced Search",
 		"TEXT": "Text",
 		"HAS_ATTACHMENT": "Has attachment(s)",

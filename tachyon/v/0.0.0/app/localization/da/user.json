@@ -56,6 +56,7 @@
         "BUTTON_ADD_ACCOUNT": "Tilføj konto"
     },
     "SEARCH": {
+        "ALSO_CC": "Søg også i Cc",
         "TITLE_ADV": "Avanceret søgning",
         "TEXT": "Tekst",
         "HAS_ATTACHMENT": "Har vedhæftet fil",

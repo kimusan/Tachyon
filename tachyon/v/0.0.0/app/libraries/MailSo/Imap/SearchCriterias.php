@@ -222,11 +222,28 @@ class SearchCriterias
 
 						case 'TO':
 							$sValue = static::escapeSearchString($oImapClient, $sRawValue);
-							$aCriteriasResult[] = 'OR';
+							if (isset($aLines['TO-ONLY'])) {
+								// Asked for the To header alone. Without this there was
+								// no way to exclude a message you were only copied on.
+								$aCriteriasResult[] = 'TO';
+								$aCriteriasResult[] = $sValue;
+								break;
+							}
+							// Bcc as well as Cc. It costs nothing and makes a search of
+							// Sent find what it should, since that is the only place the
+							// header survives: a message delivered to a Bcc recipient
+							// does not carry one, which is the point of Bcc.
+							$aCriteriasResult[] = 'OR OR';
 							$aCriteriasResult[] = 'TO';
 							$aCriteriasResult[] = $sValue;
 							$aCriteriasResult[] = 'CC';
 							$aCriteriasResult[] = $sValue;
+							$aCriteriasResult[] = 'BCC';
+							$aCriteriasResult[] = $sValue;
+							break;
+
+						case 'TO-ONLY':
+							// A modifier for TO above, not a criterion of its own
 							break;
 
 						case 'ATTACHMENT':
@@ -452,6 +469,7 @@ class SearchCriterias
 					}
 					break;
 
+				case 'TO-ONLY':
 				case 'ATTACHMENT':
 				case 'FLAGGED':
 				case 'UNFLAGGED':

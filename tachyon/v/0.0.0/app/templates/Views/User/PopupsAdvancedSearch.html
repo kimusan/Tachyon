@@ -11,8 +11,17 @@
 		</div>
 		<div class="control-group">
 			<label data-i18n="GLOBAL/TO"></label>
-			<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
-				data-bind="value: to">
+			<div>
+				<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
+					data-bind="value: to">
+				<div data-bind="component: {
+					name: 'Checkbox',
+					params: {
+						label: 'SEARCH/ALSO_CC',
+						value: alsoCc
+					}
+				}"></div>
+			</div>
 		</div>
 		<div class="control-group">
 			<label data-i18n="GLOBAL/SUBJECT"></label>
