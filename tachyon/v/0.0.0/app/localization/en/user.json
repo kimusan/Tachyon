@@ -377,7 +377,10 @@
 		"TITLE_CLEARING_PROCESS": "Purging the folder..."
 	},
 	"CRYPTO": {
-		"SIGN": "Sign",
+		"SIGN_METHOD": "Signing method",
+		"ENCRYPT_METHOD": "Encryption method",
+		"ASK_FALLBACK": "%FAILED% failed. Use %NEXT% instead?",
+"SIGN": "Sign",
 		"ENCRYPT": "Encrypt",
 		"DECRYPT": "Decrypt",
 		"VERIFY": "Verify",

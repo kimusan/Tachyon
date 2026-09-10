@@ -343,7 +343,10 @@
     "TITLE_CLEARING_PROCESS": "Ordner wird gelöscht ..."
   },
   "CRYPTO": {
-    "SIGN": "Unterschreiben",
+    "SIGN_METHOD": "Signaturverfahren",
+    "ENCRYPT_METHOD": "Verschlüsselungsverfahren",
+    "ASK_FALLBACK": "%FAILED% ist fehlgeschlagen. Stattdessen %NEXT% verwenden?",
+"SIGN": "Unterschreiben",
     "ENCRYPT": "Verschlüsseln",
     "DECRYPT": "Entschlüsseln",
     "VERIFY": "Überprüfen",

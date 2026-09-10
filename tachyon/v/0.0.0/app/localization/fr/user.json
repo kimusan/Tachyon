@@ -377,7 +377,10 @@
     "TITLE_CLEARING_PROCESS": "Purge du dossier..."
   },
   "CRYPTO": {
-    "SIGN": "Signer",
+    "SIGN_METHOD": "Méthode de signature",
+    "ENCRYPT_METHOD": "Méthode de chiffrement",
+    "ASK_FALLBACK": "%FAILED% a échoué. Utiliser %NEXT% à la place ?",
+"SIGN": "Signer",
     "ENCRYPT": "Chiffer",
     "DECRYPT": "Déchiffrer",
     "VERIFY": "Vérifier",

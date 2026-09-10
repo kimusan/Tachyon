@@ -343,7 +343,10 @@
     "TITLE_CLEARING_PROCESS": "Purgando carpeta..."
   },
   "CRYPTO": {
-    "SIGN": "Firmar",
+    "SIGN_METHOD": "Método de firma",
+    "ENCRYPT_METHOD": "Método de cifrado",
+    "ASK_FALLBACK": "%FAILED% falló. ¿Usar %NEXT% en su lugar?",
+"SIGN": "Firmar",
     "ENCRYPT": "Encriptar",
     "DECRYPT": "Descifrar",
     "VERIFY": "Verify",

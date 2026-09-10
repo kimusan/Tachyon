@@ -343,7 +343,10 @@
         "TITLE_CLEARING_PROCESS": "Tømmer mappe..."
     },
     "CRYPTO": {
-        "SIGN": "Signér",
+        "SIGN_METHOD": "Signeringsmetode",
+        "ENCRYPT_METHOD": "Krypteringsmetode",
+        "ASK_FALLBACK": "%FAILED% mislykkedes. Brug %NEXT% i stedet?",
+"SIGN": "Signér",
         "ENCRYPT": "Krypter",
         "DECRYPT": "Dekrypter",
         "VERIFY": "Verificér",

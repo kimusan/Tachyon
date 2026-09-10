@@ -147,7 +147,11 @@
 			<div class="btn-group" style="flex-grow:1"></div>
 			<div class="btn-group">
 				<a class="btn icon-signature" data-bind="toggle: doSign, visible: canSign, css: {'btn-success': doSign()}" data-i18n="[title]CRYPTO/SIGN"></a>
+				<select class="btn" style="display:none" data-i18n="[title]CRYPTO/SIGN_METHOD"
+					data-bind="visible: doSign() &amp;&amp; canChooseSign(), options: signMethods, value: signMethod"></select>
 				<a class="btn icon-lock" data-bind="toggle: doEncrypt, visible: canEncrypt, css: {'btn-success': doEncrypt() || 'mailvelope' == viewArea()}" data-i18n="[title]CRYPTO/ENCRYPT"></a>
+				<select class="btn" style="display:none" data-i18n="[title]CRYPTO/ENCRYPT_METHOD"
+					data-bind="visible: doEncrypt() &amp;&amp; canChooseEncrypt(), options: encryptMethods, value: encryptMethod"></select>
 			</div>
 			<div class="btn-group">
 				<a class="btn icon-paperclip" style="padding-left: 10px; padding-right: 10px;" id="composeUploadButton"
