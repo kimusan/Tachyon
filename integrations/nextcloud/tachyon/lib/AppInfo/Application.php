@@ -57,7 +57,7 @@ class Application extends App implements IBootstrap
 
 		$dispatcher = $context->getServerContainer()->get(IEventDispatcher::class);
 		$logger = $context->getServerContainer()->get(LoggerInterface::class);
-		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) use ($context) {
+		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) use ($context, $logger) {
 /*
 			$config = $context->getServerContainer()->get(\OCP\IConfig::class);
 			// Only store the user's password in the current session if they have
@@ -65,10 +65,25 @@ class Application extends App implements IBootstrap
 			if ($config->getAppValue('tachyon', 'tachyon-autologin', false)
 			 || $config->getAppValue('tachyon', 'tachyon-autologin-with-email', false)) {
 */
-				$sUID = $Event->getUser()->getUID();
-				$session = $context->getServerContainer()->get(\OCP\ISession::class);
-				$session->set('tachyon-nc-uid', $sUID);
-				$session->set('tachyon-passphrase', TachyonHelper::encodePassword($Event->getPassword(), $sUID));
+				/**
+				 * Signing in to the mail client is not worth failing a Nextcloud
+				 * login over. Anything loadApp() throws arrives after the
+				 * credentials are verified but before the session exists, so the
+				 * user sees only a failed login and cannot reach the UI to fix
+				 * the cause. The logout listener below already had this guard.
+				 *
+				 * Only the message is logged. Passing the exception itself would
+				 * put its trace in nextcloud.log, and that trace holds the
+				 * password.
+				 */
+				try {
+					$sUID = $Event->getUser()->getUID();
+					$session = $context->getServerContainer()->get(\OCP\ISession::class);
+					$session->set('tachyon-nc-uid', $sUID);
+					$session->set('tachyon-passphrase', TachyonHelper::encodePassword($Event->getPassword(), $sUID));
+				} catch (\Throwable $oException) {
+					$logger->error('Tachyon login setup failed: ' . $oException->getMessage(), ['app' => self::APP_ID]);
+				}
 /*
 			}
 */

@@ -253,7 +253,11 @@ class TachyonHelper
 		return $sUrl;
 	}
 
-	public static function encodePassword(string $sPassword, string $sSalt) : string
+	public static function encodePassword(
+		#[\SensitiveParameter]
+		string $sPassword,
+		string $sSalt
+	) : string
 	{
 		static::loadApp();
 		return \Tachyon\Util\Crypt::EncryptUrlSafe($sPassword, $sSalt);
