@@ -92,10 +92,13 @@ class Client
 			$headers['Authorization'] = $this->sPreemptiveAuth;
 		}
 		$response = $this->HTTP->doRequest($method, $url, $body, $headers);
-		if (301 == $response->status) {
-			// Like: RewriteRule ^\.well-known/carddav /nextcloud/remote.php/dav [R=301,L]
+		// Like: RewriteRule ^\.well-known/carddav /nextcloud/remote.php/dav [R=301,L]
+		// Apache answers 302 without R=301, and Stalwart answers the well-known
+		// paths with 307. All four keep the method and body, which a PROPFIND
+		// needs. 303 means "GET this instead", so it is not followed.
+		if (\in_array($response->status, array(301, 302, 307, 308), true)) {
 			$location = $response->getRedirectLocation();
-			\Tachyon\Util\Log::info('DAV', "301 Redirect {$url} to {$location}");
+			\Tachyon\Util\Log::info('DAV', "{$response->status} Redirect {$url} to {$location}");
 			$url = \preg_replace('@^(https?:)?//[^/]+[/$]@', '/', $location);
 			$parts = \parse_url($this->baseUri);
 			$url = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port'])?':' . $parts['port']:'') . $url;
