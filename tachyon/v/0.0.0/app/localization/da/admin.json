@@ -139,7 +139,7 @@
         "LABEL_ALLOW_UPDATE": "Tillad opdatering fra dette panel",
         "HINT_ALLOW_UPDATE": "Kun muligt når webserveren kan skrive til programfilerne. En pakkeinstallation (deb, rpm, cPanel) opdateres i stedet af den pakkemanager.",
         "LEGEND_ABOUT": "Om",
-        "LABEL_TAG_HINT": "Simpel, moderne & hurtig web-baseret e-mail klient",
+        "LABEL_TAG_HINT": "Simpel, moderne &amp; hurtig web-baseret e-mail klient",
         "LABEL_ALL_RIGHTS_RESERVED": "alle rettigheder forbeholdes.",
         "HINT_READ_CHANGE_LOG": "Læs ændrings listen før der opdateres.",
         "HINT_IS_UP_TO_DATE": "Tachyon er opdateret.",
