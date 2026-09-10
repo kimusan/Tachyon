@@ -419,7 +419,11 @@ Examples:
   filename = "{date:Y-m-d}/{user:domain}/{user:email}_{user:uid}.log"
   filename = "{user:email}-{date:Y-m-d}.txt"
   filename = "syslog"
-  filename = "stderr"'),
+  filename = "stderr"
+
+"stderr" is the process stderr. Under php-fpm that is /dev/null unless the pool
+sets catch_workers_output, so there the line goes through the SAPI instead and
+lands in the web server\'s error log.'),
 
 				'auth_logging' => array(false, 'Enable auth logging in a separate file (for fail2ban)'),
 				'auth_logging_filename' => array('fail2ban/auth-{date:Y-m-d}.txt'),
