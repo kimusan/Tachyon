@@ -18,7 +18,7 @@ import { koArrayWithDestroy, addObservablesTo, addComputablesTo, addSubscribable
 import { UNUSED_OPTION_VALUE } from 'Common/Consts';
 import { folderInformation } from 'Common/Folders';
 import { serverRequest } from 'Common/Links';
-import { i18n, getNotification, getUploadErrorDescByCode, timestampToString } from 'Common/Translator';
+import { i18n, translateTrigger, getNotification, getUploadErrorDescByCode, timestampToString } from 'Common/Translator';
 import { setFolderETag } from 'Common/Cache';
 import { SettingsCapa, SettingsGet, elementById, addShortcut, createElement } from 'Common/Globals';
 //import { exitFullscreen, isFullscreen, toggleFullscreen } from 'Common/Fullscreen';
@@ -287,6 +287,11 @@ export class ComposePopupView extends AbstractViewPopup {
 		this.encryptOptions = koArrayWithDestroy();
 		this.signOptions = koArrayWithDestroy();
 
+		// Which of the available methods to actually use. Empty means "the first
+		// one", which is what happened before there was a choice.
+		this.signMethod = ko.observable('');
+		this.encryptMethod = ko.observable('');
+
 		this.dragAndDropOver = ko.observable(false).extend({ debounce: 1 });
 		this.dragAndDropVisible = ko.observable(false).extend({ debounce: 1 });
 
@@ -342,6 +347,40 @@ export class ComposePopupView extends AbstractViewPopup {
 			canEncrypt: () => this.encryptOptions().length,
 			canMailvelope: () => this.encryptOptions.includes('Mailvelope'),
 			canSign: () => this.signOptions().length,
+
+			/**
+			 * Both buttons stay put whenever the account does crypto at all, and
+			 * grey out when they do not apply to this particular message. They
+			 * used to vanish, so adding a recipient without a key silently removed
+			 * the encrypt button, which reads as a fault rather than as a state.
+			 */
+			showCrypto: () => this.canSign() || this.canEncrypt(),
+
+			signTitle: () => {
+				translateTrigger();
+				return this.canSign()
+					? this.signOptionsText()
+					: i18n('CRYPTO/NO_SIGNING_KEY');
+			},
+
+			encryptTitle: () => {
+				translateTrigger();
+				if (this.canEncrypt()) {
+					return this.encryptOptionsText();
+				}
+				const without = this.recipientsWithoutKey();
+				return without.length
+					? i18n('CRYPTO/NO_KEY_FOR', { EMAIL: without.join(', ') })
+					: i18n('CRYPTO/NO_RECIPIENTS');
+			},
+
+			signMethods: () => this.signOptions().map(option => option[0]),
+			// Mailvelope opens a window of its own and is handled before any of
+			// this, so it is not one of the methods to pick between
+			encryptMethods: () => this.encryptOptions().filter(name => 'Mailvelope' !== name),
+			// Nothing to choose when there is only one way to do it
+			canChooseSign: () => 1 < this.signOptions().length,
+			canChooseEncrypt: () => 1 < this.encryptOptions().filter(name => 'Mailvelope' !== name).length,
 
 			encryptOptionsText: () => this.encryptOptions().join(', '),
 			signOptionsText: () => this.signOptions().map(o => o[0]).join(', '),
@@ -1478,6 +1517,68 @@ export class ComposePopupView extends AbstractViewPopup {
 			&& options.push(['S/MIME']);
 		console.dir({signOptions: options});
 		this.signOptions(options);
+		this.keepCryptoChoice();
+	}
+
+	/**
+	 * Drop a chosen method that is no longer on offer.
+	 *
+	 * Both lists are rebuilt whenever the identity changes, and the encryption
+	 * one on every recipient edit, so a choice made a moment ago can name a
+	 * method that no longer applies. Letting that reach the send would either
+	 * sign with something the user did not pick or fail for no visible reason.
+	 */
+	/**
+	 * The chosen method failed. Offer the next one instead of quietly using it:
+	 * someone who picked S/MIME on purpose should not find out later that the
+	 * message went out signed with PGP.
+	 */
+	askCryptoFallback(failed, next) {
+		return new Promise(resolve =>
+			showScreenPopup(AskPopupView, [
+				i18n('CRYPTO/ASK_FALLBACK', { FAILED: failed, NEXT: next }),
+				() => resolve(true),
+				() => resolve(false)
+			])
+		);
+	}
+
+	/**
+	 * Recipients with no public key anywhere, so the tooltip can name them
+	 * rather than saying encryption is unavailable and leaving the reader to
+	 * work out which address is the problem.
+	 */
+	recipientsWithoutKey() {
+		return this.allRecipients().filter(email =>
+			!OpenPGPUserStore.publicKeys().find(key => key.for(email))
+			&& !GnuPGUserStore.hasPublicKeyForEmails([email])
+			&& !SMimeUserStore.find(certificate => email == certificate.emailAddress && certificate.smimeencrypt)
+		);
+	}
+
+	// Guarded because the buttons are shown while unavailable now. The shared
+	// toggle binding cannot know that, so the click is handled here instead.
+	toggleSign() {
+		this.canSign() && this.doSign(!this.doSign());
+	}
+
+	toggleEncrypt() {
+		this.canEncrypt() && this.doEncrypt(!this.doEncrypt());
+	}
+
+	keepCryptoChoice() {
+		const sign = this.signMethods(), encrypt = this.encryptMethods();
+		sign.includes(this.signMethod()) || this.signMethod(sign[0] || '');
+		encrypt.includes(this.encryptMethod()) || this.encryptMethod(encrypt[0] || '');
+	}
+
+	/**
+	 * The chosen method first, the rest after it in their original order, which
+	 * is the order to fall back through if the chosen one fails.
+	 */
+	orderByChoice(options, chosen, name = option => option) {
+		const i = options.findIndex(option => name(option) === chosen);
+		return 0 < i ? [options[i], ...options.filter((_, n) => n !== i)] : options.slice();
 	}
 
 	async initEncrypt() {
@@ -1511,6 +1612,7 @@ export class ComposePopupView extends AbstractViewPopup {
 
 		console.dir({encryptOptions:options});
 		this.encryptOptions(options);
+		this.keepCryptoChoice();
 	}
 
 	/**
@@ -1701,62 +1803,76 @@ export class ComposePopupView extends AbstractViewPopup {
 				data = alternative;
 			}
 			let isSigned = false;
-			for (let i = 0; i < signOptions.length; ++i) {
-				if ('OpenPGP' == signOptions[i][0]) {
-					try {
-						// Doesn't sign attachments
-						let signed = new MimePart;
-						signed.headers['Content-Type'] =
-							'multipart/signed; micalg="pgp-sha256"; protocol="application/pgp-signature"';
-						signed.headers['Content-Transfer-Encoding'] = '7Bit';
-						signed.children.push(data);
-						let signature = new MimePart;
-						signature.headers['Content-Type'] = 'application/pgp-signature; name="signature.asc"';
-						signature.headers['Content-Transfer-Encoding'] = '7Bit';
-						signature.body = await OpenPGPUserStore.sign(data.toString(), signOptions[i][1], 1);
-						signed.children.push(signature);
-						isSigned = true;
-						params.html = params.plain = '';
-						params.signed = signed.toString();
-						params.boundary = signed.boundary;
-						data = signed;
-/*
-						Object.entries(PgpUserStore.getPublicKeyOfEmails([getEmail(this.from())]) || {})
-						.forEach(([k,v]) => params.publicKey = v);
-*/
-						break;
-					} catch (e) {
-						Passphrases.delete(signOptions[i][1])
-						console.error(e);
-					}
-				} else if ('GnuPG' == signOptions[i][0]) {
-					// TODO: sign in PHP fails
-					let pass = await GnuPGUserStore.sign(signOptions[i][1]);
-					if (null != pass) {
-//						params.signData = data.toString();
-						params.signFingerprint = signOptions[i][1].fingerprint;
-						params.signPassphrase = pass;
-//						params.attachPublicKey = false;
-						isSigned = true;
-						break;
-					}
-				} else if ('S/MIME' == signOptions[i][0]) {
-					params.sign = 'S/MIME';
-					if (identity.smimeKeyEncrypted()) {
-						const pass = await Passphrases.ask(identity,
-							i18n('SMIME/PRIVATE_KEY_OF', {EMAIL: identity.email}),
-							'CRYPTO/SIGN'
-						);
+			// The chosen method first, the rest behind it as fallbacks. Tried one
+			// at a time so a failure can be reported rather than papered over.
+			const signCandidates = this.orderByChoice(signOptions, this.signMethod(), option => option[0]);
+			for (let c = 0; c < signCandidates.length && !isSigned; ++c) {
+				if (c && !await this.askCryptoFallback(signCandidates[c-1][0], signCandidates[c][0])) {
+					break;
+				}
+				const opts = [signCandidates[c]];
+				for (let i = 0; i < opts.length; ++i) {
+					if ('OpenPGP' == opts[i][0]) {
+						try {
+							// Doesn't sign attachments
+							let signed = new MimePart;
+							signed.headers['Content-Type'] =
+								'multipart/signed; micalg="pgp-sha256"; protocol="application/pgp-signature"';
+							signed.headers['Content-Transfer-Encoding'] = '7Bit';
+							signed.children.push(data);
+							let signature = new MimePart;
+							signature.headers['Content-Type'] = 'application/pgp-signature; name="signature.asc"';
+							signature.headers['Content-Transfer-Encoding'] = '7Bit';
+							signature.body = await OpenPGPUserStore.sign(data.toString(), opts[i][1], 1);
+							signed.children.push(signature);
+							isSigned = true;
+							params.html = params.plain = '';
+							params.signed = signed.toString();
+							params.boundary = signed.boundary;
+							data = signed;
+	/*
+							Object.entries(PgpUserStore.getPublicKeyOfEmails([getEmail(this.from())]) || {})
+							.forEach(([k,v]) => params.publicKey = v);
+	*/
+							break;
+						} catch (e) {
+							Passphrases.delete(opts[i][1])
+							console.error(e);
+						}
+					} else if ('GnuPG' == opts[i][0]) {
+						// TODO: sign in PHP fails
+						let pass = await GnuPGUserStore.sign(opts[i][1]);
 						if (null != pass) {
-							params.signPassphrase = pass.password;
-							pass.remember && Passphrases.handle(identity, pass.password);
+	//						params.signData = data.toString();
+							params.signFingerprint = opts[i][1].fingerprint;
+							params.signPassphrase = pass;
+	//						params.attachPublicKey = false;
+							isSigned = true;
+							break;
+						}
+					} else if ('S/MIME' == opts[i][0]) {
+						params.sign = 'S/MIME';
+						if (identity.smimeKeyEncrypted()) {
+							const pass = await Passphrases.ask(identity,
+								i18n('SMIME/PRIVATE_KEY_OF', {EMAIL: identity.email}),
+								'CRYPTO/SIGN'
+							);
+							if (null != pass) {
+								params.signPassphrase = pass.password;
+								pass.remember && Passphrases.handle(identity, pass.password);
+								isSigned = true;
+							}
+						} else {
 							isSigned = true;
 						}
-					} else {
-						isSigned = true;
+						// It never had one. Harmless while it was the last option and
+						// nothing could follow it, but this list is ordered by choice
+						// now, so without it a successful S/MIME signature would carry
+						// on and sign with PGP as well.
+						break;
 					}
 				}
-			}
+				}
 			if (signOptions.length && !isSigned) {
 				throw 'Signing failed';
 			}
@@ -1771,30 +1887,53 @@ export class ComposePopupView extends AbstractViewPopup {
 							.replace(/\s+/g, '') // Single base64 string, let the server do compliance formatting
 						})
 					);
-				for (let i = 0; i < encryptOptions.length; ++i) {
-					if ('OpenPGP' == encryptOptions[i]) {
-						// Doesn't encrypt attachments
-						params.encrypted = await OpenPGPUserStore.encrypt(data.toString(), recipients);
-						params.signed = '';
-						autocrypt();
+				let isEncrypted = false;
+				// Same rule as signing: the chosen method first, one at a time, and
+				// a failure is offered as a choice rather than taken silently.
+				// Mailvelope is not among them, it was handled before any of this.
+				const encCandidates = this.orderByChoice(
+					encryptOptions.filter(name => 'Mailvelope' !== name), this.encryptMethod());
+				for (let c = 0; c < encCandidates.length && !isEncrypted; ++c) {
+					if (c && !await this.askCryptoFallback(encCandidates[c-1], encCandidates[c])) {
 						break;
 					}
-					if ('GnuPG' == encryptOptions[i]) {
-						// Does encrypt attachments
-						params.encryptFingerprints = JSON.stringify(GnuPGUserStore.getPublicKeyFingerprints(recipients));
-						autocrypt();
-						break;
+					const opts = [encCandidates[c]];
+					try {
+					for (let i = 0; i < opts.length; ++i) {
+						if ('OpenPGP' == opts[i]) {
+							// Doesn't encrypt attachments
+							params.encrypted = await OpenPGPUserStore.encrypt(data.toString(), recipients);
+							params.signed = '';
+							autocrypt();
+							isEncrypted = true;
+							break;
+						}
+						if ('GnuPG' == opts[i]) {
+							// Does encrypt attachments
+							params.encryptFingerprints = JSON.stringify(GnuPGUserStore.getPublicKeyFingerprints(recipients));
+							autocrypt();
+							isEncrypted = true;
+							break;
+						}
+						if ('S/MIME' == opts[i]) {
+							params.encryptCertificates = [identity.smimeCertificate()];
+							SMimeUserStore.forEach(certificate => {
+								certificate.emailAddress != identity.email
+								&& recipients.includes(certificate.emailAddress)
+								&& params.encryptCertificates.push(certificate.id)
+							});
+							isEncrypted = true;
+							break;
+						}
 					}
-					if ('S/MIME' == encryptOptions[i]) {
-						params.encryptCertificates = [identity.smimeCertificate()];
-						SMimeUserStore.forEach(certificate => {
-							certificate.emailAddress != identity.email
-							&& recipients.includes(certificate.emailAddress)
-							&& params.encryptCertificates.push(certificate.id)
-						});
-						break;
+					} catch (e) {
+						// Kept so the next candidate can be offered. Without this the
+						// first failure aborted the send outright.
+						console.error(e);
 					}
-					// We skip Mailvelope as it has its own window
+					}
+				if (encCandidates.length && !isEncrypted) {
+					throw 'Encryption failed';
 				}
 			}
 		}

@@ -10,8 +10,8 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'Avatars',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '1.25',
-		RELEASE  = '2026-08-29',
+		VERSION  = '1.26',
+		RELEASE  = '2026-09-08',
 		REQUIRED = '2.33.0',
 		CATEGORY = 'Contacts',
 		LICENSE  = 'MIT',
@@ -133,7 +133,18 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 				echo $aResult[1];
 			}
 		} else {
-			\MailSo\Base\Http::StatusHeader(404);
+			// 204 rather than 404. The <img> fails either way and the client draws
+			// its identicon from the error, but a 404 also writes a line to the
+			// browser console for every sender without a picture, which on a busy
+			// list is most of them. Measured: 404, 204 and an empty 200 all fire
+			// onerror, and only the 404 is logged.
+			//
+			// Cached like a hit, because a miss was the one answer carrying no
+			// cache headers at all, so every list render asked again and every ask
+			// redid the gravatar, favicon and BIMI lookups behind it.
+			\header("Cache-Control: max-age={$maxAge}, private");
+			\header('Expires: '.\gmdate('D, j M Y H:i:s', $maxAge + \time()).' UTC');
+			\MailSo\Base\Http::StatusHeader(204, 'No Content');
 		}
 		exit;
 	}

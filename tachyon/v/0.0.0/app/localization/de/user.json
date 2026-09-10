@@ -56,6 +56,7 @@
     "BUTTON_ADD_ACCOUNT": "Konto hinzufügen"
   },
   "SEARCH": {
+    "ALSO_CC": "Auch Cc durchsuchen",
     "TITLE_ADV": "Erweiterte Suche",
     "TEXT": "Text",
     "HAS_ATTACHMENT": "Anhang vorhanden",
@@ -342,6 +343,12 @@
     "TITLE_CLEARING_PROCESS": "Ordner wird gelöscht ..."
   },
   "CRYPTO": {
+    "NO_SIGNING_KEY": "Kein Signaturschlüssel für diese Identität",
+    "NO_KEY_FOR": "Kein öffentlicher Schlüssel für %EMAIL%",
+    "NO_RECIPIENTS": "Zuerst einen Empfänger hinzufügen",
+    "SIGN_METHOD": "Signaturverfahren",
+    "ENCRYPT_METHOD": "Verschlüsselungsverfahren",
+    "ASK_FALLBACK": "%FAILED% ist fehlgeschlagen. Stattdessen %NEXT% verwenden?",
     "SIGN": "Unterschreiben",
     "ENCRYPT": "Verschlüsseln",
     "DECRYPT": "Entschlüsseln",
@@ -717,7 +724,7 @@
     "IMPORT_SUCCEEDED": "%COUNT% Termin(e) zum Kalender hinzugefügt.",
     "ERROR_NO_WRITABLE_CALENDAR": "Kein Kalender mit Schreibrecht vorhanden.",
     "ERROR_IMPORT_FAILED": "Der Termin konnte nicht hinzugefügt werden.",
-"BUTTON_NEW_EVENT": "Neuer Termin",
+    "BUTTON_NEW_EVENT": "Neuer Termin",
     "BUTTON_PREV": "Zurück",
     "BUTTON_NEXT": "Weiter",
     "BUTTON_TODAY": "Heute",

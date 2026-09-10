@@ -24,7 +24,10 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 
 			hasAttachment: false,
 			starred: false,
-			unseen: false
+			unseen: false,
+			// On by default because that is what a To search has always done: the
+			// criteria have always covered Cc, without the form ever saying so.
+			alsoCc: true
 		});
 
 		addComputablesTo(this, {
@@ -125,6 +128,11 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 
 		let result = decodeURIComponent(new URLSearchParams(data).toString());
 
+		// The exception is recorded, not the rule, so a search saved before this
+		// existed keeps meaning what it did
+		if (self.to().trim() && !self.alsoCc()) {
+			result += '&to-only';
+		}
 		if (self.hasAttachment()) {
 			result += '&attachment';
 		}
@@ -154,6 +162,7 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		self.keyword(pString(params.get('keyword')));
 		self.selectedTreeValue(pString(params.get('in')));
 		self.selectedDateValue(0);
+		self.alsoCc(!params.has('to-only'));
 		self.hasAttachment(params.has('attachment'));
 		self.starred(params.has('flagged'));
 		self.unseen(params.has('unseen'));

@@ -56,6 +56,7 @@
 		"BUTTON_ADD_ACCOUNT": "Add Account"
 	},
 	"SEARCH": {
+		"ALSO_CC": "Also search Cc",
 		"TITLE_ADV": "Advanced Search",
 		"TEXT": "Text",
 		"HAS_ATTACHMENT": "Has attachment(s)",
@@ -204,7 +205,7 @@
 		"IMPORT_SUCCEEDED": "Added %COUNT% event(s) to the calendar.",
 		"ERROR_NO_WRITABLE_CALENDAR": "No calendar you can write to.",
 		"ERROR_IMPORT_FAILED": "The event could not be added.",
-"BUTTON_NEW_EVENT": "New event",
+		"BUTTON_NEW_EVENT": "New event",
 		"BUTTON_PREV": "Previous",
 		"BUTTON_NEXT": "Next",
 		"BUTTON_TODAY": "Today",
@@ -376,6 +377,12 @@
 		"TITLE_CLEARING_PROCESS": "Purging the folder..."
 	},
 	"CRYPTO": {
+		"NO_SIGNING_KEY": "No signing key for this identity",
+		"NO_KEY_FOR": "No public key for %EMAIL%",
+		"NO_RECIPIENTS": "Add a recipient first",
+		"SIGN_METHOD": "Signing method",
+		"ENCRYPT_METHOD": "Encryption method",
+		"ASK_FALLBACK": "%FAILED% failed. Use %NEXT% instead?",
 		"SIGN": "Sign",
 		"ENCRYPT": "Encrypt",
 		"DECRYPT": "Decrypt",

@@ -5,6 +5,12 @@
 		width: 250px;
 		height: 200px;
 		/* Yes this LESS css relative path quirk becomes ../ */
-		background: url(../../images/tachyon-logo.png) -30px -30px;
+		/*
+		 * Contained rather than offset. The negative position was cropping the
+		 * whitespace off the old artwork; the Tachyon mark is wider than it is
+		 * tall and its speed lines run to the left edge, so the same offset ate
+		 * part of the logo.
+		 */
+		background: url(../../images/tachyon-logo.png) center / contain no-repeat;
 	}
 }

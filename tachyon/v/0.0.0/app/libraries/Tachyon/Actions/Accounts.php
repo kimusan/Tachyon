@@ -82,6 +82,13 @@ trait Accounts
 		$aAccounts = $this->GetAccounts($oMainAccount);
 
 		$sEmail = \trim($this->GetActionParam('email', ''));
+		// Accounts are stored under the ASCII form of the address, which is what
+		// LoginProcess and Account::convertArray both produce. The form posts what
+		// was typed, so an address at an internationalised domain arrived as
+		// unicode and matched no key: editing kim@stopovervågning.dk looked up a
+		// key that had never existed. DoAccountDelete and
+		// loadAdditionalAccountImapClient already do this; this one did not.
+		$sEmail = IDN::emailToAscii($sEmail);
 		$oPassword = new \Tachyon\Util\SensitiveString($this->GetActionParam('password', ''));
 		$bNew = !empty($this->GetActionParam('new', 1));
 
@@ -89,8 +96,13 @@ trait Accounts
 			$oNewAccount = $this->LoginProcess($sEmail, $oPassword, false);
 			$sEmail = $oNewAccount->Email();
 			$aAccount = $oNewAccount->asTokenArray($oMainAccount);
-		} else {
+		} else if (isset($aAccounts[$sEmail])) {
 			$aAccount = \Tachyon\Model\AdditionalAccount::convertArray($aAccounts[$sEmail]);
+		} else {
+			// Reached only if the address really is not on the list. Saying so
+			// beats an undefined key warning and the bare "Unknown error" the
+			// client shows when a failure carries no code of its own.
+			throw new ClientException(Notifications::AccountDoesNotExist);
 		}
 
 		if ($bNew) {

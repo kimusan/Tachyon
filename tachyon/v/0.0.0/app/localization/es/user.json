@@ -56,6 +56,7 @@
     "BUTTON_ADD_ACCOUNT": "Agregar cuenta"
   },
   "SEARCH": {
+    "ALSO_CC": "Buscar también en Cc",
     "TITLE_ADV": "Búsqueda avanzada",
     "TEXT": "Texto",
     "HAS_ATTACHMENT": "Tiene adjunto",
@@ -342,6 +343,12 @@
     "TITLE_CLEARING_PROCESS": "Purgando carpeta..."
   },
   "CRYPTO": {
+    "NO_SIGNING_KEY": "No hay clave de firma para esta identidad",
+    "NO_KEY_FOR": "No hay clave pública para %EMAIL%",
+    "NO_RECIPIENTS": "Añada primero un destinatario",
+    "SIGN_METHOD": "Método de firma",
+    "ENCRYPT_METHOD": "Método de cifrado",
+    "ASK_FALLBACK": "%FAILED% falló. ¿Usar %NEXT% en su lugar?",
     "SIGN": "Firmar",
     "ENCRYPT": "Encriptar",
     "DECRYPT": "Descifrar",
@@ -717,7 +724,7 @@
     "IMPORT_SUCCEEDED": "Se añadieron %COUNT% evento(s) al calendario.",
     "ERROR_NO_WRITABLE_CALENDAR": "No hay ningún calendario con permiso de escritura.",
     "ERROR_IMPORT_FAILED": "No se pudo añadir el evento.",
-"BUTTON_NEW_EVENT": "Nuevo evento",
+    "BUTTON_NEW_EVENT": "Nuevo evento",
     "BUTTON_PREV": "Anterior",
     "BUTTON_NEXT": "Siguiente",
     "BUTTON_TODAY": "Hoy",
