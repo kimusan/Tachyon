@@ -8,9 +8,9 @@
         "USERNAME": "Brugernavn",
         "PASSWORD": "Adgangskode",
         "CANCEL": "Annuller",
-        "SEARCH": "Ingen kontakter fundet",
-        "YES": "Yes",
-        "NO": "No"
+        "SEARCH": "Søg",
+        "YES": "Ja",
+        "NO": "Nej"
     },
     "LOGIN": {
         "LABEL_LOGIN": "Log ind",
@@ -28,7 +28,7 @@
         "DOMAINS": "Domæner",
         "SECURITY": "Sikkerhed",
         "PACKAGES": "Pakker",
-        "CONFIG": "Config",
+        "CONFIG": "Konfiguration",
         "ABOUT": "Om",
         "CALENDAR": "Kalender",
         "LOGGING": "Logning"
@@ -143,10 +143,10 @@
         "LABEL_ALL_RIGHTS_RESERVED": "alle rettigheder forbeholdes.",
         "HINT_READ_CHANGE_LOG": "Læs ændrings listen før der opdateres.",
         "HINT_IS_UP_TO_DATE": "Tachyon er opdateret.",
-        "HTML_NEW_VERSION": "Ny  <b>%VERSION%</b> version tilgængelig",
+        "HTML_NEW_VERSION": "Ny <b>%VERSION%</b> version tilgængelig.",
         "LABEL_UPDATING": "Opdatere",
         "LABEL_CHECKING": "Tjekker for opdateringer",
-        "BUTTON_RELEASES": "Releases"
+        "BUTTON_RELEASES": "Udgivelser"
     },
     "POPUPS_DOMAIN_ALIAS": {
         "TITLE_ADD_DOMAIN_ALIAS": "Tilføj alias",
@@ -164,8 +164,8 @@
         "LABEL_SECURE": "Sikker",
         "TIMEOUT": "Timeout",
         "DISABLE_CAPABILITIES": "Deaktivér funktioner",
-        "LIMITS": "Limits",
-        "FOLDERS": "Folders",
+        "LIMITS": "Grænser",
+        "FOLDERS": "Mapper",
         "MESSAGES": "Messages",
         "SECURE_OPTION_NONE": "Ingen",
         "LABEL_ALLOW_SIEVE_SCRIPTS": "Tillad sieve skripts",
