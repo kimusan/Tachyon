@@ -18,7 +18,7 @@ import { koArrayWithDestroy, addObservablesTo, addComputablesTo, addSubscribable
 import { UNUSED_OPTION_VALUE } from 'Common/Consts';
 import { folderInformation } from 'Common/Folders';
 import { serverRequest } from 'Common/Links';
-import { i18n, getNotification, getUploadErrorDescByCode, timestampToString } from 'Common/Translator';
+import { i18n, translateTrigger, getNotification, getUploadErrorDescByCode, timestampToString } from 'Common/Translator';
 import { setFolderETag } from 'Common/Cache';
 import { SettingsCapa, SettingsGet, elementById, addShortcut, createElement } from 'Common/Globals';
 //import { exitFullscreen, isFullscreen, toggleFullscreen } from 'Common/Fullscreen';
@@ -347,6 +347,32 @@ export class ComposePopupView extends AbstractViewPopup {
 			canEncrypt: () => this.encryptOptions().length,
 			canMailvelope: () => this.encryptOptions.includes('Mailvelope'),
 			canSign: () => this.signOptions().length,
+
+			/**
+			 * Both buttons stay put whenever the account does crypto at all, and
+			 * grey out when they do not apply to this particular message. They
+			 * used to vanish, so adding a recipient without a key silently removed
+			 * the encrypt button, which reads as a fault rather than as a state.
+			 */
+			showCrypto: () => this.canSign() || this.canEncrypt(),
+
+			signTitle: () => {
+				translateTrigger();
+				return this.canSign()
+					? this.signOptionsText()
+					: i18n('CRYPTO/NO_SIGNING_KEY');
+			},
+
+			encryptTitle: () => {
+				translateTrigger();
+				if (this.canEncrypt()) {
+					return this.encryptOptionsText();
+				}
+				const without = this.recipientsWithoutKey();
+				return without.length
+					? i18n('CRYPTO/NO_KEY_FOR', { EMAIL: without.join(', ') })
+					: i18n('CRYPTO/NO_RECIPIENTS');
+			},
 
 			signMethods: () => this.signOptions().map(option => option[0]),
 			// Mailvelope opens a window of its own and is handled before any of
@@ -1515,6 +1541,29 @@ export class ComposePopupView extends AbstractViewPopup {
 				() => resolve(false)
 			])
 		);
+	}
+
+	/**
+	 * Recipients with no public key anywhere, so the tooltip can name them
+	 * rather than saying encryption is unavailable and leaving the reader to
+	 * work out which address is the problem.
+	 */
+	recipientsWithoutKey() {
+		return this.allRecipients().filter(email =>
+			!OpenPGPUserStore.publicKeys().find(key => key.for(email))
+			&& !GnuPGUserStore.hasPublicKeyForEmails([email])
+			&& !SMimeUserStore.find(certificate => email == certificate.emailAddress && certificate.smimeencrypt)
+		);
+	}
+
+	// Guarded because the buttons are shown while unavailable now. The shared
+	// toggle binding cannot know that, so the click is handled here instead.
+	toggleSign() {
+		this.canSign() && this.doSign(!this.doSign());
+	}
+
+	toggleEncrypt() {
+		this.canEncrypt() && this.doEncrypt(!this.doEncrypt());
 	}
 
 	keepCryptoChoice() {

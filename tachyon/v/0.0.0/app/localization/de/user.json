@@ -343,7 +343,10 @@
     "TITLE_CLEARING_PROCESS": "Ordner wird gelöscht ..."
   },
   "CRYPTO": {
-    "SIGN_METHOD": "Signaturverfahren",
+    "NO_SIGNING_KEY": "Kein Signaturschlüssel für diese Identität",
+    "NO_KEY_FOR": "Kein öffentlicher Schlüssel für %EMAIL%",
+    "NO_RECIPIENTS": "Zuerst einen Empfänger hinzufügen",
+"SIGN_METHOD": "Signaturverfahren",
     "ENCRYPT_METHOD": "Verschlüsselungsverfahren",
     "ASK_FALLBACK": "%FAILED% ist fehlgeschlagen. Stattdessen %NEXT% verwenden?",
 "SIGN": "Unterschreiben",

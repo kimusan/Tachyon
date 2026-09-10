@@ -343,7 +343,10 @@
     "TITLE_CLEARING_PROCESS": "Purgando carpeta..."
   },
   "CRYPTO": {
-    "SIGN_METHOD": "Método de firma",
+    "NO_SIGNING_KEY": "No hay clave de firma para esta identidad",
+    "NO_KEY_FOR": "No hay clave pública para %EMAIL%",
+    "NO_RECIPIENTS": "Añada primero un destinatario",
+"SIGN_METHOD": "Método de firma",
     "ENCRYPT_METHOD": "Método de cifrado",
     "ASK_FALLBACK": "%FAILED% falló. ¿Usar %NEXT% en su lugar?",
 "SIGN": "Firmar",

@@ -343,7 +343,10 @@
         "TITLE_CLEARING_PROCESS": "Tømmer mappe..."
     },
     "CRYPTO": {
-        "SIGN_METHOD": "Signeringsmetode",
+        "NO_SIGNING_KEY": "Ingen signeringsnøgle for denne identitet",
+        "NO_KEY_FOR": "Ingen offentlig nøgle for %EMAIL%",
+        "NO_RECIPIENTS": "Tilføj en modtager først",
+"SIGN_METHOD": "Signeringsmetode",
         "ENCRYPT_METHOD": "Krypteringsmetode",
         "ASK_FALLBACK": "%FAILED% mislykkedes. Brug %NEXT% i stedet?",
 "SIGN": "Signér",

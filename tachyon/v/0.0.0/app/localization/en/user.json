@@ -377,7 +377,10 @@
 		"TITLE_CLEARING_PROCESS": "Purging the folder..."
 	},
 	"CRYPTO": {
-		"SIGN_METHOD": "Signing method",
+		"NO_SIGNING_KEY": "No signing key for this identity",
+		"NO_KEY_FOR": "No public key for %EMAIL%",
+		"NO_RECIPIENTS": "Add a recipient first",
+"SIGN_METHOD": "Signing method",
 		"ENCRYPT_METHOD": "Encryption method",
 		"ASK_FALLBACK": "%FAILED% failed. Use %NEXT% instead?",
 "SIGN": "Sign",

@@ -377,7 +377,10 @@
     "TITLE_CLEARING_PROCESS": "Purge du dossier..."
   },
   "CRYPTO": {
-    "SIGN_METHOD": "Méthode de signature",
+    "NO_SIGNING_KEY": "Aucune clé de signature pour cette identité",
+    "NO_KEY_FOR": "Aucune clé publique pour %EMAIL%",
+    "NO_RECIPIENTS": "Ajoutez d'abord un destinataire",
+"SIGN_METHOD": "Méthode de signature",
     "ENCRYPT_METHOD": "Méthode de chiffrement",
     "ASK_FALLBACK": "%FAILED% a échoué. Utiliser %NEXT% à la place ?",
 "SIGN": "Signer",
