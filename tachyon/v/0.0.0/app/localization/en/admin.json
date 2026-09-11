@@ -146,7 +146,19 @@
 		"HTML_NEW_VERSION": "New <b>%VERSION%</b> version is available.",
 		"LABEL_UPDATING": "Updating",
 		"LABEL_CHECKING": "Checking for updates",
-		"BUTTON_RELEASES": "Releases"
+		"BUTTON_RELEASES": "Releases",
+		"LEGEND_CLEANUP": "Old versions",
+		"HINT_CLEANUP": "Each update is installed next to the previous one, which is never removed. The running version cannot be selected. Directories from an earlier RainLoop or SnappyMail install are listed too.",
+		"LABEL_CLEANUP_PRODUCT": "Application",
+		"LABEL_CLEANUP_VERSION": "Version",
+		"LABEL_CLEANUP_SIZE": "Size",
+		"LABEL_CLEANUP_RUNNING": "(running)",
+		"BUTTON_CLEANUP": "Delete selected and free",
+		"CONFIRM_DELETE_VERSIONS": "Delete %COUNT% old version(s)? This cannot be undone.",
+		"ERROR_DELETE_VERSIONS": "Could not delete the selected versions.",
+		"LABEL_CLEANUP_SCANNING": "Measuring installed versions",
+		"LABEL_CLEANUP_DELETING": "Deleting %CURRENT% of %COUNT%",
+		"LABEL_CLEANUP_LOCKED": "(not writable by the web server)"
 	},
 	"POPUPS_DOMAIN_ALIAS": {
 		"TITLE_ADD_DOMAIN_ALIAS": "Add Alias",

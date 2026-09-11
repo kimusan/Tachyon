@@ -61,6 +61,56 @@
 				</div>
 			</div>
 
+			<h3 data-i18n="TAB_ABOUT/LEGEND_CLEANUP"></h3>
+			<span class="help-block" data-i18n="TAB_ABOUT/HINT_CLEANUP"></span>
+
+			<div data-bind="visible: versionsLoading">
+				<i class="icon-spinner"></i>
+				<span data-i18n="TAB_ABOUT/LABEL_CLEANUP_SCANNING"></span>…
+			</div>
+
+			<div data-bind="visible: deleteProgress">
+				<i class="icon-spinner"></i>
+				<span data-bind="text: deleteProgress"></span>…
+			</div>
+
+			<table class="table table-hover table-bordered" data-bind="visible: !versionsLoading() && !versionsBusy() && versions().length"><thead><tr>
+				<th style="width:2rem"></th>
+				<th data-i18n="TAB_ABOUT/LABEL_CLEANUP_PRODUCT"></th>
+				<th data-i18n="TAB_ABOUT/LABEL_CLEANUP_VERSION"></th>
+				<th data-i18n="TAB_ABOUT/LABEL_CLEANUP_SIZE"></th>
+			</tr></thead><tbody data-bind="foreach: versions">
+				<tr>
+					<td>
+						<span data-bind="visible: !current && removable, component: {
+							name: 'Checkbox',
+							params: { value: selected }
+						}"></span>
+					</td>
+					<td data-bind="text: product"></td>
+					<td>
+						<span data-bind="text: version"></span>
+						<span data-bind="visible: current" data-i18n="TAB_ABOUT/LABEL_CLEANUP_RUNNING"></span>
+						<span data-bind="visible: !current && !removable" data-i18n="TAB_ABOUT/LABEL_CLEANUP_LOCKED"></span>
+					</td>
+					<td data-bind="text: sizeText"></td>
+				</tr>
+			</tbody>
+			</table>
+
+			<div data-bind="visible: !versionsLoading() && !versionsBusy() && selectedVersions().length">
+				<a class="btn btn-danger" data-bind="click: deleteSelected, css: { 'disabled': versionsBusy }">
+					<i class="icon-trash"></i>
+					<span data-i18n="TAB_ABOUT/BUTTON_CLEANUP"></span>
+					<span data-bind="text: selectedSize"></span>
+				</a>
+			</div>
+
+			<div class="alert" data-bind="visible: versionsError">
+				<i class="icon-triangle-alert" style="color:red"></i>
+				<span style="white-space: pre-line" data-bind="text: versionsError"></span>
+			</div>
+
 			<h3>System</h3>
 			<table class="table table-hover table-bordered"><tbody>
 				<tr>

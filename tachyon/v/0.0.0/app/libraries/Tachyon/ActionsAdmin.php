@@ -585,6 +585,58 @@ class ActionsAdmin extends Actions
 		return $this->DefaultResponse(\Tachyon\Util\Upgrade::core());
 	}
 
+	public function DoAdminVersionsList() : array
+	{
+		return $this->DefaultResponse(array(
+			'Versions' => \Tachyon\Util\Versions::installed()
+		));
+	}
+
+	/**
+	 * Deletes dormant application directories left behind by past upgrades.
+	 *
+	 * Takes product and version tokens, never a path. Versions::remove()
+	 * rebuilds the path itself and checks it against a fresh scan, so a request
+	 * cannot name anything the filesystem does not already list.
+	 *
+	 * One entry failing does not abandon the rest: a tree with the wrong
+	 * ownership is common and should not block the ones that would delete
+	 * cleanly, so each result is reported separately.
+	 */
+	public function DoAdminVersionsDelete() : array
+	{
+		$aVersions = $this->GetActionParam('Versions', null);
+		if (!\is_array($aVersions)) {
+			throw new ClientException(Notifications::InvalidInputArgument);
+		}
+
+		$iDeleted = 0;
+		$aErrors = array();
+		foreach ($aVersions as $aItem) {
+			$sProduct = \is_array($aItem) ? (string) ($aItem['product'] ?? '') : '';
+			$sVersion = \is_array($aItem) ? (string) ($aItem['version'] ?? '') : '';
+			try {
+				\Tachyon\Util\Versions::remove($sProduct, $sVersion);
+				++$iDeleted;
+				$this->logWrite("Removed {$sProduct} {$sVersion}", \LOG_NOTICE, 'CLEANUP');
+			} catch (\Throwable $oException) {
+				$aErrors[] = "{$sProduct} {$sVersion}: " . $oException->getMessage();
+				$this->logWrite(
+					"Refused to remove {$sProduct} {$sVersion}: " . $oException->getMessage(),
+					\LOG_WARNING, 'CLEANUP'
+				);
+			}
+		}
+
+		// No version list here on purpose. Rebuilding it means measuring every
+		// remaining tree, which doubled the cost of a delete, and the client
+		// re-reads the list once when its queue drains.
+		return $this->DefaultResponse(array(
+			'Deleted' => $iDeleted,
+			'Errors' => $aErrors
+		));
+	}
+
 	public function DoAdminQRCode() : array
 	{
 		$user = (string) $this->GetActionParam('username', '');
