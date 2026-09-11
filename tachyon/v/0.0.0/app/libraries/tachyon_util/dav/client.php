@@ -150,6 +150,41 @@ class Client
 			'Content-Type: application/xml'
 		));
 
+		$result = static::parseMultiStatus($response->body);
+
+		if (0 === $depth) {
+			\reset($result);
+			return \current($result)[200] ?? array();
+		}
+
+		return \array_map(function($statusList){
+			return $statusList[200] ?? array();
+		}, $result);
+	}
+
+	/**
+	 * Sends a REPORT and returns the href => properties map of its multistatus.
+	 *
+	 * calendar-multiget and sync-collection both answer this way, so the body is
+	 * the caller's to build and the parsing is shared with propFind().
+	 */
+	public function report(string $url, string $body, int $depth = 1) : array
+	{
+		$response = $this->request('REPORT', $url, $body, array(
+			"Depth: {$depth}",
+			'Content-Type: application/xml; charset=utf-8'
+		));
+
+		return \array_map(function($statusList){
+			return $statusList[200] ?? array();
+		}, static::parseMultiStatus($response->body));
+	}
+
+	/**
+	 * Parses a WebDAV multistatus body into href => status => properties.
+	 */
+	protected static function parseMultiStatus(string $sBody) : array
+	{
 		/**
 		 * Parse the WebDAV multistatus response body
 		 */
@@ -163,11 +198,11 @@ class Client
 			 * This is used to map the DAV: namespace to urn:DAV. This is needed, because the DAV:
 			 * namespace is actually a violation of the XML namespaces specification, and will cause errors
 			 */
-			\preg_replace("/xmlns(:[A-Za-z0-9_]*)?=(\"|\')DAV:(\\2)/", "xmlns\\1=\\2urn:DAV\\2", $response->body),
+			\preg_replace("/xmlns(:[A-Za-z0-9_]*)?=(\"|\')DAV:(\\2)/", "xmlns\\1=\\2urn:DAV\\2", $sBody),
 			null, LIBXML_NOBLANKS | LIBXML_NOCDATA);
 
 		if (false === $responseXML) {
-			throw new \UnexpectedValueException("The passed data is not valid XML\n{$response->body}");
+			throw new \UnexpectedValueException("The passed data is not valid XML\n{$sBody}");
 		}
 
 		$ns = \array_search('urn:DAV', $responseXML->getNamespaces(true)) ?: 'd';
@@ -176,10 +211,10 @@ class Client
 		$result = array();
 
 		$responseXML->registerXPathNamespace($ns, 'urn:DAV');
-		foreach ($responseXML->xpath("{$ns}:response") as $response) {
+		foreach ($responseXML->xpath("{$ns}:response") as $oResponse) {
 			$properties = array();
-			$response->registerXPathNamespace($ns, 'urn:DAV');
-			foreach ($response->xpath("{$ns}:propstat") as $propStat) {
+			$oResponse->registerXPathNamespace($ns, 'urn:DAV');
+			foreach ($oResponse->xpath("{$ns}:propstat") as $propStat) {
 				// Parse all WebDAV properties
 				$propList = array();
 				$propStat->registerXPathNamespace($ns, 'urn:DAV');
@@ -217,17 +252,10 @@ class Client
 				$properties[$statusCode] = $propList;
 			}
 
-			$result[(string) $response->children('urn:DAV')->href] = $properties;
+			$result[(string) $oResponse->children('urn:DAV')->href] = $properties;
 		}
 
-		if (0 === $depth) {
-			\reset($result);
-			return \current($result)[200] ?? array();
-		}
-
-		return \array_map(function($statusList){
-			return $statusList[200] ?? array();
-		}, $result);
+		return $result;
 	}
 
 	/**

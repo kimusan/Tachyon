@@ -550,9 +550,10 @@ class PdoCalendar
 	}
 
 	/**
-	 * Downloads a batch, then writes the batch in one transaction.
+	 * Downloads a batch in one calendar-multiget, then writes it in one
+	 * transaction.
 	 *
-	 * The GETs deliberately sit outside the transaction. Holding a write
+	 * The fetch deliberately sits outside the transaction. Holding a write
 	 * transaction across network round trips would keep the SQLite lock for the
 	 * whole sync, which is the opposite of what this is for. Every insert used
 	 * to autocommit, and the resulting fsync per event is where two to four
@@ -560,12 +561,20 @@ class PdoCalendar
 	 */
 	private function fetchAndStore(\Tachyon\Util\DAV\Client $oClient, Calendar $oCalendar, array $aChunk) : void
 	{
+		$aBodies = $this->davMultiGet($oClient, $oCalendar->DavPath, \array_column($aChunk, 'ics'));
+
 		$aFetched = array();
 		foreach ($aChunk as $sKey => $aData) {
-			$oResponse = $this->davClientRequest($oClient, 'GET', $oCalendar->DavPath . $aData['ics']);
-			if ($oResponse && 200 === $oResponse->status) {
-				$aFetched[$sKey] = array($aData, $oResponse->body);
+			$sIcal = $aBodies[$aData['ics']] ?? null;
+			if (null === $sIcal) {
+				// Not in the multiget answer, or the server does not support it
+				$oResponse = $this->davClientRequest($oClient, 'GET', $oCalendar->DavPath . $aData['ics']);
+				if (!$oResponse || 200 !== $oResponse->status) {
+					continue;
+				}
+				$sIcal = $oResponse->body;
 			}
+			$aFetched[$sKey] = array($aData, $sIcal);
 		}
 
 		if (!$aFetched) {

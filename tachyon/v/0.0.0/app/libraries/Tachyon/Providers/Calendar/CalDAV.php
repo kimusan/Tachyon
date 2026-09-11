@@ -38,6 +38,56 @@ trait CalDAV
 	}
 
 	/**
+	 * Fetches a batch of events in one calendar-multiget REPORT.
+	 *
+	 * Returns filename => iCalendar for everything the server answered with. An
+	 * href it declines to return data for is simply absent, and the caller falls
+	 * back to a plain GET for those, so a server without multiget still syncs,
+	 * just as slowly as before.
+	 *
+	 * This is what takes an initial sync from one request per event to one per
+	 * hundred. A calendar of 5,600 events was 5,600 GETs, which no gateway
+	 * timeout survives.
+	 */
+	protected function davMultiGet(DAVClient $oClient, string $sPath, array $aFileNames) : array
+	{
+		if (!$aFileNames) {
+			return array();
+		}
+
+		$sBody = '<?xml version="1.0" encoding="utf-8"?>'
+			. '<c:calendar-multiget xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">'
+			. '<d:prop><d:getetag/><c:calendar-data/></d:prop>';
+		foreach ($aFileNames as $sFileName) {
+			// Same concatenation the GET path uses, so an href that works there works here
+			$sBody .= '<d:href>' . \htmlspecialchars($sPath . $sFileName, ENT_XML1) . '</d:href>';
+		}
+		$sBody .= '</c:calendar-multiget>';
+
+		$aResult = array();
+		try {
+			foreach ($oClient->report($sPath, $sBody) as $sHref => $aProps) {
+				$sData = $aProps['{urn:ietf:params:xml:ns:caldav}calendar-data'] ?? '';
+				if (!\is_string($sData) || !\strlen($sData)) {
+					continue;
+				}
+				$aMatch = array();
+				if (\preg_match('/\/([^\/?]+)$/', \rtrim(\trim($sHref), '/'), $aMatch) && !empty($aMatch[1])) {
+					$aResult[\urldecode(\urldecode($aMatch[1]))] = $sData;
+				}
+			}
+		} catch (\Throwable $oException) {
+			// A server that will not do multiget is not a failure, only slower
+			$this->logWrite(
+				'calendar-multiget failed, falling back to GET: ' . $oException->getMessage(),
+				\LOG_NOTICE, 'Calendar'
+			);
+		}
+
+		return $aResult;
+	}
+
+	/**
 	 * Lists the .ics resources of one calendar collection with their etags, which
 	 * is what makes a full calendar-query REPORT unnecessary: an etag per resource
 	 * is enough to know what changed.
