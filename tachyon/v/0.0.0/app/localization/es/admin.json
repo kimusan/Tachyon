@@ -156,7 +156,7 @@
     "POPUPS_DOMAIN": {
         "TITLE_ADD_DOMAIN": "Agregar dominio",
         "TITLE_ADD_DOMAIN_WITH_NAME": "Agregar \"%NAME%\" como dominio",
-        "TITLE_EDIT_DOMAIN": "Editar \"&amp;NAME&amp;\"",
+        "TITLE_EDIT_DOMAIN": "Editar \"%NAME%\"",
         "LABEL_NAME": "Nombre",
         "NAME_HELPER": "wildcards soportados",
         "LABEL_SERVER": "Servidor",

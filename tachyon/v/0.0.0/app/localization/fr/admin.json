@@ -23,7 +23,7 @@
     "SETTINGS_LABELS": {
         "GENERAL": "Général",
         "LOGIN": "Identifiant",
-        "BRANDING": "Logo &amp; Marque",
+        "BRANDING": "Logo & Marque",
         "CONTACTS": "Contacts",
         "DOMAINS": "Domaines",
         "SECURITY": "Sécurité",
@@ -77,7 +77,7 @@
         "HINT_LOGO_LIGHT": "Image sombre, affichée sur les thèmes clairs.",
         "HINT_LOGO_DARK": "Image claire, affichée sur les thèmes sombres. Reprend celui du dessus si vide.",
         "ERROR_LOGO_UPLOAD": "Échec de l'envoi. Seuls PNG, JPG, GIF, SVG et WebP sont acceptés.",
-        "LEGEND_BRANDING": "Favicône &amp; Titre",
+        "LEGEND_BRANDING": "Favicône & Titre",
         "LABEL_PAGE_TITLE": "Titre de la page",
         "LABEL_LOADING_DESCRIPTION": "Description pendant le chargement",
         "LABEL_FAVICON_URL": "Favicône",
