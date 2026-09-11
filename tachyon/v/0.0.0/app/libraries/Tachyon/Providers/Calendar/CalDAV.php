@@ -69,22 +69,31 @@ trait CalDAV
 					 && !static::hasDAVCollection($aItem))
 					{
 						$sIcsFileName = \urldecode(\urldecode($aMatch[1]));
-						$sKeyID = \preg_replace('/\.ics$/i', '', $sIcsFileName);
 
-						$mResult[$sKeyID] = array(
+						/**
+						 * Keyed on the filename, not on the filename with .ics
+						 * stripped. A server does not name a resource after the
+						 * UID it holds: Nextcloud mints one UUID for the file and
+						 * another for the VEVENT. Keying on the stem meant the
+						 * local side, which is keyed on the UID, matched almost
+						 * nothing, so every event looked deleted and new at once
+						 * and was purged and refetched on every run.
+						 */
+						$mResult[$sIcsFileName] = array(
 							'deleted' => false,
-							'uid' => $sKeyID,
+							// Only a fallback, for a VEVENT that carries no UID
+							'uid' => \preg_replace('/\.ics$/i', '', $sIcsFileName),
 							'ics' => $sIcsFileName,
 							'etag' => \trim(\trim($aItem['{DAV:}getetag']), '"\''),
 							'changed' => 0
 						);
 
 						if (isset($aItem['{DAV:}getlastmodified'])) {
-							$mResult[$sKeyID]['changed'] = \MailSo\Base\DateTimeHelper::ParseRFC2822DateString(
+							$mResult[$sIcsFileName]['changed'] = \MailSo\Base\DateTimeHelper::ParseRFC2822DateString(
 								$aItem['{DAV:}getlastmodified']);
 						} else {
-							$mResult[$sKeyID]['changed'] = \MailSo\Base\DateTimeHelper::TryToParseSpecEtagFormat(
-								$mResult[$sKeyID]['etag']);
+							$mResult[$sIcsFileName]['changed'] = \MailSo\Base\DateTimeHelper::TryToParseSpecEtagFormat(
+								$mResult[$sIcsFileName]['etag']);
 						}
 					}
 				}

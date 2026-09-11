@@ -14,10 +14,15 @@ class PdoCalendar
 {
 	use CalDAV;
 
+	/** Events fetched and written per transaction */
+	private const SYNC_CHUNK = 100;
+
 	/** Events and calendars the last Sync() could not store */
 	private int $iSyncSkipped = 0;
 
 	private int $iUserID = 0;
+
+	private string $sEmail = '';
 
 	private \Tachyon\Pdo\Settings $settings;
 
@@ -72,6 +77,7 @@ class PdoCalendar
 
 	public function SetEmail(string $sEmail) : bool
 	{
+		$this->sEmail = $sEmail;
 		$this->iUserID = $this->getUserId($sEmail);
 		return 0 < $this->iUserID;
 	}
@@ -384,6 +390,28 @@ class PdoCalendar
 			return true;
 		}
 
+		/**
+		 * One sync per account at a time. A large calendar outlives the gateway
+		 * timeout, so the browser reports failure while the server is still
+		 * working, and the natural response is to trigger it again. That put two
+		 * writers on one SQLite file, which is where "database is locked" came
+		 * from. The second run now returns instead of competing.
+		 */
+		$mLock = $this->acquireSyncLock();
+		if (false === $mLock) {
+			$this->logWrite('Sync already running for this account, skipped', \LOG_NOTICE, 'Calendar');
+			return true;
+		}
+
+		try {
+			return $this->syncDav();
+		} finally {
+			$this->releaseSyncLock($mLock);
+		}
+	}
+
+	private function syncDav() : bool
+	{
 		$oClient = $this->getDavClient();
 		if (!$oClient) {
 			return false;
@@ -442,61 +470,65 @@ class PdoCalendar
 
 		// Local deletions go out first, so a later download cannot resurrect them
 		if ($bReadWrite) {
-			foreach ($aLocal as $sUid => $aData) {
+			foreach ($aLocal as $sKey => $aData) {
 				if ($aData['deleted']) {
-					if (isset($aRemote[$sUid])) {
-						$this->davClientRequest($oClient, 'DELETE', $oCalendar->DavPath . $aRemote[$sUid]['ics']);
+					if (isset($aRemote[$sKey])) {
+						$this->davClientRequest($oClient, 'DELETE', $oCalendar->DavPath . $aRemote[$sKey]['ics']);
 					}
-					unset($aLocal[$sUid], $aRemote[$sUid]);
+					unset($aLocal[$sKey], $aRemote[$sKey]);
 				}
 			}
 		}
 
-		// Gone from the server, and we had synced it before, so drop it here too
-		foreach ($aLocal as $sUid => $aData) {
-			if (!$aData['deleted'] && \strlen($aData['etag']) && !isset($aRemote[$sUid])) {
-				$this->purgeEvent((int) $aData['id_event']);
-				unset($aLocal[$sUid]);
+		/**
+		 * Gone from the server, and we had synced it before, so drop it here too.
+		 *
+		 * Skipped when the listing is empty and we still hold synced rows. A
+		 * genuinely empty collection and a listing we failed to read look alike
+		 * from here, and only one of them is worth emptying someone's calendar
+		 * for. Keeping stale rows costs another run. Guessing wrong costs data.
+		 */
+		if ($aRemote || !$this->hasSyncedRows($aLocal)) {
+			foreach ($aLocal as $sKey => $aData) {
+				if (!$aData['deleted'] && \strlen($aData['etag']) && !isset($aRemote[$sKey])) {
+					$this->purgeEvent((int) $aData['id_event']);
+					unset($aLocal[$sKey]);
+				}
 			}
+		} else {
+			$this->logWrite(
+				"Empty listing for {$oCalendar->DavPath} with " . \count($aLocal)
+				. ' local events, deletions skipped',
+				\LOG_WARNING, 'Calendar'
+			);
 		}
 
 		// Never seen here, or changed on the server since we last looked
-		foreach ($aRemote as $sUid => $aData) {
-			$bKnown = isset($aLocal[$sUid]);
-			if ($bKnown && $aLocal[$sUid]['etag'] === $aData['etag']) {
+		$aFetch = array();
+		foreach ($aRemote as $sKey => $aData) {
+			$bKnown = isset($aLocal[$sKey]);
+			if ($bKnown && $aLocal[$sKey]['etag'] === $aData['etag']) {
 				continue;
 			}
-			if ($bKnown && $bReadWrite && !\strlen($aLocal[$sUid]['etag'])) {
+			if ($bKnown && $bReadWrite && !\strlen($aLocal[$sKey]['etag'])) {
 				// Local copy has never been uploaded, so it wins
 				continue;
 			}
-			$oResponse = $this->davClientRequest($oClient, 'GET', $oCalendar->DavPath . $aData['ics']);
-			if (!$oResponse || 200 !== $oResponse->status) {
-				continue;
-			}
-			try {
-				$this->storeIcal($oCalendar, $sUid, $oResponse->body, $aData['ics'], $aData['etag']);
-			} catch (\Throwable $oException) {
-				// One event that will not store must not abandon the calendar.
-				// It used to: the exception reached the per calendar catch, so a
-				// single oversized LOCATION or a date past 2038 meant that
-				// calendar never finished syncing, on this pass or any later one.
-				++$this->iSyncSkipped;
-				$this->logWrite(
-					"Skipped event {$sUid} in {$oCalendar->DavPath}: " . $oException->getMessage(),
-					\LOG_WARNING, 'Calendar'
-				);
-			}
+			$aFetch[$sKey] = $aData;
+		}
+
+		foreach (\array_chunk($aFetch, static::SYNC_CHUNK, true) as $aChunk) {
+			$this->fetchAndStore($oClient, $oCalendar, $aChunk);
 		}
 
 		// Created here and not yet on the server
 		if ($bReadWrite) {
-			foreach ($aLocal as $sUid => $aData) {
-				if (!$aData['deleted'] && !\strlen($aData['etag']) && !isset($aRemote[$sUid])) {
-					$oEvent = $this->GetEventByUid($oCalendar->Uuid, $sUid);
+			foreach ($aLocal as $sKey => $aData) {
+				if (!$aData['deleted'] && !\strlen($aData['etag']) && !isset($aRemote[$sKey])) {
+					$oEvent = $this->GetEventByUid($oCalendar->Uuid, $aData['uid']);
 					if ($oEvent) {
-						$sDavPath = $sUid . '.ics';
-						$sEtag = $this->davPutEvent($oCalendar, $sDavPath, $oEvent->Ical());
+						// $sKey is already uid.ics for a row that has no dav_path
+						$sEtag = $this->davPutEvent($oCalendar, $sKey, $oEvent->Ical());
 						if (null !== $sEtag) {
 							$this->prepareAndExecute(
 								'UPDATE tachyon_cal_events SET etag = :etag, dav_path = :dav_path'
@@ -505,7 +537,7 @@ class PdoCalendar
 									':id_user' => array($this->iUserID, \PDO::PARAM_INT),
 									':id_event' => array((int) $aData['id_event'], \PDO::PARAM_INT),
 									':etag' => array($sEtag, \PDO::PARAM_STR),
-									':dav_path' => array($sDavPath, \PDO::PARAM_STR)
+									':dav_path' => array($sKey, \PDO::PARAM_STR)
 								)
 							);
 						}
@@ -515,6 +547,53 @@ class PdoCalendar
 		}
 
 		$this->flushDeletedEvents((int) $oCalendar->id);
+	}
+
+	/**
+	 * Downloads a batch, then writes the batch in one transaction.
+	 *
+	 * The GETs deliberately sit outside the transaction. Holding a write
+	 * transaction across network round trips would keep the SQLite lock for the
+	 * whole sync, which is the opposite of what this is for. Every insert used
+	 * to autocommit, and the resulting fsync per event is where two to four
+	 * events per second came from.
+	 */
+	private function fetchAndStore(\Tachyon\Util\DAV\Client $oClient, Calendar $oCalendar, array $aChunk) : void
+	{
+		$aFetched = array();
+		foreach ($aChunk as $sKey => $aData) {
+			$oResponse = $this->davClientRequest($oClient, 'GET', $oCalendar->DavPath . $aData['ics']);
+			if ($oResponse && 200 === $oResponse->status) {
+				$aFetched[$sKey] = array($aData, $oResponse->body);
+			}
+		}
+
+		if (!$aFetched) {
+			return;
+		}
+
+		$this->beginTransaction();
+		try {
+			foreach ($aFetched as $sKey => $aPair) {
+				try {
+					$this->storeIcal($oCalendar, $aPair[0]['uid'], $aPair[1], $aPair[0]['ics'], $aPair[0]['etag']);
+				} catch (\Throwable $oException) {
+					// One event that will not store must not abandon the calendar.
+					// It used to: the exception reached the per calendar catch, so a
+					// single oversized LOCATION or a date past 2038 meant that
+					// calendar never finished syncing, on this pass or any later one.
+					++$this->iSyncSkipped;
+					$this->logWrite(
+						"Skipped event {$sKey} in {$oCalendar->DavPath}: " . $oException->getMessage(),
+						\LOG_WARNING, 'Calendar'
+					);
+				}
+			}
+			$this->commit();
+		} catch (\Throwable $oException) {
+			$this->rollBack();
+			throw $oException;
+		}
 	}
 
 	private function davPutEvent(Calendar $oCalendar, string $sDavPath, string $sIcal) : ?string
@@ -532,11 +611,20 @@ class PdoCalendar
 		return \trim(\trim((string) $oResponse->getHeader('etag')), '"\'');
 	}
 
+	/**
+	 * Keyed on dav_path so it lines up with prepareDavSyncData(), which keys on
+	 * the same filename. It used to key on uid, and the two are different values
+	 * on every server that names resources itself, so nothing matched.
+	 *
+	 * A row created here and never uploaded has no dav_path yet. The upload
+	 * branch names it uid.ics, so that is the key it will carry afterwards and
+	 * the key it gets here in the meantime.
+	 */
 	private function localSyncData(int $iCalendarId) : array
 	{
 		$aResult = array();
 		$oStmt = $this->prepareAndExecute(
-			'SELECT id_event, uid, etag, changed, deleted FROM tachyon_cal_events'
+			'SELECT id_event, uid, dav_path, etag, changed, deleted FROM tachyon_cal_events'
 			. ' WHERE id_user = :id_user AND id_calendar = :id_calendar',
 			array(
 				':id_user' => array($this->iUserID, \PDO::PARAM_INT),
@@ -545,8 +633,11 @@ class PdoCalendar
 		);
 		if ($oStmt) {
 			foreach ($oStmt->fetchAll(\PDO::FETCH_ASSOC) as $aRow) {
-				$aResult[(string) $aRow['uid']] = array(
+				$sDavPath = (string) ($aRow['dav_path'] ?? '');
+				$sKey = \strlen($sDavPath) ? $sDavPath : $aRow['uid'] . '.ics';
+				$aResult[$sKey] = array(
 					'id_event' => (int) $aRow['id_event'],
+					'uid' => (string) $aRow['uid'],
 					'etag' => (string) $aRow['etag'],
 					'changed' => (int) $aRow['changed'],
 					'deleted' => !empty($aRow['deleted'])
@@ -554,6 +645,56 @@ class PdoCalendar
 			}
 		}
 		return $aResult;
+	}
+
+	/**
+	 * Takes the per account sync lock.
+	 *
+	 * Returns the handle when it is ours, false when another run holds it, and
+	 * null when locking is unavailable at all. Those last two are deliberately
+	 * different: a lock file we cannot create must not mean sync never runs
+	 * again, so that case proceeds unguarded exactly as before.
+	 *
+	 * @return resource|false|null
+	 */
+	private function acquireSyncLock()
+	{
+		if (!\strlen($this->sEmail)) {
+			return null;
+		}
+
+		$rHandle = @\fopen(APP_PRIVATE_DATA . 'calendar-sync-' . \sha1($this->sEmail) . '.lock', 'c');
+		if (!$rHandle) {
+			$this->logWrite('Could not open the sync lock, running unguarded', \LOG_WARNING, 'Calendar');
+			return null;
+		}
+
+		if (!\flock($rHandle, \LOCK_EX | \LOCK_NB)) {
+			\fclose($rHandle);
+			return false;
+		}
+
+		return $rHandle;
+	}
+
+	/** @param resource|null $mLock */
+	private function releaseSyncLock($mLock) : void
+	{
+		if ($mLock) {
+			\flock($mLock, \LOCK_UN);
+			\fclose($mLock);
+		}
+	}
+
+	/** Whether anything here has been synced before, i.e. is worth deleting over */
+	private function hasSyncedRows(array $aLocal) : bool
+	{
+		foreach ($aLocal as $aData) {
+			if (!$aData['deleted'] && \strlen($aData['etag'])) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/* -------------------------------------------------------------- storage */
