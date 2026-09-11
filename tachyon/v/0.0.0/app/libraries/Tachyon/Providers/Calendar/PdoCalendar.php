@@ -14,8 +14,17 @@ class PdoCalendar
 {
 	use CalDAV;
 
-	/** Events fetched and written per transaction */
-	private const SYNC_CHUNK = 100;
+	/**
+	 * Events fetched and written per transaction.
+	 *
+	 * Nothing is committed until a whole chunk is fetched, so this also decides
+	 * how much work a gateway timeout throws away. At 100, an account still
+	 * falling back to one GET per event committed nothing for well over a minute
+	 * and a 504 left no progress at all, which is worse than the autocommit it
+	 * replaced. Small enough to land often, still far fewer fsyncs than one per
+	 * event, and with calendar-multiget it is one request either way.
+	 */
+	private const SYNC_CHUNK = 25;
 
 	/** Events and calendars the last Sync() could not store */
 	private int $iSyncSkipped = 0;
