@@ -28,6 +28,19 @@ jobs:
           | xargs -0 -P4 php -l \
           | grep -v "^No syntax errors" && exit 1 || true
 
+  i18n:
+    name: Localization sanity
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    # Weblate's safe-html autofix escapes & to &amp; inside values. Translator.js
+    # only uses innerHTML for keys prefixed [html]; everything else is set as
+    # textContent, where an escaped entity is displayed rather than decoded. That
+    # shipped to eight languages once already.
+    - name: No HTML entities in translated strings
+      run: python3 .github/scripts/check-i18n-entities.py
+
   js-lint:
     name: JS/CSS lint
     runs-on: ubuntu-latest

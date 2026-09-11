@@ -139,15 +139,27 @@ jobs:
           I18N_REPORT="build/dist/releases/webmail/${{ steps.version.outputs.version }}/tachyon-${{ steps.version.outputs.version }}-translation-status.txt" \
             npx gulp i18n
 
+      # Rebuilt from origin/master rather than committed here and rebased on top
+      # of it. The old shape could not survive a re-run: the first attempt pushes
+      # this commit to master, so a second attempt rebases an identical change
+      # onto itself and stops on a conflict. That matters, because the step after
+      # this one can fail on a transient API error and a re-run is the remedy.
       - name: Commit updated packages.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages.json
-          git diff --cached --quiet || git commit -m "chore: update packages.json for $GITHUB_REF_NAME [skip ci]"
+          cp packages.json "$RUNNER_TEMP/packages.json"
           git checkout -- .
-          git pull --rebase origin master
-          git push origin HEAD:master
+          git fetch origin master
+          git checkout -B release-packages origin/master
+          cp "$RUNNER_TEMP/packages.json" packages.json
+          git add packages.json
+          if git diff --cached --quiet; then
+            echo "packages.json on master is already current"
+          else
+            git commit -m "chore: update packages.json for $GITHUB_REF_NAME [skip ci]"
+            git push origin HEAD:master
+          fi
 
       - name: Upload release artifacts
         uses: softprops/action-gh-release@v2
