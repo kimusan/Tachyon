@@ -43,14 +43,15 @@ credential, which is how to check what an account actually has.
 
 ## Behaviour worth knowing
 
-- It writes on **every** login, which is what re-seals the password after a
-  password change. A user who disables sync in Settings has it re-enabled at
-  their next login; remove them from `allow_list` to opt them out.
+- It rewrites the credentials on **every** login, which is what re-seals the
+  password after a password change. It does not rewrite `Mode`: turning sync off
+  in Settings writes `Mode` 0 to the same file and that choice is kept. Remove
+  the account from `allow_list` to stop configuring it at all.
 - It never throws into the login path. A failure is logged and the login
   proceeds.
-- `Mode` is always `1` (read + write). On a first sync that uploads every local
-  contact and deletes none, because deletion is guarded on an etag that only
-  exists after a successful upload.
+- `Mode` is `1` (read + write) for an account that has no config yet. On a first
+  sync that uploads every local contact and deletes none, because deletion is
+  guarded on an etag that only exists after a successful upload.
 - Sync itself runs on a browser timer, not a daemon. Nothing synchronises for a
   user who does not open webmail.
 

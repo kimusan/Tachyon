@@ -11,8 +11,8 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME = 'DAV autoconfiguration',
 		AUTHOR = 'Clinically',
 		URL = 'https://github.com/kimusan/Tachyon',
-		VERSION = '1.0',
-		RELEASE = '2026-09-10',
+		VERSION = '1.1',
+		RELEASE = '2026-09-11',
 		REQUIRED = '4.2.2',
 		CATEGORY = 'Contacts',
 		LICENSE = 'MIT',
@@ -30,14 +30,15 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 	 * password is sealed with the account's CryptKey, which is unsealed by the
 	 * login password and so exists only inside an authenticated session.
 	 *
-	 * Unconditional by design. A stored password is discarded on read if its
-	 * HMAC no longer matches, so rewriting each login is what keeps sync alive
-	 * across a password change. The configs hold no sync state -- etags live in
-	 * the contacts database -- so a rewrite costs nothing.
+	 * The credentials are rewritten every login, because a stored password is
+	 * discarded on read once its HMAC stops matching, and rewriting is what
+	 * keeps sync alive across a password change.
 	 *
-	 * The consequence, which is intended: a user who turns sync off in Settings
-	 * has it turned back on at their next login. Removing them from the allow
-	 * list is the way to opt an account out.
+	 * Mode is the exception. Turning sync off in Settings writes Mode 0 to this
+	 * same file, so overwriting it unconditionally took that choice away again
+	 * at the next login, with no way for the user to make it stick. An existing
+	 * Mode is now kept and only a config that is not there yet gets Mode 1.
+	 * Remove the account from the allow list to stop configuring it at all.
 	 */
 	public function LoginSuccess(\Tachyon\Model\MainAccount $oAccount) : void
 	{
@@ -79,6 +80,12 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$aData = Rules::payload($oAccount->Email(), $sPassword,
 			Rules::collectionUrl($sUrl, $oAccount->Email()));
 
+		// Whatever the user last chose wins over the seed default
+		$mMode = $this->storedMode($oAccount, $sConfigKey);
+		if (null !== $mMode) {
+			$aData['Mode'] = $mMode;
+		}
+
 		$sCryptKey = $oAccount->CryptKey();
 		$aData['Password'] = \Tachyon\Util\Crypt::EncryptToJSON($aData['Password'], $sCryptKey);
 		$aData['PasswordHMAC'] = \hash_hmac('sha1', $aData['Password'], $sCryptKey);
@@ -92,6 +99,29 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 			// parameter.
 			\json_encode($aData, JSON_THROW_ON_ERROR)
 		);
+	}
+
+	/**
+	 * The Mode already stored for this account, or null when nothing is stored.
+	 *
+	 * Only Mode is read back. The password cannot be checked from here without
+	 * the session's CryptKey, and there is no need to: it is being rewritten.
+	 */
+	private function storedMode(\Tachyon\Model\MainAccount $oAccount, string $sConfigKey) : ?int
+	{
+		$sData = $this->Manager()->Actions()->StorageProvider()->Get(
+			$oAccount,
+			StorageType::CONFIG,
+			$sConfigKey
+		);
+
+		if (empty($sData)) {
+			return null;
+		}
+
+		$aData = \json_decode($sData, true);
+
+		return (\is_array($aData) && isset($aData['Mode'])) ? (int) $aData['Mode'] : null;
 	}
 
 	protected function configMapping() : array
