@@ -11,6 +11,9 @@ import { AskPopupView } from 'View/Popup/Ask';
 export class AdminSettingsAbout /*extends AbstractViewSettings*/ {
 	constructor() {
 		this.version = Settings.app('version');
+		// Read at render rather than written into the template, which is how it
+		// came to still say 2025 in 2026
+		this.year = new Date().getFullYear();
 		this.phpextensions = ko.observableArray();
 		// Why the update cannot run. It was already being sent and never shown,
 		// which left an admin with a missing button and no way to find out why.
