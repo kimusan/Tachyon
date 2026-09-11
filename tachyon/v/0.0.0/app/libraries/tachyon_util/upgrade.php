@@ -205,6 +205,18 @@ abstract class Upgrade
 					$oArchive = new \Tachyon\Util\TAR($sTmp);
 				}
 
+				/**
+				 * Check before extracting rather than after failing. An archive
+				 * without this entry is not a core package, and extractTo()
+				 * answers that with a PharException naming a missing directory,
+				 * which says nothing about the real problem. That is what the
+				 * cPanel bundle produced while the asset was picked by suffix
+				 * instead of by name (#68).
+				 */
+				if (!isset($oArchive['tachyon'])) {
+					throw new \Exception('Downloaded archive is not a Tachyon core package');
+				}
+
 				$target = \rtrim(APP_INDEX_ROOT_PATH, '\\/');
 				\umask(0022);
 				\error_log('Extract to ' . $target);
