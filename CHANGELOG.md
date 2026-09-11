@@ -1,3 +1,24 @@
+## 4.2.3 - 2026-09-11
+
+### Added
+- The admin About tab lists application directories left behind by past upgrades and deletes the ones you choose. Every release is installed beside the previous one and nothing ever removed the old copy, so an install upgraded ten times was carrying ten of them, plus anything inherited from a RainLoop or SnappyMail past. The running version cannot be selected, and a directory the web server cannot delete is shown as such rather than failing halfway through
+- Calendar events are fetched with `calendar-multiget`, so a first sync of 5,605 events takes about 56 requests instead of 5,605
+
+### Fixed
+- Calendar sync never converged. The local side was keyed on the event UID and the remote side on the `.ics` filename, and no server names a file after the UID it contains, so almost nothing matched. Every run deleted each event as gone from the server, downloaded it again as new, and repeated. One reported install had 8,189 of 8,220 rows affected, including a Nextcloud-generated birthday calendar and a subscription, so this was never limited to imported data (#66)
+- Calendar sync no longer deletes local events when the server returns an empty listing it cannot corroborate
+- Calendar events are written in batches inside a transaction rather than one autocommit each, and a sync takes a per-account lock so a retry cannot compete with a run already in progress (#66)
+- The Docker image sets `fastcgi_read_timeout`, since nginx's 60s default ended a first sync mid-flight (#66)
+- A still-enabled SnappyMail made Nextcloud login fail outright, with no way to reach the UI to disable either app. The failure also wrote the user's password to `nextcloud.log` in plaintext, because it sat in a stack frame that was serialised into the trace. Anyone who hit this should treat those logs as exposed (#67)
+- Contact edits now reach the CardDAV server instead of being overwritten by the next pull
+- DAV follows 302, 307 and 308 redirects, not only 301
+- The additional configuration file is loaded again
+- The stderr log driver reaches a log under php-fpm
+- The updater says an archive is not a core package rather than reporting a missing directory from inside Phar (#68)
+- The About page copyright year follows the calendar
+
+---
+
 ## 4.2.2 - 2026-09-08
 
 ### Fixed
