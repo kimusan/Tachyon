@@ -6,7 +6,7 @@
 		"TEST": "Тест",
 		"UPDATE": "Обновить",
 		"USERNAME": "Имя пользователя",
-		"PASSWORD": "Пароль",
+		"PASSWORD": "Кодовая фраза",
 		"CANCEL": "Отменить",
 		"SEARCH": "Поиск",
 		"YES": "Да",
@@ -14,7 +14,7 @@
 	},
 	"LOGIN": {
 		"LABEL_LOGIN": "Логин",
-		"LABEL_TOTP": "TOTP code",
+		"LABEL_TOTP": "Временный одноразовый пароль",
 		"BUTTON_LOGIN": "Войти в админ панель"
 	},
 	"TOP_PANEL": {
@@ -30,7 +30,8 @@
 		"PACKAGES": "Плагины",
 		"CONFIG": "Файл конфигурации",
 		"ABOUT": "О Программе",
-		"LOGGING": "Ведение Журнала"
+		"LOGGING": "Ведение Журнала",
+		"CALENDAR": "Календарь"
 	},
 	"TAB_GENERAL": {
 		"LEGEND_INTERFACE": "Интерфейс",
@@ -47,7 +48,7 @@
 		"LABEL_ALLOW_IDENTITIES": "Разрешить множественные профили",
 		"ALERT_DATA_ACCESS": "Папка данных Tachyon доступна. Пожалуйста, настройте свой веб-сервер так, чтобы скрыть папку данных с внешнего доступа. Подробнее здесь:",
 		"ALERT_WARNING": "Внимание!",
-		"HTML_ALERT_WEAK_PASSWORD": "Вы используете пароль администратора по умолчанию.\n<br>\nПо соображениям безопасности, пожалуйста,\n<strong><a href=\"#/security\">измените пароль</a></strong> прямо сейчас.\n"
+		"HTML_ALERT_WEAK_PASSWORD": "Вы используете пароль администратора по умолчанию.\n<br>\nВ целях безопасности, пожалуйста,\n<strong><a href=\"#/security\">измените</a></strong> \nпароль на другой прямо сейчас.\n"
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Страница Входа",
@@ -65,7 +66,26 @@
 		"BUTTON_UPLOAD_LOGO": "Загрузить логотип",
 		"LABEL_LOGIN_LOGO": "Логотип",
 		"LABEL_NO_LOGO": "Логотип не установлен",
-		"LEGEND_LOGO": "Логотип входа"
+		"LEGEND_LOGO": "Логотип входа",
+		"LABEL_LOGIN_FOOTER": "Нижний колонтитул страницы входа",
+		"LABEL_FAVICON": "Значок сайта",
+		"FAVICON_MODE_CUSTOM": "Загрузить файл",
+		"LABEL_FAVICON_FILE": "Файл значка сайта",
+		"FAVICON_MODE_DEFAULT": "Значок Tachyon",
+		"FAVICON_MODE_URL": "Внешний URL",
+		"HINT_FAVICON_FILE": "Рекомендуется использовать формат SVG: это единственный формат, который масштабируется до любого размера, запрашиваемого браузером, и единственный, который может следовать цветовой схеме. Форматы PNG, ICO, GIF и WebP принимаются, но разрешение картинки не будет автоматически изменяться под нужные параметры.",
+		"LABEL_LOGO_MODE": "Логотип страницы входа",
+		"HINT_LOGO_MODE": "Логотип Tachyon заимствует свой цвет из темы оформления, поэтому он остается читаемым как на светлом, так и на темном фоне. Выберите «Пользовательский», чтобы использовать собственное изображение, или «Без логотипа», чтобы отображался только текст загрузки.",
+		"HINT_LOGIN_FOOTER": "Отображается под формой входа, для ввода контактных данных или обращения в службу поддержки. Обычный текст: любой https(s)-адрес в нем становится ссылкой, и ничто не рассматривается как HTML.",
+		"HINT_FAVICON": "Значок Tachyon соответствует цветовой схеме браузера. Загрузите свой собственный или укажите на значок, размещенный на другом ресурсе.",
+		"LOGO_MODE_DEFAULT": "Логотип Tachyon",
+		"LOGO_MODE_CUSTOM": "Пользовательская загрузка",
+		"LOGO_MODE_NONE": "Без логотипа",
+		"LABEL_LOGO_LIGHT": "Логотип для светлого фона",
+		"LABEL_LOGO_DARK": "Логотип для темного фона",
+		"HINT_LOGO_LIGHT": "Тёмная графика, отображаемая в светлых темах.",
+		"HINT_LOGO_DARK": "Светлая графика, отображаемая в тёмных темах. Если она не задана, используется вариант выше.",
+		"ERROR_LOGO_UPLOAD": "Загрузка не удалась. Принимаются только файлы форматов PNG, JPG, GIF, SVG и WebP."
 	},
 	"TAB_CONTACTS": {
 		"LEGEND_CONTACTS": "Контакты",
@@ -75,12 +95,14 @@
 		"LABEL_STORAGE_TYPE": "Тип",
 		"LABEL_STORAGE_DSN": "Dsn",
 		"LABEL_STORAGE_USER": "Пользователь",
-		"LABEL_STORAGE_PASSWORD": "Пароль",
-		"SQLITE_GLOBAL": "Use a global DB instead of per account",
+		"LABEL_STORAGE_PASSWORD": "Кодовая фраза",
+		"SQLITE_GLOBAL": "Используйте глобальную базу данных вместо базы данных для каждой учетной записи",
 		"ALERT_NOTICE": "Внимание!",
 		"SUGGESTIONS_LIMIT": "Лимит предложений",
 		"HTML_ALERT_DO_NOT_USE_THIS_DATABASE": "Не используйте этот тип базы данных с большим числом активных пользователей.",
-		"HTML_ALERT_DOES_NOT_SUPPORTED": "Ваша система не поддерживает контакты.\n<br>\nВам необходимо установить или включить <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> расширения на вашем сервере.\n"
+		"HTML_ALERT_DOES_NOT_SUPPORTED": "Ваша система не поддерживает контакты.\n<br>\nВам необходимо установить или включить <strong>PDO (SQLite / MySQL / PostgreSQL)</strong> расширения на вашем сервере.\n",
+		"COMPOSE_LIMIT": "Максимальное количество получателей из выбранного списка",
+		"BCC_LIMIT": "Рекомендовать \"Скрытую копию\" выше этого количества получателей"
 	},
 	"TAB_DOMAINS": {
 		"LEGEND_DOMAINS": "Домены",
@@ -92,7 +114,7 @@
 	"TAB_SECURITY": {
 		"LEGEND_SECURITY": "Безопасность",
 		"LABEL_USE_IMAGE_PROXY": "Использовать локальный прокси для внешних изображений",
-		"LABEL_AUTO_VERIFY": "Verify signatures automatically",
+		"LABEL_AUTO_VERIFY": "Автоматическая проверка подписей",
 		"LABEL_SHOW_PHP_INFO": "Показать PHP информацию",
 		"LEGEND_ADMIN_PANEL_ACCESS_CREDENTIALS": "Учетные данные для доступа к панели администратора",
 		"LABEL_CURRENT_PASSWORD": "Текущий пароль",
@@ -100,7 +122,11 @@
 		"LABEL_REPEAT_PASSWORD": "Повторить пароль",
 		"LABEL_REQUIRE_VERIFICATION": "Требовать проверку SSL сертификата для",
 		"CRYPTO": "Шифрование",
-		"LABEL_ALLOW_SELF_SIGNED": "Разрешить самоподписанные сертификаты"
+		"LABEL_ALLOW_SELF_SIGNED": "Разрешить самоподписанные сертификаты",
+		"LABEL_TOTP_CLEAR": "Очистить",
+		"HINT_CURRENT_PASSWORD": "Введите свой текущий пароль, чтобы сохранить все данные на этой вкладке.",
+		"LABEL_TOTP_CONFIRM": "Код подтверждения",
+		"HINT_TOTP_CONFIRM": "Отсканируйте приведенный выше код с помощью вашего аутентификатора и введите шесть цифр, которые он покажет. Без этого двухфакторная аутентификация не будет включена."
 	},
 	"TAB_PACKAGES": {
 		"LABEL_ENABLE_PLUGINS": "Включить плагины",
@@ -111,14 +137,28 @@
 	},
 	"TAB_ABOUT": {
 		"LEGEND_ABOUT": "О программе",
-		"LABEL_TAG_HINT": "Простой, современный и быстрый веб-клиент электронной почты\n",
+		"LABEL_TAG_HINT": "Простой, современный и быстрый веб-клиент электронной почты",
 		"LABEL_ALL_RIGHTS_RESERVED": "Все права защищены.",
-		"HINT_READ_CHANGE_LOG": "Пожалуйста, ознакомьтесь с изменениями перед обновлением.\n",
+		"HINT_READ_CHANGE_LOG": "Пожалуйста, ознакомьтесь с изменениями перед обновлением.",
 		"HINT_IS_UP_TO_DATE": "Версия Tachyon актуальна.",
 		"HTML_NEW_VERSION": "Новая <b>%VERSION%</b> версия доступна.",
 		"LABEL_UPDATING": "Обновление",
 		"LABEL_CHECKING": "Проверка",
-		"BUTTON_RELEASES": "Релизы"
+		"BUTTON_RELEASES": "Релизы",
+		"LABEL_ALLOW_UPDATE": "Разрешить обновление из этой панели",
+		"HINT_ALLOW_UPDATE": "Это возможно только в том случае, если веб-сервер имеет права на запись в папку приложения. Обновление пакета (deb, rpm, cPanel) осуществляется с помощью соответствующего менеджера пакетов.",
+		"LEGEND_CLEANUP": "Старые версии",
+		"HINT_CLEANUP": "Каждое обновление устанавливается рядом с предыдущим и никогда не удаляется. Выбрать текущую версию невозможно. Также отображаются каталоги из более ранних установок RainLoop или SnappyMail.",
+		"LABEL_CLEANUP_PRODUCT": "Приложение",
+		"LABEL_CLEANUP_VERSION": "Версия",
+		"LABEL_CLEANUP_SIZE": "Размер",
+		"LABEL_CLEANUP_RUNNING": "(запущено)",
+		"BUTTON_CLEANUP": "Удалить выбранные и свободные",
+		"CONFIRM_DELETE_VERSIONS": "Удалить %COUNT% старых версий? Это действие необратимо.",
+		"ERROR_DELETE_VERSIONS": "Не удалось удалить выбранные версии.",
+		"LABEL_CLEANUP_SCANNING": "Измерение установленных версий",
+		"LABEL_CLEANUP_DELETING": "Удаление %CURRENT% из %COUNT%",
+		"LABEL_CLEANUP_LOCKED": "(недоступно для записи через веб-сервер)"
 	},
 	"POPUPS_DOMAIN_ALIAS": {
 		"TITLE_ADD_DOMAIN_ALIAS": "Добавить псевдоним",
@@ -142,7 +182,7 @@
 		"SECURE_OPTION_NONE": "Нет",
 		"LABEL_ALLOW_SIEVE_SCRIPTS": "Разрешить Sieve сценарии",
 		"LABEL_USE_SHORT_LOGIN": "Использовать короткий логин",
-		"LABEL_LOWERCASE_LOGIN": "Lowercase login (case-insensitive)",
+		"LABEL_LOWERCASE_LOGIN": "Логин в нижнем регистре (регистр нечувствителен)",
 		"LABEL_USE_AUTH": "Использовать аутентификацию",
 		"LABEL_SET_SENDER": "Использовать логин в качестве отправителя",
 		"LABEL_AUTH_PLAIN_LINE": "Принудительный вход командой AUTH PLAIN",
@@ -150,8 +190,8 @@
 		"BUTTON_WHITE_LIST": "Белый список",
 		"NEW_DOMAIN_DESC": "Эта конфигурация позволит вам работать с <strong>%NAME%</strong> адресами.",
 		"WHITE_LIST_ALERT": "Список пользователей домена к которым разрешен доступ.\nИспользуйте пробел в качестве разделителя.\n",
-		"VALID_SPAM_HEADERS": "Valid SPAM headers",
-		"VALID_VIRUS_HEADERS": "Valid virus headers"
+		"VALID_SPAM_HEADERS": "Оценка спам-заголовков",
+		"VALID_VIRUS_HEADERS": "Оценка антивирусных заголовков"
 	},
 	"POPUPS_PLUGIN": {
 		"TITLE_PLUGIN": "Плагин",
@@ -184,5 +224,51 @@
 		"InvalidPluginPackage": "Ошибка пакета плагина",
 		"UnsupportedPluginPackage": "Для работы плагина необходима полная поддержка сервера",
 		"UnknownError": "Неизвестная ошибка"
+	},
+	"TAB_CALENDAR": {
+		"LEGEND_CALENDAR": "Календарь",
+		"ALERT_NOTICE": "Уведомление",
+		"HTML_ALERT_DOES_NOT_SUPPORTED": "В вашей установке PHP отсутствуют драйверы PDO, поэтому календарь не может ничего хранить.",
+		"LABEL_ENABLE_CALENDAR": "Включить календарь",
+		"LABEL_ALLOW_SYNC": "Предоставить пользователям возможность подключаться к серверу CalDAV",
+		"SYNC_INTERVAL": "Интервал синхронизации (минуты)",
+		"MAX_RANGE_DAYS": "Наибольший временной промежуток (дни)",
+		"MAX_OCCURRENCES": "Количество случаев на одно повторяющееся событие",
+		"LEGEND_STORAGE": "Хранилище",
+		"LABEL_STORAGE_TYPE": "Тип",
+		"LABEL_STORAGE_DSN": "DSN",
+		"LABEL_STORAGE_USER": "Пользователь",
+		"LABEL_STORAGE_PASSWORD": "Пароль",
+		"SQLITE_GLOBAL": "Одна общая база данных для всех, а не отдельная для каждого пользователя"
+	},
+	"TAB_LOGS": {
+		"LABEL_SYSLOG_IDENT": "Название системного журнала",
+		"HINT_SYSLOG_IDENT": "Назовите этот экземпляр так, чтобы он отправлял отчеты в syslog. Установите это имя для каждого экземпляра, если на хосте работает более одного экземпляра, и используйте его в фильтре fail2ban.",
+		"LEGEND_LOGGING": "Ведение журнала",
+		"LABEL_ENABLE": "Включить ведение журнала",
+		"LABEL_HIDE_PASSWORDS": "Скрыть пароли в журнале",
+		"LABEL_LEVEL": "Уровень",
+		"LABEL_PATH": "Путь",
+		"HINT_PATH": "Если это поле оставить пустым, логи будут записаны в каталоге данных.",
+		"LABEL_FILENAME": "Имя файла",
+		"HINT_FILENAME": "Шаблоны, такие как {date:Y-m-d}, {user:email} и {user:domain}, заменяются. Вместо них используйте \"syslog\" или \"stderr\".",
+		"LABEL_TIME_ZONE": "Часовой пояс",
+		"LEGEND_AUTH_LOGGING": "Не удалось выполнить аутентификацию",
+		"LABEL_AUTH_LOGGING": "Сообщения о неудачных попытках входа в систему записываются в отдельный файл",
+		"HINT_AUTH_LOGGING": "Предназначено для fail2ban и подобных сервисов.",
+		"LABEL_AUTH_FORMAT": "Формат",
+		"LEGEND_DEBUG": "Отладка",
+		"HINT_DEBUG": "Только для разработки. Отладочные записи содержат много информации, превышающей потребности повседневной работы.",
+		"LABEL_DEBUG_ENABLE": "Включить режим отладки",
+		"LABEL_DEBUG_JS": "Предоставлять неминифицированный JavaScript",
+		"LABEL_DEBUG_CSS": "Предоставлять неминифицированный CSS",
+		"LEVEL_EMERGENCY": "Чрезвычайный",
+		"LEVEL_ALERT": "Оповещение",
+		"LEVEL_CRITICAL": "Критический",
+		"LEVEL_ERROR": "Ошибка",
+		"LEVEL_WARNING": "Предупреждение",
+		"LEVEL_NOTICE": "Внимание",
+		"LEVEL_INFO": "Информационный",
+		"LEVEL_DEBUG": "Отладка"
 	}
 }
