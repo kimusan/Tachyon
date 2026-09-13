@@ -71,6 +71,12 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'allowLanguagesOnSettings', 'webmail', 'allow_languages_on_settings', 'bool');
 		$this->setConfigFromParams($oConfig, 'allowLanguagesOnLogin', 'login', 'allow_languages_on_login', 'bool');
 		$this->setConfigFromParams($oConfig, 'attachmentLimit', 'webmail', 'attachment_size_limit', 'int');
+		$this->setConfigFromParams($oConfig, 'messagesPerPage', 'webmail', 'messages_per_page', 'int');
+		$this->setConfigFromParams($oConfig, 'messagesPerPageMax', 'webmail', 'messages_per_page_max', 'int');
+		// setConfigFromParams only runs its callback for strings, so the floor
+		// goes here. Ten is the lowest the settings screen offers.
+		$oConfig->Set('webmail', 'messages_per_page', \max(10, (int) $oConfig->Get('webmail', 'messages_per_page', 20)));
+		$oConfig->Set('webmail', 'messages_per_page_max', \max(10, (int) $oConfig->Get('webmail', 'messages_per_page_max', 100)));
 
 		$this->setConfigFromParams($oConfig, 'loginDefaultDomain', 'login', 'default_domain', 'string');
 

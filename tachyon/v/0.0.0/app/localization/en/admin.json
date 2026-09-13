@@ -48,7 +48,11 @@
 		"LABEL_ALLOW_IDENTITIES": "Allow multiple identities",
 		"ALERT_DATA_ACCESS": "Data folder is accessible. Please configure your web server to hide the data folder from external access. Read more here:",
 		"ALERT_WARNING": "Warning!",
-		"HTML_ALERT_WEAK_PASSWORD": "You are using the default admin passphrase.\n<br>\nFor security reasons please\n<strong><a href=\"#/security\">change</a></strong>\npassphrase to something else now.\n"
+		"HTML_ALERT_WEAK_PASSWORD": "You are using the default admin passphrase.\n<br>\nFor security reasons please\n<strong><a href=\"#/security\">change</a></strong>\npassphrase to something else now.\n",
+		"LABEL_MESSAGES_PER_PAGE": "Messages per page",
+		"HINT_MESSAGES_PER_PAGE": "Default for a user who has not chosen their own.",
+		"LABEL_MESSAGES_PER_PAGE_MAX": "Messages per page limit",
+		"HINT_MESSAGES_PER_PAGE_MAX": "Highest a user may choose. A larger default wins over a smaller limit."
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Login Screen",

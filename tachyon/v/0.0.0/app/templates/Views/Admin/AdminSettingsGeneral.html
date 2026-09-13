@@ -93,6 +93,22 @@
 		</div>
 	</div>
 	<div class="control-group">
+		<label data-i18n="TAB_GENERAL/LABEL_MESSAGES_PER_PAGE"></label>
+		<div>
+			<input type="number" min="10" step="1" class="span1" data-bind="textInput: messagesPerPage">
+			<span data-bind="saveTrigger: messagesPerPageTrigger"></span>
+			<span class="help-block" data-i18n="TAB_GENERAL/HINT_MESSAGES_PER_PAGE"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_GENERAL/LABEL_MESSAGES_PER_PAGE_MAX"></label>
+		<div>
+			<input type="number" min="10" step="1" class="span1" data-bind="textInput: messagesPerPageMax">
+			<span data-bind="saveTrigger: messagesPerPageMaxTrigger"></span>
+			<span class="help-block" data-i18n="TAB_GENERAL/HINT_MESSAGES_PER_PAGE_MAX"></span>
+		</div>
+	</div>
+	<div class="control-group">
 		<div>
 			<div data-bind="component: {
 				name: 'Checkbox',

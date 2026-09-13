@@ -606,10 +606,9 @@ class Actions
 						 * The ceiling the user may choose, sent so the input can
 						 * carry it rather than hardcoding one. The template said 50
 						 * and the save clamped at 100, neither of which had any
-						 * relation to what an admin had configured, so a site set
-						 * to 300 could not be matched from the settings screen.
+						 * relation to what an admin had configured.
 						 */
-						'MessagesPerPageMax' => \max(100, \intval($oConfig->Get('webmail', 'messages_per_page', 25))),
+						'MessagesPerPageMax' => static::messagesPerPageMax($oConfig),
 						'messageNewWindow' => false,
 						'markdown' => false,
 						'messageReadAuto' => true, // (bool) $oConfig->Get('webmail', 'message_read_auto', true),
@@ -824,6 +823,8 @@ class Actions
 				case 'K': $upload_max_filesize *= 1024;
 			}
 			$aResult['attachmentLimit'] = \min($upload_max_filesize, ((int) $oConfig->Get('webmail', 'attachment_size_limit', 10)) * 1024 * 1024);
+			$aResult['messagesPerPage'] = \max(10, (int) $oConfig->Get('webmail', 'messages_per_page', 20));
+			$aResult['messagesPerPageMax'] = static::messagesPerPageMax($oConfig);
 			$aResult['phpUploadSizes'] = array(
 				'upload_max_filesize' => $value,
 				'post_max_size' => \ini_get('post_max_size')
@@ -923,6 +924,22 @@ class Actions
 		}
 
 		return $this->DefaultResponse($aResponse);
+	}
+
+	/**
+	 * Highest messages per page a user may choose.
+	 *
+	 * Never below the configured default, since an admin who raises the default
+	 * past the ceiling means the higher number, and handing a user a default
+	 * they are not allowed to keep would be worse than either.
+	 */
+	public static function messagesPerPageMax(Config\Application $oConfig): int
+	{
+		return \max(
+			10,
+			(int) $oConfig->Get('webmail', 'messages_per_page', 20),
+			(int) $oConfig->Get('webmail', 'messages_per_page_max', 100)
+		);
 	}
 
 	public function Capa(bool $bAdmin, ?Model\Account $oAccount = null): array

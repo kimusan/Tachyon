@@ -48,8 +48,15 @@ export class AdminSettingsGeneral extends AbstractViewSettings {
 			.observable(SettingsGet('attachmentLimit') / (1024 * 1024))
 			.extend({ debounce: 500 });
 
+		this.messagesPerPage = ko.observable(SettingsGet('messagesPerPage') || 20)
+			.extend({ debounce: 500 });
+		this.messagesPerPageMax = ko.observable(SettingsGet('messagesPerPageMax') || 100)
+			.extend({ debounce: 500 });
+
 		this.addSetting('language');
 		this.addSetting('attachmentLimit');
+		this.addSetting('messagesPerPage');
+		this.addSetting('messagesPerPageMax');
 		this.addSetting('Theme', value => changeTheme(value, this.themeTrigger));
 
 		this.uploadData = SettingsGet('phpUploadSizes');

@@ -205,6 +205,7 @@ so nothing here is ever interpreted as markup.'),
 				'popup_identity' => array(true, 'When identity is not set yet, open identity popup after login'),
 
 				'messages_per_page'           => array(20, 'Number of messages displayed on page by default'),
+				'messages_per_page_max'       => array(100, 'Highest number a user may choose for messages per page'),
 				'message_read_delay'          => array(5, 'Mark message read after N seconds'),
 
 				'min_refresh_interval'        => array(5, 'Minimal check for new messages interval in minutes'),

@@ -159,7 +159,7 @@ trait User
 
 		// Same ceiling the client is given, so a value the settings screen offers
 		// is never silently reduced on the way in
-		$iPerPageMax = \max(100, \intval($this->Config()->Get('webmail', 'messages_per_page', 25)));
+		$iPerPageMax = static::messagesPerPageMax($this->Config());
 		$this->setSettingsFromParams($oSettings, 'MessagesPerPage', 'int', function ($iValue) use ($iPerPageMax) {
 			return \min($iPerPageMax, \max(10, $iValue));
 		});
