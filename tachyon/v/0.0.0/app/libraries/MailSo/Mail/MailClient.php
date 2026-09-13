@@ -720,7 +720,7 @@ class MailClient
 		}
 
 		if ($oSearchCriterias->bHasAttachment) {
-			$aResultUids = $this->oImapClient->FilterAttachmentMessages($aResultUids, $bReturnUid, $oCacher, $oSelectedInfo);
+			$aResultUids = $this->oImapClient->FilterAttachmentMessages($aResultUids, $bReturnUid, $oParams->oAttachmentCacher ?? $oCacher, $oSelectedInfo);
 		}
 
 		if ($bUseCache) {
@@ -976,7 +976,7 @@ class MailClient
 			$oSelectedInfo = $this->oImapClient->FolderExamine($oParams->sFolderName);
 			$aUids = $this->oImapClient->MessageSearch($oSearchCriterias, true);
 			if ($oSearchCriterias->bHasAttachment) {
-				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oCacher, $oSelectedInfo);
+				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oAttachmentCacher ?? $oParams->oCacher, $oSelectedInfo);
 			}
 			$oMessageCollection->totalEmails = \count($aUids);
 			if ($aUids) {
@@ -990,7 +990,7 @@ class MailClient
 			foreach ($aPerFolder as $sFolderName => $aUids) {
 				if ($aUids) {
 					$oSelectedInfo = $this->oImapClient->FolderExamine($sFolderName);
-					$aPerFolder[$sFolderName] = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oCacher, $oSelectedInfo);
+					$aPerFolder[$sFolderName] = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oAttachmentCacher ?? $oParams->oCacher, $oSelectedInfo);
 				}
 			}
 		}

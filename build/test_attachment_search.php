@@ -146,6 +146,11 @@ $getUids->invoke($client, $params, $info);
 check((bool) $imap->fetches, 'Accounts cannot share classifications');
 $imap->account = 'test-account';
 $params->sSearch = 'attachment';
+$params->oAttachmentCacher = $params->oCacher;
+$params->oCacher = null;
+$imap->fetches = [];
+$getUids->invoke($client, $params, $info);
+check(!$imap->fetches, 'Attachment metadata cache works with whole-query UID caching disabled');
 
 class AttachmentSearchMail extends \MailSo\Mail\MailClient
 {
@@ -178,6 +183,7 @@ $pluginSearch = new ReflectionMethod($plugin, 'searchMessages');
 check($pluginSearch->invoke($plugin, $imap, 'attachment', 'INBOX') === [2], 'Automatic attachment rules must not match ordinary messages');
 $imap->bodies = [1 => null];
 $params->oCacher = null;
+$params->oAttachmentCacher = null;
 try {
 	$getUids->invoke($client, $params, $info);
 	throw new RuntimeException('Missing metadata must not silently count as no attachment');
