@@ -85,8 +85,11 @@ trait Messages
 
 		try
 		{
-			if ($this->Config()->Get('cache', 'enable', true) && $this->Config()->Get('cache', 'server_uids', false)) {
-				$oParams->oCacher = $this->Cacher($oAccount);
+			if ($this->Config()->Get('cache', 'enable', true)) {
+				$oParams->oAttachmentCacher = $this->Cacher($oAccount);
+				if ($this->Config()->Get('cache', 'server_uids', false)) {
+					$oParams->oCacher = $oParams->oAttachmentCacher;
+				}
 			}
 
 //			\ignore_user_abort(true);
