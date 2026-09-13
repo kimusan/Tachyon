@@ -48,15 +48,19 @@ export class AdminSettingsGeneral extends AbstractViewSettings {
 			.observable(SettingsGet('attachmentLimit') / (1024 * 1024))
 			.extend({ debounce: 500 });
 
-		this.messagesPerPage = ko.observable(SettingsGet('messagesPerPage') || 20)
-			.extend({ debounce: 500 });
-		this.messagesPerPageMax = ko.observable(SettingsGet('messagesPerPageMax') || 100)
-			.extend({ debounce: 500 });
+		/**
+		 * Not addSetting(), because these two are also editable as raw keys on
+		 * the Config tab and so have to be re-read when this tab is shown. Its
+		 * subscription saves unconditionally and its callback cannot veto that,
+		 * so refreshing through it would write the value straight back.
+		 */
+		this.refreshing = false;
+		this.messagesPerPage = this.perPageSetting('messagesPerPage', 20);
+		this.messagesPerPageMax = this.perPageSetting('messagesPerPageMax', 100);
 
 		this.addSetting('language');
 		this.addSetting('attachmentLimit');
-		this.addSetting('messagesPerPage');
-		this.addSetting('messagesPerPageMax');
+
 		this.addSetting('Theme', value => changeTheme(value, this.themeTrigger));
 
 		this.uploadData = SettingsGet('phpUploadSizes');
@@ -102,6 +106,45 @@ export class AdminSettingsGeneral extends AbstractViewSettings {
 			capaThemes: fSaveHelper('CapaThemes'),
 
 			capaUserBackground: fSaveHelper('CapaUserBackground')
+		});
+	}
+
+	/**
+	 * An admin setting that saves on change, except while being refreshed.
+	 */
+	perPageSetting(sName, iFallback) {
+		const trigger = ko.observable(SaveSettingStatus.Idle),
+			value = ko.observable(SettingsGet(sName) || iFallback).extend({ debounce: 500 });
+		this[sName + 'Trigger'] = trigger;
+		value.subscribe(v => {
+			if (this.refreshing) {
+				return;
+			}
+			trigger(SaveSettingStatus.Saving);
+			Remote.saveSetting(sName, v, iError => {
+				trigger(iError ? SaveSettingStatus.Failed : SaveSettingStatus.Success);
+				setTimeout(() => trigger(SaveSettingStatus.Idle), 1000);
+			});
+		});
+		return value;
+	}
+
+	/**
+	 * The Config tab reloads itself every time it is shown; this one did not, so
+	 * a value changed over there still showed its page-load copy here, and
+	 * saving from here would have put the stale number back.
+	 */
+	beforeShow() {
+		Remote.request('AdminSettingsGet', (iError, data) => {
+			const webmail = data?.Result?.webmail;
+			if (iError || !webmail) {
+				return;
+			}
+			this.refreshing = true;
+			this.messagesPerPage(webmail.messages_per_page?.[0] ?? this.messagesPerPage());
+			this.messagesPerPageMax(webmail.messages_per_page_max?.[0] ?? this.messagesPerPageMax());
+			// The observables debounce, so the guard has to outlast that window
+			setTimeout(() => this.refreshing = false, 800);
 		});
 	}
 
