@@ -78,11 +78,24 @@ class Application extends App implements IBootstrap
 				 */
 				try {
 					$sUID = $Event->getUser()->getUID();
+					/**
+					 * Sealed before either value is stored. Writing the uid first
+					 * and then throwing left the session claiming to know who had
+					 * logged in while holding no passphrase, and auto-login reads
+					 * those two together: it matched the uid, found nothing to
+					 * send, and presented a login form with the password blank and
+					 * no clue why.
+					 */
+					$sPassphrase = TachyonHelper::encodePassword($Event->getPassword(), $sUID);
 					$session = $context->getServerContainer()->get(\OCP\ISession::class);
 					$session->set('tachyon-nc-uid', $sUID);
-					$session->set('tachyon-passphrase', TachyonHelper::encodePassword($Event->getPassword(), $sUID));
+					$session->set('tachyon-passphrase', $sPassphrase);
 				} catch (\Throwable $oException) {
-					$logger->error('Tachyon login setup failed: ' . $oException->getMessage(), ['app' => self::APP_ID]);
+					$logger->error(
+						'Tachyon login setup failed, auto-login will ask for a password: '
+						. $oException->getMessage(),
+						['app' => self::APP_ID]
+					);
 				}
 /*
 			}

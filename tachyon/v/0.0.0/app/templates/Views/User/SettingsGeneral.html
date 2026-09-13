@@ -67,7 +67,7 @@
 	<div class="control-group">
 		<label data-i18n="SETTINGS_GENERAL/MESSAGE_PER_PAGE"></label>
 		<div>
-			<input type="number" min="10" max="50" step="1" class="span1" data-bind="textInput: messagesPerPage">
+			<input type="number" min="10" step="1" class="span1" data-bind="textInput: messagesPerPage, attr: { max: messagesPerPageMax }">
 			&nbsp;
 			<span data-bind="saveTrigger: messagesPerPageTrigger"></span>
 		</div>

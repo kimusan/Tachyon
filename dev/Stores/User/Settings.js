@@ -12,6 +12,8 @@ export const SettingsUserStore = new class {
 		const self = this;
 
 		self.messagesPerPage = ko.observable(25).extend({ debounce: 999 });
+		// Ceiling the server will accept, derived from the admin's setting
+		self.messagesPerPageMax = ko.observable(100);
 		self.checkMailInterval = ko.observable(15).extend({ debounce: 999 });
 		self.messageReadDelay = ko.observable(5).extend({ debounce: 999 });
 
@@ -168,6 +170,7 @@ export const SettingsUserStore = new class {
 
 		self.layout(pInt(SettingsGet('Layout')));
 		self.messagesPerPage(pInt(SettingsGet('MessagesPerPage')));
+		self.messagesPerPageMax(pInt(SettingsGet('MessagesPerPageMax')) || 100);
 		self.checkMailInterval(pInt(SettingsGet('CheckMailInterval')));
 		self.messageReadDelay(pInt(SettingsGet('MessageReadDelay')));
 		self.autoLogout(pInt(SettingsGet('AutoLogout')));

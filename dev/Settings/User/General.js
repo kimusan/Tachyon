@@ -115,6 +115,10 @@ export class UserSettingsGeneral extends AbstractViewSettings {
 		 'messageReadAuto', 'showNextMessage', 'messageNewWindow', 'markdown'
 		].forEach(name => this[name] = SettingsUserStore[name]);
 
+		// Read-only, so it is not in the list above: the input's ceiling, which
+		// follows the admin's messages_per_page rather than a hardcoded number
+		this.messagesPerPageMax = SettingsUserStore.messagesPerPageMax;
+
 		this.allowLanguagesOnSettings = !!SettingsGet('allowLanguagesOnSettings');
 
 		this.languageTrigger = ko.observable(SaveSettingStatus.Idle);

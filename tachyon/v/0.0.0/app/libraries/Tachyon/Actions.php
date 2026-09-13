@@ -602,6 +602,14 @@ class Actions
 						'simpleAttachmentsList' => false,
 						'listGrouped' => $oConfig->Get('defaults', 'mail_list_grouped', false),
 						'MessagesPerPage' => \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 25)) ?: 25),
+						/**
+						 * The ceiling the user may choose, sent so the input can
+						 * carry it rather than hardcoding one. The template said 50
+						 * and the save clamped at 100, neither of which had any
+						 * relation to what an admin had configured, so a site set
+						 * to 300 could not be matched from the settings screen.
+						 */
+						'MessagesPerPageMax' => \max(100, \intval($oConfig->Get('webmail', 'messages_per_page', 25))),
 						'messageNewWindow' => false,
 						'markdown' => false,
 						'messageReadAuto' => true, // (bool) $oConfig->Get('webmail', 'message_read_auto', true),
