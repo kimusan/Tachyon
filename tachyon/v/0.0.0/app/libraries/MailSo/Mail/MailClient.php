@@ -684,7 +684,8 @@ class MailClient
 		if ($bUseCache && $oInfo->etag) {
 			$sSerializedHash = 'Get'
 				. ($bReturnUid ? 'UIDS/' : 'IDS/')
-				. "{$oParams->sSort}/{$this->oImapClient->Hash()}/{$sFolderName}/{$oSearchCriterias}";
+				. "{$oParams->sSort}/{$this->oImapClient->Hash()}/{$sFolderName}/{$oSearchCriterias}"
+				. ($oSearchCriterias->bHasAttachment ? '/attachment-bodystructure-v1' : '');
 			$sSerializedLog = "\"{$sFolderName}\" / {$oParams->sSort} / {$oSearchCriterias}";
 			$sSerialized = $oCacher->Get($sSerializedHash);
 			if (!empty($sSerialized)) {
@@ -716,6 +717,10 @@ class MailClient
 			// A search scoped with IN (subtree) never gets here, MessageList() routes it to
 			// MessageListMultiFolder() because ESEARCH returns UIDs per folder, not a flat list.
 			$aResultUids = $this->oImapClient->MessageSearch($oSearchCriterias, $bReturnUid);
+		}
+
+		if ($oSearchCriterias->bHasAttachment) {
+			$aResultUids = $this->oImapClient->FilterAttachmentMessages($aResultUids, $bReturnUid);
 		}
 
 		if ($bUseCache) {
@@ -970,12 +975,24 @@ class MailClient
 			$oMessageCollection->SearchScope = '';
 			$this->oImapClient->FolderExamine($oParams->sFolderName);
 			$aUids = $this->oImapClient->MessageSearch($oSearchCriterias, true);
+			if ($oSearchCriterias->bHasAttachment) {
+				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids);
+			}
 			$oMessageCollection->totalEmails = \count($aUids);
 			if ($aUids) {
 				$aUids = \array_slice($aUids, $oParams->iOffset, $oParams->iLimit);
 				$this->MessageListByRequestIndexOrUids($oMessageCollection, new SequenceSet($aUids));
 			}
 			return $oMessageCollection;
+		}
+
+		if ($oSearchCriterias->bHasAttachment) {
+			foreach ($aPerFolder as $sFolderName => $aUids) {
+				if ($aUids) {
+					$this->oImapClient->FolderExamine($sFolderName);
+					$aPerFolder[$sFolderName] = $this->oImapClient->FilterAttachmentMessages($aUids);
+				}
+			}
 		}
 
 		// Both strategies must order the same way. The ESEARCH response order and the LIST

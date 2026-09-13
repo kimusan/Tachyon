@@ -523,6 +523,33 @@ trait Messages
 	}
 
 	/**
+	 * Inspect metadata only, using the same attachment definition as Message.
+	 * The selected mailbox owns these IDs. Preserve SEARCH/SORT order even if
+	 * FETCH returns a different order, and bound each request's metadata volume.
+	 */
+	public function FilterAttachmentMessages(array $aIds, bool $bUid = true) : array
+	{
+		$aMatches = [];
+		foreach (\array_chunk($aIds, 200) as $aBatch) {
+			$oRange = new SequenceSet($aBatch, $bUid);
+			foreach ($this->FetchIterate(
+				[FetchType::UID, FetchType::BODYSTRUCTURE], (string) $oRange, $bUid
+			) as $oFetchResponse) {
+				$oBody = $oFetchResponse->GetFetchBodyStructure();
+				if (!$oBody) {
+					throw new \MailSo\RuntimeException('Missing BODYSTRUCTURE for attachment search');
+				}
+				if ($oBody->SearchAttachmentsParts()->valid()) {
+					$iId = $bUid ? $oFetchResponse->GetFetchValue(FetchType::UID)
+						: $oFetchResponse->oImapResponse->ResponseList[1];
+					$aMatches[$iId] = true;
+				}
+			}
+		}
+		return \array_values(\array_filter($aIds, static fn ($iId) => isset($aMatches[$iId])));
+	}
+
+	/**
 	 * @throws \InvalidArgumentException
 	 * @throws \MailSo\RuntimeException
 	 * @throws \MailSo\Net\Exceptions\*
