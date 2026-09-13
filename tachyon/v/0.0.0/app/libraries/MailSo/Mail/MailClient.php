@@ -704,7 +704,7 @@ class MailClient
 			return null;
 		}
 
-		$this->oImapClient->FolderExamine($sFolderName);
+		$oSelectedInfo = $this->oImapClient->FolderExamine($sFolderName);
 
 		$aResultUids = [];
 		if ($bUseSort) {
@@ -720,7 +720,7 @@ class MailClient
 		}
 
 		if ($oSearchCriterias->bHasAttachment) {
-			$aResultUids = $this->oImapClient->FilterAttachmentMessages($aResultUids, $bReturnUid);
+			$aResultUids = $this->oImapClient->FilterAttachmentMessages($aResultUids, $bReturnUid, $oCacher, $oSelectedInfo);
 		}
 
 		if ($bUseCache) {
@@ -973,10 +973,10 @@ class MailClient
 			// Nothing can search the subtree, use the current folder on its own
 			$this->logWrite('No subtree search available, searching only "'.$oParams->sFolderName.'"', \LOG_WARNING);
 			$oMessageCollection->SearchScope = '';
-			$this->oImapClient->FolderExamine($oParams->sFolderName);
+			$oSelectedInfo = $this->oImapClient->FolderExamine($oParams->sFolderName);
 			$aUids = $this->oImapClient->MessageSearch($oSearchCriterias, true);
 			if ($oSearchCriterias->bHasAttachment) {
-				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids);
+				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oCacher, $oSelectedInfo);
 			}
 			$oMessageCollection->totalEmails = \count($aUids);
 			if ($aUids) {
@@ -989,8 +989,8 @@ class MailClient
 		if ($oSearchCriterias->bHasAttachment) {
 			foreach ($aPerFolder as $sFolderName => $aUids) {
 				if ($aUids) {
-					$this->oImapClient->FolderExamine($sFolderName);
-					$aPerFolder[$sFolderName] = $this->oImapClient->FilterAttachmentMessages($aUids);
+					$oSelectedInfo = $this->oImapClient->FolderExamine($sFolderName);
+					$aPerFolder[$sFolderName] = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oCacher, $oSelectedInfo);
 				}
 			}
 		}

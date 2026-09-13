@@ -20,14 +20,18 @@ class AttachmentSearchImap extends \MailSo\Imap\ImapClient
 	public array $bodies = [];
 	public array $fetches = [];
 	public array $folders = [];
+	public int $uidValidity = 1;
 	public function hasCapability(string $sExtentionName): bool { return $sExtentionName === 'MULTISEARCH' && (bool) $this->folders; }
-	public function Hash(): string { return 'test-account'; }
+	public string $account = 'test-account';
+	public function Hash(): string { return $this->account; }
 	public function FolderExamine(string $sFolderName, bool $bForceReselect = false): \MailSo\Imap\FolderInformation
 	{
 		if ($this->folders) {
 			$this->bodies = $this->folders[$sFolderName];
 		}
-		return new \MailSo\Imap\FolderInformation($sFolderName, false);
+		$info = new \MailSo\Imap\FolderInformation($sFolderName, false);
+		$info->UIDVALIDITY = $this->uidValidity;
+		return $info;
 	}
 	public function FolderSelect(string $sFolderName, bool $bForceReselect = false): \MailSo\Imap\FolderInformation
 	{
@@ -123,7 +127,25 @@ $params->sSearch = 'attachment';
 $info->UIDNEXT = 503;
 $info->etag = 'after-append';
 $getUids->invoke($client, $params, $info);
-check((bool) $imap->fetches, 'Folder changes invalidate attachment results');
+check(count($imap->fetches) === 1 && \MailSo\Imap\SequenceSet::expand($imap->fetches[0][1]) === [502], 'Appending mail fetches metadata only for the new UID');
+$imap->fetches = [];
+$params->sSearch = 'attachment&unseen';
+check(count($getUids->invoke($client, $params, $info)) === 501 && !$imap->fetches, 'Different queries reuse positive and negative classifications');
+$imap->uidValidity = 2;
+$info->etag = 'uid-validity-reset';
+$getUids->invoke($client, $params, $info);
+check((bool) $imap->fetches, 'UID validity reset requires new classifications');
+$imap->fetches = [];
+$params->sFolderName = 'Archive';
+$getUids->invoke($client, $params, $info);
+check((bool) $imap->fetches, 'Folders cannot share classifications for identical UIDs');
+$params->sFolderName = 'INBOX';
+$imap->account = 'other-account';
+$imap->fetches = [];
+$getUids->invoke($client, $params, $info);
+check((bool) $imap->fetches, 'Accounts cannot share classifications');
+$imap->account = 'test-account';
+$params->sSearch = 'attachment';
 
 class AttachmentSearchMail extends \MailSo\Mail\MailClient
 {
@@ -135,6 +157,7 @@ class AttachmentSearchMail extends \MailSo\Mail\MailClient
 }
 $multi = new AttachmentSearchMail;
 (new ReflectionProperty(\MailSo\Mail\MailClient::class, 'oImapClient'))->setValue($multi, $imap);
+$imap->uidValidity = 3;
 $imap->folders = ['INBOX' => [1 => $text, 2 => $file], 'INBOX/Sub' => [1 => $file, 2 => $text]];
 $params->iOffset = 1;
 $params->iLimit = 1;
@@ -143,6 +166,9 @@ $collection = new \MailSo\Mail\MessageCollection;
 (new ReflectionMethod($multi, 'MessageListMultiFolder'))->invoke($multi, $params, $collection, $criteria);
 check($collection->totalEmails === 2, 'Multi-folder total counts attachments before pagination');
 check($multi->page === [['INBOX/Sub', 1]], 'Pagination preserves folder identity when UIDs overlap');
+$imap->fetches = [];
+(new ReflectionMethod($multi, 'MessageListMultiFolder'))->invoke($multi, $params, $collection, $criteria);
+check(!$imap->fetches, 'Repeated subtree search reuses per-folder classifications');
 
 $imap->folders = [];
 $imap->bodies = [1 => $text, 2 => $file];
@@ -158,4 +184,22 @@ try {
 } catch (\MailSo\RuntimeException $expected) {
 	check(str_contains($expected->getMessage(), 'BODYSTRUCTURE'), 'Missing metadata reports the failed search');
 }
+
+// An interrupted scan keeps completed batches, but never caches missing metadata as false.
+$cache = new AttachmentSearchCache;
+$selected = $imap->FolderExamine('Recovery');
+$imap->bodies = array_fill(1, 200, $file) + [201 => null];
+try {
+	$imap->FilterAttachmentMessages(range(1, 201), true, $cache, $selected);
+	throw new RuntimeException('Expected incomplete scan to fail');
+} catch (\MailSo\RuntimeException $expected) {
+	check(str_contains($expected->getMessage(), 'BODYSTRUCTURE'), 'Incomplete scan reports failure');
+}
+$imap->bodies[201] = $text;
+$imap->fetches = [];
+check(count($imap->FilterAttachmentMessages(range(1, 201), true, $cache, $selected)) === 200, 'Retry returns correct matches');
+check(count($imap->fetches) === 1 && $imap->fetches[0][1] === '201', 'Retry resumes after completed cached batches');
+$imap->fetches = [];
+$imap->FilterAttachmentMessages([1, 201], false, $cache, $selected);
+check((bool) $imap->fetches, 'Sequence-number searches bypass UID classifications');
 echo "Attachment search regression checks passed.\n";
