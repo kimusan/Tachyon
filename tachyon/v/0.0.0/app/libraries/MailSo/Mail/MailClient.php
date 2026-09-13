@@ -685,7 +685,7 @@ class MailClient
 			$sSerializedHash = 'Get'
 				. ($bReturnUid ? 'UIDS/' : 'IDS/')
 				. "{$oParams->sSort}/{$this->oImapClient->Hash()}/{$sFolderName}/{$oSearchCriterias}"
-				. ($oSearchCriterias->bHasAttachment ? '/attachment-bodystructure-v1' : '');
+				. ($oSearchCriterias->bHasAttachment ? '/attachment-bodystructure-v2' : '');
 			$sSerializedLog = "\"{$sFolderName}\" / {$oParams->sSort} / {$oSearchCriterias}";
 			$sSerialized = $oCacher->Get($sSerializedHash);
 			if (!empty($sSerialized)) {

@@ -523,7 +523,7 @@ trait Messages
 	}
 
 	/**
-	 * Inspect metadata only, using the same attachment definition as Message.
+	 * Inspect metadata only, excluding inline resources retained by the message viewer.
 	 * The selected mailbox owns these IDs. Preserve SEARCH/SORT order even if
 	 * FETCH returns a different order, and bound each request's metadata volume.
 	 */
@@ -539,7 +539,7 @@ trait Messages
 				if (!$oBody) {
 					throw new \MailSo\RuntimeException('Missing BODYSTRUCTURE for attachment search');
 				}
-				if ($oBody->SearchAttachmentsParts()->valid()) {
+				if ($oBody->SearchAttachmentsParts(false)->valid()) {
 					$iId = $bUid ? $oFetchResponse->GetFetchValue(FetchType::UID)
 						: $oFetchResponse->oImapResponse->ResponseList[1];
 					$aMatches[$iId] = true;

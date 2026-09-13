@@ -81,6 +81,20 @@ check(!$imap->fetches, 'Ordinary searches need no attachment fetches');
 $params->sSearch = 'has:attachment';
 check($getUids->invoke($client, $params, $info) === [4, 3], 'Text search syntax also filters attachments');
 
+$inline = ['IMAGE', 'PNG', null, '<logo>', null, 'BASE64', 20, null, ['INLINE', ['FILENAME', 'logo.png']]];
+$cidOnly = ['IMAGE', 'PNG', null, '<logo>', null, 'BASE64', 20];
+$explicitWithCid = $image;
+$explicitWithCid[3] = '<attached-photo>';
+$imap->bodies = [
+	1 => [$text, $inline, 'RELATED'],
+	2 => [$text, $cidOnly, 'RELATED'],
+	3 => [$text, $inline, $file, 'MIXED'],
+	4 => [$text, $explicitWithCid, 'MIXED'],
+];
+check($getUids->invoke($client, $params, $info) === [4, 3], 'Exclude inline-only mail, retain real attachments even with a Content-ID');
+$body = \MailSo\Imap\BodyStructure::NewInstance([$text, $inline, 'RELATED']);
+check($body->SearchAttachmentsParts()->valid(), 'Message rendering must retain inline resources');
+
 $imap->bodies = array_fill(1, 501, $file);
 $imap->fetches = [];
 $params->sSearch = 'attachment';
