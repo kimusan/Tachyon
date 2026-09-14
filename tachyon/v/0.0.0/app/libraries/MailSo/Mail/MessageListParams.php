@@ -13,6 +13,8 @@ namespace MailSo\Mail;
 
 class MessageListParams
 {
+	public bool $bAllowAccountSearch = false;
+	public array $aSearchExcludedFolders = [];
 	public string
 		$sFolderName,
 		$sSearch = '',
@@ -20,7 +22,8 @@ class MessageListParams
 		$sThreadAlgorithm = '';
 
 	public ?\MailSo\Cache\CacheClient
-		$oCacher = null;
+		$oCacher = null,
+		$oAttachmentCacher = null;
 
 	public bool
 		$bUseSort = true,

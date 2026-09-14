@@ -166,7 +166,10 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 			);
 
 			$imapClient->FolderSelect($folder);
-			return $imapClient->MessageSearch($oSearchCriterias, true);
+			$uids = $imapClient->MessageSearch($oSearchCriterias, true);
+			return $oSearchCriterias->bHasAttachment
+				? $imapClient->FilterAttachmentMessages($uids)
+				: $uids;
 
 		} catch (\Throwable $e) {
 			$this->Manager()->logWrite(

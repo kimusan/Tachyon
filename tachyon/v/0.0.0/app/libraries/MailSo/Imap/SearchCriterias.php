@@ -128,6 +128,8 @@ class SearchCriterias
 
 	private array $criterias = [];
 	public bool $fuzzy = false;
+	public bool $bHasAttachment = false;
+	public bool $bIncludeSpamTrash = false;
 	public string $sIn = '';  // subtree|subtree-one|mailboxes when MULTISEARCH IN is requested
 
 	function prepend(string $rule)
@@ -178,7 +180,7 @@ class SearchCriterias
 					$aCriteriasResult[] = $sValue;
 				}
 			} else {
-				if (isset($aLines['IN']) && \in_array($aLines['IN'], ['subtree','subtree-one','mailboxes'])) {
+				if (isset($aLines['IN']) && \in_array($aLines['IN'], ['subtree','subtree-one','mailboxes','all'])) {
 					// Stored on the returned object; ESEARCH IN (...) must not be embedded in plain SEARCH criteria.
 					// Kept even without MULTISEARCH, the caller decides whether to emulate the scope.
 					$sIn = $aLines['IN'];
@@ -242,17 +244,13 @@ class SearchCriterias
 							$aCriteriasResult[] = $sValue;
 							break;
 
+						case 'INCLUDE-SPAM-TRASH':
 						case 'TO-ONLY':
 							// A modifier for TO above, not a criterion of its own
 							break;
 
 						case 'ATTACHMENT':
-							// Simple, is not detailed search (Sometimes doesn't work)
-							$aCriteriasResult[] = 'OR OR OR';
-							$aCriteriasResult[] = 'HEADER Content-Type application/';
-							$aCriteriasResult[] = 'HEADER Content-Type multipart/m';
-							$aCriteriasResult[] = 'HEADER Content-Type multipart/signed';
-							$aCriteriasResult[] = 'HEADER Content-Type multipart/report';
+							// Match actual MIME parts after SEARCH, before counting or pagination.
 							break;
 
 						case 'HEADER':
@@ -386,6 +384,8 @@ class SearchCriterias
 		$search = new self;
 		$search->criterias = $aCriteriasResult;
 		$search->sIn = $sIn ?? '';
+		$search->bHasAttachment = isset($aLines['ATTACHMENT']);
+		$search->bIncludeSpamTrash = isset($aLines['INCLUDE-SPAM-TRASH']);
 		return $search;
 	}
 
@@ -469,6 +469,7 @@ class SearchCriterias
 					}
 					break;
 
+				case 'INCLUDE-SPAM-TRASH':
 				case 'TO-ONLY':
 				case 'ATTACHMENT':
 				case 'FLAGGED':

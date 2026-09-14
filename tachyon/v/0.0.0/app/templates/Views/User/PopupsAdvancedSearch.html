@@ -75,7 +75,7 @@
 		</div>
 		<!-- ko if: showMultisearch -->
 		<div class="control-group">
-			<label data-i18n="SEARCH/SUBFOLDERS"></label>
+			<label data-i18n="SEARCH/SCOPE"></label>
 			<div data-bind="component: {
 				name: 'Select',
 				params: {
@@ -86,6 +86,12 @@
 				}
 			}"></div>
 		</div>
+		<!-- ko if: selectedTreeValue() === 'all' -->
+		<div class="control-group">
+			<label></label>
+			<div data-bind="component: {name: 'Checkbox', params: {label: 'SEARCH/INCLUDE_SPAM_TRASH', value: includeSpamTrash}}"></div>
+		</div>
+		<!-- /ko -->
 		<!-- /ko -->
 		<div class="control-group">
 			<label></label>

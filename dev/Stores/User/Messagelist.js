@@ -354,7 +354,7 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 	} else {
 		params.threadUid = 0;
 	}
-	if (folderETag) {
+	if (folderETag && new URLSearchParams(params.search).get('in') !== 'all') {
 		params.hash = folderETag + '-' + SettingsGet('accountHash');
 		sGetAdd = 'MessageList/' + SUB_QUERY_PREFIX + '/' + b64EncodeJSONSafe(params);
 		params = {};
