@@ -21,6 +21,7 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 			repliedValue: -1,
 			selectedDateValue: 0,
 			selectedTreeValue: '',
+			includeSpamTrash: false,
 
 			hasAttachment: false,
 			starred: false,
@@ -32,7 +33,8 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 
 		addComputablesTo(this, {
 			// Either the server does it, or the admin enabled the folder by folder fallback
-			showMultisearch: () => FolderUserStore.hasCapability('MULTISEARCH') || SettingsCapa('SubtreeSearch'),
+			showMultisearch: () => SettingsCapa('AccountSearch')
+				|| FolderUserStore.hasCapability('MULTISEARCH') || SettingsCapa('SubtreeSearch'),
 
 			// Almost the same as MessageModel.tagOptions
 			keywords: () => {
@@ -86,9 +88,14 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 				translateTrigger();
 				let prefix = 'SEARCH/SUBFOLDERS_';
 				return [
-					{ id: '', name: i18n(prefix + 'NONE') },
-					{ id: 'subtree-one', name: i18n(prefix + 'SUBTREE_ONE') },
-					{ id: 'subtree', name: i18n(prefix + 'SUBTREE') }
+					{ id: '', name: i18n('SEARCH/CURRENT_FOLDER', 0, 'Current folder') },
+					...(FolderUserStore.hasCapability('MULTISEARCH') || SettingsCapa('SubtreeSearch') ? [
+						{ id: 'subtree-one', name: i18n(prefix + 'SUBTREE_ONE') },
+						{ id: 'subtree', name: i18n('SEARCH/INCLUDE_SUBFOLDERS') }
+					] : []),
+					...(SettingsCapa('AccountSearch') ? [
+						{ id: 'all', name: i18n('SEARCH/ALL_FOLDERS', 0, 'All folders in this account') }
+					] : [])
 				];
 			}
 		});
@@ -133,6 +140,9 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		if (self.to().trim() && !self.alsoCc()) {
 			result += '&to-only';
 		}
+		if ('all' === self.selectedTreeValue() && self.includeSpamTrash()) {
+			result += '&include-spam-trash';
+		}
 		if (self.hasAttachment()) {
 			result += '&attachment';
 		}
@@ -161,6 +171,7 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		self.text(pString(params.get('text')));
 		self.keyword(pString(params.get('keyword')));
 		self.selectedTreeValue(pString(params.get('in')));
+		self.includeSpamTrash(params.has('include-spam-trash'));
 		self.selectedDateValue(0);
 		self.alsoCc(!params.has('to-only'));
 		self.hasAttachment(params.has('attachment'));

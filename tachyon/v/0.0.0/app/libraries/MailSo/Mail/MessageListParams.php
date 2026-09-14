@@ -13,6 +13,8 @@ namespace MailSo\Mail;
 
 class MessageListParams
 {
+	public bool $bAllowAccountSearch = false;
+	public array $aSearchExcludedFolders = [];
 	public string
 		$sFolderName,
 		$sSearch = '',

@@ -788,6 +788,14 @@ class MailClient
 		$oMessageCollection->FolderInfo = $oInfo;
 		$oMessageCollection->totalEmails = $oInfo->MESSAGES;
 
+		$oAccountCriteria = \MailSo\Imap\SearchCriterias::fromString($this->oImapClient, $oParams->sFolderName, $sSearch, $oParams->bHideDeleted);
+		if ('all' === $oAccountCriteria->sIn) {
+			if (!$oParams->bAllowAccountSearch) {
+				throw new \MailSo\RuntimeException('Account-wide search is disabled');
+			}
+			return $this->MessageListAccount($oParams, $oMessageCollection, $oAccountCriteria);
+		}
+
 		// RFC 7377 MULTISEARCH spans folders, which the sort/thread/cache logic below cannot express.
 		// Must be checked before the empty folder return, the base folder can be empty while its subfolders match.
 		if (\strlen($sSearch)
@@ -937,6 +945,115 @@ class MailClient
 		}
 
 		return $oMessageCollection;
+	}
+
+	/** Search the active connection's selectable mailboxes, then page by received date. */
+	protected function MessageListAccount(MessageListParams $oParams, MessageCollection $oCollection,
+		\MailSo\Imap\SearchCriterias $oCriteria) : MessageCollection
+	{
+		$oFolders = $this->oImapClient->FolderList('', '*');
+		$aExcluded = array_filter($oParams->aSearchExcludedFolders, 'strlen');
+		foreach ($oFolders as $oFolder) {
+			if (in_array($oFolder->Role(), ['junk', 'trash'])) {
+				$aExcluded[] = $oFolder->FullName;
+			}
+		}
+		$aSelectedFolders = [];
+		foreach ($oFolders as $oFolder) {
+			if (!$oFolder->Selectable()) {
+				continue;
+			}
+			if (!$oCriteria->bIncludeSpamTrash) {
+				foreach ($aExcluded as $sExcluded) {
+					if ($oFolder->FullName === $sExcluded || ($oFolder->Delimiter()
+						&& str_starts_with($oFolder->FullName, $sExcluded.$oFolder->Delimiter()))) {
+						continue 2;
+					}
+				}
+			}
+			$aSelectedFolders[] = $oFolder;
+		}
+		$aNative = null;
+		if ($this->oImapClient->hasCapability('MULTISEARCH')) {
+			try {
+				$aNative = $this->oImapClient->MessageMultiSearchMailboxes((string) $oCriteria,
+					array_map(static fn ($oFolder) => $oFolder->FullName, $aSelectedFolders));
+			} catch (\Throwable $oException) {
+				$this->logWrite('Account MULTISEARCH failed: '.$oException->getMessage(), \LOG_WARNING);
+			}
+		}
+		$aTuples = [];
+		foreach ($aSelectedFolders as $oFolder) {
+			// A failed folder aborts the request; never claim a partial list is complete.
+			$oInfo = $this->oImapClient->FolderExamine($oFolder->FullName);
+			$oFolderParams = clone $oParams;
+			$oFolderParams->sFolderName = $oFolder->FullName;
+			$oFolderParams->bUseSort = false;
+			$oFolderParams->oSequenceSet = null;
+			$aUids = null === $aNative ? $this->GetUids($oFolderParams, $oInfo) : ($aNative[$oFolder->FullName] ?? []);
+			if (null !== $aNative && $oCriteria->bHasAttachment) {
+				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oAttachmentCacher ?? $oParams->oCacher, $oInfo);
+			}
+			$aDates = $this->AccountSearchDates($aUids, $oInfo, $oParams->oAttachmentCacher ?? $oParams->oCacher);
+			foreach ($aUids as $iUid) {
+				if (isset($aDates[$iUid])) {
+					$aTuples[] = [$oFolder->FullName, $iUid, $aDates[$iUid]];
+				}
+			}
+		}
+		usort($aTuples, static fn ($a, $b) => ($b[2] <=> $a[2]) ?: strcmp($a[0], $b[0]) ?: ($b[1] <=> $a[1]));
+		$oCollection->SearchScope = 'all';
+		$oCollection->ThreadUid = 0;
+		$oCollection->Sort = 'REVERSE ARRIVAL';
+		$oCollection->totalEmails = count($aTuples);
+		$this->MessageListMultiFolderFetch($oCollection, array_map(
+			static fn ($a) => [$a[0], $a[1]], array_slice($aTuples, $oParams->iOffset, $oParams->iLimit)
+		));
+		return $oCollection;
+	}
+
+	/** Immutable per-UID dates avoid repeating the cross-folder sorting scan. */
+	private function AccountSearchDates(array $aUids, FolderInformation $oInfo, ?\MailSo\Cache\CacheClient $oCache) : array
+	{
+		$bCache = $oCache && $oCache->IsInited() && $oInfo->UIDVALIDITY > 0;
+		$sPrefix = 'AccountSearchDates/v1/'.hash('sha256', json_encode([
+			$this->oImapClient->Hash(), $oInfo->FullName, $oInfo->UIDVALIDITY
+		])).'/';
+		$aDates = [];
+		$aBlocks = [];
+		$aPending = [];
+		foreach ($aUids as $iUid) {
+			$iBlock = intdiv($iUid, 256);
+			if ($bCache && !isset($aBlocks[$iBlock])) {
+				$aData = json_decode($oCache->Get($sPrefix.$iBlock) ?? '', true);
+				$aBlocks[$iBlock] = is_array($aData) ? array_filter($aData, 'is_int') : [];
+			}
+			if ($bCache && isset($aBlocks[$iBlock][$iUid])) {
+				$aDates[$iUid] = $aBlocks[$iBlock][$iUid];
+			} else {
+				$aPending[] = $iUid;
+			}
+		}
+		foreach (array_chunk($aPending, 200) as $aBatch) {
+			$aDirty = [];
+			foreach ($this->oImapClient->FetchIterate([FetchType::UID, FetchType::INTERNALDATE], (string) new SequenceSet($aBatch), true) as $oFetch) {
+				$iUid = $oFetch->GetFetchValue(FetchType::UID);
+				$iDate = strtotime($oFetch->GetFetchValue(FetchType::INTERNALDATE) ?? '');
+				if (false === $iDate) {
+					throw new \MailSo\RuntimeException('Missing INTERNALDATE for account search');
+				}
+				$aDates[$iUid] = $iDate;
+				if ($bCache) {
+					$iBlock = intdiv($iUid, 256);
+					$aBlocks[$iBlock][$iUid] = $iDate;
+					$aDirty[$iBlock] = true;
+				}
+			}
+			foreach ($aDirty as $iBlock => $_) {
+				$oCache->Set($sPrefix.$iBlock, json_encode($aBlocks[$iBlock]));
+			}
+		}
+		return $aDates;
 	}
 
 	/**
@@ -1110,6 +1227,9 @@ class MailClient
 			try {
 				$this->oImapClient->FolderExamine($sFolderName);
 			} catch (\Throwable $oException) {
+				if ('all' === $oMessageCollection->SearchScope) {
+					throw $oException;
+				}
 				// A folder the user cannot select must not fail the whole search
 				$this->logWrite('Skipped folder "'.$sFolderName.'": '.$oException->getMessage(), \LOG_WARNING);
 				continue;
@@ -1123,10 +1243,16 @@ class MailClient
 					$aFolderMessages[$oFetchResponse->GetFetchValue(FetchType::UID)] = $oMessage;
 				}
 			}
-			$aMessages = \array_merge($aMessages, \array_values(\array_filter($aFolderMessages)));
+			foreach ($aFolderMessages as $iUid => $oMessage) {
+				if ($oMessage) {
+					$aMessages[$sFolderName][$iUid] = $oMessage;
+				}
+			}
 		}
 
-		$oMessageCollection->exchangeArray($aMessages);
+		$oMessageCollection->exchangeArray(\array_values(\array_filter(\array_map(
+			static fn ($aTuple) => $aMessages[$aTuple[0]][$aTuple[1]] ?? null, $aTuples
+		))));
 	}
 
 	public function FindMessageUidByMessageId(string $sFolderName, string $sMessageId) : ?int

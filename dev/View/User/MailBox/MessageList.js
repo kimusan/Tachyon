@@ -132,7 +132,9 @@ export class MailMessageList extends AbstractViewRight {
 
 		addComputablesTo(this, {
 
-			sortSupported: () => FolderUserStore.hasCapability('SORT') && !MessagelistUserStore.threadUid(),
+			sortSupported: () => FolderUserStore.hasCapability('SORT') && !MessagelistUserStore.threadUid()
+				&& 'all' !== MessagelistUserStore.listSearchScope(),
+			accountSearch: () => 'all' === MessagelistUserStore.listSearchScope(),
 
 			messageListSearchDesc: () => {
 				const value = MessagelistUserStore().search;
@@ -162,7 +164,7 @@ export class MailMessageList extends AbstractViewRight {
 			listGrouped: () => {
 				let uid = MessagelistUserStore.threadUid(),
 					sort = FolderUserStore.sortMode() || 'DATE';
-				if (uid) {
+				if (uid || 'all' === MessagelistUserStore.listSearchScope()) {
 					return false;
 				}
 				// A list spanning folders is only readable when grouped, so ignore the setting

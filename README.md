@@ -214,3 +214,19 @@ Squire is used in place of CKEditor.
 |--------|--------:|--------:|-------:|---------:|
 |squire  | 115,520 |  47,548 | 23,387 |   14,867 |
 |ckeditor|       ? | 520,035 |      ? |  155,916 |
+
+### Account-wide search
+
+Advanced Search offers **All folders in this account**, ordered newest received
+first, with the source folder shown on each result. **Include Spam and Trash**
+is unchecked by default; exclusions use account folder settings and IMAP
+special-use roles, including their subfolders. Searches stay within the active
+account and include selectable folders even when unsubscribed.
+
+Administrators can disable this scope with `search_all_folders = Off` in the
+`[imap]` configuration section. Folder and subfolder search remain available.
+The first broad search fetches date metadata for sorting; subsequent searches
+reuse per-message date and attachment caches when caching is enabled. IMAP
+searches still run to reflect new mail and flag changes. Any folder failure
+fails the account-wide request rather than returning an apparently complete
+partial result. Results are individual messages, not cross-folder threads.

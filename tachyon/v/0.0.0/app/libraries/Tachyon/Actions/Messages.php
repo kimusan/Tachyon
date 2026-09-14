@@ -65,14 +65,19 @@ trait Messages
 
 		$oAccount = $this->initMailClientConnection();
 
+		$oParams->bAllowAccountSearch = (bool) $this->Config()->Get('imap', 'search_all_folders', true);
 		$oSettingsLocal = $this->SettingsProvider(true)->Load($oAccount);
 		if ($oSettingsLocal instanceof \Tachyon\Settings) {
+			$oParams->aSearchExcludedFolders = [(string) $oSettingsLocal->GetConf('JunkFolder', ''), (string) $oSettingsLocal->GetConf('TrashFolder', '')];
 			$oParams->bHideDeleted = !empty($oSettingsLocal->GetConf('HideDeleted', 1));
 		}
 
 //		$oParams->bUseSort = $this->ImapClient()->hasCapability('SORT');
 		$oParams->bUseSort = true;
 
+		if ('all' === \MailSo\Imap\SearchCriterias::fromString($this->ImapClient(), $oParams->sFolderName, $oParams->sSearch, $oParams->bHideDeleted)->sIn) {
+			$sHash = ''; // A single folder's etag cannot validate account-wide results.
+		}
 		if ($sHash) {
 			$oInfo = $this->ImapClient()->FolderStatusAndSelect($oParams->sFolderName);
 			$aRequestHash = \explode('-', $sHash);

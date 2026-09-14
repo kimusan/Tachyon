@@ -426,6 +426,22 @@ trait Messages
 		return $this->getSimpleESearchOrESortResult($bReturnUid);
 	}
 
+	/** Search an explicit account folder set; never send an empty scope. */
+	public function MessageMultiSearchMailboxes(string $sCriteria, array $aFolders) : array
+	{
+		if (!$aFolders) {
+			return [];
+		}
+		$oRequest = new \MailSo\Imap\Requests\ESEARCH($this);
+		$oRequest->sCriterias = $sCriteria;
+		$oRequest->aMailboxes = array_map(fn ($sFolder) => $this->EscapeFolderName($sFolder), $aFolders);
+		if (!$this->UTF8 && !\MailSo\Base\Utils::IsAscii($sCriteria)) {
+			$oRequest->sCharset = 'UTF-8';
+		}
+		$oRequest->SendRequest();
+		return $this->getMultiSearchResult(true);
+	}
+
 	/**
 	 * RFC 7377 MULTISEARCH
 	 * Searches the $sIn scope ('subtree', 'subtree-one' or 'mailboxes') relative to $sBaseFolder.
