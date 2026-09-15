@@ -25,7 +25,7 @@
 		"TO_SPAM": "Переместить сообщение(-я) в Спам",
 		"NOT_SPAM": "Не спам",
 		"USERNAME": "Имя пользователя",
-		"PASSWORD": "Кодовая фраза",
+		"PASSWORD": "Пароль",
 		"REMEMBER": "Запомнить",
 		"REMEMBER_FOR_SESSION": "Запомнить Временное",
 		"REMEMBER_PERMANENT": "Запомнить Навсегда",
@@ -116,7 +116,7 @@
 		"MENU_UNSET_SEEN": "Отметить как непрочитанное",
 		"MENU_SET_FLAG": "Установить флаг",
 		"MENU_UNSET_FLAG": "Снять флаг",
-		"MENU_SELECT_ALL": "Выбрать все",
+		"MENU_SELECT_ALL": "Все",
 		"MENU_SELECT_INVERT": "Инвертировать",
 		"MENU_SELECT_UNSEEN": "Непрочитанные",
 		"MENU_SELECT_SEEN": "Прочитанные",
@@ -243,7 +243,13 @@
 		"BUTTON_SHARE_ALL": "Всем",
 		"BUTTON_SYNC": "Синхронизация (CardDAV)",
 		"SEND_TO_ALL_CONTACT_EMAILS": "Отправить всем контактам",
-		"TAGS_PLACEHOLDER": "Добавить тег"
+		"TAGS_PLACEHOLDER": "Добавить тег",
+		"SELECT_ALL": "Выбрать все на странице",
+		"SELECT_PAGE": "Выбрать эту страницу",
+		"SELECT_ALL_MATCHING": "Выбрать все",
+		"SELECT_NONE": "Отменить выбор",
+		"SELECTED_SOME": "%COUNT% выбрано",
+		"SELECTED_ALL": "%COUNT% выбрано, все"
 	},
 	"COMPOSE": {
 		"LINK_SHOW_INPUTS": "Показать все поля",
@@ -524,7 +530,7 @@
 	"SETTINGS_CONTACTS": {
 		"LABEL_CONTACTS_AUTOSAVE": "Автоматически добавлять получателей писем в адресную книгу",
 		"LEGEND_CONTACTS_SYNC": "Синхронизация (CardDAV)",
-		"LABEL_CONTACTS_SYNC_ENABLE": "Включить синхронизация",
+		"LABEL_CONTACTS_SYNC_ENABLE": "Включить синхронизацию",
 		"LABEL_CONTACTS_SYNC_SERVER": "Сервер",
 		"LABEL_CONTACTS_SYNC_AB_URL": "Адресная книга (URL)",
 		"LABEL_CONTACTS_SYNC_USER": "Пользователь",

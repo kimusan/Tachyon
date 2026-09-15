@@ -6,7 +6,7 @@
 		"TEST": "Тест",
 		"UPDATE": "Обновить",
 		"USERNAME": "Имя пользователя",
-		"PASSWORD": "Кодовая фраза",
+		"PASSWORD": "Пароль",
 		"CANCEL": "Отменить",
 		"SEARCH": "Поиск",
 		"YES": "Да",
@@ -30,7 +30,7 @@
 		"PACKAGES": "Плагины",
 		"CONFIG": "Файл конфигурации",
 		"ABOUT": "О Программе",
-		"LOGGING": "Ведение Журнала",
+		"LOGGING": "Ведение журнала",
 		"CALENDAR": "Календарь"
 	},
 	"TAB_GENERAL": {
@@ -48,7 +48,11 @@
 		"LABEL_ALLOW_IDENTITIES": "Разрешить множественные профили",
 		"ALERT_DATA_ACCESS": "Папка данных Tachyon доступна. Пожалуйста, настройте свой веб-сервер так, чтобы скрыть папку данных с внешнего доступа. Подробнее здесь:",
 		"ALERT_WARNING": "Внимание!",
-		"HTML_ALERT_WEAK_PASSWORD": "Вы используете пароль администратора по умолчанию.\n<br>\nВ целях безопасности, пожалуйста,\n<strong><a href=\"#/security\">измените</a></strong> \nпароль на другой прямо сейчас.\n"
+		"HTML_ALERT_WEAK_PASSWORD": "Вы используете пароль администратора по умолчанию.\n<br>\nВ целях безопасности, пожалуйста,\n<strong><a href=\"#/security\">измените</a></strong> \nпароль на другой прямо сейчас.\n",
+		"LABEL_MESSAGES_PER_PAGE": "Количество сообщений на странице",
+		"HINT_MESSAGES_PER_PAGE": "Значение по умолчанию для пользователя, который не выбрал свой собственный вариант.",
+		"LABEL_MESSAGES_PER_PAGE_MAX": "Ограничение на количество сообщений на странице",
+		"HINT_MESSAGES_PER_PAGE_MAX": "Максимально допустимый пользователем уровень. Больший уровень по умолчанию имеет приоритет над меньшим."
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Страница Входа",
@@ -93,9 +97,9 @@
 		"LABEL_ENABLE_CONTACTS": "Включить контакты",
 		"LABEL_ALLOW_SYNC": "Разрешить синхронизацию контактов (с внешним CardDAV сервером)",
 		"LABEL_STORAGE_TYPE": "Тип",
-		"LABEL_STORAGE_DSN": "Dsn",
+		"LABEL_STORAGE_DSN": "Настройка источника данных (DSN)",
 		"LABEL_STORAGE_USER": "Пользователь",
-		"LABEL_STORAGE_PASSWORD": "Кодовая фраза",
+		"LABEL_STORAGE_PASSWORD": "Пароль",
 		"SQLITE_GLOBAL": "Используйте глобальную базу данных вместо базы данных для каждой учетной записи",
 		"ALERT_NOTICE": "Внимание!",
 		"SUGGESTIONS_LIMIT": "Лимит предложений",
@@ -236,7 +240,7 @@
 		"MAX_OCCURRENCES": "Количество случаев на одно повторяющееся событие",
 		"LEGEND_STORAGE": "Хранилище",
 		"LABEL_STORAGE_TYPE": "Тип",
-		"LABEL_STORAGE_DSN": "DSN",
+		"LABEL_STORAGE_DSN": "Настройка источника данных",
 		"LABEL_STORAGE_USER": "Пользователь",
 		"LABEL_STORAGE_PASSWORD": "Пароль",
 		"SQLITE_GLOBAL": "Одна общая база данных для всех, а не отдельная для каждого пользователя"
