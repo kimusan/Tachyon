@@ -46,19 +46,26 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 	 * that owns the settings file, which is the main one, and is moved into its
 	 * bucket the first time that account writes.
 	 */
-	private function allFilters() : array
+	private function allFilters(?\Tachyon\Model\Account $oAccount = null) : array
 	{
-		$aSettings = $this->getUserSettings();
+		if ($oAccount) {
+			// imap.after-login runs before LoginProcess establishes the session.
+			$aPlugins = $this->Manager()->Actions()->SettingsProvider()->Load($oAccount)->GetConf('Plugins', []);
+			$aSettings = $aPlugins[$this->Name()] ?? [];
+		} else {
+			$aSettings = $this->getUserSettings();
+		}
 		$aAll = $aSettings['SFilters'] ?? [];
 		return \is_array($aAll) ? $aAll : [];
 	}
 
-	private function filtersFor(string $sEmail) : array
+	private function filtersFor(string $sEmail, ?\Tachyon\Model\Account $oAccount = null) : array
 	{
-		$aAll = $this->allFilters();
+		$aAll = $this->allFilters($oAccount);
 		if ($aAll && \array_is_list($aAll)) {
 			// Legacy flat list: only the settings owner ever had it
-			return $sEmail === $this->ownerEmail() ? $aAll : [];
+			$bOwner = $oAccount ? $oAccount instanceof \Tachyon\Model\MainAccount : $sEmail === $this->ownerEmail();
+			return $bOwner ? $aAll : [];
 		}
 		return isset($aAll[$sEmail]) && \is_array($aAll[$sEmail]) ? $aAll[$sEmail] : [];
 	}
@@ -101,7 +108,7 @@ class SearchFiltersPlugin extends \Tachyon\Plugins\AbstractPlugin
 			return;
 		}
 
-		$Filters = $this->filtersFor($oAccount->Email());
+		$Filters = $this->filtersFor($oAccount->Email(), $oAccount);
 		if (!$Filters) {
 			return;
 		}
