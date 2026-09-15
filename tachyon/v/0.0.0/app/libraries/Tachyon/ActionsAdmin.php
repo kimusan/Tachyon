@@ -647,13 +647,37 @@ class ActionsAdmin extends Actions
 	{
 		$user = (string) $this->GetActionParam('username', '');
 		$secret = (string) $this->GetActionParam('TOTP', '');
-		$issuer = \rawurlencode(API::Config()->Get('webmail', 'title', 'Tachyon'));
-		$QR = \Tachyon\Util\QRCode::getMinimumQRCode(
-			"otpauth://totp/{$issuer}:{$user}?secret={$secret}&issuer={$issuer}",
-//			"otpauth://totp/{$user}?secret={$secret}",
-			\Tachyon\Util\QRCode::ERROR_CORRECT_LEVEL_M
-		);
-		return $this->DefaultResponse($QR->__toString());
+
+		/**
+		 * The issuer is the admin's own webmail title, it appears twice in the
+		 * URI, and rawurlencode turns one non-ASCII character into six bytes. A
+		 * long Cyrillic title therefore ran past what any QR code we can produce
+		 * holds and two factor enrolment failed outright (#80). The title is
+		 * only a label in the authenticator, so a shortened one is far better
+		 * than no QR code, and the product name is the last resort.
+		 */
+		$sTitle = \trim((string) API::Config()->Get('webmail', 'title', 'Tachyon'));
+		foreach ([$sTitle, \mb_substr($sTitle, 0, 16), \mb_substr($sTitle, 0, 8), 'Tachyon'] as $sCandidate) {
+			if (!\strlen($sCandidate)) {
+				continue;
+			}
+			$issuer = \rawurlencode($sCandidate);
+			try {
+				$QR = \Tachyon\Util\QRCode::getMinimumQRCode(
+					"otpauth://totp/{$issuer}:{$user}?secret={$secret}&issuer={$issuer}",
+//					"otpauth://totp/{$user}?secret={$secret}",
+					\Tachyon\Util\QRCode::ERROR_CORRECT_LEVEL_M
+				);
+				return $this->DefaultResponse($QR->__toString());
+			} catch (\OutOfBoundsException $oException) {
+				$this->logWrite(
+					'TOTP QR code too long with this issuer, shortening: ' . $oException->getMessage(),
+					\LOG_NOTICE
+				);
+			}
+		}
+
+		throw new \Exception('Could not build a TOTP QR code');
 	}
 
 	private function setAdminAuthToken() : string
