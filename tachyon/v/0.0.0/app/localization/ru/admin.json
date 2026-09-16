@@ -267,7 +267,7 @@
 		"LABEL_DEBUG_JS": "Предоставлять неминифицированный JavaScript",
 		"LABEL_DEBUG_CSS": "Предоставлять неминифицированный CSS",
 		"LEVEL_EMERGENCY": "Чрезвычайный",
-		"LEVEL_ALERT": "Оповещение",
+		"LEVEL_ALERT": "Тревога",
 		"LEVEL_CRITICAL": "Критический",
 		"LEVEL_ERROR": "Ошибка",
 		"LEVEL_WARNING": "Предупреждение",
