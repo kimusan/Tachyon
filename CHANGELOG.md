@@ -1,3 +1,22 @@
+## 4.2.4 - 2026-09-16
+
+### Added
+- A Calendar button on the folder panel, beside the Contacts one that was already there (#75)
+- Messages per page is now two admin settings rather than one: a default, and a separate limit on what a user may choose. Both are on the General tab instead of only in the config file (#73)
+
+### Fixed
+- A long webmail title broke two-factor enrolment outright. The title is the QR code's issuer and appears in it twice, and percent-encoding turns one Cyrillic character into six bytes, so a 60 character title came to 744 bytes against the 213 a QR code of that size holds. The title is shortened now rather than the code failing, and the failure it used to produce named neither the real input nor the real limit (#80)
+- The settings input capped messages per page at 50 while the save clamped at 100 and the admin could configure anything, so a site set higher could not be matched from the settings screen (#73)
+- A still-enabled SnappyMail could leave the Nextcloud session holding a user id but no passphrase, so auto-login found nothing to send and presented an empty password field with nothing to explain it (#72)
+- The General and Config admin tabs edit the same keys, and General never re-read them, so a value changed on Config still showed the old number and saving put it back
+- Search filters were not applied on a fresh login, because the settings lookup needed a session that `imap.after-login` runs before. Thanks to @wojt-janowski
+- Weblate's safe-html autofix had escaped `&` to `&amp;` inside translated strings. Those render as text, not HTML, so eight languages were displaying the entity. A CI check now fails on it rather than leaving it to review
+
+### Changed
+- Russian is substantially more complete, thanks to @lvarnava and @BrainDeLook
+
+---
+
 ## 4.2.3 - 2026-09-11
 
 ### Added
