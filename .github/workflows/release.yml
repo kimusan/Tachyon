@@ -161,26 +161,39 @@ jobs:
             git push origin HEAD:master
           fi
 
+      # Uploaded with gh rather than softprops/action-gh-release. That action put
+      # every asset in place and then failed updating asset metadata with a 404
+      # from the API, which failed both 4.2.3 and 4.2.4 after the release was in
+      # fact complete, and each time took the App Store publish down with it
+      # because that job needs this one to succeed. gh uploads and stops.
       - name: Upload release artifacts
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(
             build/dist/releases/webmail/*/tachyon-*.tar.gz
             build/dist/releases/webmail/*/tachyon-*.zip
             build/dist/releases/webmail/*/tachyon_*.deb
-            build/dist/releases/webmail/*/tachyon-*-nextcloud.tar.gz
-            build/dist/releases/webmail/*/tachyon-*-owncloud.tar.gz
             build/dist/releases/webmail/*/tachyon-*-translation-status.txt
             build/dist/releases/webmail/*/tachyon-archive-keyring.asc
-            build/dist/releases/plugins/*.tgz
-            packages.json
             build/dist/releases/webmail/*/*.asc
-            build/dist/releases/plugins/*.asc
             build/dist/releases/webmail/*/InRelease
             build/dist/releases/webmail/*/Release
             build/dist/releases/webmail/*/Release.gpg
             build/dist/releases/webmail/*/Packages
             build/dist/releases/webmail/*/Packages.gz
+            build/dist/releases/plugins/*.tgz
+            build/dist/releases/plugins/*.asc
+            packages.json
+          )
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::No release artifacts were produced"
+            exit 1
+          fi
+          echo "Uploading ${#files[@]} assets to $GITHUB_REF_NAME"
+          # --clobber so a re-run replaces what the previous attempt uploaded
+          gh release upload "$GITHUB_REF_NAME" "${files[@]}" --clobber
 
   publish-appstore:
     name: Publish to Nextcloud App Store
