@@ -1,14 +1,14 @@
 {
     "NEXTCLOUD": {
-        "SAVE_ATTACHMENTS": "",
-        "SAVE_EML": "",
-        "SAVE_ICS": "",
-        "SELECT_FOLDER": "",
-        "SELECT_FILES": "",
-        "ATTACH_FILES": "",
-        "SELECT_CALENDAR": "",
-        "FILE_ATTACH": "",
-        "FILE_INTERNAL": "",
-        "FILE_PUBLIC": ""
+        "SAVE_ATTACHMENTS": "Gem i Nextcloud",
+        "SAVE_EML": "Gem som .eml i Nextcloud",
+        "SAVE_ICS": "Tilføj til kalender",
+        "SELECT_FOLDER": "Vælg mappe",
+        "SELECT_FILES": "Vælg fil(er)",
+        "ATTACH_FILES": "Vedhæft Nextcloud filer",
+        "SELECT_CALENDAR": "Vælg kalender",
+        "FILE_ATTACH": "Vedhæft",
+        "FILE_INTERNAL": "Intern",
+        "FILE_PUBLIC": "offentlig"
     }
 }
