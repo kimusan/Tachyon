@@ -534,7 +534,8 @@
 		"LABEL_CONTACTS_SYNC_SERVER": "Сервер",
 		"LABEL_CONTACTS_SYNC_AB_URL": "Адресная книга (URL)",
 		"LABEL_CONTACTS_SYNC_USER": "Пользователь",
-		"SYNC_READ": "Только чтение"
+		"SYNC_READ": "Только чтение",
+		"LABEL_CONTACTS_HIDE_NO_EMAIL": "Скрыть контакты без адреса электронной почты"
 	},
 	"SETTINGS_THEMES": {
 		"LEGEND_THEMES": "Темы Оформления",
@@ -666,6 +667,12 @@
 		"CalendarSyncError": "Синхронизация календаря не удалась"
 	},
 	"CALENDAR": {
-		"LABEL_CALENDAR": "Календарь"
+		"LABEL_CALENDAR": "Календарь",
+		"BUTTON_ADD_TO_CALENDAR": "Добавить в календарь",
+		"LABEL_CHOOSE_CALENDAR": "Какой календарь?",
+		"IMPORT_SUCCEEDED": "Добавлено %COUNT% событий в календарь.",
+		"ERROR_NO_WRITABLE_CALENDAR": "Нет календаря, в который можно писать.",
+		"ERROR_IMPORT_FAILED": "Не удалось добавить событие.",
+		"BUTTON_NEW_EVENT": "Новое событие"
 	}
 }
