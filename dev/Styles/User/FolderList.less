@@ -194,20 +194,47 @@
 	}
 }
 
+/**
+ * Compose takes the room the icon buttons leave rather than a fixed reserve.
+ * The old rule subtracted a hardcoded 48px for one button, which neither
+ * accounted for a second one nor gave the space back when contacts or the
+ * calendar are disabled. That matters most on a phone, where this panel is
+ * half the viewport and there is little to spare.
+ */
+#rl-left .b-folders > .b-toolbar {
+	align-items: center;
+	display: flex;
+	gap: 4px;
+
+	/* btn-toolbar hands every child a 3px right margin, which would stack on
+	   top of the gap. The gap is the only spacing wanted here. */
+	> * {
+		margin-right: 0;
+	}
+}
+
 #rl-left .buttonCompose {
+	flex: 1 1 auto;
 	max-height: 2em;
-	max-width: fit-content;
+	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	width: calc(100% - 48px);
+}
+
+/* Contacts and calendar sit in a btn-group so they butt together, the way
+   Archive and Not spam do, rather than carrying the toolbar's gap between them */
+#rl-left .b-folders > .b-toolbar > .btn-group {
+	flex: 0 0 auto;
 }
 
 html.rl-left-panel-disabled {
 	.buttonComposeText,
+	.buttonCalendar,
 	.buttonContacts {
 		display: none;
 	}
 	#rl-left .buttonCompose {
+		flex: 0 0 auto;
 		width: auto;
 	}
 }

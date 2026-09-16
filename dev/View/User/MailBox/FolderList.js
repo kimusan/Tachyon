@@ -18,6 +18,7 @@ import { AbstractViewLeft } from 'Knoin/AbstractViews';
 import { showMessageComposer, moveAction } from 'Common/UtilsUser';
 import { FolderCreatePopupView } from 'View/Popup/FolderCreate';
 import { ContactsPopupView } from 'View/Popup/Contacts';
+import { CalendarPopupView } from 'View/Popup/Calendar';
 import { ComposePopupView } from 'View/Popup/Compose';
 
 import { setExpandedFolder, foldersFilter } from 'Model/FolderCollection';
@@ -36,6 +37,7 @@ export class MailFolderList extends AbstractViewLeft {
 		this.moveAction = moveAction;
 
 		this.allowContacts = AppUserStore.allowContacts();
+		this.allowCalendar = AppUserStore.allowCalendar();
 
 		this.foldersFilter = foldersFilter;
 
@@ -200,6 +202,12 @@ export class MailFolderList extends AbstractViewLeft {
 	contactsClick() {
 		if (this.allowContacts) {
 			showScreenPopup(ContactsPopupView);
+		}
+	}
+
+	calendarClick() {
+		if (this.allowCalendar) {
+			showScreenPopup(CalendarPopupView);
 		}
 	}
 }
