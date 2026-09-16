@@ -1,1 +1,21 @@
-{}
+{
+    "SFILTERS": {
+        "WHEN_MESSAGE_MATCH_SEARCH_CRITERIA": "Når en besked er en nøjagtig match for dit søge kriterie:",
+        "FILTERS": "Filtre",
+        "FILTER": "Filter",
+        "MOVE_TO_FOLDER": "Flyt til mappe: ",
+        "CREATE_FILTER": "Opret filter",
+        "EDIT_FILTERS": "Rediger filter",
+        "MATCHES": "Matche: ",
+        "DO_THIS": "Gør dette: ",
+        "SAVE": "Gem",
+        "EDIT": "Rediger",
+        "REMOVE": "Fjern",
+        "NO_FILTERS": "Du har ikke tilføjet nogen filtre endnu.",
+        "THE_FOLLOWING_FILTERS_ARE_APPLIED": "Følgende filtre er påført alle dine indkomne emails: ",
+        "MARK_AS_READ": "Mærkér som læst",
+        "STAR_IT": "Sæt stjerne",
+        "PRIORITY_LABLE": "Prioritets point, højere betyder at det påføres først",
+        "PRIORITY_POINTS": "Prioritets point"
+    }
+}
