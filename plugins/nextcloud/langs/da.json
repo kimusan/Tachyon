@@ -1,0 +1,14 @@
+{
+    "NEXTCLOUD": {
+        "SAVE_ATTACHMENTS": "",
+        "SAVE_EML": "",
+        "SAVE_ICS": "",
+        "SELECT_FOLDER": "",
+        "SELECT_FILES": "",
+        "ATTACH_FILES": "",
+        "SELECT_CALENDAR": "",
+        "FILE_ATTACH": "",
+        "FILE_INTERNAL": "",
+        "FILE_PUBLIC": ""
+    }
+}
