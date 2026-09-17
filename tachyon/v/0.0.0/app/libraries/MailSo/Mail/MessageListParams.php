@@ -20,7 +20,8 @@ class MessageListParams
 		$sThreadAlgorithm = '';
 
 	public ?\MailSo\Cache\CacheClient
-		$oCacher = null;
+		$oCacher = null,
+		$oAttachmentCacher = null;
 
 	public bool
 		$bUseSort = true,
