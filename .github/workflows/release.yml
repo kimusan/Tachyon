@@ -152,13 +152,26 @@ jobs:
           git checkout -- .
           git fetch origin master
           git checkout -B release-packages origin/master
-          cp "$RUNNER_TEMP/packages.json" packages.json
-          git add packages.json
-          if git diff --cached --quiet; then
-            echo "packages.json on master is already current"
+          # A GPG signature embeds the time it was made, so every build produces
+          # different pgp_sig values even when nothing about a plugin changed.
+          # Those values are written by build/plugins.php and read by nothing, so
+          # committing on that alone only adds noise: a re-run of a release would
+          # otherwise always push a commit touching one line per plugin. Compare
+          # without them and keep whatever master already has when that is all
+          # that moved.
+          if diff -q \
+              <(jq -S 'map(del(.pgp_sig))' packages.json) \
+              <(jq -S 'map(del(.pgp_sig))' "$RUNNER_TEMP/packages.json") >/dev/null; then
+            echo "packages.json differs only in signature timestamps, leaving master alone"
           else
-            git commit -m "chore: update packages.json for $GITHUB_REF_NAME [skip ci]"
-            git push origin HEAD:master
+            cp "$RUNNER_TEMP/packages.json" packages.json
+            git add packages.json
+            if git diff --cached --quiet; then
+              echo "packages.json on master is already current"
+            else
+              git commit -m "chore: update packages.json for $GITHUB_REF_NAME [skip ci]"
+              git push origin HEAD:master
+            fi
           fi
 
       # Uploaded with gh rather than softprops/action-gh-release. That action put
