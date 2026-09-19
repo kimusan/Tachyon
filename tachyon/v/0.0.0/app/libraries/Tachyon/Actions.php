@@ -601,7 +601,7 @@ class Actions
 						'MaxBlockquotesLevel' => 0,
 						'simpleAttachmentsList' => false,
 						'listGrouped' => $oConfig->Get('defaults', 'mail_list_grouped', false),
-						'MessagesPerPage' => \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 25)) ?: 25),
+						'MessagesPerPage' => static::messagesPerPageDefault($oConfig),
 						/**
 						 * The ceiling the user may choose, sent so the input can
 						 * carry it rather than hardcoding one. The template said 50
@@ -754,7 +754,12 @@ class Actions
 						// name is not worth failing the whole app data for.
 						$this->logException($oException, \LOG_WARNING);
 					}
-					$aResult['MessagesPerPage'] = \max(10, \intval($oSettings->GetConf('MessagesPerPage', $aResult['MessagesPerPage']) ?: $aResult['MessagesPerPage']));
+					// Also held to the limit, so lowering it takes effect for people who
+					// had already stored a larger number rather than only for new ones
+					$aResult['MessagesPerPage'] = \min(
+						$aResult['MessagesPerPageMax'],
+						\max(10, \intval($oSettings->GetConf('MessagesPerPage', $aResult['MessagesPerPage']) ?: $aResult['MessagesPerPage']))
+					);
 					$aResult['messageNewWindow'] = (bool)$oSettings->GetConf('messageNewWindow', $aResult['messageNewWindow']);
 					$aResult['markdown'] = (bool)$oSettings->GetConf('markdown', $aResult['markdown']);
 					$aResult['messageReadAuto'] = (int)$oSettings->GetConf('messageReadAuto', $aResult['messageReadAuto']);
@@ -927,18 +932,25 @@ class Actions
 	}
 
 	/**
-	 * Highest messages per page a user may choose.
-	 *
-	 * Never below the configured default, since an admin who raises the default
-	 * past the ceiling means the higher number, and handing a user a default
-	 * they are not allowed to keep would be worse than either.
+	 * Highest messages per page a user may choose. The limit means the limit.
 	 */
 	public static function messagesPerPageMax(Config\Application $oConfig): int
 	{
-		return \max(
-			10,
-			(int) $oConfig->Get('webmail', 'messages_per_page', 20),
-			(int) $oConfig->Get('webmail', 'messages_per_page_max', 100)
+		return \max(10, (int) $oConfig->Get('webmail', 'messages_per_page_max', 100));
+	}
+
+	/**
+	 * Messages per page for a user who has not chosen their own.
+	 *
+	 * Held at or below the limit. A default above it would hand every new user a
+	 * number they are not allowed to keep, which their settings screen would
+	 * then refuse the moment they opened it.
+	 */
+	public static function messagesPerPageDefault(Config\Application $oConfig): int
+	{
+		return \min(
+			static::messagesPerPageMax($oConfig),
+			\max(10, (int) $oConfig->Get('webmail', 'messages_per_page', 20))
 		);
 	}
 

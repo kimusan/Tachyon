@@ -52,7 +52,7 @@
 		"LABEL_MESSAGES_PER_PAGE": "Messages per page",
 		"HINT_MESSAGES_PER_PAGE": "Default for a user who has not chosen their own.",
 		"LABEL_MESSAGES_PER_PAGE_MAX": "Messages per page limit",
-		"HINT_MESSAGES_PER_PAGE_MAX": "Highest a user may choose. A larger default wins over a smaller limit."
+		"HINT_MESSAGES_PER_PAGE_MAX": "Highest a user may choose. A default above this is held down to it."
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Login Screen",
