@@ -3,7 +3,7 @@ const js = require('@eslint/js');
 
 module.exports = [
 	{
-		ignores: ['node_modules/**', 'vendors/**', 'snappymail/**']
+		ignores: ['node_modules/**', 'vendors/**', 'tachyon/**']
 	},
 	{
 		files: ['dev/**/*.js'],

@@ -6,8 +6,8 @@ Only the latest release receives security updates.
 
 | Version  | Supported |
 | -------- | --------- |
-| 3.x      | ✔         |
-| < 3.0.0  | ❌         |
+| 4.x      | ✔         |
+| < 4.0.0  | ❌         |
 
 ## Reporting a Vulnerability
 
@@ -17,4 +17,4 @@ Reports will be analyzed and fixed as fast as possible. Disclosure is planned to
 
 ## Upgrade path
 
-Existing SnappyMail installations (2.x) can upgrade directly to Tachyon 3.x. The on-disk data format is backward compatible. PHP 8.2+ is required.
+Existing SnappyMail installations (2.x) can upgrade directly to Tachyon 4.x. The on-disk data format is backward compatible. PHP 8.2+ is required.
