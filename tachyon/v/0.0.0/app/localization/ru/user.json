@@ -361,7 +361,7 @@
 		"POPUP_IMPORT_BUTTON": "Импорт",
 		"POPUP_VIEW_TITLE": "Просмотр OpenPGP ключа",
 		"POPUP_VIEW_BUTTON": "Выбрать",
-		"POPUP_GENERATE_TITLE": "Генерация OpenPGP ключа",
+		"POPUP_GENERATE_TITLE": "Создать пару ключей OpenPGP",
 		"POPUP_GENERATE_BUTTON": "Создать",
 		"LABEL_KEY_TYPE": "Тип",
 		"SIGNED_MESSAGE": "OpenPGP подписанное сообщение",
@@ -611,7 +611,7 @@
 	},
 	"SETTINGS_OPENPGP": {
 		"BUTTON_IMPORT_KEY": "Импортировать ключ",
-		"BUTTON_GENERATE_KEY_PAIR": "Новый ключ",
+		"BUTTON_GENERATE_KEY_PAIR": "Создать пару ключей",
 		"IMPORT_FROM_SERVER": "Импортировать с сервера",
 		"TITLE_PRIVATE": "Приватный",
 		"TITLE_PUBLIC": "Публичный",
