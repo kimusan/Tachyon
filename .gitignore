@@ -31,3 +31,13 @@
 /vendors/vanillaqr.js/
 /integrations/nextcloud/rainloop
 /integrations/owncloud/rainloop
+
+# Exported by the release build into build/dist; a copy left in the root is a
+# local leftover, not source. The workflow regenerates it from the signing key.
+/tachyon-archive-keyring.asc
+
+# Working copies of the logo. The artwork the application ships lives under
+# tachyon/v/0.0.0/static/ and integrations/, not here.
+/tachyon-black.png
+/tachyon-icon.png
+/tachyon-white.png
