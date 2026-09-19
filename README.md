@@ -59,6 +59,7 @@ no third party fonts or scripts, and no external avatar service.
 - Clear the admin TOTP secret, which is generated from a real CSPRNG
 - Configurable syslog identity, so several instances on one host stay apart in the log and in a fail2ban filter
 - The account you log in with can be named like any other
+- List and delete the application directories left behind by past updates. Every release installs beside the previous one and nothing used to remove the old copy, so a long-lived install accumulated them. The running version cannot be selected, and a directory the web server cannot delete says so rather than half deleting it
 
 **Nextcloud**
 - Published on the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon), supporting Nextcloud 26 through 35
@@ -94,6 +95,7 @@ no third party fonts or scripts, and no external avatar service.
 - **ownCloud** — see `integrations/owncloud/`
 - **Cloudron** — see `integrations/cloudron/`
 - **Docker** — see `examples/docker/`
+- **Debian and derivatives** — each release carries a signed `.deb` and a small apt repository (`Packages`, `Release`, `InRelease`), so a release can be added as an apt source and upgraded with the rest of the system. The signing key ships alongside as `tachyon-archive-keyring.asc`
 
 ## Translations
 

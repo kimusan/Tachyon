@@ -27,39 +27,60 @@ there.
 **Getting started**
 
 1. Install PHP 8.2+
-2. Install node.js - `https://nodejs.org/download/`
+2. Install node.js - `https://nodejs.org/download/` (CI builds on Node 20)
 3. Install yarn - `https://yarnpkg.com/en/docs/install`
-4. Install gulp - `npm install gulp -g`
-5. Fork Tachyon from https://github.com/kimusan/tachyon
-6. Clone it - `git clone git@github.com:USERNAME/tachyon.git tachyon`
-7. `cd tachyon`
-8. Install all dependencies - `yarn install`
-9. Run gulp - `gulp`
+4. Fork Tachyon from https://github.com/kimusan/Tachyon
+5. Clone it - `git clone git@github.com:USERNAME/Tachyon.git Tachyon`
+6. `cd Tachyon`
+7. Install all dependencies - `yarn install`
+8. Build - `npx gulp`
+
+Gulp is a project dependency, so `npx gulp` uses the pinned version. There is no
+need to install it globally, and a global copy of a different major version will
+fight the local one.
+
+Useful targets: `npx gulp lint` for the checks CI runs, `npx gulp build` for
+everything, `npx gulp i18n` to see what each translation is missing.
 
 ---
 
 **Debugging JavaScript**
 
-1. Edit data/\_data_/\_default_/configs/application.ini
-2. Set 'use_app_debug_js' (and optionally 'use_app_debug_css') to 'On'
+Edit `data/_data_/_default_/configs/application.ini` and set, under `[debug]`:
+
+```ini
+javascript = On
+css = On
+```
+
+The old `use_app_debug_js` and `use_app_debug_css` names still work, but they
+are quietly rewritten to the two above, so it is worth using the current ones.
 
 ---
 
 **Editing HTML Template Files**
 
-1. Edit data/\_data_/\_default_/configs/application.ini
-2. Set `[cache] system_data` to Off
+Edit `data/_data_/_default_/configs/application.ini` and set `system_data = Off`
+under `[cache]`, otherwise compiled templates are served from cache and your
+edits will not appear.
 
 **Release**
 
 1. Install gzip
 2. Install brotli
-3. php release.php
+3. `php release.php`
 
-Options:
-* `php release.php --aur` = Build Arch Linux package
-* `php release.php --docker` = Build Docker instance
-* `php release.php --plugins` = Build plugins
+Plugins are always built, so there is no switch for them. The rest are opt in:
+
+* `--skip-gulp` = reuse the current build output instead of rebuilding the assets
+* `--sign` = sign the artifacts with the release key
+* `--debian` = Debian package and apt repository metadata
+* `--aur` = Arch Linux package
+* `--docker` = Docker image
+* `--nextcloud`, `--owncloud`, `--cpanel` = the matching integration archives
+
+Releases are normally cut by the GitHub Actions workflow rather than by hand;
+see `.github/workflows/release.yml`.
 
 ---
 
