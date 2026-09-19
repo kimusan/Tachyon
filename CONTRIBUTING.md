@@ -5,6 +5,25 @@
 
 ---
 
+**Translations**
+
+Translating needs none of the setup below. Tachyon is translated on
+[Hosted Weblate](https://hosted.weblate.org/engage/tachyon-webmail/): pick a
+language, translate the strings you recognise, and Weblate opens the pull
+request for you. No fork, no clone, no toolchain.
+
+The interface, the admin panel and the plugins that ship their own strings are
+all there. Partial work is welcome, since anything left untranslated falls back
+to English rather than breaking.
+
+Please do not edit the files under `tachyon/v/0.0.0/app/localization/` by hand.
+Weblate owns them, and a manual change there will be overwritten or will
+conflict with the next sync. English is the exception: new strings are added to
+the `en/` files with the code that uses them, and Weblate picks them up from
+there.
+
+---
+
 **Getting started**
 
 1. Install PHP 8.2+
