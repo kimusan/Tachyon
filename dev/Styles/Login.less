@@ -107,8 +107,18 @@
 		height: 40px;
 		padding-right: 30px;
 
-		&:placeholder {
-			color: #fff;
+		/**
+		 * Two colons. As :placeholder this matched nothing, so every theme fell
+		 * back to the browser's own light grey, which vanished on the themes
+		 * that put a translucent dark box over a light wallpaper (#94).
+		 *
+		 * Taken from the theme rather than hardcoded white, because four themes
+		 * use a light login box with dark text and white on white would have
+		 * been the same bug pointing the other way.
+		 */
+		&::placeholder {
+			color: var(--login-color, rgba(255, 255, 255, .8));
+			opacity: .7;
 		}
 
 		&:focus, &:hover {
