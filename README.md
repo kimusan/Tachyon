@@ -95,6 +95,20 @@ no third party fonts or scripts, and no external avatar service.
 - **Cloudron** — see `integrations/cloudron/`
 - **Docker** — see `examples/docker/`
 
+## Translations
+
+[![Translation status](https://hosted.weblate.org/widget/tachyon-webmail/svg-badge.svg)](https://hosted.weblate.org/engage/tachyon-webmail/)
+
+Tachyon is translated on [Hosted Weblate](https://hosted.weblate.org/engage/tachyon-webmail/),
+who provide their service free of charge to libre software projects.
+
+You do not need a development setup or a pull request to help. Pick a language,
+translate the strings you recognise, and Weblate opens the pull request for you.
+Both the interface and the admin panel are covered, and so are the plugins that
+ship their own strings.
+
+[![Translation status by language](https://hosted.weblate.org/widget/tachyon-webmail/multi-auto.svg)](https://hosted.weblate.org/engage/tachyon-webmail/)
+
 ## Requirements
 
 - PHP 8.2+
