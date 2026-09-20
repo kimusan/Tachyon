@@ -800,6 +800,9 @@ trait Messages
 				if (!$sFrom || !\MailSo\Base\Utils::FunctionCallable('mail')) {
 					throw new ClientException(Notifications::CantSendMessage);
 				}
+				if ($bDsn) {
+					$this->Logger()->Write('DSN was requested but PHP mail() cannot request one', \LOG_WARNING);
+				}
 				$oToCollection = $oMessage->GetTo();
 				if (!$oToCollection) {
 					throw new ClientException(Notifications::CantSendMessage);
