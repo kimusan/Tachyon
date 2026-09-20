@@ -156,7 +156,7 @@
 		"BUTTON_SHOW_IMAGES": "Показать внешние изображения в письме",
 		"BUTTON_NOTIFY_READ_RECEIPT": "Уведомить отправителя о прочтении этого сообщения.",
 		"BUTTON_IN_NEW_WINDOW": "В отдельном окне",
-		"BUTTON_THREAD_LIST": "Список",
+		"BUTTON_THREAD_LIST": "Список цепочек",
 		"BUTTON_THREAD_PREV": "Предыдущее",
 		"BUTTON_THREAD_NEXT": "Следующее",
 		"BUTTON_THREAD_MORE": "Больше сообщений",
@@ -201,7 +201,7 @@
 	},
 	"CONTACTS": {
 		"TAB_CONTACT": "Контакт",
-		"TAB_LOCATIONS": "Местоположение",
+		"TAB_LOCATIONS": "Местоположения",
 		"TAB_BUSINESS": "Организация",
 		"LABEL_ORGANIZATION": "Компания",
 		"LABEL_DEPARTMENT": "Отдел",
@@ -318,7 +318,8 @@
 	"POPUPS_ADD_ACCOUNT": {
 		"TITLE_ADD_ACCOUNT": "Добавить ещё аккаунт",
 		"BUTTON_ADD_ACCOUNT": "Добавить",
-		"TITLE_UPDATE_ACCOUNT": "Обновить аккаунт"
+		"TITLE_UPDATE_ACCOUNT": "Обновить аккаунт",
+		"HINT_MAIN_NAME": "Оставьте поле пустым, чтобы использовать имя вашего профиля или ваш адрес (если он был указан)."
 	},
 	"POPUPS_IDENTITY": {
 		"TITLE_ADD_IDENTITY": "Добавить Профиль",
@@ -354,7 +355,13 @@
 		"CHANGE_PASS": "Изменить парольную фразу",
 		"CURRENT_PASS": "Текущая парольная фраза",
 		"NEW_PASS": "Новая парольная фраза",
-		"ASK_CRYPTKEY_PASS": "Ваша парольная фраза была изменена. Введите вашу старую фразу для расшифровки данных"
+		"ASK_CRYPTKEY_PASS": "Ваша парольная фраза была изменена. Введите вашу старую фразу для расшифровки данных",
+		"NO_SIGNING_KEY": "Для этого идентификатора отсутствует ключ подписи",
+		"NO_KEY_FOR": "Отсутствует открытый ключ для %EMAIL%",
+		"NO_RECIPIENTS": "Сначала добавьте получателя",
+		"SIGN_METHOD": "Метод подписи",
+		"ENCRYPT_METHOD": "Метод шифрования",
+		"ASK_FALLBACK": "%FAILED% завершилось с ошибкой. Использовать %NEXT% вместо него?"
 	},
 	"OPENPGP": {
 		"POPUP_IMPORT_TITLE": "Импорт OpenPGP ключа",
@@ -371,7 +378,10 @@
 		"STORE_PRIVATE_KEY_IN_GNUPG": "Хранение закрытого ключа на сервере в GnuPG",
 		"BACKUP_ON_SERVER": "Хранить (с шифрованием) на сервере",
 		"BACKUP_PUBLIC_KEY_ON_SERVER": "Хранить открытый ключ на сервере",
-		"BACKUP_PRIVATE_KEY_ON_SERVER": "Хранить закрытый ключ на сервере"
+		"BACKUP_PRIVATE_KEY_ON_SERVER": "Хранить закрытый ключ на сервере",
+		"SEARCH_TRYING": "Поиск на %HOST%…",
+		"SEARCH_FOUND_ON": "Найдено на %HOST%",
+		"SEARCH_NOT_FOUND": "Ключ для %QUERY% не найден ни на одном сервере ключей."
 	},
 	"SMIME": {
 		"POPUP_IMPORT_TITLE": "Импорт сертификата S/MIME",
@@ -478,7 +488,15 @@
 		"IMAGEUPLOAD": "Выбрать на устройстве",
 		"UNDO": "Отменить",
 		"REDO": "Повторить",
-		"REMOVESTYLE": "Очистить стиль"
+		"REMOVESTYLE": "Очистить стиль",
+		"TABLE": "Вставить таблицу",
+		"ROWABOVE": "Вставить строку выше",
+		"ROWBELOW": "Вставить строку ниже",
+		"COLLEFT": "Вставить столбец слева",
+		"COLRIGHT": "Вставить столбец справа",
+		"ROWDELETE": "Удалить строку",
+		"COLDELETE": "Удалить столбец",
+		"TABLEDELETE": "Удалить таблицу"
 	},
 	"SETTINGS_LABELS": {
 		"GENERAL": "Основные",
@@ -564,7 +582,8 @@
 		"LABEL_CONTACTS_SYNC_AB_URL": "Адресная книга (URL)",
 		"LABEL_CONTACTS_SYNC_USER": "Пользователь",
 		"SYNC_READ": "Только чтение",
-		"LABEL_CONTACTS_HIDE_NO_EMAIL": "Скрыть контакты без адреса электронной почты"
+		"LABEL_CONTACTS_HIDE_NO_EMAIL": "Скрыть контакты без адреса электронной почты",
+		"TEST_OK": "Соединение установлено"
 	},
 	"SETTINGS_THEMES": {
 		"LEGEND_THEMES": "Темы Оформления",
@@ -615,7 +634,12 @@
 		"IMPORT_FROM_SERVER": "Импортировать с сервера",
 		"TITLE_PRIVATE": "Приватный",
 		"TITLE_PUBLIC": "Публичный",
-		"GET_MAILVELOPE": "Получить дополнение для браузера Mailvelope."
+		"GET_MAILVELOPE": "Получить дополнение для браузера Mailvelope.",
+		"RESTORE_FROM_ACCOUNT": "Восстановить ключи, сохраненные в моей учетной записи",
+		"RESTORE_HINT": "Ключи хранятся в вашем браузере, поэтому при использовании другого браузера или устройства список ключей будет пустым. Эта функция восстанавливает ключи, которые вы ранее сохранили в своей учетной записи на данном сервере. Поиск по публичным серверам ключей не выполняется.",
+		"IMPORT_NONE_FOUND": "На сервере не хранятся ключи OpenPGP.",
+		"IMPORT_ADDED": "Импортировано ключей: %COUNT%.",
+		"IMPORT_ALL_KNOWN": "Все %COUNT% ключа(-ей) с сервера уже находятся в вашей связке ключей."
 	},
 	"SHORTCUTS_HELP": {
 		"LEGEND_SHORTCUTS_HELP": "Сочетания клавиш",
@@ -702,6 +726,45 @@
 		"IMPORT_SUCCEEDED": "Добавлено %COUNT% событий в календарь.",
 		"ERROR_NO_WRITABLE_CALENDAR": "Нет календаря, в который можно писать.",
 		"ERROR_IMPORT_FAILED": "Не удалось добавить событие.",
-		"BUTTON_NEW_EVENT": "Новое событие"
+		"BUTTON_NEW_EVENT": "Новое событие",
+		"BUTTON_PREV": "Предыдущий",
+		"BUTTON_NEXT": "Следующий",
+		"BUTTON_TODAY": "Сегодня",
+		"BUTTON_SYNC": "Синхронизировать календари",
+		"SYNC_SKIPPED": "Синхронизация завершена, но %COUNT% элемент(ов) не удалось сохранить. Подробности см. в журнале.",
+		"VIEW_MONTH": "Месяц",
+		"VIEW_WEEK": "Неделя",
+		"VIEW_DAY": "День",
+		"VIEW_LIST": "Список",
+		"EMPTY_LIST": "Календари отсутствуют",
+		"READ_ONLY": "Только для чтения",
+		"LABEL_SUMMARY": "Название",
+		"LABEL_ALL_DAY": "Весь день",
+		"LABEL_START": "Начало",
+		"LABEL_END": "Окончание",
+		"LABEL_LOCATION": "Местоположение",
+		"LABEL_DESCRIPTION": "Описание",
+		"CONFIRM_DELETE_EVENT": "Вы уверены, что хотите удалить это событие?",
+		"ERROR_LOAD_COMPONENT": "Не удалось загрузить компонент календаря",
+		"RECURRING_READ_ONLY": "Это повторяющееся событие. Редактирование повторяющихся событий пока не поддерживается, поэтому оно отображается «только для чтения».",
+		"ERROR_NO_TITLE": "Назовите мероприятие",
+		"ERROR_BAD_START": "Недопустимая дата начала",
+		"ERROR_BAD_END": "Недопустимая дата окончания",
+		"ERROR_END_BEFORE_START": "Мероприятие закончится до того, как начнется",
+		"ERROR_NO_CALENDAR": "Выберите календарь для мероприятия"
+	},
+	"SETTINGS_CALENDAR": {
+		"LEGEND_DISPLAY": "Показывать",
+		"LABEL_FIRST_DAY": "Первый день недели",
+		"LABEL_WEEK_NUMBERS": "Показывать номера недель",
+		"DAY_MONDAY": "Понедельник",
+		"DAY_SUNDAY": "Воскресенье",
+		"DAY_SATURDAY": "Суббота",
+		"LEGEND_CALENDAR_SYNC": "Удаленная синхронизация (CalDAV)",
+		"LABEL_CALENDAR_SYNC_ENABLE": "Включить удаленную синхронизацию",
+		"LABEL_CALENDAR_SYNC_URL": "URL-адрес CalDAV",
+		"LABEL_CALENDAR_SYNC_USER": "Пользователь",
+		"SYNC_READ": "Только для чтения",
+		"TEST_OK": "Соединение установлено"
 	}
 }

@@ -52,7 +52,7 @@
 		"LABEL_MESSAGES_PER_PAGE": "Antal beskeder pr side",
 		"HINT_MESSAGES_PER_PAGE": "Standard for brugere der ikke har valgt en værdi.",
 		"LABEL_MESSAGES_PER_PAGE_MAX": "Antal beskeder pr side max",
-		"HINT_MESSAGES_PER_PAGE_MAX": "Højeste værdi en bruger kan vælge. En højere standard værdi vinder over en lavere mac max-værdi."
+		"HINT_MESSAGES_PER_PAGE_MAX": "Højeste værdi en bruger kan vælge. En højere standard værdi vil blive hold nede til denne max-værdi."
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Log ind skærm",
