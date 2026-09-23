@@ -1,3 +1,25 @@
+## 4.2.5 - 2026-09-23
+
+### Added
+- Delivery receipts carry an envelope id, so a notification that turns up days later can be matched to the message that caused it (#96)
+
+### Fixed
+- Requesting a delivery receipt did nothing whatsoever on a domain set to use `php mail()`. mail() cannot pass the SMTP parameters a receipt needs, so the request was discarded in silence, with the tick box in the compose window doing precisely nothing. The admin panel now says what the setting costs beside the setting itself, and both places a request used to be dropped without a word are logged. Found by @lvarnava, who noticed the one domain it worked on was the one with the box unticked (#96)
+- Delivery receipts asked for success and failure but never delay. Plenty of servers decline to send success notifications as backscatter protection while still honouring delay, so a message that was queued or retried reported nothing at all to the sender (#96)
+- Placeholder text was invisible on Xv, Linen and Squares. The rule meant to colour it was written with one colon rather than two, so it matched nothing and had never applied on any theme. Those three are also the only ones pairing a light wallpaper with a translucent black login box, which composited to mid grey; their own labels sat at 3.86:1, below the readable threshold, which nobody had reported (#94)
+- The messages per page limit now caps the default, rather than the larger of the two setting the ceiling. A default above the limit was handing every new user a number their own settings screen would refuse the moment they opened it (#73)
+- PDF attachments lost their preview link and the eye badge added in 4.0.5. The check read `navigator.mimeTypes`, a deprecated API that browsers now populate only while the built-in PDF viewer is enabled, so it came back empty on anything current. It asks `navigator.pdfViewerEnabled` instead
+
+### Changed
+- The README credits Weblate and charts progress per language, as the Libre plan asks
+- CONTRIBUTING opens with translating, the one kind of contribution that needs none of the toolchain, and its release switches, gulp advice and debug config keys match the code again
+- SECURITY.md listed 3.x as the supported line and asked for encrypted email without giving either an address or a key, so there was no way to report a vulnerability privately. Private reporting is enabled on the repository and the policy points at it
+- Seven dead files left over from SnappyMail and RainLoop are gone from the repository root, along with a roadmap that finished months ago
+- Release assets upload with `gh`, and packages.json is no longer re-committed when only the signatures moved
+- Russian and Danish are substantially more complete, thanks to @lvarnava and @BrainDeLook
+
+---
+
 ## 4.2.4 - 2026-09-16
 
 ### Added
