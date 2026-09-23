@@ -204,6 +204,12 @@ jobs:
             echo "::error::No release artifacts were produced"
             exit 1
           fi
+          # The keyring matches both its own pattern and the *.asc one, so it
+          # appears twice. gh works out what --clobber has to replace once, at
+          # the start, so the second copy collides with the one this same
+          # command just uploaded. Deduplicate after the empty check, since
+          # printf on an empty array would yield one blank entry and pass it.
+          mapfile -t files < <(printf '%s\n' "${files[@]}" | sort -u)
           echo "Uploading ${#files[@]} assets to $GITHUB_REF_NAME"
           # --clobber so a re-run replaces what the previous attempt uploaded
           gh release upload "$GITHUB_REF_NAME" "${files[@]}" --clobber
