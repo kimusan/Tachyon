@@ -454,7 +454,7 @@
 	},
 	"UPLOAD": {
 		"ERROR_FILE_IS_TOO_BIG": "Filen er for stor",
-		"ERROR_FILE_PARTIALLY_UPLOADED": "Upload iike færdiggjort, ukendt fejl.",
+		"ERROR_FILE_PARTIALLY_UPLOADED": "Upload iike færdiggjort, ukendt fejl",
 		"ERROR_NO_FILE_UPLOADED": "Ingen fil uploaded",
 		"ERROR_MISSING_TEMP_FOLDER": "Midlertidig fil findes ikke",
 		"ERROR_ON_SAVING_FILE": "Ukendt upload fejl",
@@ -476,8 +476,8 @@
 		"ITALIC": "Italic",
 		"UNDERLINE": "Understregning",
 		"STRIKE": "Gennemstregning",
-		"SUB": "Subscript",
-		"SUP": "Superscript",
+		"SUB": "Subskript",
+		"SUP": "Superskript",
 		"OL": "Nummereret liste",
 		"UL": "Punktopstilling",
 		"QUOTE": "Blockquote",
@@ -624,7 +624,7 @@
 		"LEGEND_IDENTITIES": "Identiteter",
 		"LEGEND_ACCOUNTS_AND_IDENTITIES": "Kontoer og identiteter",
 		"BUTTON_ADD_ACCOUNT": "Tilføj konto",
-		"BUTTON_ADD_IDENTITY": "Tilføj identitet?",
+		"BUTTON_ADD_IDENTITY": "Tilføj en identitet",
 		"LOADING_PROCESS": "Opdaterer...",
 		"SHOW_UNREAD": "Vis antal ulæste beskeder"
 	},

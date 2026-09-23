@@ -195,7 +195,8 @@
 		"NEW_DOMAIN_DESC": "Denne domæne konfiguration tillader <strong>%NAME%</strong> e-mail adresser.",
 		"WHITE_LIST_ALERT": "Liste med godkendte domæne for webmail opsætning.\nBrug mellemrum til at separere domæner.\n",
 		"VALID_SPAM_HEADERS": "Gyldige spam-headere",
-		"VALID_VIRUS_HEADERS": "Gyldige virus-headere"
+		"VALID_VIRUS_HEADERS": "Gyldige virus-headere",
+		"HINT_PHP_MAIL": "Sender beskeden via den lokale mail() funktion i stedet for at tale med SMTP direkte. Visse funktioner som f.eks. \"besked ved levering\" vil ikke virke uden SMTP adgang."
 	},
 	"POPUPS_PLUGIN": {
 		"TITLE_PLUGIN": "Tilføjelse",
