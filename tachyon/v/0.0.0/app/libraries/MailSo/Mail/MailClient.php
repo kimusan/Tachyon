@@ -684,7 +684,8 @@ class MailClient
 		if ($bUseCache && $oInfo->etag) {
 			$sSerializedHash = 'Get'
 				. ($bReturnUid ? 'UIDS/' : 'IDS/')
-				. "{$oParams->sSort}/{$this->oImapClient->Hash()}/{$sFolderName}/{$oSearchCriterias}";
+				. "{$oParams->sSort}/{$this->oImapClient->Hash()}/{$sFolderName}/{$oSearchCriterias}"
+				. ($oSearchCriterias->bHasAttachment ? '/attachment-bodystructure-v2' : '');
 			$sSerializedLog = "\"{$sFolderName}\" / {$oParams->sSort} / {$oSearchCriterias}";
 			$sSerialized = $oCacher->Get($sSerializedHash);
 			if (!empty($sSerialized)) {
@@ -703,7 +704,7 @@ class MailClient
 			return null;
 		}
 
-		$this->oImapClient->FolderExamine($sFolderName);
+		$oSelectedInfo = $this->oImapClient->FolderExamine($sFolderName);
 
 		$aResultUids = [];
 		if ($bUseSort) {
@@ -716,6 +717,10 @@ class MailClient
 			// A search scoped with IN (subtree) never gets here, MessageList() routes it to
 			// MessageListMultiFolder() because ESEARCH returns UIDs per folder, not a flat list.
 			$aResultUids = $this->oImapClient->MessageSearch($oSearchCriterias, $bReturnUid);
+		}
+
+		if ($oSearchCriterias->bHasAttachment) {
+			$aResultUids = $this->oImapClient->FilterAttachmentMessages($aResultUids, $bReturnUid, $oParams->oAttachmentCacher ?? $oCacher, $oSelectedInfo);
 		}
 
 		if ($bUseCache) {
@@ -968,14 +973,26 @@ class MailClient
 			// Nothing can search the subtree, use the current folder on its own
 			$this->logWrite('No subtree search available, searching only "'.$oParams->sFolderName.'"', \LOG_WARNING);
 			$oMessageCollection->SearchScope = '';
-			$this->oImapClient->FolderExamine($oParams->sFolderName);
+			$oSelectedInfo = $this->oImapClient->FolderExamine($oParams->sFolderName);
 			$aUids = $this->oImapClient->MessageSearch($oSearchCriterias, true);
+			if ($oSearchCriterias->bHasAttachment) {
+				$aUids = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oAttachmentCacher ?? $oParams->oCacher, $oSelectedInfo);
+			}
 			$oMessageCollection->totalEmails = \count($aUids);
 			if ($aUids) {
 				$aUids = \array_slice($aUids, $oParams->iOffset, $oParams->iLimit);
 				$this->MessageListByRequestIndexOrUids($oMessageCollection, new SequenceSet($aUids));
 			}
 			return $oMessageCollection;
+		}
+
+		if ($oSearchCriterias->bHasAttachment) {
+			foreach ($aPerFolder as $sFolderName => $aUids) {
+				if ($aUids) {
+					$oSelectedInfo = $this->oImapClient->FolderExamine($sFolderName);
+					$aPerFolder[$sFolderName] = $this->oImapClient->FilterAttachmentMessages($aUids, true, $oParams->oAttachmentCacher ?? $oParams->oCacher, $oSelectedInfo);
+				}
+			}
 		}
 
 		// Both strategies must order the same way. The ESEARCH response order and the LIST

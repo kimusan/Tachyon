@@ -128,6 +128,7 @@ class SearchCriterias
 
 	private array $criterias = [];
 	public bool $fuzzy = false;
+	public bool $bHasAttachment = false;
 	public string $sIn = '';  // subtree|subtree-one|mailboxes when MULTISEARCH IN is requested
 
 	function prepend(string $rule)
@@ -247,12 +248,7 @@ class SearchCriterias
 							break;
 
 						case 'ATTACHMENT':
-							// Simple, is not detailed search (Sometimes doesn't work)
-							$aCriteriasResult[] = 'OR OR OR';
-							$aCriteriasResult[] = 'HEADER Content-Type application/';
-							$aCriteriasResult[] = 'HEADER Content-Type multipart/m';
-							$aCriteriasResult[] = 'HEADER Content-Type multipart/signed';
-							$aCriteriasResult[] = 'HEADER Content-Type multipart/report';
+							// Match actual MIME parts after SEARCH, before counting or pagination.
 							break;
 
 						case 'HEADER':
@@ -386,6 +382,7 @@ class SearchCriterias
 		$search = new self;
 		$search->criterias = $aCriteriasResult;
 		$search->sIn = $sIn ?? '';
+		$search->bHasAttachment = isset($aLines['ATTACHMENT']);
 		return $search;
 	}
 

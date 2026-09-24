@@ -523,6 +523,61 @@ trait Messages
 	}
 
 	/**
+	 * Inspect metadata only, excluding inline resources retained by the message viewer.
+	 * The selected mailbox owns these IDs. Preserve SEARCH/SORT order even if
+	 * FETCH returns a different order, and bound each request's metadata volume.
+	 */
+	public function FilterAttachmentMessages(array $aIds, bool $bUid = true,
+		?\MailSo\Cache\CacheClient $oCacher = null, ?\MailSo\Imap\FolderInformation $oInfo = null) : array
+	{
+		// Sequence numbers can change after EXPUNGE; only stable UIDs may be cached.
+		$bCache = $bUid && $oCacher && $oCacher->IsInited() && $oInfo && $oInfo->UIDVALIDITY > 0;
+		$sPrefix = $bCache ? 'AttachmentParts/v2/'.\hash('sha256', \json_encode([
+			$this->Hash(), $oInfo->FullName, $oInfo->UIDVALIDITY
+		])) . '/' : '';
+		$aBlocks = [];
+		$aMatches = [];
+		$aPending = [];
+		foreach ($aIds as $iId) {
+			$iBlock = \intdiv($iId, 256);
+			if ($bCache && !isset($aBlocks[$iBlock])) {
+				$aCached = \json_decode($oCacher->Get($sPrefix.$iBlock) ?? '', true);
+				$aBlocks[$iBlock] = \is_array($aCached) ? \array_filter($aCached, 'is_bool') : [];
+			}
+			if ($bCache && isset($aBlocks[$iBlock][$iId])) {
+				$aMatches[$iId] = $aBlocks[$iBlock][$iId];
+			} else {
+				$aPending[] = $iId;
+			}
+		}
+		foreach (\array_chunk($aPending, 200) as $aBatch) {
+			$aDirty = [];
+			$oRange = new SequenceSet($aBatch, $bUid);
+			foreach ($this->FetchIterate(
+				[FetchType::UID, FetchType::BODYSTRUCTURE], (string) $oRange, $bUid
+			) as $oFetchResponse) {
+				$oBody = $oFetchResponse->GetFetchBodyStructure();
+				if (!$oBody) {
+					throw new \MailSo\RuntimeException('Missing BODYSTRUCTURE for attachment search');
+				}
+				$iId = $bUid ? $oFetchResponse->GetFetchValue(FetchType::UID)
+					: $oFetchResponse->oImapResponse->ResponseList[1];
+				$aMatches[$iId] = $oBody->SearchAttachmentsParts(false)->valid();
+				if ($bCache) {
+					$iBlock = \intdiv($iId, 256);
+					$aBlocks[$iBlock][$iId] = $aMatches[$iId];
+					$aDirty[$iBlock] = true;
+				}
+			}
+			// Save completed batches so a later timeout does not discard all progress.
+			foreach ($aDirty as $iBlock => $_) {
+				$oCacher->Set($sPrefix.$iBlock, \json_encode($aBlocks[$iBlock]));
+			}
+		}
+		return \array_values(\array_filter($aIds, static fn ($iId) => !empty($aMatches[$iId])));
+	}
+
+	/**
 	 * @throws \InvalidArgumentException
 	 * @throws \MailSo\RuntimeException
 	 * @throws \MailSo\Net\Exceptions\*

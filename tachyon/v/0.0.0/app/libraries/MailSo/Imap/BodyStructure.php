@@ -256,11 +256,13 @@ class BodyStructure implements \JsonSerializable
 		}
 	}
 
-	public function SearchAttachmentsParts() : iterable
+	public function SearchAttachmentsParts(bool $bIncludeInline = true) : iterable
 	{
-		return $this->SearchByCallback(function ($oItem, $oParent) {
+		return $this->SearchByCallback(function ($oItem, $oParent) use ($bIncludeInline) {
 //			return $oItem->IsAttachment();
-			return $oItem->IsAttachment($oParent) && (!$oParent || !$oParent->isPgpEncrypted());
+			return $oItem->IsAttachment($oParent) && (!$oParent || !$oParent->isPgpEncrypted())
+				// Explicit attachments can also carry Content-ID; disposition takes precedence.
+				&& ($bIncludeInline || 'attachment' === $oItem->sDisposition || !$oItem->isInline());
 		});
 	}
 
