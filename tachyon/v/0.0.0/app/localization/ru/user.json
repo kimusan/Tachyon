@@ -29,7 +29,7 @@
 		"REMEMBER": "Запомнить",
 		"REMEMBER_FOR_SESSION": "Запомнить Временное",
 		"REMEMBER_PERMANENT": "Запомнить Навсегда",
-		"REPLY_TO": "Ответить-на",
+		"REPLY_TO": "Адрес для ответа",
 		"SAVE": "Сохранить",
 		"SAVE_CHANGES": "Сохранить изменения?",
 		"SEARCH": "Поиск",
@@ -326,7 +326,7 @@
 		"TITLE_UPDATE_IDENTITY": "Обновить Профиль",
 		"LABEL": "Label",
 		"BUTTON_ADD_IDENTITY": "Добавить",
-		"SIGNATURE": "Signature",
+		"SIGNATURE": "Подпись",
 		"LABEL_SIGNATURE_INSERT_BEFORE": "Вставлять подпись перед цитированием текста в ответах"
 	},
 	"POPUPS_CREATE_FOLDER": {
