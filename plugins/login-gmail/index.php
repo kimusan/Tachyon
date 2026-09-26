@@ -13,8 +13,8 @@ class LoginGMailPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login GMail OAuth2',
-		VERSION  = '2.37',
-		RELEASE  = '2024-07-15',
+		VERSION  = '2.38',
+		RELEASE  = '2026-09-26',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'GMail IMAP, Sieve & SMTP login using RFC 7628 OAuth2';
@@ -181,7 +181,7 @@ class LoginGMailPlugin extends \Tachyon\Plugins\AbstractPlugin
 						);
 						if (!empty($aRefreshTokenResponse['result']['access_token'])) {
 							$aData['access_token'] = $aRefreshTokenResponse['result']['access_token'];
-							$aResponse['expires'] = $iExpires + $aResponse['expires_in'];
+							$aData['expires'] = $iExpires + $aRefreshTokenResponse['result']['expires_in'];
 							$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION, \Tachyon\Utils::GetSessionToken(),
 								\Tachyon\Util\Crypt::EncryptToJSON($aData, $oAccount->CryptKey())
 							);
