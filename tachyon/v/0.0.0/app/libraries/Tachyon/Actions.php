@@ -28,6 +28,14 @@ class Actions
 	const AUTH_SIGN_ME_TOKEN_KEY = 'smremember';
 
 	/**
+	 * This 30 days HttpOnly cookie holds the client half of the
+	 * "remember me" encryption key. The server never stores it, so a
+	 * server-side file read alone cannot decrypt remember-me blobs.
+	 * Gets refreshed on each login
+	 */
+	const AUTH_SIGN_ME_SECRET_KEY = 'smsignsecret';
+
+	/**
 	 * This session cookie contains a \Tachyon\Model\Account
 	 * Value is Base64 EncryptToJSON
 	 */

@@ -341,12 +341,33 @@ trait UserAuth
 	 * SignMe methods used for the "remember me" cookie
 	 */
 
+	/**
+	 * Split-knowledge "remember me" key: the server half is APP_SALT, the
+	 * client half is a random secret in a persistent HttpOnly cookie that
+	 * the server never stores. A server-side file read alone can no longer
+	 * decrypt remember-me blobs (which contain the account passwords).
+	 * Returns null when the client secret is missing, in which case the
+	 * caller must fall back to a normal login.
+	 */
+	private static function SignMeKey(): ?string
+	{
+		$sSecret = Cookies::get(self::AUTH_SIGN_ME_SECRET_KEY);
+		if (!\is_string($sSecret) || 44 !== \strlen($sSecret)) {
+			return null;
+		}
+		return 'signme:' . $sSecret;
+	}
+
 	private static function GetSignMeToken(): ?array
 	{
+		$sKey = self::SignMeKey();
+		if (!$sKey) {
+			return null;
+		}
 		$sSignMeToken = Cookies::get(self::AUTH_SIGN_ME_TOKEN_KEY);
 		if ($sSignMeToken) {
 			\Tachyon\Util\Log::notice(self::AUTH_SIGN_ME_TOKEN_KEY, 'decrypt');
-			$aResult = \Tachyon\Util\Crypt::DecryptUrlSafe($sSignMeToken, 'signme');
+			$aResult = \Tachyon\Util\Crypt::DecryptUrlSafe($sSignMeToken, $sKey);
 			if (isset($aResult['e'], $aResult['u']) && \Tachyon\Util\UUID::isValid($aResult['u'])) {
 				if (!isset($aResult['c'])) {
 					$aResult['c'] = \array_key_last($aResult);
@@ -363,8 +384,20 @@ trait UserAuth
 	public function SetSignMeToken(MainAccount $oAccount): void
 	{
 		$this->ClearSignMeData();
+		$sKey = self::SignMeKey();
+		if (!$sKey) {
+			// First issuance (or the client secret was lost): mint a fresh one
+			$sSecret = \base64_encode(\random_bytes(32));
+			Cookies::set(
+				self::AUTH_SIGN_ME_SECRET_KEY,
+				$sSecret,
+				\time() + 3600 * 24 * 30, // 30 days, matches the remember-me lifetime
+				true // HttpOnly: JavaScript never needs this value
+			);
+			$sKey = 'signme:' . $sSecret;
+		}
 		$uuid = \Tachyon\Util\UUID::generate();
-		$data = \Tachyon\Util\Crypt::Encrypt($oAccount, 'signme');
+		$data = \Tachyon\Util\Crypt::Encrypt($oAccount, $sKey);
 		Cookies::set(
 			self::AUTH_SIGN_ME_TOKEN_KEY,
 			\Tachyon\Util\Crypt::EncryptUrlSafe([
@@ -372,7 +405,7 @@ trait UserAuth
 				'u' => $uuid,
 				'c' => $data[0],
 				'd' => \base64_encode($data[1])
-			], 'signme'),
+			], $sKey),
 			\time() + 3600 * 24 * 30 // 30 days
 		);
 		$this->StorageProvider()->Put($oAccount, StorageType::SIGN_ME, $uuid, $data[2]);
@@ -380,7 +413,8 @@ trait UserAuth
 
 	public function GetAccountFromSignMeToken(): ?MainAccount
 	{
-		$aTokenData = static::GetSignMeToken();
+		$sKey = self::SignMeKey();
+		$aTokenData = $sKey ? static::GetSignMeToken() : null;
 		if ($aTokenData) {
 			try
 			{
@@ -396,7 +430,7 @@ trait UserAuth
 					$aTokenData['c'],
 					\base64_decode($aTokenData['d']),
 					$sAuthToken
-				], 'signme');
+				], $sKey);
 				if (!\is_array($aAccountHash)) {
 					throw new \RuntimeException('token decrypt failed');
 				}
@@ -425,6 +459,7 @@ trait UserAuth
 			$this->StorageProvider()->Clear($aTokenData['e'], StorageType::SIGN_ME, $aTokenData['u']);
 		}
 		Cookies::clear(self::AUTH_SIGN_ME_TOKEN_KEY);
+		Cookies::clear(self::AUTH_SIGN_ME_SECRET_KEY);
 	}
 
 	/**
