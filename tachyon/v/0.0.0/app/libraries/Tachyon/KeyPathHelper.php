@@ -28,4 +28,9 @@ class KeyPathHelper
 	{
 		return '/Session/AdminKey/'.\md5($sRand).'/';
 	}
+
+	static public function AdminLoginFaults(string $sIp) : string
+	{
+		return '/AdminLoginFaults/'.\md5($sIp).'/';
+	}
 }
