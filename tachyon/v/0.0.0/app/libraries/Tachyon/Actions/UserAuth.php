@@ -414,7 +414,7 @@ trait UserAuth
 	public function GetAccountFromSignMeToken(): ?MainAccount
 	{
 		$sKey = self::SignMeKey();
-		$aTokenData = $sKey ? static::GetSignMeToken() : null;
+		$aTokenData = static::GetSignMeToken();
 		if ($aTokenData) {
 			try
 			{

@@ -31,7 +31,7 @@ class Actions
 	 * This 30 days HttpOnly cookie holds the client half of the
 	 * "remember me" encryption key. The server never stores it, so a
 	 * server-side file read alone cannot decrypt remember-me blobs.
-	 * Gets refreshed on each login
+	 * Minted on first login when missing; kept for the cookie lifetime.
 	 */
 	const AUTH_SIGN_ME_SECRET_KEY = 'smsignsecret';
 
