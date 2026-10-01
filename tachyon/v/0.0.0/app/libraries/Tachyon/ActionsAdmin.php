@@ -305,21 +305,39 @@ class ActionsAdmin extends Actions
 
 		$totp = $this->Config()->Get('security', 'admin_totp', '');
 
-		// Brute-force backstop: 5 failures per IP per 15 minutes, after which
+		// Brute-force backstop: 5 attempts per IP per 15 minutes, after which
 		// the endpoint stops evaluating credentials until the window expires.
 		// The locked-out response is identical to a failed login (same error
 		// and delay), so the lockout state itself is not observable.
+		// The check-and-increment runs under a per-IP lock: without it,
+		// concurrent requests read the same counter value and each write
+		// back count+1, multiplying the attempt budget by the attacker's
+		// concurrency (lost-update race). A successful login clears the
+		// counter below.
 		$sIp = $this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false));
 		$sFaultKey = KeyPathHelper::AdminLoginFaults($sIp);
 		$oCacher = $this->Cacher(null, true);
-		$iFaults = 0;
-		$iFirstFault = 0;
-		$sFaults = $oCacher->Get($sFaultKey);
-		if (\is_string($sFaults) && 2 === \sscanf($sFaults, '%d|%d', $iFaults, $iFirstFault)
-			&& \time() - $iFirstFault > 900) {
-			$iFaults = 0; // window expired
+		$bLockedOut = true; // fail closed if the counter cannot be updated
+		$rLock = \fopen(\sys_get_temp_dir().'/tachyon-adminlogin-'.\md5($sIp).'.lock', 'c');
+		if (\is_resource($rLock) && \flock($rLock, LOCK_EX)) {
+			$iFaults = 0;
+			$iFirstFault = 0;
+			$sFaults = $oCacher->Get($sFaultKey);
+			if (\is_string($sFaults) && 2 === \sscanf($sFaults, '%d|%d', $iFaults, $iFirstFault)
+				&& \time() - $iFirstFault > 900) {
+				$iFaults = 0; // window expired
+				$iFirstFault = 0;
+			}
+			if ($iFaults < 5) {
+				$oCacher->Set($sFaultKey, ($iFaults + 1).'|'.($iFaults ? $iFirstFault : \time()));
+				$bLockedOut = false;
+			}
+			\flock($rLock, LOCK_UN);
 		}
-		if ($iFaults >= 5) {
+		if (\is_resource($rLock)) {
+			\fclose($rLock);
+		}
+		if ($bLockedOut) {
 			$this->LoggerAuthHelper(null, $sLogin, true);
 			$this->loginErrorDelay();
 			throw new ClientException(Notifications::AuthError);
@@ -332,7 +350,6 @@ class ActionsAdmin extends Actions
 			!$this->Config()->ValidatePassword($oPassword)
 			|| ($totp && !\Tachyon\Util\TOTP::Verify($totp, $this->GetActionParam('TOTP', ''))))
 		{
-			$oCacher->Set($sFaultKey, ($iFaults + 1) . '|' . ($iFaults ? $iFirstFault : \time()));
 			$this->LoggerAuthHelper(null, $sLogin, true);
 			$this->loginErrorDelay();
 			throw new ClientException(Notifications::AuthError);
