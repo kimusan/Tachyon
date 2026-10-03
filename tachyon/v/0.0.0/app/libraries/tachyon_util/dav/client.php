@@ -71,6 +71,14 @@ class Client
 	}
 
 	/**
+	 * Set a custom CA bundle file for SSL peer verification
+	 */
+	public function setCABundleFile(string $file) : void
+	{
+		$this->HTTP->setCABundleFile($file);
+	}
+
+	/**
 	 * Performs an actual HTTP request, and returns the result.
 	 *
 	 * If the specified url is relative, it will be expanded based on the base url.
