@@ -327,6 +327,11 @@ class ServiceActions
 				$tmp = \tmpfile();
 				$HTTP = \Tachyon\Util\HTTP\Request::factory();
 				$HTTP->max_redirects = 2;
+				// The proxied URL comes from message content: never let it
+				// reach private, reserved, loopback or link-local IPs
+				// (cloud metadata, intranet services). Checked on the
+				// initial URL and on every redirect hop via canFetchURI().
+				$HTTP->block_private_ips = true;
 				$HTTP->streamBodyTo($tmp);
 				$oResponse = $HTTP->doRequest('GET', $sUrl);
 				if ($oResponse) {
