@@ -8,8 +8,8 @@ class TwoFactorAuthPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Two Factor Authentication',
-		VERSION  = '2.19.1',
-		RELEASE  = '2026-09-29',
+		VERSION  = '2.19.1.1',
+		RELEASE  = '2026-10-06',
 		REQUIRED = '2.36.0',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'Provides support for TOTP 2FA';
