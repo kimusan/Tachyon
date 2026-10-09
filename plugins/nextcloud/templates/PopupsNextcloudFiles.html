@@ -6,9 +6,17 @@
 <div class="modal-body form-horizontal">
 	<ul id="sm-nc-files-tree"></ul>
 </div>
-<footer data-bind="hidden:files">
+<footer data-bind="visible:!files()">
+	<!--
+		visible rather than hidden: the hidden binding sets the attribute, and any
+		author rule carrying a display beats the user agent's [hidden] rule, so the
+		button could show in file mode where it means nothing. visible sets
+		display:none on the element itself.
+		Labelled from GLOBAL/SAVE: by the time the folder is ticked, saving is all
+		that is left to do, and that key is already translated everywhere.
+	-->
 	<button data-bind="click:selectFolder, disable:!folder()" name="select-folder" data-icon="folder"
-		class="button-vue" data-i18n="NEXTCLOUD/SELECT_FOLDER">select folder</button>
+		class="button-vue" data-i18n="GLOBAL/SAVE">save</button>
 </footer>
 <footer data-bind="visible:files">
 	<button data-bind="click:attach" name="select" data-icon="paperclip" class="button-vue" data-i18n="NEXTCLOUD/FILE_ATTACH">attach</button>
