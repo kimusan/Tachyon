@@ -1,25 +1,31 @@
-## Unreleased
+## 4.4.2 - 2026-10-09
 
-### Security
-- The two-factor-auth plugin keeps its TOTP secret sealed rather than in clear, and backup codes only as hashes. A code from an already-accepted 30 second step is refused, and five failures in fifteen minutes lock that account's second factor for fifteen. Existing enrolments and printed backup codes carry over untouched. Thanks to @FathiBenNasr (#128)
-- The avatars plugin answered without a session and fetched a URL chosen by whoever asked, with the SSRF gate switched off, then cached the result under any address. Only instances with `bimi` or `favicon` enabled were affected; both default to off
-
-### Changed
-- **The two-factor secret is now tied to `APP_SALT`.** Lose or regenerate `SALT.php`, by restoring a backup without it for instance, and every user loses their second factor with no way back but an administrator clearing their record. Before this the secret was stored in clear and survived such a change. Back up `SALT.php` with the data directory
+A release worth taking promptly: 4.4.0 and 4.4.1 could make login impossible on a host without the sodium extension.
 
 ### Fixed
+- **Upgrading to 4.4.0 could make login impossible on a host without the sodium extension**, with `Folders error: HTTP Token mismatch` after every attempt. `openssl_get_cipher_methods()` lists ciphers the provider will not actually use, and on OpenSSL 3 that includes `aes-256-cbc-hmac-sha1`, which is the shipped default. Encryption fell back to xxtea, correctly, but the hardening added in 4.4.0 then refused xxtea whenever `openssl_decrypt()` merely existed, so the server rejected the tokens it had just minted and no session could be established. The cipher is now tried rather than looked up, a working one is used when the configured one is not, and the refusal asks whether openssl can really be used. Affected installs are signed out once and move to proper encryption. Reported by @realsimix (#121)
+- Save in Nextcloud selected a folder, turned its spinner and wrote nothing. The plugin called `\OCP\Files::getStorage()`, which Nextcloud deprecated in 14 and has since removed, so the call threw and the save failed silently. The same call was in the "Save as .eml" path. Reported by @BlackIkeEagle (#116)
+- The Nextcloud file picker put a `select` button on every folder row and floated its checkboxes out of line. Folders now carry a radio confirmed from the footer, file names are clickable labels, and the rows line up. Reported by @lvarnava (#117)
 - A plugin updated to a build-numbered version kept reporting the version before it and offered the same update for ever. The release-time bump wrote the new version into `packages.json` but packaged an `index.php` still declaring the old one, and the admin panel reads the installed version from that constant. Reported by @ivnmad (#119)
 - Several callers passed HTTP headers as an associative array, which reached curl as bare values and were sent malformed and dropped: the integrity check, the breach lookup, which therefore travelled without its API key, and the CardDAV upload path, which answered `403 supported-address-data`. Thanks to @FathiBenNasr (#124)
 - Only the first `data-*` attribute was stripped from a composed message, because removing an attribute while iterating a live `DOMNamedNodeMap` ends the iteration. The rest went out in sent mail and saved drafts. Thanks to @FathiBenNasr (#126)
 - An empty contact list on either side of a CardDAV sync deleted everything on the other. An empty list is more often a fault than an intent, so deletions in that direction are now skipped and logged. Thanks to @FathiBenNasr (#125)
 - The ics-viewer panel never appeared on invitations from Evolution or Exchange, which put the calendar part inline and repeat it as `application/ics` rather than attaching `text/calendar`. Thanks to @FathiBenNasr (#127)
 
+### Security
+- The two-factor-auth plugin keeps its TOTP secret sealed rather than in clear, and backup codes only as hashes. A code from an already-accepted 30 second step is refused, and five failures in fifteen minutes lock that account's second factor for fifteen. Existing enrolments and printed backup codes carry over untouched. Thanks to @FathiBenNasr (#128)
+- The avatars plugin answered without a session and fetched a URL chosen by whoever asked, with the SSRF gate switched off, then cached the result under any address. Only instances with `bimi` or `favicon` enabled were affected; both default to off
+
+### Changed
+- The Debian package gains a signed `tachyon_<version>-1_all.changes` file for importing into reprepro or aptly, declares `php-xml`, without which a clean Debian 13 install fails the integrity check, and requires PHP 8.2 or later. `php-openssl`, `php-exif` and `php-sodium` are dropped, none of them being real packages on Debian. Thanks to @dionysius (#129)
+- **The two-factor secret is now tied to `APP_SALT`.** Lose or regenerate `SALT.php`, by restoring a backup without it for instance, and every user loses their second factor with no way back but an administrator clearing their record. Before this the secret was stored in clear and survived such a change. Back up `SALT.php` with the data directory
+
 ---
 
 ## 4.4.1 - 2026-10-07
 
 ### Fixed
-- The first request after an upgrade could die part way through the page. It empties the cache directory, and requests arriving together all got past the version check before any of them recorded the new version, so several walked and deleted the same tree at once; one removed a directory another had already listed and that request ended in a fatal. A browser left holding a half-built page has no usable request token, so later calls come back as `Folders error: HTTP Token mismatch`, which reads as a login fault rather than an install one. Found in the log attached to #121, though it has not turned out to be the whole of what @realsimix is seeing: that report is still open
+- The first request after an upgrade could die part way through the page. It empties the cache directory, and requests arriving together all got past the version check before any of them recorded the new version, so several walked and deleted the same tree at once; one removed a directory another had already listed and that request ended in a fatal. A browser left holding a half-built page has no usable request token, so later calls come back as `Folders error: HTTP Token mismatch`, which reads as a login fault rather than an install one. Found in the log attached to #121, though it was not the whole of what @realsimix was seeing; the rest of that report is fixed in 4.4.2
 
 ---
 
