@@ -1,5 +1,8 @@
 (rl => {
 
+// Where the last folder saved into is remembered, per browser.
+const LAST_FOLDER_KEY = 'tachyon-nextcloud-last-folder';
+
 const
 	nsDAV = 'DAV:',
 	nsNC = 'http://nextcloud.org/ns',
@@ -135,8 +138,12 @@ const
 						summary = document.createElement('summary'),
 						ul = document.createElement('ul');
 					details.addEventListener('toggle', () => {
-						ul.children.length
-						|| fetchFiles(item.name).then(items => buildTree(view, ul, items, item.name));
+						// Kept on the element so revealFolder() can wait for a level
+						// before looking inside it.
+						details.loaded = details.loaded
+							|| (ul.children.length
+								? Promise.resolve()
+								: fetchFiles(item.name).then(items => buildTree(view, ul, items, item.name)));
 					});
 					summary.dataset.icon = 'folder';
 					if (view.files()) {
@@ -307,7 +314,49 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 	/** Folder mode: take the folder the radio chose. */
 	selectFolder() {
 		this.select = this.folder();
+		// Remembered so the next save opens on the same folder rather than at the
+		// root. It is only ever pre-selected, never used without being shown, so
+		// there is nothing here a user can switch on and then not find again.
+		try {
+			this.select
+				? localStorage.setItem(LAST_FOLDER_KEY, this.select)
+				: localStorage.removeItem(LAST_FOLDER_KEY);
+		} catch (e) {
+			// private mode, quota, a browser that refuses: not worth failing a save
+		}
 		this.close();
+	}
+
+	/**
+	 * Ticks the remembered folder, opening each level on the way down to it.
+	 * Anything unexpected, a folder since deleted or renamed included, simply
+	 * leaves the dialog as it would have been.
+	 */
+	async revealFolder(sPath) {
+		let oScope = this.tree,
+			sAcc = '';
+		for (const sPart of sPath.split('/').filter(Boolean)) {
+			sAcc += '/' + sPart;
+			const oRadio = [...oScope.children]
+				.map(li => li.querySelector(':scope > details > summary > input[type="radio"]'))
+				.find(r => r && r.item_name === sAcc);
+			if (!oRadio) {
+				return;
+			}
+			if (sAcc === sPath) {
+				oRadio.checked = true;
+				this.folder(sAcc);
+				oRadio.scrollIntoView({block: 'nearest'});
+				return;
+			}
+			const oDetails = oRadio.closest('details');
+			oDetails.open = true;
+			await oDetails.loaded;
+			oScope = oDetails.querySelector('ul');
+			if (!oScope) {
+				return;
+			}
+		}
 	}
 
 	// Happens after showModal()
@@ -320,6 +369,15 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 		this.tree.innerHTML = '';
 		fetchFiles('/').then(items => {
 			buildTree(this, this.tree, items, '/');
+			if (!this.files()) {
+				let sLast = '';
+				try {
+					sLast = localStorage.getItem(LAST_FOLDER_KEY) || '';
+				} catch (e) {
+					// no storage, no memory, no harm
+				}
+				sLast && this.revealFolder(sLast).catch(err => console.error(err));
+			}
 		}).catch(err => console.error(err))
 	}
 
