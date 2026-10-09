@@ -14,7 +14,7 @@ A release worth taking promptly: 4.4.0 and 4.4.1 could make login impossible on 
 
 ### Security
 - The two-factor-auth plugin keeps its TOTP secret sealed rather than in clear, and backup codes only as hashes. A code from an already-accepted 30 second step is refused, and five failures in fifteen minutes lock that account's second factor for fifteen. Existing enrolments and printed backup codes carry over untouched. Thanks to @FathiBenNasr (#128)
-- The avatars plugin answered without a session and fetched a URL chosen by whoever asked, with the SSRF gate switched off, then cached the result under any address. Only instances with `bimi` or `favicon` enabled were affected; both default to off
+- The avatars plugin answered without a session and fetched a URL chosen by whoever asked, with the SSRF gate switched off, then cached the result under any address. Only instances with `bimi` or `favicon` enabled were affected; both default to off. Reported by Fathi Ben Nasr, Convergent Cloud Computing (GHSA-2r3w-3qmp-ppf2)
 
 ### Changed
 - The Debian package gains a signed `tachyon_<version>-1_all.changes` file for importing into reprepro or aptly, declares `php-xml`, without which a clean Debian 13 install fails the integrity check, and requires PHP 8.2 or later. `php-openssl`, `php-exif` and `php-sodium` are dropped, none of them being real packages on Debian. Thanks to @dionysius (#129)
