@@ -1,19 +1,19 @@
 <?php
 echo "\x1b[33;1m === Debian === \x1b[0m\n";
 
-// Debian Repository
+$deb_version = "{$package->version}-1";
 define('DEB_SOURCE_DIR', __DIR__ . '/deb');
-define('DEB_DEST_DIR', DEB_SOURCE_DIR . "/tachyon_{$package->version}-1_all");
+define('DEB_DEST_DIR', DEB_SOURCE_DIR . "/tachyon_{$deb_version}_all");
+// Holds the changelog and files list that dpkg-gencontrol and dpkg-genchanges share
+define('DEB_META_DIR', DEB_DEST_DIR . '.meta');
 is_dir(DEB_DEST_DIR) && passthru('rm -dfr '.escapeshellarg(DEB_DEST_DIR));
+is_dir(DEB_META_DIR) && passthru('rm -dfr '.escapeshellarg(DEB_META_DIR));
 
 $dir = DEB_DEST_DIR . '/DEBIAN';
-$data = file_get_contents(DEB_SOURCE_DIR . '/DEBIAN/control');
-$data = str_replace('0.0.0', $package->version, $data);
 mkdir($dir, 0755, true);
-file_put_contents("{$dir}/control", $data);
-copy(DEB_SOURCE_DIR . '/DEBIAN/postinst', $dir . '/postinst');
+copy(DEB_SOURCE_DIR . '/debian/postinst', $dir . '/postinst');
 chmod($dir . '/postinst', 0755);
-copy(DEB_SOURCE_DIR . '/DEBIAN/conffiles', $dir . '/conffiles');
+copy(DEB_SOURCE_DIR . '/debian/conffiles', $dir . '/conffiles');
 
 $dir = DEB_DEST_DIR . '/var/lib/tachyon';
 mkdir($dir, 0755, true);
@@ -39,6 +39,21 @@ file_put_contents("{$dir}/index.php", str_replace('0.0.0', $package->version, $d
 $data = file_get_contents('_include.php');
 file_put_contents("{$dir}/include.php", preg_replace('@(external-tachyon-data-folder/\'\);)@', "\$1\ndefine('APP_DATA_FOLDER_PATH', '/var/lib/tachyon/');", $data));
 
+mkdir(DEB_META_DIR, 0755);
+preg_match('/^Maintainer: (.*)$/m', file_get_contents(DEB_SOURCE_DIR . '/debian/control'), $maintainer);
+$changelog = "tachyon ({$deb_version}) stable; urgency=medium
+
+  * Release notes: https://github.com/kimusan/Tachyon/releases/tag/v{$package->version}
+
+ -- {$maintainer[1]}  " . gmdate('r') . "
+";
+file_put_contents(DEB_META_DIR . '/changelog', $changelog);
+file_put_contents(DEB_DEST_DIR . '/usr/share/doc/tachyon/changelog.Debian.gz', gzencode($changelog, 9));
+$dpkg_args = ' -c' . escapeshellarg(DEB_SOURCE_DIR . '/debian/control')
+	. ' -l' . escapeshellarg(DEB_META_DIR . '/changelog')
+	. ' -f' . escapeshellarg(DEB_META_DIR . '/files');
+
+passthru('dpkg-gencontrol' . $dpkg_args . ' -P' . escapeshellarg(DEB_DEST_DIR));
 passthru('dpkg --build ' . escapeshellarg(DEB_DEST_DIR));
 
 $TARGET_DIR = __DIR__ . "/dist/releases/webmail/{$package->version}/";
@@ -48,7 +63,11 @@ passthru('mv '
 	. escapeshellarg($TARGET_DIR . basename(DEB_DEST_DIR.'.deb'))
 );
 
-passthru('rm -dfr '.escapeshellarg(DEB_DEST_DIR));
+passthru('dpkg-genchanges -b' . $dpkg_args
+	. ' -u' . escapeshellarg($TARGET_DIR)
+	. ' -O' . escapeshellarg($TARGET_DIR . basename(DEB_DEST_DIR) . '.changes'));
+
+passthru('rm -dfr ' . escapeshellarg(DEB_DEST_DIR) . ' ' . escapeshellarg(DEB_META_DIR));
 
 // https://github.com/the-djmaze/snappymail/issues/185#issuecomment-1059420588
 $cwd = getcwd();

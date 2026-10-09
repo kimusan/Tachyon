@@ -342,6 +342,11 @@ if (isset($options['sign'])) {
 	if (defined('DEB_DEST_DIR')) {
 		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --armor --detach-sign '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/" . basename(DEB_DEST_DIR.'.deb')), $return_var);
+		// A .changes file is signed in place, as debsign does
+		$changes = ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/" . basename(DEB_DEST_DIR) . '.changes';
+		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --digest-algo SHA512 --clearsign --output '
+			. escapeshellarg("{$changes}.tmp") . ' ' . escapeshellarg($changes), $return_var);
+		$return_var || rename("{$changes}.tmp", $changes);
 		// https://github.com/the-djmaze/snappymail/issues/185#issuecomment-1059420588
 		passthru('gpg --local-user ' . escapeshellarg(SIGNING_KEY) . ' --digest-algo SHA512 --clearsign --output '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/InRelease") . ' '

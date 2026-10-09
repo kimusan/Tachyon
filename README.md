@@ -97,7 +97,7 @@ no third party fonts or scripts, and no external avatar service.
 - **ownCloud** — see `integrations/owncloud/`
 - **Cloudron** — see `integrations/cloudron/`
 - **Docker** — see `examples/docker/`
-- **Debian and derivatives** — each release carries a signed `.deb` and a small apt repository (`Packages`, `Release`, `InRelease`), so a release can be added as an apt source and upgraded with the rest of the system. The signing key ships alongside as `tachyon-archive-keyring.asc`
+- **Debian and derivatives** — each release carries a signed `.deb` and a small apt repository (`Packages`, `Release`, `InRelease`), so a release can be added as an apt source and upgraded with the rest of the system. A signed `.changes` file is included for importing the package into an apt repository tool such as reprepro or aptly. The signing key ships alongside as `tachyon-archive-keyring.asc`. See the [installation instructions](https://github.com/kimusan/Tachyon/wiki/Installation-instructions#debian--devuan) for each variant
 
 ## Translations
 

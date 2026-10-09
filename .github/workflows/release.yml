@@ -111,6 +111,7 @@ jobs:
           done
           [ -f "$D/InRelease" ] && gpg --verify "$D/InRelease"
           [ -f "$D/Release.gpg" ] && gpg --verify "$D/Release.gpg" "$D/Release"
+          [ -f "$D/tachyon_$V-1_all.changes" ] && gpg --verify "$D/tachyon_$V-1_all.changes"
           # Shipped with the release it signs, so a user always has the key that
           # matches the artifacts they just downloaded
           gpg --armor --export "${{ steps.gpg.outputs.fpr }}" > "$D/tachyon-archive-keyring.asc"
@@ -188,6 +189,7 @@ jobs:
             build/dist/releases/webmail/*/tachyon-*.tar.gz
             build/dist/releases/webmail/*/tachyon-*.zip
             build/dist/releases/webmail/*/tachyon_*.deb
+            build/dist/releases/webmail/*/tachyon_*.changes
             build/dist/releases/webmail/*/tachyon-*-translation-status.txt
             build/dist/releases/webmail/*/tachyon-archive-keyring.asc
             build/dist/releases/webmail/*/*.asc

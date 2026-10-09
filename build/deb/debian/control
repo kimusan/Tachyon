@@ -1,0 +1,20 @@
+Source: tachyon
+Section: web
+Priority: optional
+Maintainer: Kim Schulz <kim@schulz.dk>
+Homepage: https://github.com/kimusan/Tachyon
+Vcs-Browser: https://github.com/kimusan/Tachyon
+Vcs-Git: https://github.com/kimusan/Tachyon.git
+
+Package: tachyon
+Architecture: all
+Multi-Arch: foreign
+Depends: nginx | apache2 | httpd, php-fpm (>= 2:8.2~) | libapache2-mod-php (>= 2:8.2~), php-json, php-mbstring, php-xml
+Recommends: php-intl
+Suggests: php-cli, php-sqlite3 | php-mysql | php-pgsql, php-apcu, php-bz2, php-curl, php-gnupg, php-gd | php-gmagick | php-imagick, php-uuid, php-zip
+Description: fast, modern and secure web-based email client
+ Tachyon is a PHP 8.2+ webmail client forked from SnappyMail.
+ It supports IMAP, SMTP and Sieve protocols, multiple accounts and identities,
+ an admin panel for configuration, and a modern theme with light/dark/system
+ mode support. Plugins can be installed to extend functionality.
+ Emails are not stored locally; they are accessed through IMAP.

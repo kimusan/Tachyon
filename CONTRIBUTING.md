@@ -74,7 +74,7 @@ Plugins are always built, so there is no switch for them. The rest are opt in:
 
 * `--skip-gulp` = reuse the current build output instead of rebuilding the assets
 * `--sign` = sign the artifacts with the release key
-* `--debian` = Debian package and apt repository metadata
+* `--debian` = Debian package, apt repository metadata and `.changes` file (needs dpkg-dev)
 * `--aur` = Arch Linux package
 * `--docker` = Docker image
 * `--nextcloud`, `--owncloud`, `--cpanel` = the matching integration archives
