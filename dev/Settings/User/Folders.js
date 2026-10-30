@@ -1,9 +1,11 @@
 import ko from 'ko';
+import { koComputable } from 'External/ko';
 
 import { Notifications } from 'Common/Enums';
 import { FolderMetadataKeys } from 'Common/EnumsUser';
 import { getNotification } from 'Common/Translator';
 
+import { doc } from 'Common/Globals';
 import { getFolderFromCacheList, removeFolderFromCacheList } from 'Common/Cache';
 import { defaultOptionsAfterRender } from 'Common/Utils';
 import { initOnStartOrLangChange, i18n } from 'Common/Translator';
@@ -48,6 +50,14 @@ export class UserSettingsFolders /*extends AbstractViewSettings*/ {
 		this.unhideKolabFolders = SettingsUserStore.unhideKolabFolders;
 
 		this.loading = FolderUserStore.foldersChanging;
+
+		// Empty when the count is not known for every folder, which hides the line.
+		this.totalMessages = koComputable(() => {
+			const total = FolderUserStore.totalEmailsInMailbox();
+			// lang is empty until the language script sets it, and toLocaleString
+			// throws RangeError on an empty tag rather than falling back.
+			return null === total ? '' : total.toLocaleString(doc.documentElement.lang || undefined);
+		});
 
 		this.folderForDeletion = folderForDeletion;
 

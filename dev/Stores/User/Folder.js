@@ -119,7 +119,31 @@ FolderUserStore = new class {
 			},
 
 			systemFolders: () =>
-				self.systemFoldersNames().map(name => getFolderFromCacheList(name)).filter(v => v)
+				self.systemFoldersNames().map(name => getFolderFromCacheList(name)).filter(v => v),
+
+			/**
+			 * Every message the server listed a folder for, Trash, Spam and
+			 * unsubscribed folders included, so it can be held against the count of a
+			 * backup or an import. Null without LIST-STATUS: the folder list then
+			 * arrives with no counts at all and only the folders that happen to have
+			 * been opened since carry one, which sums to a number indistinguishable
+			 * from a complete one.
+			 * https://github.com/kimusan/Tachyon/discussions/181
+			 */
+			totalEmailsInMailbox: () => {
+				if (!self.hasCapability('LIST-STATUS')) {
+					return null;
+				}
+				let total = 0;
+				// subFolders() rather than .length, which reads past the dependency
+				// tracker, so a folder appearing later would not update the sum.
+				const walk = folders => folders.forEach(folder => {
+					total += folder.totalEmails();
+					walk(folder.subFolders());
+				});
+				walk(self.folderList());
+				return total;
+			}
 		});
 
 		const

@@ -650,6 +650,7 @@
 	},
 	"SETTINGS_FOLDERS": {
 		"LEGEND_FOLDERS": "Folder List",
+		"TOTAL_MESSAGES": "Messages in all folders:",
 		"BUTTON_CREATE": "Create Folder",
 		"BUTTON_SYSTEM": "System Folders",
 		"BUTTON_SUBSCRIBE": "Subscribe",
