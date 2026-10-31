@@ -290,7 +290,7 @@ class Message implements \JsonSerializable
 				}
 			}
 
-			$aAuth = $oHeaders->AuthStatuses();
+			$aAuth = $oHeaders->AuthStatuses(\Tachyon\Api::Config()->Get('security', 'trusted_authserv_ids', ''));
 			$oMessage->SPF = $aAuth['spf'];
 			$oMessage->DKIM = $aAuth['dkim'];
 			$oMessage->DMARC = $aAuth['dmarc'];
