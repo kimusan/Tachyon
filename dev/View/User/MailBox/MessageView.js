@@ -12,6 +12,7 @@ import {
 	MessageSetAction
 } from 'Common/EnumsUser';
 import { RFC822 } from 'Common/File';
+import { encodeHtml } from 'Common/Html';
 import {
 	elementById,
 	keyScopeReal,
@@ -202,9 +203,13 @@ export class MailMessageView extends AbstractViewRight {
 
 			messageVisible: () => !MessageUserStore.loading() && !!currentMessage(),
 
+			// A keyword is the sender's as soon as a Sieve rule or a shared folder can set
+			// one, and only the leading $ namespace is allow-listed, so it is escaped here:
+			// an IMAP atom may hold < and >, and this goes into an html: binding.
 			tagsToHTML: () => currentMessage()?.flags().map(value =>
 					isAllowedKeyword(value)
-					? '<span class="focused msgflag-'+value+'">' + i18n('MESSAGE_TAGS/'+value,0,value) + '</span>'
+					? '<span class="focused msgflag-'+encodeHtml(value)+'">'
+						+ encodeHtml(i18n('MESSAGE_TAGS/'+value,0,value)) + '</span>'
 					: ''
 				).join(' '),
 
