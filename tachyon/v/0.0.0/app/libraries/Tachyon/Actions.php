@@ -896,6 +896,8 @@ class Actions
 
 	public function DoPing(): array
 	{
+		// The client's keepalive while in use: reading the token records the activity
+		$this->getMainAccountFromToken(false);
 		return $this->DefaultResponse('Pong');
 	}
 

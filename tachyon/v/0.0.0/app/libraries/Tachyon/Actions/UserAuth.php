@@ -180,7 +180,7 @@ trait UserAuth
 		), \LOG_NOTICE, 'LOGIN');
 
 		if ($bMainAccount) {
-			$this->StorageProvider()->Put($oAccount, StorageType::SESSION, Utils::GetSessionToken(), 'true');
+			$this->StorageProvider()->Put($oAccount, StorageType::SESSION, Utils::GetSessionToken(), (string) \time());
 
 			// Must be here due to bug #1241
 			$this->SetMainAuthAccount($oAccount);
@@ -286,6 +286,24 @@ trait UserAuth
 					);
 					if ($oMainAuthAccount) {
 						$sTokenValue = $this->StorageProvider()->Get($oMainAuthAccount, StorageType::SESSION, $sToken);
+						// AutoLogout used to exist only as a timer in the browser, which closing
+						// the tab stops, so the session lived on for the 3 hours GC() allows
+						// (#185). The value is the time of the last request, written at most once
+						// a minute; 'true' is a session from before this and starts counting now.
+						$iIdle = \is_numeric($sTokenValue) ? \time() - (int) $sTokenValue : 60;
+						if ($sTokenValue && 60 <= $iIdle) {
+							$iAutoLogout = isset($_COOKIE[self::AUTH_SIGN_ME_TOKEN_KEY]) ? 0
+								: (int) $this->SettingsProvider()->Load($oMainAuthAccount)->GetConf('AutoLogout',
+									$this->Config()->Get('defaults', 'autologout', 30));
+							// Three minutes of grace: the stored time trails the last request by up
+							// to a minute, and the client's keepalive trails input by another.
+							if ($iAutoLogout && $iIdle > 60 * ($iAutoLogout + 3)) {
+								\Tachyon\Util\Log::notice('TOKENS', "SESSION_TOKEN idle {$iIdle}s, AutoLogout {$iAutoLogout}m");
+								$sTokenValue = false;
+							} else {
+								$this->StorageProvider()->Put($oMainAuthAccount, StorageType::SESSION, $sToken, (string) \time());
+							}
+						}
 						if ($sTokenValue) {
 							$this->oMainAuthAccount = $oMainAuthAccount;
 						} else {
@@ -310,7 +328,7 @@ trait UserAuth
 						$oAccount,
 						StorageType::SESSION,
 						Utils::GetSessionToken(),
-						'true'
+						(string) \time()
 					);
 					$this->SetAuthToken($oAccount);
 				}

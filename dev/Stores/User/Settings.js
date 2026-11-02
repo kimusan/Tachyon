@@ -77,7 +77,7 @@ export const SettingsUserStore = new class {
 		ThemeStore.isMobile.subscribe(toggleLayout);
 		toggleLayout();
 
-		let iAutoLogoutTimer;
+		let iAutoLogoutTimer, iKeepAlive = Date.now();
 		self.delayLogout = (() => {
 			clearTimeout(iAutoLogoutTimer);
 			if (0 < self.autoLogout() && !SettingsGet('accountSignMe')) {
@@ -85,6 +85,12 @@ export const SettingsUserStore = new class {
 					rl.app.logout,
 					self.autoLogout() * 60000
 				);
+				// The server ends a session after autoLogout minutes without a request
+				// (#185), and typing a long message sends none, so tell it we are here.
+				if (60000 < Date.now() - iKeepAlive) {
+					iKeepAlive = Date.now();
+					rl.app.Remote.request('Ping');
+				}
 			}
 		}).throttle(5000);
 	}
