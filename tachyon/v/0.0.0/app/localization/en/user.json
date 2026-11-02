@@ -50,7 +50,7 @@
 	},
 	"LOGIN": {
 		"LABEL_LOGIN": "Login",
-		"LABEL_SIGN_ME": "Remember Me",
+		"LABEL_SIGN_ME": "Keep Me Signed In",
 		"BUTTON_SIGN_IN": "Sign In"
 	},
 	"TOP_TOOLBAR": {

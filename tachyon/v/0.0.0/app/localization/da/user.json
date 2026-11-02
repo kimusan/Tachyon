@@ -49,7 +49,7 @@
 	},
 	"LOGIN": {
 		"LABEL_LOGIN": "Log ind",
-		"LABEL_SIGN_ME": "Husk mig",
+		"LABEL_SIGN_ME": "Forbliv logget ind",
 		"BUTTON_SIGN_IN": "Log ind"
 	},
 	"TOP_TOOLBAR": {

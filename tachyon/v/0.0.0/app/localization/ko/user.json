@@ -48,7 +48,7 @@
   },
   "LOGIN": {
     "LABEL_LOGIN": "아이디",
-    "LABEL_SIGN_ME": "아이디 기억",
+    "LABEL_SIGN_ME": "로그인 상태 유지",
     "BUTTON_SIGN_IN": "로그인"
   },
   "TOP_TOOLBAR": {
