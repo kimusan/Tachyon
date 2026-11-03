@@ -137,23 +137,22 @@ abstract class Upgrade
 	}
 
 	/**
-	 * Decodes old less secure data
+	 * Decodes old less secure data. JSON only: the serialize() format of very old
+	 * versions is no longer read, since unserialize() on stored data is object
+	 * injection for whoever can write the storage. Such data is not converted.
 	 */
 	private static function DecodeKeyValues(string $sData) : array
 	{
 		$sData = \MailSo\Base\Utils::UrlSafeBase64Decode($sData);
 		if (!\strlen($sData)) {
-			return '';
+			return array();
 		}
 		$sKey = \md5(APP_SALT);
 		$sData = \is_callable('xxtea_decrypt')
 			? \xxtea_decrypt($sData, $sKey)
 			: \MailSo\Base\Xxtea::decrypt($sData, $sKey);
-		try {
-			return \json_decode($sData, true, 512, JSON_THROW_ON_ERROR) ?: array();
-		} catch (\Throwable $e) {
-			return \unserialize($sData) ?: array();
-		}
+		$mData = \json_decode((string) $sData, true);
+		return \is_array($mData) ? $mData : array();
 	}
 
 	public static function backup() : string

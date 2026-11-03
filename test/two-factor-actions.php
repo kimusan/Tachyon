@@ -149,10 +149,29 @@ check(!str_contains($stored, 'JBSWY3DPEHPK3PXPJBSWY3DP') && !str_contains($store
 check(true === $login($code('JBSWY3DPEHPK3PXPJBSWY3DP')), 'an old secret no longer logs in');
 check(true === $login('987654321'), 'an old backup code no longer logs in');
 
-// Older still: xxtea-wrapped serialized data is read, without objects.
+// Older still: xxtea-wrapped serialized data is no longer read at all, and is
+// refused rather than taken for "no second factor".
 $plugin->store->data['user@example.com'] = \MailSo\Base\Utils::UrlSafeBase64Encode(\MailSo\Base\Xxtea::encrypt(
 	serialize(['User' => 'user@example.com', 'Enable' => true, 'Secret' => 'JBSWY3DPEHPK3PXPJBSWY3DP', 'BackupCodes' => '']), md5(APP_SALT)));
-check(true === $call('DoGetTwoFactorInfo')['Enable'], 'a serialized record reads as disabled');
+check('refused' === $call('DoGetTwoFactorInfo'), 'a serialized record is not refused');
+check(true !== $login(''), 'a serialized record let the login through without a code');
+check((bool) preg_grep('/unreadable record .*CONFIG key two_factor/', $plugin->log), 'the refusal does not say where the record lives');
+// With 2FA forced and a session already open, the app data still loads.
+$config->Set('plugin', 'force_two_factor_auth', true);
+$appData = ['Auth' => true];
+$plugin->FilterAppData(false, $appData);
+check(true === $appData['RequireTwoFactor'] && false === $appData['SetupTwoFactor'], 'app data with an unreadable record');
+$config->Set('plugin', 'force_two_factor_auth', false);
+// Switched off, but damaged: still refused, since nothing says it was off.
+$plugin->store->data['user@example.com'] = 'damaged';
+check(true !== $login(''), 'a damaged record let the login through');
+// Present but unusable in other ways: empty (a truncated file), '0', no secret, another user's.
+foreach (['', '0', json_encode(['User' => 'user@example.com', 'Enable' => true]),
+	json_encode(['User' => 'other@example.com', 'Enable' => true, 'Secret' => 'JBSWY3DPEHPK3PXPJBSWY3DP'])] as $sRecord) {
+	$plugin->store->data['user@example.com'] = $sRecord;
+	check(true !== $login(''), "record '$sRecord' let the login through");
+	check('refused' === $call('DoClearTwoFactorInfo'), "record '$sRecord' was cleared without a code");
+}
 class WakeProbe { public static bool $woken = false; public function __wakeup() { self::$woken = true; } }
 $plugin->store->data['user@example.com'] = \MailSo\Base\Utils::UrlSafeBase64Encode(\MailSo\Base\Xxtea::encrypt(
 	serialize(['User' => 'user@example.com', 'Enable' => true, 'Secret' => 'JBSWY3DPEHPK3PXPJBSWY3DP', 'x' => new WakeProbe]), md5(APP_SALT)));
