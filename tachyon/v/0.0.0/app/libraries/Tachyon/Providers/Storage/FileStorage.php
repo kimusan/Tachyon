@@ -45,6 +45,12 @@ class FileStorage implements \Tachyon\Providers\Storage\IStorage
 		$sFileName = $this->generateFileName($mAccount, $iStorageType, $sKey);
 		if ($sFileName && \file_exists($sFileName)) {
 			$mValue = \file_get_contents($sFileName);
+			// There but unreadable, an owner left wrong by a restore say, is not
+			// missing: two-factor-auth would read that as "no second factor".
+			if (false === $mValue) {
+				\Tachyon\Util\Log::warning('FileStorage', "unreadable {$sFileName}");
+				$mValue = '';
+			}
 			// Update mtime to prevent garbage collection
 			if (StorageType::SESSION === $iStorageType) {
 				\touch($sFileName);
