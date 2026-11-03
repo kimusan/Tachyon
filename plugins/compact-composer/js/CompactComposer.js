@@ -181,26 +181,6 @@
 			const fontFamiliesLowerCase = Object.values(fontFamilySelect.options).map(option => option.value.toLowerCase());
 
 			/**
-			 * A theme might have CSS like div.squire-wysiwyg[contenteditable="true"] {
-			 * font-family: 'Times New Roman', Times, serif; }
-			 * so let's find the best match squire.getRoot()'s font
-			 * it will also help to properly handle generic font names like 'sans-serif'
-			 * @type {number}
-			 */
-			let defaultFontFamilyIndex = 0;
-			const squireRootFonts = getComputedStyle(squire.getRoot()).fontFamily.split(',').map(normalizeFontName);
-			fontFamiliesLowerCase.some((family, index) => {
-				const matchFound = family.split(',').some(availableFontName => {
-					const normalizedFontName = normalizeFontName(availableFontName);
-					return squireRootFonts.some(squireFontName => squireFontName === normalizedFontName);
-				});
-				if (matchFound) {
-					defaultFontFamilyIndex = index;
-				}
-				return matchFound;
-			});
-
-			/**
 			 * Instead of comparing whole 'font-family' strings,
 			 * we are going to look for individual font names, because we might be
 			 * editing a Draft started in another email client for example
@@ -220,14 +200,7 @@
 					}
 				});
 			};
-			// first deal with the default font family
-			processFontFamilyString(fontFamiliesLowerCase[defaultFontFamilyIndex], defaultFontFamilyIndex);
-			// and now with the rest of the font families
-			fontFamiliesLowerCase.forEach((fontFamily, index) => {
-				if (index !== defaultFontFamilyIndex) {
-					processFontFamilyString(fontFamily, index);
-				}
-			});
+			fontFamiliesLowerCase.forEach(processFontFamilyString);
 
 			// -----
 
@@ -245,7 +218,10 @@
 					indicator.element.classList.toggle('active', indicator.selectors.some(selector => tokensMap.has(selector)));
 				});
 
-				let familySelectedIndex = defaultFontFamilyIndex;
+				// Text with no font-family shows "Default", not the font it happens to
+				// be drawn in: the message carries none, so the receiver picks one, and
+				// the menu can only apply a font that is not already showing (#177)
+				let familySelectedIndex = 0;
 				const fontFamily = tokensMap.get('__font_family__');
 				if (fontFamily) {
 					familySelectedIndex = -1; // show empty select if we don't know the font
@@ -353,7 +329,7 @@
 							prop: 'fontFamily',
 							items: {
 								'sans-serif': {
-									Arial: '\'Nimbus Sans L\', \'Liberation sans\', \'Arial Unicode MS\', Arial, Helvetica, Garuda, Utkal, FreeSans, sans-serif',
+									Arial: 'Arial, Helvetica, \'Liberation Sans\', \'Nimbus Sans\', \'Nimbus Sans L\', Arimo, \'Arial Unicode MS\', Garuda, Utkal, FreeSans, sans-serif',
 									Tahoma: '\'Luxi Sans\', Tahoma, Loma, Geneva, Meera, sans-serif',
 									Trebuchet: '\'DejaVu Sans Condensed\', Trebuchet, \'Trebuchet MS\', sans-serif',
 									Lucida: '\'Lucida Sans Unicode\', \'Lucida Sans\', \'DejaVu Sans\', \'Bitstream Vera Sans\', \'DejaVu LGC Sans\', sans-serif',
@@ -363,7 +339,7 @@
 									Courier: '\'Liberation Mono\', \'Courier New\', FreeMono, Courier, monospace',
 									Lucida: '\'DejaVu Sans Mono\', \'DejaVu LGC Sans Mono\', \'Bitstream Vera Sans Mono\', \'Lucida Console\', Monaco, monospace'
 								},
-								sans: {
+								serif: {
 									Times: '\'Nimbus Roman No9 L\', \'Times New Roman\', Times, FreeSerif, serif',
 									Palatino: '\'Bitstream Charter\', \'Palatino Linotype\', Palatino, Palladio, \'URW Palladio L\', \'Book Antiqua\', Times, serif',
 									Georgia: '\'URW Palladio L\', Georgia, Times, serif'
@@ -771,6 +747,7 @@
 								element.append(option);
 							});
 						} else {
+							element.add(new Option(i18n('GLOBAL/DEFAULT', 'Default'), ''));
 							Object.entries(item.items).forEach(([label, options]) => {
 								const optgroup = createElement('optgroup');
 								optgroup.label = label;

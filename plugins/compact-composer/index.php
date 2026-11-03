@@ -6,8 +6,8 @@ class CompactComposerPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME = 'Compact Composer',
 		AUTHOR = 'Sergey Mosin',
 		URL = 'https://github.com/the-djmaze/snappymail/pull/1466',
-		VERSION = '1.0.6',
-		RELEASE = '2024-08-08',
+		VERSION = '1.0.7',
+		RELEASE = '2026-11-03',
 		REQUIRED = '2.34.0',
 		LICENSE = 'AGPL v3',
 		DESCRIPTION = 'WYSIWYG editor with a compact toolbar';
