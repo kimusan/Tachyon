@@ -144,7 +144,16 @@
 		"SORT_SUBJECT_ASC": "Тема А-Я",
 		"SORT_SUBJECT_DESC": "Тема Я-А",
 		"SORT_FROM_ASC": "От А-Я",
-		"SORT_FROM_DESC": "От Я-А"
+		"SORT_FROM_DESC": "От Я-А",
+		"PAGE_SELECTED": "Все %COUNT% сообщений на этой странице выбраны.",
+		"SELECT_ALL_MATCHING": "Выбрать все сообщения в этой папке",
+		"SELECT_ALL_MATCHING_SEARCH": "Выбрать все найденные сообщения",
+		"ALL_MATCHING_SELECTED": "Все %COUNT% сообщений в этой папке выбраны.",
+		"ALL_MATCHING_SEARCH_SELECTED": "Все %COUNT% найденных сообщений выбраны.",
+		"CLEAR_SELECTION": "Отменить выбор",
+		"CONFIRM_ALL_MOVE": "Переместить все выбранные %COUNT% сообщений в %FOLDER%?",
+		"CONFIRM_ALL_COPY": "Скопировать все выбранные %COUNT% сообщений в %FOLDER%?",
+		"CONFIRM_ALL_DELETE": "Удалить все выбранные %COUNT% сообщений безвозвратно? Это действие необратимо."
 	},
 	"MESSAGE": {
 		"BUTTON_EDIT": "Редактировать",
@@ -623,7 +632,8 @@
 		"TYPE_FILES": "Файлы",
 		"TYPE_JOURNAL": "Журнал",
 		"TYPE_NOTES": "Записки",
-		"TYPE_TASKS": "Задачи"
+		"TYPE_TASKS": "Задачи",
+		"TOTAL_MESSAGES": "Сообщений во всех папках:"
 	},
 	"SETTINGS_ACCOUNTS": {
 		"LEGEND_ACCOUNTS": "Список Аккаунтов",
