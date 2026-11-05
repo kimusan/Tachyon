@@ -1,0 +1,27 @@
+<div>
+	<div class="form-horizontal">
+
+		<div class="legend">Nextcloud</div>
+
+		<div class="control-group">
+			<label class="control-label" data-i18n="NEXTCLOUD/SAVE_FOLDER"></label>
+			<div class="controls">
+				<span data-icon="folder" data-bind="text: folderName"></span>
+				<button class="btn" data-bind="click: choose" data-i18n="NEXTCLOUD/CHOOSE_FOLDER"></button>
+				<i class="icon-check iconcolor-green" data-bind="visible: saved"></i>
+				<i class="icon-x iconcolor-red" data-bind="visible: error"></i>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<div class="controls" data-bind="component: {
+				name: 'Checkbox',
+				params: {
+					label: 'NEXTCLOUD/SAVE_ASK',
+					value: ask
+				}
+			}"></div>
+		</div>
+
+	</div>
+</div>

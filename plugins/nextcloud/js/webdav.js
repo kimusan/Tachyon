@@ -28,6 +28,8 @@ const
 		<getcontentlength/>
 		<ocs:share-permissions/>
 		<oc:share-types/>
+		<nc:contained-folder-count/>
+		<nc:contained-file-count/>
 	</prop>
 </propfind>`,
 
@@ -107,6 +109,15 @@ const
 					if (elem.name === path) {
 						continue;
 					}
+					// What is inside, so a folder with nothing to open shows nothing to
+					// open it with. Nextcloud before 28 does not answer these, and
+					// undefined then means "unknown", which keeps the arrow (#117).
+					const count = name => {
+						const node = e.getElementsByTagNameNS(nsNC, name)?.item(0);
+						return node && '' !== node.textContent ? +node.textContent : undefined;
+					};
+					elem.folders = count('contained-folder-count');
+					elem.files = count('contained-file-count');
 				} else {
 					elem.isFile = true;
 					elem.id = e.getElementsByTagNameNS(nsOC, 'fileid')?.item(0)?.textContent;
@@ -164,11 +175,27 @@ const
 					details.load = () => details.loaded = details.loaded
 						|| (ul.children.length
 							? Promise.resolve()
-							: fetchFiles(item.name).then(items => buildTree(view, ul, items)));
+							: fetchFiles(item.name).then(items => {
+								buildTree(view, ul, items);
+								// Older servers give no counts, so learn it on opening
+								ul.children.length || details.classList.add('nc-leaf');
+							}));
 					details.addEventListener('toggle', () => details.load());
+					// Our own arrow rather than the native marker: the Nextcloud theme
+					// lays the summary out as a flex row, which drops the marker, and
+					// a folder with nothing inside should have no arrow at all (#117).
+					const twisty = document.createElement('span');
+					twisty.className = 'nc-twisty';
+					summary.append(twisty);
+					if (0 === item.folders && (!view.files() || 0 === item.files)) {
+						details.classList.add('nc-leaf');
+					}
+					summary.addEventListener('click', event => {
+						details.classList.contains('nc-leaf') && event.preventDefault();
+					});
 					summary.dataset.icon = 'folder';
 					if (view.files()) {
-						summary.textContent = item.name.replace(/^.*\/([^/]+)$/, '$1');
+						summary.append(item.name.replace(/^.*\/([^/]+)$/, '$1'));
 					} else {
 						// One radio for the whole tree, so choosing a folder deeper in
 						// unchooses the one above without any bookkeeping here.
@@ -330,6 +357,13 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 
 		oRow = document.createElement('li');
 		oRow.className = 'nc-create';
+		// The + that opened this row does nothing more while it is open, and a
+		// second one under the row read as a button that did not work (#117)
+		oButton.hidden = true;
+		const fClose = () => {
+			oRow.remove();
+			oButton.hidden = false;
+		};
 		const oInput = document.createElement('input'),
 			oCreate = document.createElement('button'),
 			oCancel = document.createElement('button'),
@@ -345,8 +379,9 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 				// Wait for the level's own listing: one still in flight would arrive
 				// afterwards and add a second row for the same folder
 				Promise.resolve(oDetails?.loaded).then(() => createDirectory(sFull)).then(response => {
-					oRow.remove();
+					fClose();
 					if (201 === response.status) {
+						oDetails?.classList.remove('nc-leaf');
 						buildTree(this, oList, [{name: sFull, isFile: false}]);
 						const oRadio = [...oList.querySelectorAll(':scope > li > details > summary > input[type="radio"]')]
 							.find(oInp => oInp.item_name === sFull);
@@ -356,7 +391,7 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 							oRadio.scrollIntoView({block: 'nearest'});
 						}
 					}
-				}).catch(() => oRow.remove());
+				}).catch(fClose);
 			};
 
 		oInput.placeholder = rl.i18n('NEXTCLOUD/FOLDER_NAME');
@@ -365,7 +400,10 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 				event.preventDefault();
 				fCreate();
 			} else if ('Escape' === event.key) {
-				oRow.remove();
+				// Only the row: left to bubble, it closed the whole dialog too
+				event.preventDefault();
+				event.stopPropagation();
+				fClose();
 			}
 		});
 		oCreate.type = 'button';
@@ -375,7 +413,7 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 		oCancel.type = 'button';
 		oCancel.className = 'button-vue';
 		oCancel.textContent = rl.i18n('GLOBAL/CANCEL');
-		oCancel.addEventListener('click', () => oRow.remove());
+		oCancel.addEventListener('click', fClose);
 		oRow.append(oInput, oCreate, oCancel);
 		oList.prepend(oRow);
 		oInput.focus();
@@ -403,6 +441,14 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 	 * leaves the dialog as it would have been.
 	 */
 	async revealFolder(sPath) {
+		if ('/' === sPath) {
+			const oRadio = this.tree.querySelector('.nc-create-root input[type="radio"]');
+			if (oRadio) {
+				oRadio.checked = true;
+				this.folder('/');
+			}
+			return;
+		}
 		let oScope = this.tree,
 			sAcc = '';
 		for (const sPart of sPath.split('/').filter(Boolean)) {
@@ -440,10 +486,22 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 		fetchFiles('/').then(items => {
 			buildTree(this, this.tree, items);
 			if (!this.files()) {
-				// Without one at the top there is no way to make a folder at the root
-				const oRootRow = document.createElement('li');
+				// Without one at the top there is no way to make a folder at the root,
+				// and without its own radio no way back to it once a subfolder has
+				// been remembered (#117)
+				const oRootRow = document.createElement('li'),
+					oTwisty = document.createElement('span'),
+					oRadio = document.createElement('input'),
+					oName = document.createElement('span');
 				oRootRow.className = 'nc-create-root';
-				oRootRow.append(createButton(this, '/'));
+				// An arrow that never shows, so the root lines up with the folders
+				oTwisty.className = 'nc-twisty';
+				oRadio.type = 'radio';
+				oRadio.name = 'nc-folder';
+				oRadio.item_name = '/';
+				oName.textContent = rl.i18n('NEXTCLOUD/ROOT_FOLDER');
+				oRootRow.dataset.icon = 'folder';
+				oRootRow.append(oTwisty, oRadio, oName, createButton(this, '/'));
 				this.tree.prepend(oRootRow);
 			}
 			if (!this.files()) {
@@ -453,6 +511,7 @@ class NextcloudFilesPopupView extends rl.pluginPopupView {
 				} catch (e) {
 					// no storage, no memory, no harm
 				}
+				sLast = sLast || rl.settings.get('Nextcloud')?.SaveFolder || '';
 				sLast && this.revealFolder(sLast).catch(err => console.error(err));
 			}
 		}).catch(err => console.error(err))
@@ -637,8 +696,56 @@ rl.nextcloud = {
 				true,
 				files => resolve(files),
 			]);
-		})
+		}),
+
+	// Where to save: the folder from the settings when the user said not to ask,
+	// otherwise the dialog (#117)
+	saveFolder: () => {
+		const cfg = rl.settings.get('Nextcloud') || {};
+		return (false === cfg.SaveAsk && cfg.SaveFolder)
+			? Promise.resolve(cfg.SaveFolder)
+			: rl.nextcloud.selectFolder();
+	}
 };
+
+class NextcloudSettingsTab {
+	constructor() {
+		const cfg = rl.settings.get('Nextcloud') || {};
+		this.folder = ko.observable(cfg.SaveFolder || '/Attachments');
+		this.ask = ko.observable(false !== cfg.SaveAsk);
+		this.saved = ko.observable(false).extend({ falseTimeout: 3000 });
+		this.error = ko.observable(false);
+		this.folderName = ko.computed(() => '/' === this.folder() ? rl.i18n('NEXTCLOUD/ROOT_FOLDER') : this.folder());
+		this.ask.subscribe(() => this.save());
+	}
+
+	choose() {
+		rl.nextcloud.selectFolder().then(folder => {
+			if (folder) {
+				this.folder(folder);
+				this.save();
+			}
+		});
+	}
+
+	save() {
+		this.error(false);
+		rl.pluginRemoteRequest((iError, data) => {
+			const result = !iError && data?.Result;
+			if (result) {
+				const cfg = rl.settings.get('Nextcloud');
+				cfg.SaveFolder = result.save_folder;
+				cfg.SaveAsk = result.save_ask;
+				this.folder(result.save_folder);
+				this.saved(true);
+			} else {
+				this.error(true);
+			}
+		}, 'NextcloudSettings', {folder: this.folder(), ask: this.ask() ? 1 : 0});
+	}
+}
+
+rl.addSettingsViewModel(NextcloudSettingsTab, 'STabNextcloud', 'Nextcloud', 'nextcloud');
 
 })(window.rl);
 

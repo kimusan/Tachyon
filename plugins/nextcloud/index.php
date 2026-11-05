@@ -5,8 +5,8 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 	const
 		NAME = 'Nextcloud',
 		// Keep upstream metadata if you prefer; this is not functional.
-		VERSION = '2.41.1',
-		RELEASE  = '2026-10-28',
+		VERSION = '2.42.0',
+		RELEASE  = '2026-11-05',
 		CATEGORY = 'Integrations',
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
 		REQUIRED = '4.4.8';
@@ -28,6 +28,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 			$this->addJs('js/message.js');
 			$this->addHook('json.attachments', 'DoAttachmentsActions');
 			$this->addJsonHook('NextcloudSaveMsg', 'NextcloudSaveMsg');
+			$this->addJsonHook('NextcloudSettings', 'NextcloudSettings');
 
 			$this->addJs('js/composer.js');
 			$this->addJsonHook('NextcloudAttachFile', 'NextcloudAttachFile');
@@ -37,6 +38,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 			$this->addTemplate('templates/PopupsNextcloudFiles.html');
 			$this->addTemplate('templates/PopupsNextcloudCalendars.html');
 			$this->addTemplate('templates/ComposeNextcloudAttach.html');
+			$this->addTemplate('templates/STabNextcloud.html');
 
 			// $this->addHook('login.credentials.step-2', 'loginCredentials2');
 			// $this->addHook('login.credentials', 'loginCredentials');
@@ -163,7 +165,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 	public function NextcloudSaveMsg() : array
 	{
-		$sSaveFolder = \ltrim($this->jsonParam('folder', ''), '/');
+		$sFolder = (string) $this->jsonParam('folder', '');
 //		$aValues = \Tachyon\Api::Actions()->decodeRawKey($this->jsonParam('msgHash', ''));
 		$msgHash = $this->jsonParam('msgHash', '');
 		$aValues = \json_decode(\MailSo\Base\Utils::UrlSafeBase64Decode($msgHash), true);
@@ -172,7 +174,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 			'filename' => '',
 			'success' => false
 		];
-		if ($sSaveFolder && !empty($aValues['folder']) && !empty($aValues['uid'])) {
+		if ('' !== $sFolder && !empty($aValues['folder']) && !empty($aValues['uid'])) {
 			$oActions = \Tachyon\Api::Actions();
 			$oMailClient = $oActions->MailClient();
 			if (!$oMailClient->IsLoggined()) {
@@ -180,9 +182,9 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 				$oAccount->ImapConnectAndLogin($oActions->Plugins(), $oMailClient->ImapClient(), $oActions->Config());
 			}
 
-			$sSaveFolder = $sSaveFolder ?: 'Emails';
+			$sSaveFolder = static::saveFolder($sFolder, 'Emails');
 			$oFiles = static::userFolder();
-			if ($oFiles) {
+			if ($oFiles && '' !== $sSaveFolder) {
 				$oFiles->nodeExists($sSaveFolder) || $oFiles->newFolder($sSaveFolder);
 			}
 			$aResult['folder'] = $sSaveFolder;
@@ -199,7 +201,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 						// newFile() returns the node and reports failure by throwing,
 						// so there is nothing falsy to test.
 						try {
-							$oFiles->newFile("{$aResult['folder']}/{$aResult['filename']}", $rResource);
+							$oFiles->newFile(\ltrim("{$aResult['folder']}/{$aResult['filename']}", '/'), $rResource);
 							$aResult['success'] = true;
 						} catch (\Throwable $e) {
 							\Tachyon\Util\Log::warning('Nextcloud', 'save message: ' . $e->getMessage());
@@ -220,21 +222,21 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 		if (static::isLoggedIn() && 'nextcloud' === $data->action) {
 			$oFiles = static::userFolder();
 			if ($oFiles) {
-				$sSaveFolder = \ltrim($this->jsonParam('NcFolder', ''), '/');
-				$sSaveFolder = $sSaveFolder ?: 'Attachments';
-				$oFiles->nodeExists($sSaveFolder) || $oFiles->newFolder($sSaveFolder);
+				$sSaveFolder = static::saveFolder((string) $this->jsonParam('NcFolder', ''), 'Attachments');
+				'' === $sSaveFolder || $oFiles->nodeExists($sSaveFolder) || $oFiles->newFolder($sSaveFolder);
+				$sSaveFolder = '' === $sSaveFolder ? '' : "{$sSaveFolder}/";
 				$data->result = true;
 				foreach ($data->items as $aItem) {
 					$sSavedFileName = empty($aItem['fileName']) ? 'file.dat' : $aItem['fileName'];
 					if (!empty($aItem['data'])) {
-						$sSavedFileNameFull = static::SmartFileExists($sSaveFolder.'/'.$sSavedFileName, $oFiles);
+						$sSavedFileNameFull = static::SmartFileExists($sSaveFolder.$sSavedFileName, $oFiles);
 						if (!static::writeFile($oFiles, $sSavedFileNameFull, $aItem['data'])) {
 							$data->result = false;
 						}
 					} else if (!empty($aItem['fileHash'])) {
 						$fFile = $data->filesProvider->GetFile($data->account, $aItem['fileHash'], 'rb');
 						if (\is_resource($fFile)) {
-							$sSavedFileNameFull = static::SmartFileExists($sSaveFolder.'/'.$sSavedFileName, $oFiles);
+							$sSavedFileNameFull = static::SmartFileExists($sSaveFolder.$sSavedFileName, $oFiles);
 							if (!static::writeFile($oFiles, $sSavedFileNameFull, $fFile)) {
 								$data->result = false;
 							}
@@ -262,6 +264,11 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 				'CalDAV' => $this->Config()->Get('plugin', 'calendar', false)
 //				'WebDAV_files' => $sWebDAV . '/files/' . $sUID
 			];
+			if (!empty($aResult['Auth'])) {
+				$aSettings = $this->getUserSettings();
+				$aResult['Nextcloud']['SaveFolder'] = (string) ($aSettings['save_folder'] ?? '/Attachments');
+				$aResult['Nextcloud']['SaveAsk'] = (bool) ($aSettings['save_ask'] ?? true);
+			}
 			if (empty($aResult['Auth'])) {
 				$config = \OC::$server->get(\OCP\IConfig::class);
 				$sEmail = '';
@@ -425,6 +432,36 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 	}
 
 	/**
+	 * Where saved attachments and messages go, and whether to ask each time
+	 * instead (#117).
+	 */
+	public function NextcloudSettings() : array
+	{
+		$sFolder = static::saveFolder((string) $this->jsonParam('folder', ''), 'Attachments');
+		$aSettings = [
+			'save_folder' => '/' . $sFolder,
+			'save_ask' => !empty($this->jsonParam('ask', true))
+		];
+		return $this->jsonResponse(__FUNCTION__, $this->saveUserSettings($aSettings) ? $aSettings : false);
+	}
+
+	/**
+	 * A folder the browser asked for, relative to the user's files: '' is the
+	 * root ("/"), and nothing at all is $sDefault. Empty, '.' and '..' segments
+	 * are dropped, so the result cannot climb out of where it is joined.
+	 */
+	private static function saveFolder(string $sFolder, string $sDefault) : string
+	{
+		if ('' === \trim($sFolder)) {
+			return $sDefault;
+		}
+		return \implode('/', \array_filter(
+			\explode('/', \str_replace('\\', '/', $sFolder)),
+			fn ($sPart) => '' !== \trim($sPart) && '.' !== $sPart && '..' !== $sPart
+		));
+	}
+
+	/**
 	 * newFile() returns the node and reports failure by throwing, where the
 	 * removed file_put_contents() returned false, so each caller would have
 	 * gone on believing a failed save had worked.
@@ -471,7 +508,8 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 		while (true) {
 			++$iIndex;
-			$sFilePathNew = $aFileInfo['dirname'].'/'.
+			// A file at the root has '.' for a directory, which is not a path
+			$sFilePathNew = ('.' === $aFileInfo['dirname'] ? '' : $aFileInfo['dirname'].'/').
 				\preg_replace('/\(\d{1,2}\)$/', '', $aFileInfo['filename']).
 				' ('.$iIndex.')'.
 				(empty($aFileInfo['extension']) ? '' : '.'.$aFileInfo['extension'])

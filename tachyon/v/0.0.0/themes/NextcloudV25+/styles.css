@@ -2370,13 +2370,14 @@ html.rl-mobile #rl-app #V-AdminPane>.b-toolbar {
 	overflow-wrap: anywhere;
 }
 
-#rl-app #V-PopupsNextcloudFiles li button,
-#rl-app #V-PopupsNextcloudFiles li input {
+/* Only the + goes to the far end: the radio and the checkbox sit by their name */
+#rl-app #V-PopupsNextcloudFiles summary > button,
+#rl-app #V-PopupsNextcloudFiles li.nc-create-root > button {
 	margin-left: auto !important;
 	align-self: center;
 }
 
-#rl-app #V-PopupsNextcloudFiles li input {
+#rl-app #V-PopupsNextcloudFiles li.nc-create input {
 	min-width: 100px;
 	flex-shrink: 1;
 }
@@ -2413,7 +2414,8 @@ html.rl-mobile #rl-app #V-AdminPane>.b-toolbar {
 	list-style-type: none;
 }
 
-#rl-app #V-PopupsNextcloudFiles li details summary[data-icon]::before {
+#rl-app #V-PopupsNextcloudFiles li details summary[data-icon]::before,
+#rl-app #V-PopupsNextcloudFiles li.nc-create-root[data-icon]::before {
 	color: var(--nc-color-primary);
 	font-size: 20px;
 }

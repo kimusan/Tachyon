@@ -30,13 +30,17 @@
 	cursor: pointer;
 }
 /*
- * The create-a-folder row only: a child combinator, or this also catches the
- * radio nested in details > summary and floats it away from its name.
+ * The create-a-folder row: the name field, then Create, then Cancel, in that
+ * order. Floated right they came out reversed, Cancel first (#117).
  */
-#V-PopupsNextcloudFiles li:not([data-icon="file"]) > input,
-#V-PopupsNextcloudFiles li:not([data-icon="file"]) > button {
-	float: right;
-	margin: 0 0 0 0.5em;
+#V-PopupsNextcloudFiles li.nc-create {
+	align-items: center;
+	display: flex;
+	gap: 0.5em;
+}
+#V-PopupsNextcloudFiles li.nc-create input {
+	flex: 1;
+	margin: 0;
 }
 
 #rl-app .squire-wysiwyg a {
@@ -44,18 +48,55 @@
 }
 
 /*
- * Folder rows in select mode carry a radio ahead of the name, inside the
- * <summary> that opens the subtree. The summary is deliberately left as it is:
- * giving it display:flex drops the disclosure triangle in Chrome and Safari,
- * because that marker comes from display:list-item. Align the radio instead.
+ * A folder row is one line: arrow, folder icon, radio, name, and the + at the
+ * far end. The arrow is our own (.nc-twisty), not the native marker, which the
+ * Nextcloud theme removes by making the summary a flex row, and which cannot
+ * be hidden for a folder that has nothing in it (#117). The root row carries
+ * one that never shows, so it lines up with the rest.
  */
-#V-PopupsNextcloudFiles summary input[type="radio"] {
+#V-PopupsNextcloudFiles summary,
+#V-PopupsNextcloudFiles li.nc-create-root {
+	align-items: center;
 	cursor: pointer;
-	margin: 0 0.5em 0 0;
-	vertical-align: middle;
+	display: flex;
+	gap: 0.5em;
+	list-style: none;
 }
-#V-PopupsNextcloudFiles summary > span {
-	vertical-align: middle;
+#V-PopupsNextcloudFiles summary::-webkit-details-marker {
+	display: none;
+}
+#V-PopupsNextcloudFiles .nc-twisty {
+	flex: none;
+	order: -1;
+	width: 1em;
+}
+#V-PopupsNextcloudFiles .nc-twisty::before {
+	border: solid transparent;
+	border-left-color: currentColor;
+	border-width: 0.35em 0 0.35em 0.5em;
+	content: "";
+	display: inline-block;
+	transition: transform 0.1s;
+}
+#V-PopupsNextcloudFiles details[open] > summary > .nc-twisty::before {
+	transform: rotate(90deg);
+}
+#V-PopupsNextcloudFiles details.nc-leaf > summary > .nc-twisty::before,
+#V-PopupsNextcloudFiles li.nc-create-root > .nc-twisty::before {
+	visibility: hidden;
+}
+#V-PopupsNextcloudFiles summary input[type="radio"],
+#V-PopupsNextcloudFiles li.nc-create-root input[type="radio"] {
+	flex: none;
+	margin: 0;
+}
+#V-PopupsNextcloudFiles summary > button,
+#V-PopupsNextcloudFiles li.nc-create-root > button {
+	margin-left: auto;
+}
+/* A theme rule giving buttons a display would otherwise beat [hidden] */
+#V-PopupsNextcloudFiles button[hidden] {
+	display: none !important;
 }
 
 /* The name is a hit target for the box, so it should look like one. */

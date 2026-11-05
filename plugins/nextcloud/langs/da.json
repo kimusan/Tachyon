@@ -9,6 +9,10 @@
         "SELECT_CALENDAR": "Vælg kalender",
         "FILE_ATTACH": "Vedhæft",
         "FILE_INTERNAL": "Intern",
-        "FILE_PUBLIC": "offentlig"
+        "FILE_PUBLIC": "offentlig",
+        "ROOT_FOLDER": "Alle filer",
+        "SAVE_FOLDER": "Gem vedhæftninger og beskeder i",
+        "CHOOSE_FOLDER": "Vælg mappe",
+        "SAVE_ASK": "Spørg hvor der skal gemmes hver gang"
     }
 }

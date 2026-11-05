@@ -6,7 +6,7 @@
 			let view = e.detail;
 			view.nextcloudSaveMsgs = () => {
 				view.messageList.hasChecked()
-				 && rl.nextcloud.selectFolder().then(folder => {
+				 && rl.nextcloud.saveFolder().then(folder => {
 					folder && view.messageList.forEach(msg => {
 						msg.checked() && rl.pluginRemoteRequest(
 							(iError, data) => {

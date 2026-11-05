@@ -12,6 +12,10 @@
         "FILE_PUBLIC": "öffentlich",
         "CREATE_SUBFOLDER": "Neuen Unterordner anlegen",
         "FOLDER_NAME": "Ordnername",
-        "FOLDER_CREATE": "Anlegen"
+        "FOLDER_CREATE": "Anlegen",
+        "ROOT_FOLDER": "Alle Dateien",
+        "SAVE_FOLDER": "Anhänge und Nachrichten speichern in",
+        "CHOOSE_FOLDER": "Ordner wählen",
+        "SAVE_ASK": "Jedes Mal fragen, wo gespeichert wird"
     }
 }

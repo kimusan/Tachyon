@@ -54,8 +54,10 @@
 			view.saveNextcloudError = ko.observable(false).extend({ falseTimeout: 7000 });
 			// A save that worked said nothing at all, so there was no way to tell it
 			// from one that had not happened yet (#117). The icon turns into a green
-			// check and goes back to the save icon by itself.
-			view.saveNextcloudSuccess = ko.observable(false).extend({ falseTimeout: 5000 });
+			// check and stays one until another message is opened, so coming back to
+			// the message still shows that its attachments were saved.
+			view.saveNextcloudSuccess = ko.observable(false);
+			view.message.subscribe(() => view.saveNextcloudSuccess(false));
 			view.saveNextcloudLoading = ko.observable(false);
 			view.saveNextcloud = () => {
 				const
@@ -65,7 +67,7 @@
 				if (hashes.length) {
 					view.saveNextcloudSuccess(false);
 					view.saveNextcloudLoading(true);
-					rl.nextcloud.selectFolder().then(folder => {
+					rl.nextcloud.saveFolder().then(folder => {
 						if (folder) {
 							rl.fetchJSON('./?/Json/&q[]=/0/', {}, {
 								Action: 'AttachmentsActions',
@@ -93,7 +95,7 @@
 			};
 
 			view.nextcloudSaveMsg = () => {
-				rl.nextcloud.selectFolder().then(folder => {
+				rl.nextcloud.saveFolder().then(folder => {
 					let msg = view.message();
 					folder && rl.pluginRemoteRequest(
 						(iError, data) => {

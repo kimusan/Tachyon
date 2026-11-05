@@ -12,6 +12,10 @@
 		"FILE_PUBLIC": "public",
 		"CREATE_SUBFOLDER": "Create new subfolder",
 		"FOLDER_NAME": "Folder name",
-		"FOLDER_CREATE": "Create"
+		"FOLDER_CREATE": "Create",
+		"ROOT_FOLDER": "All files",
+		"SAVE_FOLDER": "Save attachments and messages in",
+		"CHOOSE_FOLDER": "Choose folder",
+		"SAVE_ASK": "Ask where to save every time"
 	}
 }
