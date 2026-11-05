@@ -745,6 +745,43 @@ class MailClient
 		return $aResultUids;
 	}
 
+	/**
+	 * Every UID the list for these parameters holds, in no particular order:
+	 * what "select all matching" acts on (#182). It goes through GetUids() with
+	 * the same search and hidden-deleted rule as MessageList(), so the selection
+	 * cannot hold a message the list would not show. With threads, a search
+	 * lists every thread holding a match, and acting on a thread acts on all of
+	 * it, so the rest of those threads is included. A search across folders is
+	 * refused, since its UIDs only mean something per folder.
+	 */
+	public function MessageListUids(MessageListParams $oParams) : array
+	{
+		$oParams->sSearch = \trim($oParams->sSearch);
+		if (\strlen(\MailSo\Imap\SearchCriterias::fromString(
+			$this->oImapClient, $oParams->sFolderName, $oParams->sSearch, $oParams->bHideDeleted
+		)->sIn)) {
+			throw new \ValueError('A search across folders has no single list of UIDs');
+		}
+		$oInfo = $this->oImapClient->FolderStatusAndSelect($oParams->sFolderName);
+		if (!$oInfo->MESSAGES) {
+			return [];
+		}
+		$oParams->bUseSort = false;
+		$aUids = $this->GetUids($oParams, $oInfo);
+		if ($aUids && \strlen($oParams->sSearch) && $oParams->bUseThreads && $this->oImapClient->CapabilityValue('THREAD')) {
+			$oCollection = new MessageCollection;
+			$oCollection->FolderInfo = $oInfo;
+			$aMatched = \array_flip($aUids);
+			foreach ($this->ThreadsMap($oParams->sThreadAlgorithm, $oCollection, $oParams->oCacher) as $aMap) {
+				if (\array_intersect_key(\array_flip($aMap), $aMatched)) {
+					$aUids = \array_merge($aUids, $aMap);
+				}
+			}
+			$aUids = \array_values(\array_unique($aUids));
+		}
+		return $aUids;
+	}
+
 	public function MessageListUnseen(MessageListParams $oParams, FolderInformation $oInfo) : array
 	{
 		$oUnseenParams = new MessageListParams;

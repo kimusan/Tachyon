@@ -56,6 +56,9 @@ addObservablesTo(MessagelistUserStore, {
 	page: 1,
 	pageBeforeThread: 1,
 	error: '',
+	// Every message the list matches, not only the page that is loaded:
+	// {folder, search, uids: Set}, or null (#182)
+	allMatching: null,
 //	folder: '',
 
 	endHash: '',
@@ -115,6 +118,10 @@ addComputablesTo(MessagelistUserStore, {
 	},
 
 	listCheckedOrSelectedUidsWithSubMails: () => {
+		const all = MessagelistUserStore.allMatching();
+		if (all) {
+			return new Set(all.uids);
+		}
 		let result = new Set;
 		MessagelistUserStore.listCheckedOrSelected().forEach(message => {
 			result.add(message.uid);
@@ -127,6 +134,10 @@ addComputablesTo(MessagelistUserStore, {
 
 	// A search can span folders, so the uids are keyed by the folder they belong to
 	listCheckedOrSelectedByFolder: () => {
+		const all = MessagelistUserStore.allMatching();
+		if (all) {
+			return new Map([[all.folder, new Set(all.uids)]]);
+		}
 		let result = new Map;
 		MessagelistUserStore.listCheckedOrSelected().forEach(message => {
 			result.has(message.folder) || result.set(message.folder, new Set);
@@ -143,6 +154,39 @@ addComputablesTo(MessagelistUserStore, {
 MessagelistUserStore.listChecked = koComputable(
 	() => MessagelistUserStore.filter(isChecked)
 ).extend({ rateLimit: 0 });
+
+// Unticking a message, or anything else that leaves part of the page unticked,
+// is no longer "all of them"
+MessagelistUserStore.listChecked.subscribe(list =>
+	MessagelistUserStore.allMatching()
+	&& list.length < MessagelistUserStore().length
+	&& MessagelistUserStore.allMatching(null)
+);
+
+/**
+ * Selects every message the list matches, beyond the page: asks the server for
+ * them through the same search the list came from (#182). Not for a list that
+ * spans folders or shows one thread, where the view does not offer it.
+ */
+MessagelistUserStore.selectAllMatching = () => {
+	const folder = FolderUserStore.currentFolderFullName(),
+		search = MessagelistUserStore.listSearch(),
+		params = { folder: folder, search: search };
+	if (AppUserStore.threadsAllowed() && SettingsUserStore.useThreads()) {
+		params.useThreads = 1;
+		params.threadAlgorithm = SettingsUserStore.threadAlgorithm();
+	}
+	Remote.request('MessageListUids', (iError, oData) => {
+		// Only if the list is still the one it was asked for
+		if (!iError && Array.isArray(oData?.Result)
+		 && folder === FolderUserStore.currentFolderFullName()
+		 && search === MessagelistUserStore.listSearch()
+		) {
+			MessagelistUserStore.forEach(message => message.checked(true));
+			MessagelistUserStore.allMatching({ folder: folder, search: search, uids: new Set(oData.Result) });
+		}
+	}, params);
+};
 
 // Also used by Selector
 MessagelistUserStore.hasChecked = koComputable(
@@ -360,6 +404,16 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 						});
 					}
 
+					// Another page of the same list stays selected, anything else ends it
+					const all = MessagelistUserStore.allMatching();
+					if (all) {
+						if (all.folder === folderInfo.name && all.search === MessagelistUserStore.listSearch()) {
+							collection.forEach(msg => all.uids.has(msg.uid) && msg.checked(true));
+						} else {
+							MessagelistUserStore.allMatching(null);
+						}
+					}
+
 					MessagelistUserStore(collection);
 					MessagelistUserStore.isIncomplete(false);
 				} else {
@@ -397,8 +451,10 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
  * @param {string} sFolderFullName
  * @param {number} iSetAction
  * @param {Array=} messages = null
+ * @param {Set=} oAllUids every message to act on, when that is more than the
+ *     loaded ones; the server then works out what changes, not the counts here
  */
-MessagelistUserStore.setAction = (sFolderFullName, iSetAction, messages) => {
+MessagelistUserStore.setAction = (sFolderFullName, iSetAction, messages, oAllUids) => {
 	messages = messages || MessagelistUserStore.listChecked();
 
 	let folder,
@@ -440,7 +496,7 @@ MessagelistUserStore.setAction = (sFolderFullName, iSetAction, messages) => {
 			oMessage.isDeleted() && rootUids.push(oMessage.uid) && oMessage.flags.remove('\\deleted')
 		);
 	}
-	rootUids = rootUids.validUnique();
+	rootUids = oAllUids ? [...oAllUids] : rootUids.validUnique();
 	length = rootUids.length;
 
 	if (sFolderFullName && length) {
@@ -450,7 +506,11 @@ MessagelistUserStore.setAction = (sFolderFullName, iSetAction, messages) => {
 				// fallthrough is intentionally
 			case MessageSetAction.UnsetSeen:
 				folder = getFolderFromCacheList(sFolderFullName);
-				if (folder) {
+				if (oAllUids) {
+					// How many were unread is not known here, so ask again
+					setFolderETag(sFolderFullName, '');
+					rl.app.folderInformation(sFolderFullName);
+				} else if (folder) {
 					folder.unreadEmails(Math.max(0, folder.unreadEmails() + length));
 				}
 				Remote.request('MessageSetSeen', null, {
@@ -489,11 +549,30 @@ MessagelistUserStore.setAction = (sFolderFullName, iSetAction, messages) => {
  * @param {boolean=} copy = false
  */
 MessagelistUserStore.moveMessages = (
-	fromFolderFullName, oUids, toFolderFullName = '', copy = false
+	fromFolderFullName, oUids, toFolderFullName = '', copy = false, confirmed = false
 ) => {
 	const fromFolder = getFolderFromCacheList(fromFolderFullName);
 
 	if (!fromFolder || !oUids?.size) return;
+
+	// Moving or deleting fifty and forty thousand should not feel the same, so
+	// all of a list is never acted on without saying how many (#182)
+	if (MessagelistUserStore.allMatching() && !confirmed) {
+		const toFolder = toFolderFullName ? getFolderFromCacheList(toFolderFullName) : null;
+		rl.app.ask.showModal([
+			i18n(toFolderFullName
+				? (copy ? 'MESSAGE_LIST/CONFIRM_ALL_COPY' : 'MESSAGE_LIST/CONFIRM_ALL_MOVE')
+				: 'MESSAGE_LIST/CONFIRM_ALL_DELETE', {
+				COUNT: oUids.size.toLocaleString(),
+				FOLDER: toFolder?.name() || toFolderFullName
+			}),
+			() => {
+				MessagelistUserStore.allMatching(null);
+				MessagelistUserStore.moveMessages(fromFolderFullName, oUids, toFolderFullName, copy, true);
+			}
+		]);
+		return;
+	}
 
 	let unseenCount = 0,
 		setPage = 0,

@@ -130,6 +130,10 @@
 		<div class="listThreadUidDesc" data-bind="visible: messageList.threadUid(), click: cancelThreadUid"
 			data-icon="arrow-left" data-i18n="MESSAGE_LIST/BACK_TO_MESSAGE_LIST"></div>
 		<div class="listSearchDesc" data-bind="visible: messageListSearchDesc(), text: messageListSearchDesc"></div>
+		<div class="listAllMatching" data-bind="visible: allMatchingOffer()">
+			<span data-bind="text: allMatchingOffer"></span>
+			<a href="#" class="g-ui-link" data-bind="click: toggleAllMatching, text: allMatchingAction"></a>
+		</div>
 		<div class="listDragOver" data-bind="css: {'viewAppendArea': dragOver() && !messageList.error() && !popupVisibility(), 'dragOverEnter': dragOverEnter }"
 			data-icon="arrow-down" data-i18n="MESSAGE_LIST/PUT_MESSAGE_HERE"></div>
 		<div class="listClear" data-bind="visible: clearListIsVisible()">

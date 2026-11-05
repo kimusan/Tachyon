@@ -105,6 +105,43 @@ trait Messages
 		}
 	}
 
+	/**
+	 * Every UID in a folder that matches a search, for acting on all of them
+	 * rather than on the page that is loaded (#182)
+	 */
+	public function DoMessageListUids() : array
+	{
+		$oParams = new \MailSo\Mail\MessageListParams;
+		$oParams->sFolderName = (string) $this->GetActionParam('folder', '');
+		$oParams->sSearch = (string) $this->GetActionParam('search', '');
+		$oParams->bUseThreads = !empty($this->GetActionParam('useThreads', '0'));
+		$oParams->sThreadAlgorithm = (string) $this->GetActionParam('threadAlgorithm', '');
+		if (!\strlen($oParams->sFolderName)) {
+			throw new ClientException(Notifications::CantGetMessageList);
+		}
+
+		$oAccount = $this->initMailClientConnection();
+
+		$oSettingsLocal = $this->SettingsProvider(true)->Load($oAccount);
+		if ($oSettingsLocal instanceof \Tachyon\Settings) {
+			$oParams->bHideDeleted = !empty($oSettingsLocal->GetConf('HideDeleted', 1));
+		}
+
+		try
+		{
+			if ($this->Config()->Get('cache', 'enable', true)) {
+				$oParams->oAttachmentCacher = $this->Cacher($oAccount);
+			}
+			$aUids = $this->MailClient()->MessageListUids($oParams);
+		}
+		catch (\Throwable $oException)
+		{
+			throw new ClientException(Notifications::CantGetMessageList, $oException);
+		}
+
+		return $this->DefaultResponse(\array_values(\array_map('intval', $aUids)));
+	}
+
 	public function DoSaveMessage() : array
 	{
 		$oAccount = $this->initMailClientConnection();

@@ -131,7 +131,10 @@ export class AppUser extends AbstractApp {
 			// no default
 		}
 
-		if (bDelete) {
+		if (bDelete && MessagelistUserStore.allMatching()) {
+			// moveMessages() asks itself, with the count, rather than twice
+			MessagelistUserStore.moveMessages(sFromFolderFullName, oUids);
+		} else if (bDelete) {
 			showScreenPopup(AskPopupView, [
 				i18n('POPUPS_ASK/DESC_WANT_DELETE_MESSAGES'),
 				() => {
