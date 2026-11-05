@@ -192,7 +192,9 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 
 
 			$oMailClient->MessageMimeStream(
-				function ($rResource) use ($oFiles, $aResult) {
+				// By reference: the success flag set in here is what gets returned, and
+				// a copy left every save reporting failure
+				function ($rResource) use ($oFiles, &$aResult) {
 					if ($oFiles && \is_resource($rResource)) {
 						// newFile() returns the node and reports failure by throwing,
 						// so there is nothing falsy to test.
