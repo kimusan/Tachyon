@@ -216,8 +216,6 @@ export class MailMessageList extends AbstractViewRight {
 				return SettingsUserStore.listGrouped() && (sort.includes('DATE') || sort.includes('FROM'));
 			},
 
-			timeFormat: () => (FolderUserStore.sortMode() || '').includes('FROM') ? 'AUTO' : 'LT',
-
 			groupedList: () => {
 				let list = [], current, sort = FolderUserStore.sortMode() || 'DATE';
 				if (MessagelistUserStore.listSearchScope()) {
@@ -272,6 +270,9 @@ export class MailMessageList extends AbstractViewRight {
 								id: ymd,
 								label: date,
 								search: 'on=' + dt.getFullYear() + '-' + pad2(1 + dt.getMonth()) + '-' + pad2(dt.getDate()),
+								// The label carries the date, so a row needs only the time.
+								// Any other group, a plugin's included, gets the full one (#150).
+								timeFormat: 'LT',
 								messages: []
 							};
 							list.push(current);

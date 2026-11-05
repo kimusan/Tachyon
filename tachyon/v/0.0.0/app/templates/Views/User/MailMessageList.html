@@ -160,7 +160,7 @@
 						<i data-bind="css: attachmentIconClass"></i>
 					</div>
 					<div class="sizeParent" data-bind="text: friendlySize()"></div>
-					<time data-bind="attr:{'data-time-format':$root.timeFormat()}, time: dateTimestamp"></time>
+					<time data-bind="attr:{'data-time-format':$parent.timeFormat || 'AUTO'}, time: dateTimestamp"></time>
 				</div>
 			</div>
 			<!-- /ko -->
