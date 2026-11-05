@@ -17,7 +17,7 @@ class DeeplTranslatePlugin extends \Tachyon\Plugins\AbstractPlugin
 		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '0.3',
 		RELEASE  = '2026-10-28',
-		REQUIRED = '4.4.8',
+		REQUIRED = '4.5.0',
 		CATEGORY = 'General',
 		LICENSE  = 'MIT',
 		DESCRIPTION = 'Translate a received message in place, or a draft before sending, using DeepL';

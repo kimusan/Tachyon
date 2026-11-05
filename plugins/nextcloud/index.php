@@ -9,7 +9,7 @@ class NextcloudPlugin extends \Tachyon\Plugins\AbstractPlugin
 		RELEASE  = '2026-11-05',
 		CATEGORY = 'Integrations',
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
-		REQUIRED = '4.4.8';
+		REQUIRED = '4.5.0';
 
 	public function Init() : void
 	{

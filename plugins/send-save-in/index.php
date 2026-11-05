@@ -10,7 +10,7 @@ class SendSaveInPlugin extends \Tachyon\Plugins\AbstractPlugin
 		URL      = 'https://github.com/kimusan/Tachyon',
 		VERSION  = '0.2',
 		RELEASE  = '2026-10-28',
-		REQUIRED = '4.4.8',
+		REQUIRED = '4.5.0',
 		CATEGORY = 'General',
 		LICENSE  = 'MIT',
 		DESCRIPTION = 'When composing a message, select the save folder';
