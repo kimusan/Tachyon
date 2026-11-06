@@ -416,10 +416,25 @@
 		}
 
 		&.html {
+			container-type: inline-size;
 
 			img {
 				max-width: 100%;
 				height: auto;
+			}
+			/* A percentage max-width lets an image add nothing to its cell's width,
+			   so a table declaring too small a width squeezed its images down to it
+			   (#178). Capping at the pane instead lets them widen the table. A quote
+			   is its own container, or its indent pushes such an image past the
+			   pane; not one inside a table, which would shrink it to nothing. */
+			table img {
+				max-width: 100cqw;
+			}
+			blockquote {
+				container-type: inline-size;
+			}
+			table blockquote {
+				container-type: normal;
 			}
 			img[data-x-src]:not([src]) {
 				border: 1px solid #999;
