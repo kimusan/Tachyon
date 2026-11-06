@@ -350,6 +350,16 @@ export const
 		// https://github.com/the-djmaze/snappymail/issues/1125
 		tmpl.content.querySelectorAll(keepTagContent).forEach(oElement => replaceWithChildren(oElement));
 
+		// An element the parser does not know, like <root> or <my-tag>, is inert,
+		// so drop only the tag: removing it took everything inside it along (#191).
+		// <xml> is Outlook's settings block, whose content is noise.
+		tmpl.content.querySelectorAll('*').forEach(oElement =>
+			oElement instanceof HTMLElement
+			&& (oElement instanceof HTMLUnknownElement || oElement.tagName.includes('-'))
+			&& 'XML' !== oElement.tagName
+			&& replaceWithChildren(oElement)
+		);
+
 		tmpl.content.querySelectorAll(
 			':not('+allowedTags+'),a:empty,span:empty'
 			+ (0 < bqLevel ? ',' + (new Array(1 + bqLevel).fill('blockquote').join(' ')) : '')
