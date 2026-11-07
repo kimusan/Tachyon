@@ -12,6 +12,10 @@
         "FILE_PUBLIC": "Публичная ссылка",
         "CREATE_SUBFOLDER": "Создать новую подпапку",
         "FOLDER_NAME": "Имя папки",
-        "FOLDER_CREATE": "Создать"
+        "FOLDER_CREATE": "Создать",
+        "ROOT_FOLDER": "Все файлы",
+        "SAVE_FOLDER": "Сохранять вложения и сообщения в",
+        "CHOOSE_FOLDER": "Выбрать папку",
+        "SAVE_ASK": "Каждый раз спрашивать, где сохранить"
     }
 }

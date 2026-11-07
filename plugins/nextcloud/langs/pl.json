@@ -3,7 +3,7 @@
         "SAVE_ATTACHMENTS": "Zapisz w Nextcloudzie",
         "SAVE_EML": "Zapisz jako .eml w Nextcloudzie",
         "SAVE_ICS": "Dodaj do Kalendarza",
-        "SELECT_FOLDER": "Wybierz folder",
+        "SELECT_FOLDER": "Zaznacz folder",
         "SELECT_FILES": "Wybierz plik(i)",
         "ATTACH_FILES": "Dodaj załącznik z Nextclouda",
         "SELECT_CALENDAR": "Wybierz kalendarz",
@@ -12,6 +12,10 @@
         "FILE_PUBLIC": "link publiczny",
         "CREATE_SUBFOLDER": "Utwórz nowy podkatalog",
         "FOLDER_NAME": "Nazwa folderu",
-        "FOLDER_CREATE": "Utwórz"
+        "FOLDER_CREATE": "Utwórz",
+        "ROOT_FOLDER": "Wszystkie pliki",
+        "SAVE_FOLDER": "Zapisuj załączniki i wiadomości w",
+        "CHOOSE_FOLDER": "Wybierz folder",
+        "SAVE_ASK": "Za każdym razem pytaj gdzie zapisać"
     }
 }

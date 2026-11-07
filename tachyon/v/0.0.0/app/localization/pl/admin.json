@@ -159,7 +159,7 @@
 		"LABEL_CLEANUP_PRODUCT": "Aplikacja",
 		"LABEL_CLEANUP_VERSION": "Wersja",
 		"LABEL_CLEANUP_SIZE": "Wielkość",
-		"LABEL_CLEANUP_RUNNING": "(działanie)",
+		"LABEL_CLEANUP_RUNNING": "(uruchomiona)",
 		"BUTTON_CLEANUP": "Usuń zaznaczone i zwolnij",
 		"CONFIRM_DELETE_VERSIONS": "Usunąć %COUNT% starszych wersji? Tej operacji nie można cofnąć.",
 		"ERROR_DELETE_VERSIONS": "Nie udało się usunąć wybranych wersji.",
