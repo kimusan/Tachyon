@@ -9,6 +9,8 @@ const
 
 	htmlre = /[&<>"']/g,
 	httpre = /^(https?:)?\/\//i,
+	// A link in a message may only use these; javascript:, data: and the like are dropped
+	schemesre = /^(http|https|geo|irc|nntp|mailto|sms|tel|intent|itms-apps|msteams|slack|spotify|steam|zoommtg):/i,
 	htmlmap = {
 		'&': '&amp;',
 		'<': '&lt;',
@@ -495,6 +497,9 @@ export const
 				value = oElement.href;
 				if (!/^([a-z]+):/i.test(value)) {
 					setAttribute('data-x-href-broken', value);
+					delAttribute('href');
+				} else if (!schemesre.test(value)) {
+					setAttribute('data-x-href-disallowed', value);
 					delAttribute('href');
 				} else {
 					oElement.href = stripTracking(value);
