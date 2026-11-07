@@ -15,6 +15,7 @@ import {
 
 import { mailBox } from 'Common/Links';
 import { i18n, getNotification } from 'Common/Translator';
+import { encodeHtml } from 'Common/Html';
 
 import { EmailCollectionModel } from 'Model/EmailCollection';
 import { MessageCollectionModel } from 'Model/MessageCollection';
@@ -564,7 +565,8 @@ MessagelistUserStore.moveMessages = (
 				? (copy ? 'MESSAGE_LIST/CONFIRM_ALL_COPY' : 'MESSAGE_LIST/CONFIRM_ALL_MOVE')
 				: 'MESSAGE_LIST/CONFIRM_ALL_DELETE', {
 				COUNT: oUids.size.toLocaleString(),
-				FOLDER: toFolder?.name() || toFolderFullName
+				// askDesc is rendered as HTML, and a shared folder's name is someone else's
+				FOLDER: encodeHtml(toFolder?.name() || toFolderFullName)
 			}),
 			() => {
 				MessagelistUserStore.allMatching(null);
