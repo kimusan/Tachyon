@@ -1276,7 +1276,7 @@ a.btn:hover, a.btn:focus, .dropdown-menu a:hover, .b-folders a:hover, #V-Setting
 	column-gap: 0;
 }
 .sm-msgView-side .messageListItem .senderParent,
-.rl-mobile .messageListItem .senderParent { order: 0; flex: 1 1 0; min-width: 0; }
+.rl-mobile .messageListItem .senderParent { order: 0; flex: 1 1 56px; min-width: 0; }   /* the 56px the subject leaves, so it can never fit on line 1 */
 .sm-msgView-side .messageListItem .threads-len,
 .rl-mobile .messageListItem .threads-len { order: 1; margin-left: 6px; }
 .sm-msgView-side .messageListItem time,
