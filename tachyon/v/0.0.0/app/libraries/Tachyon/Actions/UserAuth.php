@@ -149,6 +149,15 @@ trait UserAuth
 
 		$oDomain = $this->DomainProvider()->getByEmailAddress($aCredentials['email']);
 
+		// Keep only an SMTP user a plugin mapped. The one the domain's settings give is
+		// worked out again on every send, so a change to "Use short login" reaches an
+		// open session instead of waiting for the next login (#194).
+		if ($aCredentials['domain']
+		 && $aCredentials['smtpUser'] === $aCredentials['domain']->SmtpSettings()->fixUsername($aCredentials['email'])
+		) {
+			$aCredentials['smtpUser'] = '';
+		}
+
 		$oAccount = null;
 		try {
 			$oAccount = $bMainAccount ? new MainAccount : new AdditionalAccount;
