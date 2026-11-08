@@ -10,8 +10,8 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'Avatars',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '1.28',
-		RELEASE  = '2026-10-24',
+		VERSION  = '1.29',
+		RELEASE  = '2026-11-08',
 		REQUIRED = '2.33.0',
 		CATEGORY = 'Contacts',
 		LICENSE  = 'MIT',
@@ -281,6 +281,10 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$sEmailId = \sha1($sAsciiEmail);
 		$sDomain = \explode('@', $sAsciiEmail);
 		$sDomain = \array_pop($sDomain);
+		// The domain goes into glob() patterns, file names, DNS queries and URLs below
+		if (!static::isPlainHost($sDomain)) {
+			return null;
+		}
 
 		\header('Cache-Control: private');
 //		\header('Expires: '.\gmdate('D, j M Y H:i:s', \time() + 86400).' UTC');
@@ -489,11 +493,11 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 	private static function getCustomImage(string $sEmail) : ?array
 	{
 		$sEmail = \mb_strtolower(\Tachyon\Util\IDN::emailToAscii($sEmail));
-		$aFiles = \glob(\APP_PRIVATE_DATA . "avatars/{$sEmail}.*");
+		$aFiles = static::isPlainAddress($sEmail) ? \glob(\APP_PRIVATE_DATA . "avatars/{$sEmail}.*") : [];
 		if (!$aFiles && \str_contains($sEmail, '@')) {
 			$sDomain = \explode('@', $sEmail);
 			$sDomain = \array_pop($sDomain);
-			$aFiles = \glob(\APP_PRIVATE_DATA . "avatars/{$sDomain}.*");
+			$aFiles = static::isPlainHost($sDomain) ? \glob(\APP_PRIVATE_DATA . "avatars/{$sDomain}.*") : [];
 		}
 		return $aFiles ? static::readImage($aFiles[0]) : null;
 	}
@@ -515,10 +519,29 @@ class AvatarsPlugin extends \Tachyon\Plugins\AbstractPlugin
 			if (!$aFiles) {
 				$sDomain = \explode('@', $sEmail);
 				$sDomain = \array_pop($sDomain);
-				$aFiles = \glob(\APP_PRIVATE_DATA . 'avatars/favicon-' . $sDomain . '.*');
+				$aFiles = static::isPlainHost($sDomain) ? \glob(\APP_PRIVATE_DATA . 'avatars/favicon-' . $sDomain . '.*') : [];
 			}
 		}
 		return $aFiles ? static::readImage($aFiles[0]) : null;
+	}
+
+	/**
+	 * Only a plain host name, or a plain address at one, is put into a glob()
+	 * pattern or a file name. Glob characters and path separators passed
+	 * IDN::emailToAscii() untouched, so "x@../configs/application" was answered
+	 * with application.ini.
+	 */
+	private static function isPlainHost(string $sDomain) : bool
+	{
+		return 1 === \preg_match('/^[a-z0-9_-]+(?:\.[a-z0-9_-]+)*$/D', $sDomain);
+	}
+
+	private static function isPlainAddress(string $sEmail) : bool
+	{
+		$aParts = \explode('@', $sEmail);
+		return 2 === \count($aParts)
+			&& 1 === \preg_match('/^[a-z0-9._+-]+$/D', $aParts[0])
+			&& static::isPlainHost($aParts[1]);
 	}
 
 	private static function readImage(string $sFile) : array
