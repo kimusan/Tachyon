@@ -50,7 +50,7 @@
 	},
 	"LOGIN": {
 		"LABEL_LOGIN": "Login",
-		"LABEL_SIGN_ME": "Zapamiętaj mnie",
+		"LABEL_SIGN_ME": "Pozostań zalogowany",
 		"BUTTON_SIGN_IN": "Zaloguj"
 	},
 	"TOP_TOOLBAR": {
@@ -101,7 +101,7 @@
 		"ACL_K": "Utwórz podfoldery",
 		"ACL_L": "Pokaż wiadomości",
 		"ACL_P": "Wyślij mail",
-		"ACL_R": "Wybierz folder",
+		"ACL_R": "Zaznacz folder",
 		"ACL_S": "\\Tag przeczytane",
 		"ACL_T": "\\Tag usunięte",
 		"ACL_W": "Inne tagi",
@@ -144,7 +144,16 @@
 		"SORT_SUBJECT_ASC": "Temat A-Z",
 		"SORT_SUBJECT_DESC": "Temat Z-A",
 		"SORT_FROM_ASC": "Od A-Z",
-		"SORT_FROM_DESC": "Od Z-A"
+		"SORT_FROM_DESC": "Od Z-A",
+		"PAGE_SELECTED": "Wybrano wszystkie %COUNT% wiadomości na tej stronie.",
+		"SELECT_ALL_MATCHING": "Zaznacz wszystkie wiadomości w tym folderze",
+		"SELECT_ALL_MATCHING_SEARCH": "Zaznacz wszystkie wiadomości pasujące do tego wyszukiwania",
+		"ALL_MATCHING_SELECTED": "Wszystkie %COUNT% wiadomości w tym folderze są zaznaczone.",
+		"ALL_MATCHING_SEARCH_SELECTED": "Wybrano wszystkie %COUNT% wiadomości pasujące do tego wyszukiwania.",
+		"CLEAR_SELECTION": "Wyczyść zaznaczenie",
+		"CONFIRM_ALL_MOVE": "Przenieść %COUNT% zaznaczonych wiadomości do %FOLDER%?",
+		"CONFIRM_ALL_COPY": "Skopiować %COUNT% zaznaczonych wiadomości do %FOLDER%?",
+		"CONFIRM_ALL_DELETE": "Trwale usunąć %COUNT% zaznaczonych wiadomości? Tej czynności nie można cofnąć."
 	},
 	"MESSAGE": {
 		"BUTTON_EDIT": "Edytuj",
@@ -623,7 +632,8 @@
 		"TYPE_FILES": "Pliki",
 		"TYPE_JOURNAL": "Dziennik",
 		"TYPE_NOTES": "Notatki",
-		"TYPE_TASKS": "Zadania"
+		"TYPE_TASKS": "Zadania",
+		"TOTAL_MESSAGES": "Wiadomości we wszystkich folderach:"
 	},
 	"SETTINGS_ACCOUNTS": {
 		"LEGEND_ACCOUNTS": "Konta",
