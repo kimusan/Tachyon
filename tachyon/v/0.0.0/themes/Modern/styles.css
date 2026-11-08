@@ -1307,6 +1307,10 @@ a.btn:hover, a.btn:focus, .dropdown-menu a:hover, .b-folders a:hover, #V-Setting
 .messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage) .flagParent::after { opacity: 0 !important; transition: opacity .12s ease; }
 .messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage):hover .flagParent::after { opacity: .45 !important; }
 .messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage) .flagParent:hover::after { opacity: 1 !important; color: #f5a524; }
+/* A touch screen has no hover to reveal it, so there it stays dimmed instead */
+@media (hover: none) {
+	.messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage) .flagParent::after { opacity: .45 !important; }
+}
 .messageListItem.msgflag-\\flagged .flagParent::after,
 .messageListItem.hasFlaggedSubMessage .flagParent::after { color: #f5a524; opacity: 1; }
 
