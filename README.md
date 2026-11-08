@@ -43,7 +43,8 @@ no third party fonts or scripts, and no external avatar service.
 - Writing to a selection can target To, Cc or Bcc, and suggests Bcc past a configurable threshold so a large To does not hand every address to every recipient
 
 **Appearance**
-- A light, dark and follow-the-system toggle that applies without reloading. All 16 bundled themes carry both schemes, so switching mode is a mode change rather than picking a different theme
+- A light, dark and follow-the-system toggle that applies without reloading. All 17 bundled themes carry both schemes, so switching mode is a mode change rather than picking a different theme
+- Themes can come in several colour palettes, picked under Settings, Themes, with an admin default. Modern, contributed by Chris Jones, ships with seven. A custom theme declares its own in a `theme.json`; see `themes/example.css`
 - Vector icons throughout, drawn in the current text colour so they follow the active theme. The interface previously drew most of its icons as emoji, which ignored theming entirely
 - A date picker in place of the browser's, which rendered in its own locale and ignored everything the application asked of it
 - Tables in the HTML editor: insert, add and remove rows and columns

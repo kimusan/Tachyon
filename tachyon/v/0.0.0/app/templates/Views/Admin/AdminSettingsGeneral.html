@@ -43,6 +43,20 @@
 			}
 		}"></div>
 	</div>
+	<div class="control-group" data-bind="visible: themeAccentOptions().length">
+		<label data-i18n="TAB_GENERAL/LABEL_THEME_ACCENT"></label>
+		<div data-bind="component: {
+			name: 'Select',
+			params: {
+				options: themeAccentOptions,
+				value: themeAccent,
+				trigger: themeAccentTrigger,
+				optionsText: 'optText',
+				optionsValue: 'optValue',
+				size: 2
+			}
+		}"></div>
+	</div>
 	<div class="control-group">
 		<div>
 			<div data-bind="component: {

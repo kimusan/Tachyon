@@ -204,9 +204,13 @@ abstract class Service
 			$oActions = Api::Actions();
 
 			$sThemeName = $oActions->GetTheme($bAdmin);
+			$sThemeAccent = $oActions->GetThemeAccent($bAdmin);
 
 			$aTemplateParameters = array(
 				'{{BaseAppThemeName}}' => $sThemeName,
+				// On <html> from the start, so the page paints in the palette rather
+				// than switching to it once the app has loaded
+				'{{BaseAppThemeAccentAttr}}' => $sThemeAccent ? ' data-accent="'.\htmlspecialchars($sThemeAccent).'"' : '',
 				'{{BaseAppFaviconPngLinkTag}}' => $sFaviconPngLink ? '<link type="image/png" rel="shortcut icon" href="'.$sFaviconPngLink.'">' : '',
 				'{{BaseAppFaviconTouchLinkTag}}' => $sAppleTouchLink ? '<link type="image/png" rel="apple-touch-icon" href="'.$sAppleTouchLink.'">' : '',
 				'{{BaseAppManifestLink}}' => Utils::WebStaticPath('manifest.json'),

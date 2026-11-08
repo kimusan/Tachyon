@@ -150,6 +150,13 @@ trait User
 			$this->setSettingsFromParams($oSettingsLocal, 'Theme', 'string', function ($sTheme) use ($self) {
 				return $self->ValidateTheme($sTheme);
 			});
+			// Checked against the theme saved with it, else the one in use
+			$this->setSettingsFromParams($oSettingsLocal, 'ThemeAccent', 'string', function ($sAccent) use ($self, $oSettingsLocal, $oConfig) {
+				return $self->ValidateThemeAccent(
+					$self->ValidateTheme((string) $oSettingsLocal->GetConf('Theme', $oConfig->Get('webmail', 'theme', 'Default'))),
+					$sAccent
+				);
+			});
 			$this->setSettingsFromParams($oSettings, 'fontSansSerif', 'string');
 			$this->setSettingsFromParams($oSettings, 'fontSerif', 'string');
 			$this->setSettingsFromParams($oSettings, 'fontMono', 'string');

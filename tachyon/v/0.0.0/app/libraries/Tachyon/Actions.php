@@ -850,9 +850,21 @@ class Actions
 				'post_max_size' => \ini_get('post_max_size')
 			);
 			$aResult['System']['themes'] = $this->GetThemes();
+			// Only themes that have palettes, each as a list so the order holds
+			$aResult['System']['themeAccents'] = array();
+			foreach ($aResult['System']['themes'] as $sTheme) {
+				if ($aAccents = $this->GetThemeAccents($sTheme)) {
+					$aList = array();
+					foreach ($aAccents['accents'] as $sId => $aAccent) {
+						$aList[] = array('id' => (string) $sId) + $aAccent;
+					}
+					$aResult['System']['themeAccents'][$sTheme] = array('default' => $aAccents['default'], 'accents' => $aList);
+				}
+			}
 		}
 
 		$aResult['Theme'] = $this->GetTheme($bAdmin);
+		$aResult['ThemeAccent'] = $this->GetThemeAccent($bAdmin);
 		$aResult['ThemeWasDark'] = $this->ThemeWasDark();
 
 		$aResult['language'] = $this->GetLanguage();

@@ -39,6 +39,7 @@
 		"LABEL_LANGUAGE": "Language",
 		"LABEL_LANGUAGE_ADMIN": "Language (admin)",
 		"LABEL_THEME": "Theme",
+		"LABEL_THEME_ACCENT": "Colour",
 		"LABEL_ALLOW_LANGUAGES_ON_SETTINGS": "Allow language selection on settings screen",
 		"LABEL_ALLOW_THEMES_ON_SETTINGS": "Allow theme selection on settings screen",
 		"LABEL_ALLOW_BACKGROUND_ON_SETTINGS": "Allow background selection on settings screen",

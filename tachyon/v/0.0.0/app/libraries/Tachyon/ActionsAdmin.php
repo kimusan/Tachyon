@@ -63,6 +63,10 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'Theme', 'webmail', 'theme', 'string', function ($sTheme) use ($self) {
 			return $self->ValidateTheme($sTheme);
 		});
+		// After Theme, so it is checked against the theme saved with it
+		$this->setConfigFromParams($oConfig, 'ThemeAccent', 'webmail', 'theme_accent', 'string', function ($sAccent) use ($self, $oConfig) {
+			return $self->ValidateThemeAccent($self->ValidateTheme((string) $oConfig->Get('webmail', 'theme', 'Default')), $sAccent);
+		});
 
 		$this->setConfigFromParams($oConfig, 'proxyExternalImages', 'labs', 'use_local_proxy_for_external_images', 'bool');
 		$this->setConfigFromParams($oConfig, 'allowUpdate', 'admin_panel', 'allow_update', 'bool');

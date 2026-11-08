@@ -16,6 +16,10 @@ export const
 	ThemeStore = {
 		theme: ko.observable(''),
 		themes: ko.observableArray(),
+		// The palette of the theme, for a theme that declares some in theme.json
+		themeAccent: ko.observable(''),
+		// { theme: { default: id, accents: [{ id, name, swatch }] } }
+		themeAccents: {},
 		userBackgroundName: ko.observable(''),
 		userBackgroundHash: ko.observable(''),
 		fontSansSerif: ko.observable(''),
@@ -29,8 +33,10 @@ export const
 			themes = Settings.app('themes');
 
 		ThemeStore.themes(isArray(themes) ? themes : []);
+		ThemeStore.themeAccents = Settings.app('themeAccents') || {};
 		ThemeStore.theme(theme);
 		changeTheme(theme);
+		ThemeStore.themeAccent(SettingsGet('ThemeAccent') || '');
 		if (!ThemeStore.isMobile()) {
 			ThemeStore.userBackgroundName(SettingsGet('userBackgroundName'));
 			ThemeStore.userBackgroundHash(SettingsGet('userBackgroundHash'));
@@ -66,9 +72,19 @@ export const
 		}
 	},
 
+	/**
+	 * The palette is a data-accent attribute on <html> that the theme's CSS
+	 * keys on, so changing it needs no new stylesheet
+	 */
+	changeThemeAccent = value => value
+		? document.documentElement.setAttribute('data-accent', value)
+		: document.documentElement.removeAttribute('data-accent'),
+
 	convertThemeName = theme => theme.replace(/@[a-z]+$/, '').replace(/([A-Z])/g, ' $1').trim();
 
 addSubscribablesTo(ThemeStore, {
+	themeAccent: value => changeThemeAccent(value),
+
 	fontSansSerif: value => {
 		if (null != value) {
 			let cl = appEl.classList;

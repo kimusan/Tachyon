@@ -61,7 +61,23 @@ export class AdminSettingsGeneral extends AbstractViewSettings {
 		this.addSetting('language');
 		this.addSetting('attachmentLimit');
 
-		this.addSetting('Theme', value => changeTheme(value, this.themeTrigger));
+		this.addSetting('Theme', value => {
+			changeTheme(value, this.themeTrigger);
+			// Palette ids belong to one theme, so a new theme starts on its default
+			ThemeStore.themeAccent(ThemeStore.themeAccents[value]?.default || '');
+		});
+
+		// Sent with the theme, which the server checks it against: on its own it
+		// could arrive before the theme it belongs to was saved
+		this.themeAccent = ThemeStore.themeAccent;
+		this.themeAccentTrigger = ko.observable(SaveSettingStatus.Idle).extend({ debounce: 100 });
+		this.themeAccent.subscribe(value => {
+			this.themeAccentTrigger(SaveSettingStatus.Saving);
+			Remote.request('AdminSettingsUpdate', iError => {
+				this.themeAccentTrigger(iError ? SaveSettingStatus.Failed : SaveSettingStatus.Success);
+				setTimeout(() => this.themeAccentTrigger(SaveSettingStatus.Idle), 1000);
+			}, { Theme: this.theme(), ThemeAccent: value });
+		});
 
 		this.uploadData = SettingsGet('phpUploadSizes');
 		this.uploadDataDesc =
@@ -76,6 +92,8 @@ export class AdminSettingsGeneral extends AbstractViewSettings {
 
 		addComputablesTo(this, {
 			themesOptions: () => this.themes.map(theme => ({ optValue: theme, optText: convertThemeName(theme) })),
+			themeAccentOptions: () => (ThemeStore.themeAccents[this.theme()]?.accents || [])
+				.map(accent => ({ optValue: accent.id, optText: accent.name })),
 
 			languageFullName: () => convertLangName(this.language()),
 			languageAdminFullName: () => convertLangName(this.languageAdmin())

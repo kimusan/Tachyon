@@ -652,6 +652,7 @@
 		"LEGEND_THEMES": "Themes",
 		"LABEL_BACKGROUND": "Background",
 		"LABEL_FONTS": "Fonts",
+		"LABEL_ACCENT": "Colour",
 		"BUTTON_UPLOAD_BACKGROUND_IMAGE": "Upload background image (JPG, PNG)",
 		"ERROR_FILE_IS_TOO_BIG": "File is too big",
 		"ERROR_FILE_TYPE_ERROR": "Invalid file type (JPG and PNG only)",

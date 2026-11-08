@@ -194,6 +194,8 @@ so nothing here is ever interpreted as markup.'),
 				'app_path'                    => array(''),
 
 				'theme'                       => array('Tachyon', 'Theme used by default'),
+				'theme_accent'                => array('', 'Palette of that theme used by default, for a theme that has palettes.
+Empty is the default the theme declares.'),
 				'allow_themes'                => array(true, 'Allow theme selection on settings screen'),
 				'allow_user_background'       => array(false),
 

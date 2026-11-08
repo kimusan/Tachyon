@@ -1,3 +1,32 @@
+/*
+ * Palettes
+ *
+ * A theme can offer several colour palettes that people pick under Settings,
+ * Themes. List them in a theme.json next to styles.css:
+ *
+ *   {
+ *     "default": "blue",
+ *     "accents": {
+ *       "blue":  { "name": "Blue",  "swatch": "#3b55e6" },
+ *       "green": { "name": "Green", "swatch": "#1f7a5c" }
+ *     }
+ *   }
+ *
+ * Ids are lower case letters, digits and "-", up to 32 characters; a name is
+ * up to 40 characters of plain text; a swatch is a #rgb or #rrggbb colour.
+ * Anything else is left out of the list. The chosen id is set as data-accent
+ * on <html>, so give each palette its own variables, for light and dark:
+ *
+ *   :root[data-accent="green"] { --link-color: #1f7a5c; }
+ *   :root[data-accent="green"][data-color-scheme="dark"] { --link-color: #3fcf9f; }
+ *   @media (prefers-color-scheme: dark) {
+ *     :root[data-accent="green"]:not([data-color-scheme="light"]) { --link-color: #3fcf9f; }
+ *   }
+ *
+ * Switching palette only changes that attribute; the stylesheet stays loaded.
+ * themes/Modern is a complete example.
+ */
+
 
 :root {
 	color-scheme: light;

@@ -8,6 +8,18 @@
 		<img data-bind="attr: { 'src': themePreviewSrc }">
 	</figure>
 </div>
+<div data-bind="visible: accents().length">
+	<br>
+	<div class="legend" data-i18n="SETTINGS_THEMES/LABEL_ACCENT"></div>
+	<div class="theme-accents" role="radiogroup" data-bind="foreach: accents">
+		<button type="button" role="radio" data-bind="click: $root.setAccent,
+			css: { selected: $root.themeAccent() === id },
+			attr: { 'aria-checked': $root.themeAccent() === id ? 'true' : 'false' }">
+			<span class="swatch" data-bind="style: { backgroundColor: swatch }"></span>
+			<span data-bind="text: name"></span>
+		</button>
+	</div>
+</div>
 <br>
 <br>
 <div class="form-horizontal">

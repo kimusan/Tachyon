@@ -47,6 +47,9 @@ export class UserSettingsThemes /*extends AbstractViewSettings*/ {
 		this.themes = ThemeStore.themes;
 		this.themesObjects = ko.observableArray();
 
+		this.themeAccent = ThemeStore.themeAccent;
+		this.accents = ko.computed(() => ThemeStore.themeAccents[ThemeStore.theme()]?.accents || []);
+
 		themeBackground.enabled = SettingsCapa('UserBackground');
 		this.background = themeBackground;
 
@@ -57,14 +60,25 @@ export class UserSettingsThemes /*extends AbstractViewSettings*/ {
 
 			changeTheme(value, this.themeTrigger);
 
+			// Palette ids belong to one theme, so a new theme starts on its default
+			ThemeStore.themeAccent(ThemeStore.themeAccents[value]?.default || '');
+
 			Remote.saveSettings(null, {
-				Theme: value
+				Theme: value,
+				ThemeAccent: ''
 			});
 		});
 	}
 
 	setTheme(theme) {
 		ThemeStore.theme(theme.name);
+	}
+
+	setAccent(accent) {
+		ThemeStore.themeAccent(accent.id);
+		Remote.saveSettings(null, {
+			ThemeAccent: accent.id
+		});
 	}
 
 	onBuild() {
