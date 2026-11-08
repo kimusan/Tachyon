@@ -699,11 +699,13 @@ export const
 		 * wrapper table most senders use collapsed into a column one word across.
 		 * Only a wrapper that holds one of those percentages is given a width, so
 		 * an ordinary small table in the body of a message still sizes to its own
-		 * content.
+		 * content. Those come with a max-width; a bare width:100% is the sender's
+		 * own, like an image filling a fixed width cell, and stretched that cell
+		 * to the pane.
 		 */
 		tmpl.content.querySelectorAll('table').forEach(table => {
 			if (!table.style.width
-			 && [...table.querySelectorAll('table,img')].some(el => el.style.width.includes('%'))) {
+			 && [...table.querySelectorAll('table,img')].some(el => el.style.width.includes('%') && el.style.maxWidth)) {
 				table.style.width = '100%';
 			}
 		});
