@@ -1,0 +1,4839 @@
+/*
+ * Modern 1.0.0, a theme for Tachyon webmail.
+ * Copyright (c) 2026 Chris Jones
+ * SPDX-License-Identifier: MIT (full text in LICENSE next to this file)
+ * https://github.com/christopherjones/tachyon-theme-modern
+ *
+ * One stylesheet with seven palettes. "Modern" is the default tokens below;
+ * the others are the blocks at the end, each scoped to the data-accent
+ * attribute Tachyon sets on <html> (listed in theme.json). Merged from the
+ * seven separate themes of the upstream repository without other changes.
+ */
+
+/*
+ * Modern, a theme for Tachyon webmail : shared base
+ *
+ * Layout and component styling for every Modern palette. Written entirely
+ * against the --m-* tokens; colours live in palettes/*.css.
+ * Don't install this file directly: run build.sh, which prepends a palette.
+ *
+ * Copyright (c) 2026 Chris Jones
+ * SPDX-License-Identifier: MIT
+ * See LICENSE for the full text.
+ */
+
+/* =========================================================================
+   1. Default tokens (the "Modern" palette)
+   Zero specificity via :where(), so a palette file can override any of
+   them with a plain :root rule regardless of order.
+   ========================================================================= */
+:where(:root) {
+	color-scheme: light;
+	/* Light mode, tinted: cool slate canvas, off-white panels, no pure #fff
+	   anywhere large. Less glare, and panels separate from the canvas by
+	   value instead of by borders alone. */
+	--m-bg:          #e4e8f0;
+	--m-surface:     #f9fafc;
+	--m-surface-2:   #eceff5;
+	--m-text:        #0f1525;
+	--m-text-2:      #343b4f;
+	--m-muted:       #5a6276;
+	--m-faint:       #868ea2;
+	--m-line:        #dde1ea;
+	--m-line-strong: #c9cfdb;
+	--m-accent:      #3b55e6;
+	--m-accent-hover:#2f47cc;
+	--m-accent-fg:   #ffffff;
+	--m-accent-soft: rgba(59, 85, 230, 0.12);
+	--m-hover:       rgba(15, 21, 37, 0.055);
+	--m-danger:      #d93f45;
+	--m-reader:      #ffffff;   /* message surface stays white: HTML mail assumes it */
+	--m-canvas-line: rgba(15, 21, 37, 0.10);   /* dividers and card edges on the canvas */
+	--m-success:     #1f8a4c;
+	--m-warn:        #a35a00;
+	--m-warn-bg:     #fff6e5;
+	--m-warn-line:   #f5d9a8;
+	--m-err:         #b42318;
+	--m-err-bg:      #fdecec;
+	--m-err-line:    #f6c6c4;
+	--m-info-bg:     #edf1ff;
+	--m-info-line:   #c9d3fb;
+
+	--m-r-lg: 14px;
+	--m-r:    10px;
+	--m-r-sm: 8px;
+
+	--m-pad:   16px;
+	--m-bar-h: 64px;
+
+	--m-shadow-panel: 0 1px 2px rgba(15,21,37,.05), 0 6px 20px -6px rgba(15,21,37,.12);
+	--m-shadow-pop: 0 12px 32px -8px rgba(17,19,24,.18), 0 2px 6px rgba(17,19,24,.06);
+	--m-shadow-dlg: 0 24px 64px -12px rgba(17,19,24,.28), 0 4px 12px rgba(17,19,24,.08);
+
+	--m-font: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, sans-serif;
+}
+
+:where(:root[data-color-scheme="dark"]) {
+	color-scheme: dark;
+	--m-bg:          #0d0f14;
+	--m-surface:     #15181f;
+	--m-surface-2:   #1c2029;
+	--m-text:        #eceef2;
+	--m-text-2:      #c3c7d1;
+	--m-muted:       #8a90a0;
+	--m-faint:       #5d6372;
+	--m-line:        #232733;
+	--m-line-strong: #2e3341;
+	--m-accent:      #7b8cff;
+	--m-accent-hover:#93a1ff;
+	--m-accent-fg:   #0d0f14;
+	--m-accent-soft: rgba(123, 140, 255, 0.13);
+	--m-hover:       rgba(255, 255, 255, 0.045);
+	--m-danger:      #ff6369;
+	--m-reader:      var(--m-surface);
+	--m-canvas-line: rgba(255, 255, 255, 0.07);
+	--m-success:     #3fcf7f;
+	--m-warn:        #f5b544;
+	--m-warn-bg:     #2a2010;
+	--m-warn-line:   #5c4415;
+	--m-err:         #ff8a8a;
+	--m-err-bg:      #2c1416;
+	--m-err-line:    #5e2327;
+	--m-info-bg:     rgba(123, 140, 255, 0.10);
+	--m-info-line:   rgba(123, 140, 255, 0.28);
+	--m-shadow-panel: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+	--m-shadow-pop: 0 12px 32px -8px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+	--m-shadow-dlg: 0 24px 64px -12px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05);
+}
+@media (prefers-color-scheme: dark) {
+	:where(:root:not([data-color-scheme="light"])) {
+		color-scheme: dark;
+		--m-bg:          #0d0f14;
+		--m-surface:     #15181f;
+		--m-surface-2:   #1c2029;
+		--m-text:        #eceef2;
+		--m-text-2:      #c3c7d1;
+		--m-muted:       #8a90a0;
+		--m-faint:       #5d6372;
+		--m-line:        #232733;
+		--m-line-strong: #2e3341;
+		--m-accent:      #7b8cff;
+		--m-accent-hover:#93a1ff;
+		--m-accent-fg:   #0d0f14;
+		--m-accent-soft: rgba(123, 140, 255, 0.13);
+		--m-hover:       rgba(255, 255, 255, 0.045);
+		--m-danger:      #ff6369;
+		--m-reader:      var(--m-surface);
+		--m-canvas-line: rgba(255, 255, 255, 0.07);
+		--m-success:     #3fcf7f;
+		--m-warn:        #f5b544;
+		--m-warn-bg:     #2a2010;
+		--m-warn-line:   #5c4415;
+		--m-err:         #ff8a8a;
+		--m-err-bg:      #2c1416;
+		--m-err-line:    #5e2327;
+		--m-info-bg:     rgba(123, 140, 255, 0.10);
+		--m-info-line:   rgba(123, 140, 255, 0.28);
+		--m-shadow-panel: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+		--m-shadow-pop: 0 12px 32px -8px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+		--m-shadow-dlg: 0 24px 64px -12px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05);
+	}
+}
+
+
+/* Canvas ("chrome") tokens: the sidebar, account button, login header and,
+   on phones, the toolbars sit on the canvas rather than on a panel. They
+   default to the panel colours; a palette with a dark canvas overrides them.
+   --m-p-* keep the panel values so menus opened from the chrome reset to them. */
+:where(:root) {
+	--m-c-text:        var(--m-text);
+	--m-c-text-2:      var(--m-text-2);
+	--m-c-muted:       var(--m-muted);
+	--m-c-faint:       var(--m-faint);
+	--m-c-hover:       var(--m-hover);
+	--m-c-chip:        var(--m-surface);
+	--m-c-field:       var(--m-surface-2);
+	--m-c-line:        var(--m-line);
+	--m-c-line-strong: var(--m-line-strong);
+	--m-c-accent-text: var(--m-accent);   /* accent-coloured text on the canvas (count pills) */
+
+	--m-p-text:        var(--m-text);
+	--m-p-text-2:      var(--m-text-2);
+	--m-p-muted:       var(--m-muted);
+	--m-p-faint:       var(--m-faint);
+	--m-p-hover:       var(--m-hover);
+	--m-p-surface:     var(--m-surface);
+	--m-p-surface-2:   var(--m-surface-2);
+	--m-p-line:        var(--m-line);
+	--m-p-line-strong: var(--m-line-strong);
+}
+
+/* Feed Tachyon's own variables so built-in components inherit the palette */
+:root, :root[data-color-scheme] {
+	/* MAIN */
+	--main-font-family: var(--m-font);
+	--fontSans: var(--m-font);
+	--main-font-size: 14px;
+	--main-color: var(--m-text);
+	--main-bg-color: var(--m-bg);
+	--main-bg-image: none;
+	--main-bg-size: auto;
+	--main-bg-repeat: repeat;
+	--link-color: var(--m-accent);
+	--border-color: var(--m-line);
+	--border-radius: var(--m-r-lg);
+	--hr-color: var(--m-line);
+	--panel-bg-clr: var(--m-surface);
+	--smMainShadow: none;
+
+	/* ALERTS */
+	--warning-clr: var(--m-warn);
+	--warning-bg-clr: var(--m-warn-bg);
+	--warning-border-clr: var(--m-warn-line);
+	--error-clr: var(--m-err);
+	--error-bg-clr: var(--m-err-bg);
+	--error-border-clr: var(--m-err-line);
+	--info-clr: var(--m-accent);
+	--info-bg-clr: var(--m-info-bg);
+	--info-border-clr: var(--m-info-line);
+
+	/* LOADING */
+	--loading-color: var(--m-c-text);
+	--loading-text-shadow: none;
+	--spinner-color: var(--m-accent);
+
+	/* LOGIN */
+	--login-color: var(--m-text);
+	--login-bg-color: var(--m-surface);
+	--login-box-shadow: var(--m-shadow-dlg);
+	--login-border: 1px solid var(--m-line);
+	--login-border-radius: 16px;
+
+	/* MENU */
+	--dropdown-menu-color: var(--m-text);
+	--dropdown-menu-bg-color: var(--m-surface);
+	--dropdown-menu-hover-bg-color: var(--m-hover);
+	--dropdown-menu-hover-color: var(--m-text);
+	--dropdown-menu-disable-color: var(--m-faint);
+	--dropdown-menu-disabled-color: var(--m-faint);
+	--dropdown-menu-border-clr: var(--m-line);
+
+	/* FOLDERS */
+	--folders-color: var(--m-text-2);
+	--folders-disabled-color: var(--m-faint);
+	--folders-selected-color: var(--m-text);
+	--folders-selected-bg-color: var(--m-surface);
+	--folders-focused-color: var(--m-text);
+	--folders-focused-bg-color: var(--m-hover);
+	--folders-hover-color: var(--m-text);
+	--folders-hover-bg-color: var(--m-hover);
+	--folders-drop-color: var(--m-accent);
+	--folders-drop-bg-color: var(--m-accent-soft);
+	--unread-count-color: var(--m-accent);
+	--unread-count-bg-color: var(--m-accent-soft);
+
+	/* SETTINGS */
+	--settings-menu-color: var(--m-text-2);
+	--settings-menu-selected-color: var(--m-text);
+	--settings-menu-selected-bg-color: var(--m-surface);
+	--settings-menu-hover-color: var(--m-text);
+	--settings-menu-hover-bg-color: var(--m-hover);
+
+	/* MESSAGES */
+	--message-list-toolbar-bg-color: var(--m-surface);
+	--message-header-bg-clr: var(--m-reader);
+
+	/* DIALOGS */
+	--dialog-clr: var(--m-text);
+	--dialog-bg-clr: var(--m-surface);
+	--dialog-border-clr: var(--m-line);
+	--dialog-border-radius: 16px;
+
+	/* FORMS */
+	--btn-clr: var(--m-accent-fg);
+	--btn-bg-clr: var(--m-accent);
+	--btn-border-clr: var(--m-accent);
+	--btn-border-radius: var(--m-r-sm);
+	--btn-success-bg-clr: var(--m-accent);
+	--btn-danger-bg-clr: var(--m-danger);
+
+	--input-clr: var(--m-text);
+	--input-bg-clr: var(--m-surface-2);
+	--input-border-clr: transparent;
+	--input-border-radius: var(--m-r);
+	--input-focus-border-clr: var(--m-accent);
+
+	/* TABLES */
+	--tr-hover-bg-clr: var(--m-hover);
+	--tr-odd-bg-clr: transparent;
+
+	/* TABS */
+	--tab-active-bg-clr: transparent;
+	--tab-hover-border-clr: transparent;
+
+	--smDialogShrink: 48px;
+}
+
+/* Apply the canvas tokens to everything that sits on the canvas */
+#rl-left,
+#V-SystemDropDown,
+.LoginView .login-logo,
+.LoginView .descWrapper,
+.LoginView .login-footer {
+	--m-text:        var(--m-c-text);
+	--m-text-2:      var(--m-c-text-2);
+	--m-muted:       var(--m-c-muted);
+	--m-faint:       var(--m-c-faint);
+	--m-hover:       var(--m-c-hover);
+	--m-surface:     var(--m-c-chip);
+	--m-surface-2:   var(--m-c-field);
+	--m-line:        var(--m-c-line);
+	--m-line-strong: var(--m-c-line-strong);
+	--m-badge-text:  var(--m-c-accent-text);
+}
+@media screen and (max-width: 799px) {
+	#V-MailMessageList > .btn-toolbar,
+	#V-MailMessageView .top-toolbar {
+		--m-text:        var(--m-c-text);
+		--m-text-2:      var(--m-c-text-2);
+		--m-muted:       var(--m-c-muted);
+		--m-faint:       var(--m-c-faint);
+		--m-hover:       var(--m-c-hover);
+		--m-surface:     var(--m-c-chip);
+		--m-surface-2:   var(--m-c-field);
+		--m-line:        var(--m-c-line);
+		--m-line-strong: var(--m-c-line-strong);
+	}
+}
+/* ...and back to panel colours for menus and popups opened from it */
+.dropdown-menu,
+dialog {
+	--m-text:        var(--m-p-text);
+	--m-text-2:      var(--m-p-text-2);
+	--m-muted:       var(--m-p-muted);
+	--m-faint:       var(--m-p-faint);
+	--m-hover:       var(--m-p-hover);
+	--m-surface:     var(--m-p-surface);
+	--m-surface-2:   var(--m-p-surface-2);
+	--m-line:        var(--m-p-line);
+	--m-line-strong: var(--m-p-line-strong);
+}
+
+html, body {
+	background: var(--m-bg);
+	color: var(--m-text);
+	font-family: var(--m-font);
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: "cv11", "ss01";
+}
+
+
+/* =========================================================================
+   1b. Baseline components
+   Generic buttons, links and alerts. Specific areas below refine these.
+   ========================================================================= */
+a { color: var(--m-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a.btn:hover, a.btn:focus, .dropdown-menu a:hover, .b-folders a:hover, #V-SettingsMenu a:hover { text-decoration: none; }
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 36px;
+	padding: 0 14px;
+	border: 1px solid var(--m-line-strong);
+	border-radius: var(--m-r-sm);
+	background: var(--m-surface);
+	color: var(--m-text);
+	font-family: var(--m-font);
+	font-size: 13.5px;
+	font-weight: 550;
+	line-height: 1;
+	text-shadow: none;
+	box-shadow: 0 1px 2px rgba(15,21,37,.04);
+	text-decoration: none;
+	cursor: pointer;
+	opacity: 1;
+	transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:hover { background: var(--m-surface-2); color: var(--m-text); opacity: 1; filter: none; }
+.btn:active, .btn.active { box-shadow: none; }
+.btn.disabled, .btn[disabled] { opacity: .45; cursor: default; }
+.btn-success, .btn-primary,
+.btn.btn-success, .btn.btn-primary {
+	background: var(--m-accent);
+	border-color: var(--m-accent);
+	color: var(--m-accent-fg);
+}
+.btn-success:hover, .btn-primary:hover { background: var(--m-accent-hover); border-color: var(--m-accent-hover); color: var(--m-accent-fg); }
+.btn-danger, .btn.btn-danger { background: transparent; border-color: var(--m-line-strong); color: var(--m-danger); }
+.btn-danger:hover { background: rgba(217,63,69,.08); border-color: var(--m-danger); color: var(--m-danger); }
+.btn-warning, .btn.btn-warning { background: #d97706; border-color: #d97706; color: #fff; }
+.btn-group > .btn + .btn { margin-left: 0; }
+
+.alert {
+	padding: 10px 36px 10px 14px;
+	border-radius: var(--m-r);
+	border: 1px solid var(--warning-border-clr);
+	background: var(--warning-bg-clr);
+	color: var(--warning-clr);
+	font-size: 13.5px;
+	line-height: 1.5;
+	text-shadow: none;
+}
+.alert-danger, .alert-error { background: var(--error-bg-clr); border-color: var(--error-border-clr); color: var(--error-clr); }
+.alert-info { background: var(--info-bg-clr); border-color: var(--info-border-clr); color: var(--info-clr); }
+.alert-success { background: rgba(31,138,76,.08); border-color: rgba(31,138,76,.25); color: var(--m-success); }
+
+.icon-spinner:not(.not-animated) { border-top-color: var(--m-accent); }
+
+/* =========================================================================
+   2. Buttons
+   ========================================================================= */
+/* Every toolbar action is a quiet icon button */
+.btn-toolbar .btn,
+.btn-toolbar .btn-group > .btn {
+	background: transparent;
+	border: 0;
+	color: var(--m-muted);
+	border-radius: var(--m-r-sm) !important;
+	height: 36px;
+	min-height: 36px;
+	min-width: 36px;
+	padding: 0 10px;
+	box-shadow: none;
+	text-shadow: none;
+	filter: none;
+	font-size: 15px;
+	transition: background-color .15s ease, color .15s ease;
+}
+.btn-toolbar .btn:hover,
+.btn-toolbar .btn:focus-visible {
+	background: var(--m-hover);
+	color: var(--m-text);
+	filter: none;
+}
+.btn-toolbar .btn:active { background: var(--m-accent-soft); color: var(--m-accent); }
+.btn-toolbar .btn.disabled,
+.btn-toolbar .btn[disabled] { opacity: .3; background: transparent; pointer-events: none; }
+.btn-toolbar { display: flex; align-items: center; gap: 2px; flex-wrap: nowrap; }
+.btn-toolbar .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+	vertical-align: middle;
+	margin: 0;
+}
+.btn-toolbar .btn::before,
+.btn-toolbar .btn > i { line-height: 1; vertical-align: 0; margin: 0; }
+.btn-toolbar > .btn-group { align-items: center; float: none; }
+
+/* No dotted focus box; keyboard focus gets a ring instead */
+.btn, .btn:focus, .dropdown-toggle:focus { outline: none; }
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--m-accent-soft) !important; }
+.btn-toolbar > .btn-group { display: inline-flex; gap: 2px; margin: 0; }
+.btn-toolbar > * + .btn-group,
+.btn-toolbar > .btn-group + * { margin-left: 10px; }
+
+/* Primary */
+.btn.buttonCompose,
+.btn.buttonCompose.btn-success {
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-weight: 600;
+	font-size: 14px;
+	letter-spacing: -0.005em;
+	height: 40px;
+	padding: 0 18px;
+	gap: 10px;
+	border-radius: var(--m-r) !important;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.btn.buttonCompose:hover,
+.btn.buttonCompose:focus-visible { background: var(--m-accent-hover); color: var(--m-accent-fg); }
+.btn.buttonCompose.btn-warning { background: #d97706; }
+#rl-left .b-toolbar .btn.buttonCompose { height: 40px; min-height: 40px; }
+
+/* Kill the pressed/focus outline the base theme draws around open dropdowns */
+.dropdown.show { box-shadow: none; }
+
+/* =========================================================================
+   3. Layout (desktop)
+   ========================================================================= */
+/* Layout model:
+   - A global row across the top (Compose, contacts, calendar on the left,
+     account menu on the right) sits on the canvas.
+   - The list and the reader are cards below it, and each card carries its
+     own toolbar, so it's obvious which actions belong to which pane. */
+@media screen and (min-width: 800px) {
+	:root { --m-card-bar-h: 56px; }
+
+	#rl-right {
+		box-sizing: border-box;
+		padding: var(--m-bar-h) var(--m-pad) var(--m-pad) 0;
+	}
+
+	/* The cards are the view containers themselves. No overflow:hidden here,
+	   or the toolbar dropdowns get clipped; children carry the radii instead. */
+	#V-MailMessageList,
+	#V-MailMessageView {
+		box-sizing: border-box;
+		background: var(--m-surface);
+		border: 1px solid var(--m-canvas-line);
+		border-radius: var(--m-r-lg);
+		box-shadow: var(--m-shadow-panel);
+	}
+	#V-MailMessageView { background: var(--m-reader, var(--m-surface)); padding-bottom: 0; overflow: visible; }
+
+	/* Card toolbars */
+	#V-MailMessageList > .btn-toolbar,
+	#V-MailMessageView .top-toolbar {
+		box-sizing: border-box;
+		height: var(--m-card-bar-h);
+		margin: 0;
+		padding: 0 10px 0 12px;
+		display: flex;
+		align-items: center;
+		background: transparent;
+		border-bottom: 1px solid var(--m-line);
+	}
+
+	#V-MailMessageList .messageList,
+	#V-MailMessageList.focused .messageList,
+	#V-MailMessageView .messageView,
+	#V-MailMessageView.focused .messageView {
+		height: calc(100% - var(--m-card-bar-h));
+		background: transparent;
+		/* (reader background set just below: "Open in new window" copies it) */
+		border: 0;
+		border-radius: 0 0 var(--m-r-lg) var(--m-r-lg);
+		box-shadow: none;
+		overflow: visible;
+	}
+	/* Must include the .focused variants: the rule above sets overflow:visible
+	   with that extra class, which let the square footer paint over the
+	   card's rounded corner */
+	#V-MailMessageList .messageList,
+	#V-MailMessageList.focused .messageList { overflow: hidden; }
+	#V-MailMessageList .messageList .b-footer { border-radius: 0 0 calc(var(--m-r-lg) - 1px) calc(var(--m-r-lg) - 1px); }
+	html.sm-msgView-side #V-MailMessageList .messageList .b-footer { border-radius: 0 0 0 calc(var(--m-r-lg) - 1px); }
+	#V-MailMessageList .messageList .second-toolbar { border-radius: 0; }
+
+	/* "Open in new window" and Print copy this element's computed background
+	   and text colour onto the new page. Transparent here meant the new
+	   window got no background at all, so the browser's dark default showed
+	   through under dark text. */
+	#V-MailMessageView .messageView,
+	#V-MailMessageView.focused .messageView { background: var(--m-reader, var(--m-surface)); }
+
+	/* Bottom-preview and no-preview layouts have no reader toolbar */
+	html.sm-msgView-bottom #V-MailMessageView .messageView { height: 100%; border-radius: var(--m-r-lg); }
+
+	/* Side-by-side: one joined surface, divider between the panes */
+	html.sm-msgView-side #V-MailMessageList { border-radius: var(--m-r-lg) 0 0 var(--m-r-lg); }
+	/* The list/reader divider is panel against panel, so it uses the panel
+	   line colour, not the canvas edge (white on dark-canvas palettes) */
+	html.sm-msgView-side #V-MailMessageList { border-right-color: var(--m-line); }
+	html.sm-msgView-side #V-MailMessageView { border-left: 0; border-radius: 0 var(--m-r-lg) var(--m-r-lg) 0; }
+	html.sm-msgView-side #V-MailMessageList .messageList,
+	html.sm-msgView-side #V-MailMessageList.focused .messageList { border-radius: 0 0 0 calc(var(--m-r-lg) - 1px); }
+	html.sm-msgView-side #V-MailMessageView .messageView { border-radius: 0 0 var(--m-r-lg) 0; }
+	html.sm-msgView-side #V-MailMessageView .top-toolbar { padding-left: 16px; }
+	html.sm-msgView-side #V-MailMessageList { clip-path: inset(-80px 0 -40px -40px); }
+	html.sm-msgView-side #V-MailMessageView { clip-path: inset(-40px -40px -40px 0); }
+	/* clip-path would cut off menus that open past the card; let the reader's spill */
+	html.sm-msgView-side #V-MailMessageView:has(.dropdown.show),
+	html.sm-msgView-side #V-MailMessageList:has(.dropdown.show) { clip-path: none; }
+
+	/* Bulk actions in the list only when something is checked; with nothing
+	   checked they duplicated the reader's own archive/spam/delete */
+	html.sm-msgView-side #V-MailMessageList > .btn-toolbar:not(.hasChecked) .onCheckedShow { display: none; }
+
+	/* List toolbar: refresh (and bulk actions when checked) on the left,
+	   more + sort on the right */
+	#V-MailMessageList > .btn-toolbar > .btn-group:has(#more-list-dropdown-id) { margin-left: auto; }
+	#V-MailMessageList > .btn-toolbar > .btn-group.onCheckedShow { position: relative; margin-left: 17px; }
+	#V-MailMessageList > .btn-toolbar > .btn-group.onCheckedShow::before {
+		content: "";
+		position: absolute;
+		left: -9px;
+		top: 9px;
+		bottom: 9px;
+		width: 1px;
+		background: var(--m-line);
+	}
+
+	/* Reader toolbar: separators between groups */
+	#V-MailMessageView .top-toolbar > .btn-group + .btn-group {
+		position: relative;
+		margin-left: 17px;
+	}
+	#V-MailMessageView .top-toolbar > .btn-group + .btn-group::before {
+		content: "";
+		position: absolute;
+		left: -9px;
+		top: 9px;
+		bottom: 9px;
+		width: 1px;
+		background: var(--m-line);
+	}
+
+
+	/* ---- Search lifted into the global row, above the list it filters ---- */
+	/* Positioned against #V-MailMessageList (the card), so it always matches
+	   the list's width, including when the list is resized. */
+	#V-MailMessageList .messageList .second-toolbar {
+		height: 0;
+		min-height: 0;
+		padding: 0;
+		border: 0;
+		overflow: visible;
+	}
+	#V-MailMessageList .messageList .second-toolbar .search-input-wrp {
+		position: absolute;
+		top: calc(-1 * var(--m-bar-h) + 12px);
+		left: 0;
+		right: 0;
+		height: 40px;
+		z-index: 5;
+	}
+	#V-MailMessageList .messageList .second-toolbar .search-input-wrp::before {
+		content: "";
+		position: absolute;
+		left: 14px;
+		top: 12px;
+		width: 16px;
+		height: 16px;
+		background-color: var(--m-faint);
+		-webkit-mask: var(--icon-search) no-repeat center / contain;
+		mask: var(--icon-search) no-repeat center / contain;
+		pointer-events: none;
+		z-index: 1;
+	}
+	#V-MailMessageList .messageList .inputSearch,
+	#V-MailMessageList .messageList .inputSearch:focus {
+		height: 40px;
+		padding: 0 76px 0 40px;
+		background: var(--m-surface);
+		border: 1px solid var(--m-canvas-line);
+		box-shadow: 0 1px 2px rgba(15,21,37,.04);
+	}
+	#V-MailMessageList .messageList .inputSearch:focus {
+		border-color: var(--m-accent);
+		box-shadow: 0 0 0 4px var(--m-accent-soft);
+	}
+	#V-MailMessageList .messageList .search-input-wrp .closeSearch { right: 36px; top: 8px; }
+	/* Advanced search toggle sits inside the field's right end */
+	#V-MailMessageList .messageList .btn.buttonMoreSearch {
+		position: absolute;
+		top: calc(-1 * var(--m-bar-h) + 16px);
+		right: 4px;
+		height: 32px;
+		min-height: 32px;
+		min-width: 32px;
+		padding: 0;
+		z-index: 6;
+		font-size: 10px;
+	}
+	/* Select-all moves into the list toolbar, left of refresh */
+	#V-MailMessageList .messageList .checkboxCheckAll {
+		position: absolute;
+		top: 18px;
+		left: 20px;
+		z-index: 6;
+		font-size: 16px;
+	}
+	#V-MailMessageList:has(.messageList:not(.hideMessageListCheckbox)) > .btn-toolbar { padding-left: 46px; }
+
+	/* Reader toolbar must stay visible at every width now that the list no
+	   longer duplicates its actions (the base theme hides it under 1400px) */
+	html.sm-msgView-side #V-MailMessageView .top-toolbar { visibility: visible; }
+	#V-MailMessageView .top-toolbar { min-width: 0; overflow: hidden; padding-right: 150px; }
+
+	/* Reply + more menu: lifted out of the message header into the reader
+	   toolbar row, right side, so every action lives in one place */
+	html:not(.sm-msgView-bottom) #V-MailMessageView .messageView { overflow: visible; }
+	html:not(.sm-msgView-bottom) .messageView .b-message:not([style*="none"]) {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+	html:not(.sm-msgView-bottom) .messageView #messageItem { flex: 1 1 auto; min-height: 0; height: auto; }
+	html:not(.sm-msgView-bottom) .messageView .message-fixed-button-toolbar {
+		top: calc(-1 * var(--m-card-bar-h) + 12px);
+		right: 12px;
+	}
+	html:not(.sm-msgView-bottom) .messageItemHeader .subjectParent { padding-right: 0; }
+
+	/* Reply gets its label (the app's own localized title) and a filled chip */
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReply,
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReplyAll {
+		width: max-content !important;
+		max-width: none;
+		flex-shrink: 0;
+		padding: 0 14px 0 11px !important;
+		gap: 7px;
+		margin-right: 2px;
+		background: var(--m-accent-soft) !important;
+		color: var(--m-accent) !important;
+		font-size: 15px;
+	}
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReply:hover,
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReplyAll:hover {
+		background: var(--m-accent) !important;
+		color: var(--m-accent-fg) !important;
+	}
+	/* The icon is a pseudo-element with no intrinsic size, so in a tight flex
+	   box it was shrinking to nothing */
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReply::before,
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReplyAll::before {
+		flex: 0 0 auto;
+		width: 15px;
+		height: 15px;
+		margin: 0;
+	}
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReply::after,
+	#V-MailMessageView .messageView .message-fixed-button-toolbar .btn.buttonReplyAll::after {
+		content: attr(title);
+		flex: 0 0 auto;
+		white-space: nowrap;
+		font-family: var(--m-font);
+		font-size: 13.5px;
+		font-weight: 600;
+		line-height: 1;
+	}
+
+	.messageView .message-fixed-button-toolbar .buttonReply,
+	.messageView .message-fixed-button-toolbar .buttonReplyAll { color: var(--m-text-2); }
+
+	/* The sidebar toolbar is the global row: same height as the canvas bar */
+	#rl-left .b-folders .b-content { padding-top: 0; }
+}
+
+/* Refresh: was an idle loading ring, which reads as "busy". Real refresh
+   glyph instead; it still spins while the list is loading. */
+#V-MailMessageList .btn-toolbar .icon-spinner.not-animated {
+	width: 1em;
+	height: 1em;
+	border: 0 !important;
+	border-radius: 0;
+	margin: 0;
+	vertical-align: middle;
+}
+#V-MailMessageList .btn-toolbar .icon-spinner.not-animated::before {
+	content: "";
+	display: block;
+	width: 1em;
+	height: 1em;
+	background-color: currentColor;
+	-webkit-mask: var(--icon-refresh-cw) no-repeat center / contain;
+	mask: var(--icon-refresh-cw) no-repeat center / contain;
+}
+
+.resizer { background: transparent !important; }
+.resizer:hover { background: var(--m-accent-soft) !important; }
+
+/* =========================================================================
+   4. Sidebar
+   ========================================================================= */
+#rl-left { background: transparent; padding-top: 0; margin-top: 0; }
+#V-MailFolderList, #V-MailMessageList, #V-MailMessageView, #V-SettingsMenu { margin-top: 0; padding-top: 0; }
+.b-folders, .b-folders .b-toolbar { margin-top: 0 !important; }
+@media screen and (min-width: 1401px) { #rl-left { width: 248px; } }
+
+#rl-left .b-folders .b-toolbar,
+.b-folders .b-toolbar {
+	flex-shrink: 0;   /* .b-content is height:100% in a flex column and was squeezing this */
+	margin: 0;
+	height: var(--m-bar-h);
+	box-sizing: border-box;
+	padding: 0 12px 0 16px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+.b-folders .b-toolbar .buttonCompose { flex: 1; justify-content: center; }
+.b-folders .b-toolbar .btn-group { margin-left: 4px; }
+
+.b-folders .b-content { padding: 4px 12px 16px 16px; }
+
+.b-folders .b-content ul { margin: 0; padding: 0; }
+.b-folders .b-content li > a {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	border-radius: var(--m-r-sm);
+	padding: 0 12px;
+	height: 36px;
+	margin: 1px 0;
+	color: var(--m-text-2);
+	font-weight: 500;
+	font-size: 14px;
+	text-decoration: none;
+	transition: background-color .15s ease, color .15s ease;
+}
+/* One icon column for every row: 16px icon, 12px gap, text at 40px.
+   (The base adds .5em after icons, which pushed system folder names out.) */
+#V-MailFolderList .b-folders .b-content li > a::before {
+	flex: 0 0 16px;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	color: var(--m-faint);
+	font-size: 16px;
+}
+/* Your own folders get a folder glyph so they share that column */
+#V-MailFolderList .b-folders-user li > a:not([data-icon])::before {
+	content: "";
+	display: inline-block;
+	background-color: var(--m-faint);
+	-webkit-mask: var(--icon-folder) no-repeat center / contain;
+	mask: var(--icon-folder) no-repeat center / contain;
+}
+#V-MailFolderList .b-folders-user li > a.selected:not([data-icon])::before { background-color: var(--m-accent); }
+
+/* Expand/collapse arrow: off the icon column, to the right end of the row */
+#V-MailFolderList .b-folders .b-content li > a > .e-collapsed-sign {
+	order: 2;
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	min-width: 0;
+	margin: 0 -4px 0 auto;
+	border-radius: 6px;
+	color: var(--m-faint);
+	font-size: 14px;
+	text-indent: 0;
+}
+#V-MailFolderList .b-folders .b-content li > a > .e-collapsed-sign:hover { background: var(--m-hover); color: var(--m-text); }
+#V-MailFolderList .b-folders .b-content li > a > .e-collapsed-sign.icon-none { display: none; }
+#V-MailFolderList .b-folders .b-content li > a[data-unread]::after { order: 3; }
+#V-MailFolderList .b-folders .b-content li > a:has(> .e-collapsed-sign:not(.icon-none))[data-unread]::after { margin-left: 10px; }
+
+/* Subfolders: indent by one icon column per level (base used text-indent) */
+#V-MailFolderList .b-folders .b-content li li > a { text-indent: 0; padding-left: 28px; }
+#V-MailFolderList .b-folders .b-content li li li > a { padding-left: 44px; }
+#V-MailFolderList .b-folders .b-content li li li li > a { padding-left: 60px; }
+#V-MailFolderList .b-folders .b-content li li li li li > a { padding-left: 76px; }
+.b-folders .b-content li > a:hover { background: var(--m-hover); color: var(--m-text); }
+.b-folders .b-content li > a,
+.focused .b-folders a.focused { border: 0; }
+.b-folders .b-content li > a.selected,
+.focused .b-folders .b-content li > a.selected {
+	background: var(--m-surface);
+	color: var(--m-text);
+	font-weight: 600;
+	/* Inset: the li clips anything drawn outside the row */
+	box-shadow: inset 0 0 0 1px var(--m-canvas-line), 0 1px 2px rgba(15,21,37,.06);
+}
+/* Keyboard focus on a folder: accent ring, also inset */
+.focused .b-folders .b-content li > a.focused {
+	background: var(--m-hover);
+	color: var(--m-text);
+	box-shadow: inset 0 0 0 1px var(--m-accent);
+}
+.b-folders .b-content li > a.selected::before { color: var(--m-accent); }
+
+/* Unread count: soft pill, in normal flow (base theme absolutely positions it) */
+#V-MailFolderList .b-folders .b-content a[data-unread]::after {
+	position: static;
+	margin: 0 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 20px;
+	min-width: 20px;
+	padding: 0 7px;
+	box-sizing: border-box;
+	border-radius: 999px;
+	background: var(--m-accent-soft) !important;
+	color: var(--m-badge-text, var(--m-accent)) !important;
+	font-size: 11.5px;
+	font-weight: 650;
+	line-height: 1;
+	text-shadow: none;
+	font-variant-numeric: tabular-nums;
+}
+#V-MailFolderList .b-folders .b-content a.selected[data-unread]::after {
+	background: var(--m-accent) !important;
+	color: var(--m-accent-fg) !important;
+}
+#V-MailFolderList .b-folders .b-content a[data-unread] { font-weight: 600; color: var(--m-text); }
+
+/* Inbox pin star only on hover */
+.b-folders .flag-icon { opacity: 0; transition: opacity .15s ease; }
+.b-folders li > a:hover .flag-icon { opacity: .6; }
+
+.b-folders .b-content hr {
+	border: 0;
+	border-top: 1px solid var(--m-canvas-line);
+	margin: 12px 12px 8px;
+}
+/* Folder filter + Unseen toggle: laid out like folder rows (icon in the same
+   column, text at the same indent) so they read as part of the folder list,
+   not as a second message search. Unfilled until focused. */
+#V-MailFolderList .search-input-wrp {
+	position: relative;
+	width: 100%;
+	margin: 0 0 1px;
+}
+#V-MailFolderList .search-input-wrp::before {
+	content: "";
+	position: absolute;
+	left: 12px;
+	top: 50%;
+	width: 15px;
+	height: 15px;
+	margin-top: -7.5px;
+	background-color: var(--m-faint);
+	-webkit-mask: var(--icon-funnel) no-repeat center / contain;
+	mask: var(--icon-funnel) no-repeat center / contain;
+	pointer-events: none;
+	z-index: 1;
+}
+#V-MailFolderList #folderSearchInput {
+	width: 100%;
+	height: 34px;
+	margin: 0;
+	padding: 0 30px 0 39px;
+	box-sizing: border-box;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: var(--m-r-sm);
+	box-shadow: none;
+	color: var(--m-text);
+	font-size: 13.5px;
+	transition: background-color .15s ease, border-color .15s ease;
+}
+#V-MailFolderList #folderSearchInput::placeholder { color: var(--m-muted); }
+#V-MailFolderList #folderSearchInput:hover { background: var(--m-hover); }
+#V-MailFolderList #folderSearchInput:focus {
+	background: var(--m-surface);
+	border-color: var(--m-line-strong);
+	box-shadow: none;
+}
+#V-MailFolderList .search-input-wrp:focus-within::before { background-color: var(--m-accent); }
+#V-MailFolderList .search-input-wrp a {
+	top: 50%;
+	right: 4px;
+	margin: 0;
+	transform: translateY(-50%);
+	width: 24px;
+	height: 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 6px;
+	color: var(--m-muted);
+	opacity: 1;
+	text-decoration: none;
+}
+#V-MailFolderList .search-input-wrp a:hover { background: var(--m-hover); color: var(--m-text); }
+
+#V-MailFolderList .e-checkbox,
+.b-folders .e-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	height: 34px;
+	margin: 0 0 6px;
+	padding: 0 12px;
+	box-sizing: border-box;
+	border-radius: var(--m-r-sm);
+	color: var(--m-muted);
+	font-size: 13.5px;
+	cursor: pointer;
+}
+#V-MailFolderList .e-checkbox:hover { background: var(--m-hover); color: var(--m-text); }
+#V-MailFolderList .e-checkbox i { width: 16px; min-width: 16px; font-size: 15px; text-align: center; color: var(--m-faint); }
+#V-MailFolderList .e-checkbox i.icon-square-check { color: var(--m-accent); }
+#V-MailFolderList .e-checkbox span { margin: 0; }
+.b-folders .b-folders-user li > a { font-size: 13.5px; }
+
+.b-folders .b-footer {
+	flex-shrink: 0;
+	border-top: 0;
+	background: transparent;
+	padding: 8px 12px 12px 16px;
+}
+/* The base gives the folder list height:100% inside a flex column, so with
+   the toolbar and footer it ran past the bottom and under the footer.
+   Let it take the remaining space and scroll instead. */
+#V-MailFolderList .b-folders .b-content {
+	flex: 1 1 auto;
+	height: auto;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+/* =========================================================================
+   Collapsed sidebar: icon rail
+   ========================================================================= */
+@media screen and (min-width: 800px) {
+	html.rl-left-panel-disabled #rl-left {
+		width: 72px !important;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	/* Compose: square icon button centred in the rail */
+	html.rl-left-panel-disabled #rl-left .b-folders .b-toolbar {
+		justify-content: center;
+		padding: 0;
+	}
+	html.rl-left-panel-disabled #rl-left .b-toolbar .btn.buttonCompose {
+		flex: 0 0 auto;
+		width: 44px;
+		min-width: 44px;
+		height: 44px;
+		padding: 0;
+		gap: 0;
+	}
+
+	/* Folder list: icons only, no fading, no min-width */
+	html.rl-left-panel-disabled #rl-left .b-content {
+		opacity: 1;
+		min-width: 0;
+		padding: 4px 0 16px;
+		overflow-x: hidden;
+	}
+	html.rl-left-panel-disabled #rl-left .b-content ul { padding: 0; }
+	html.rl-left-panel-disabled #rl-left .b-content ul ul,
+	html.rl-left-panel-disabled #rl-left .e-checkbox,
+	html.rl-left-panel-disabled #rl-left .search-input-wrp { display: none; }
+	html.rl-left-panel-disabled #rl-left .b-content hr { margin: 12px 18px; }
+
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders .b-content li > a {
+		position: relative;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		margin: 2px auto;
+		padding: 0;
+		gap: 0;
+		font-size: 0;           /* hides the folder name text node */
+		border-left: 0;
+	}
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders .b-content li > a::before { font-size: 18px; margin: 0; }
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders .b-content li > a > * { display: none; }
+
+	/* User folders have no icon of their own; give them the folder glyph */
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders-user li > a:not([data-icon])::before {
+		content: "";
+		display: inline-block;
+		width: 1em;
+		height: 1em;
+		background-color: currentColor;
+		-webkit-mask: var(--icon-folder) no-repeat center / contain;
+		mask: var(--icon-folder) no-repeat center / contain;
+	}
+
+	/* Unread count becomes a small badge on the icon's corner */
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders .b-content a[data-unread]::after {
+		position: absolute;
+		top: 3px;
+		right: 1px;
+		margin: 0;
+		height: 16px;
+		min-width: 16px;
+		padding: 0 4px;
+		font-size: 10px;
+		background: var(--m-accent) !important;
+		color: var(--m-accent-fg) !important;
+		box-shadow: 0 0 0 2px var(--m-bg);
+	}
+
+	/* Footer: just the expand toggle, centred */
+	html.rl-left-panel-disabled #rl-left .b-folders .b-footer {
+		justify-content: center;
+		padding: 8px 0 12px;
+	}
+	html.rl-left-panel-disabled #rl-left .b-folders .b-footer .btn-group { margin: 0; }
+}
+
+/* =========================================================================
+   Account menu (top right)
+   ========================================================================= */
+@media screen and (min-width: 800px) {
+	#V-SystemDropDown {
+		box-sizing: border-box;
+		height: var(--m-bar-h);
+		padding: 0 var(--m-pad) 0 0;
+		display: flex;
+		align-items: center;
+	}
+}
+
+/* Trigger: avatar + name, quiet pill */
+#top-system-dropdown-id,
+#top-system-dropdown-id.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	min-height: 40px;
+	padding: 0 10px 0 5px;
+	background: transparent;
+	border: 0;
+	border-radius: 999px !important;
+	color: var(--m-text);
+	box-shadow: none;
+	filter: none;
+	font-size: 14px;
+	font-weight: 550;
+}
+#top-system-dropdown-id:hover,
+.dropdown.show #top-system-dropdown-id { background: var(--m-hover); }
+#top-system-dropdown-id .accountPlace {
+	order: 1;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	font-weight: 550;
+	line-height: 1;
+	color: var(--m-text);
+}
+#top-system-dropdown-id > i {
+	order: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	min-width: 30px;
+	border-radius: 50%;
+	background: var(--m-accent-soft);
+	color: var(--m-accent);
+	font-size: 15px;
+}
+#top-system-dropdown-id::after { order: 2; color: var(--m-faint); font-size: 12px; margin-left: -2px; }
+#top-system-dropdown-id > b {
+	order: 3;
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-size: 11px;
+	font-weight: 650;
+	line-height: 18px;
+	min-width: 18px;
+	padding: 0 5px;
+	text-shadow: none;
+}
+
+/* Panel */
+#V-SystemDropDown .dropdown-menu {
+	min-width: 240px;
+	margin-top: 6px;
+	padding: 6px;
+}
+#V-SystemDropDown .dropdown-menu li > a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	height: 36px;
+	padding: 0 10px;
+	line-height: 1;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--m-text-2);
+}
+#V-SystemDropDown .dropdown-menu li > a::before { color: var(--m-faint); font-size: 16px; margin: 0; }
+#V-SystemDropDown .dropdown-menu li > a:hover { background: var(--m-hover); color: var(--m-text); }
+#V-SystemDropDown .dropdown-menu li > a:hover::before { color: var(--m-text-2); }
+
+/* Current account */
+#V-SystemDropDown .dropdown-menu a.email-title[data-icon="check"] { color: var(--m-text); font-weight: 600; }
+#V-SystemDropDown .dropdown-menu a.email-title[data-icon="check"]::before { color: var(--m-accent); }
+#V-SystemDropDown .dropdown-menu a[data-unread]::after { margin-left: auto; }
+
+/* Dividers */
+#V-SystemDropDown .dropdown-menu * + .dividerbar {
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px solid var(--m-line);
+}
+
+/* Logout */
+#V-SystemDropDown .dropdown-menu a[data-icon="log-out"]:hover { color: var(--m-danger); background: rgba(217,63,69,.08); }
+#V-SystemDropDown .dropdown-menu a[data-icon="log-out"]:hover::before { color: var(--m-danger); }
+
+/* Light / system / dark: full-width segmented control */
+#V-SystemDropDown .color-scheme-toggle {
+	display: block;
+	margin: 0 0 6px;
+	padding: 0;
+}
+#V-SystemDropDown .color-scheme-buttons {
+	display: flex;
+	gap: 2px;
+	padding: 3px;
+	background: var(--m-surface-2);
+	border-radius: var(--m-r-sm);
+}
+#V-SystemDropDown .color-scheme-btn {
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	padding: 0;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--m-muted);
+	font-size: 15px;
+	outline: none;
+	box-shadow: none;
+}
+#V-SystemDropDown .color-scheme-btn:hover { background: transparent; color: var(--m-text); }
+#V-SystemDropDown .color-scheme-btn.active,
+#V-SystemDropDown .color-scheme-btn.active:hover {
+	background: var(--m-surface);
+	color: var(--m-text);
+	box-shadow: 0 1px 2px rgba(17,19,24,.08), 0 0 0 1px var(--m-line);
+}
+#V-SystemDropDown .color-scheme-btn:focus-visible { box-shadow: 0 0 0 3px var(--m-accent-soft); }
+
+/* =========================================================================
+   5. Message list
+   ========================================================================= */
+.messageList .second-toolbar {
+	background: var(--m-surface);
+	border-bottom: 1px solid var(--m-line);
+	border-radius: 0;
+	padding: 12px 14px 12px 18px;
+	gap: 10px;
+	align-items: center;
+}
+.messageList .checkboxCheckAll { margin: 0; color: var(--m-faint); }
+.messageList .inputSearch {
+	background: var(--m-surface-2);
+	border: 1px solid transparent;
+	border-radius: var(--m-r);
+	height: 38px;
+	padding: 0 14px;
+	box-shadow: none;
+	font-size: 14px;
+	transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.messageList .inputSearch::placeholder { color: var(--m-muted); }
+.messageList .inputSearch:focus {
+	background: var(--m-surface);
+	border-color: var(--m-accent);
+	box-shadow: 0 0 0 4px var(--m-accent-soft);
+}
+.messageList .btn.buttonMoreSearch {
+	background: transparent;
+	border: 0;
+	color: var(--m-faint);
+	height: 38px;
+	min-width: 32px;
+	border-radius: var(--m-r-sm);
+}
+.messageList .btn.buttonMoreSearch:hover { background: var(--m-hover); color: var(--m-text); }
+
+/* Rows */
+.messageListItem {
+	position: relative;
+	border: 0;
+	border-bottom: 1px solid var(--m-line);
+	background: transparent;
+	transition: background-color .12s ease;
+}
+.messageListItem > div + div { padding: 14px 18px 14px 6px; row-gap: 3px; column-gap: 8px; }
+.messageListItem .messageCheckbox { padding-left: 14px; }
+.messageListItem:hover { background: var(--m-hover); }
+
+.messageListItem .senderParent { color: var(--m-text); font-weight: 500; font-size: 14px; }
+.messageListItem .subjectParent { color: var(--m-muted); font-size: 13.5px; }
+.messageListItem .previewParent { color: var(--m-muted); opacity: 1; font-size: 13px; }
+.messageListItem time { color: var(--m-muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.messageListItem .sizeParent { display: none; }
+
+.messageListItem .checkboxMessage { color: var(--m-faint); opacity: 0; transition: opacity .12s ease; }
+.messageListItem:hover .checkboxMessage,
+.messageListItem.checked .checkboxMessage,
+.messageList.hasChecked .checkboxMessage,
+.messageListPlace:has(.checked) .checkboxMessage { opacity: 1; }
+
+
+/* Two-line rows (side-by-side and mobile):
+   line 1: sender ............... date
+   line 2: subject ........ 📎 ★
+   Date and icons sit flush with the right edge instead of floating mid-row. */
+.sm-msgView-side .messageListItem > div + div,
+.rl-mobile .messageListItem > div + div {
+	flex-wrap: wrap;
+	align-items: center;
+	column-gap: 0;
+}
+.sm-msgView-side .messageListItem .senderParent,
+.rl-mobile .messageListItem .senderParent { order: 0; flex: 1 1 0; min-width: 0; }
+.sm-msgView-side .messageListItem .threads-len,
+.rl-mobile .messageListItem .threads-len { order: 1; margin-left: 6px; }
+.sm-msgView-side .messageListItem time,
+.rl-mobile .messageListItem time {
+	order: 2;
+	margin: 0 0 0 12px;
+	min-width: 0;
+	opacity: 1;
+	font-size: 12.5px;
+	text-align: right;
+}
+.sm-msgView-side .messageListItem .subjectParent,
+.rl-mobile .messageListItem .subjectParent {
+	order: 3;
+	flex: 1 1 calc(100% - 56px);   /* too wide to share line 1, leaves room for the icons */
+	width: auto;
+	min-width: 0;
+	line-height: 1.45;
+}
+.sm-msgView-side .messageListItem .attachmentParent,
+.rl-mobile .messageListItem .attachmentParent { order: 4; margin: 0 0 0 8px; min-width: 0; color: var(--m-faint); }
+.sm-msgView-side .messageListItem .flagParent,
+.rl-mobile .messageListItem .flagParent { order: 5; margin: 0 0 0 8px; min-width: 16px; text-align: right; }
+.sm-msgView-side .messageListItem .previewParent,
+.rl-mobile .messageListItem .previewParent { order: 6; flex: 1 0 100%; margin-top: 2px; }
+
+/* Star: hidden until you hover the row, always shown when flagged */
+.messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage) .flagParent::after { opacity: 0 !important; transition: opacity .12s ease; }
+.messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage):hover .flagParent::after { opacity: .45 !important; }
+.messageListItem:not(.msgflag-\\flagged):not(.hasFlaggedSubMessage) .flagParent:hover::after { opacity: 1 !important; color: #f5a524; }
+.messageListItem.msgflag-\\flagged .flagParent::after,
+.messageListItem.hasFlaggedSubMessage .flagParent::after { color: #f5a524; opacity: 1; }
+
+/* Unread: dot + weight, no colored bars */
+#V-MailMessageList .messageListItem.unseen,
+#V-MailMessageList .messageListItem.checked,
+#V-MailMessageList .messageListItem.unseen.focused,
+#V-MailMessageList .messageListItem.checked.focused {
+	border-left-color: transparent;
+	border-right-color: transparent !important;
+}
+#V-MailMessageList .messageListItem.unseen:not(.selected):not(.checked):not(:hover) { background: transparent; }
+#V-MailMessageList .messageListItem.unseen:hover:not(.selected):not(.checked) { background: var(--m-hover); }
+#V-MailMessageList .messageListItem [data-unseen] { background: transparent; border-color: transparent; }
+.messageListItem.unseen .senderParent { font-weight: 650; }
+.messageListItem.unseen .subjectParent { color: var(--m-text); font-weight: 550; }
+.messageListItem.unseen::before {
+	content: "";
+	position: absolute;
+	left: 18px;
+	top: 22px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--m-accent);
+	transition: opacity .12s ease;
+	pointer-events: none;
+}
+.messageListItem.unseen:hover::before,
+.messageListItem.unseen.checked::before,
+.messageList.hasChecked .messageListItem.unseen::before,
+.messageListPlace:has(.checked) .messageListItem.unseen::before { opacity: 0; }
+
+/* Count of checked messages, shown in the empty reader */
+.messageView .b-message-view-checked-helper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	height: 100%;
+	padding: 24px;
+	opacity: 1;
+	font: 600 20px/1 var(--m-font);
+	color: var(--m-text-2);
+	font-variant-numeric: tabular-nums;
+}
+.messageView .b-message-view-checked-helper::before {
+	content: "";
+	order: -2;
+	width: 72px;
+	height: 72px;
+	border-radius: 50%;
+	background: var(--m-accent-soft);
+}
+.messageView .b-message-view-checked-helper::after {
+	order: -1;
+	width: 30px;
+	height: 30px;
+	margin: -65px 0 21px;   /* sits centered inside the circle above */
+	background-color: var(--m-accent);
+	vertical-align: 0;
+}
+
+/* Drag image that follows the cursor when moving messages */
+#messagesDragImage {
+	display: inline-flex;
+	align-items: center;
+	height: 32px;
+	min-width: 0;
+	padding: 0 14px 0 12px;
+	border-radius: 16px;
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font: 600 13px/1 var(--m-font);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+#messagesDragImage .icon-mail { font-size: 15px; margin-left: 2px; }
+
+/* Selected */
+.messageListItem.selected,
+.messageListItem.focused,
+.messageListItem.selected:hover {
+	background: var(--m-accent-soft);
+	border-left-color: transparent;
+	border-right-color: transparent !important;
+}
+.messageListItem.checked { background: var(--m-accent-soft); }
+
+.messageList .groupLabel {
+	background: var(--m-surface);
+	opacity: 1;
+	color: var(--m-muted);
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	text-align: left;
+	padding: 18px 20px 6px;
+	line-height: 1.4;
+	border-bottom: 1px solid var(--m-line);
+}
+
+.messageList .b-footer {
+	background: var(--m-surface);
+	border-top: 1px solid var(--m-line);
+	border-radius: 0;
+	padding: 8px 14px;
+	min-height: 40px;
+	box-sizing: border-box;
+	align-items: center;
+}
+.messageList .b-footer .e-quota {
+	border-bottom: 0;
+	margin: 0;
+	font-size: 12px;
+	color: var(--m-faint);
+}
+.messageList .b-content .listEmptyMessage,
+.messageList .b-content .listLoading { color: var(--m-faint); font-size: 14px; padding: 64px 24px; }
+
+/* =========================================================================
+   6. Reader
+   ========================================================================= */
+#V-MailMessageView .top-toolbar { color: var(--m-muted); }
+.messageView .b-message-view-desc,
+#rl-right .b-message-view-desc {
+	color: var(--m-faint);
+	font-size: 14px;
+	font-weight: 500;
+}
+/* The header is two stacked blocks in the markup (subject+sender, then
+   date/to/spam/tags). Style them to read as one block. */
+.messageView .messageItemHeader {
+	background: var(--m-reader, var(--m-surface));
+	border: 0;
+	padding: 0 32px;
+	color: var(--m-text-2);
+	font-size: 13px;
+	line-height: 1.55;
+}
+/* The subject + sender block stays put while everything below it scrolls.
+   A divider marks that edge so the email visibly slides under it. */
+.messageView .messageItemHeader:not(#messageItem > *) {
+	position: relative;
+	z-index: 1;
+	padding-top: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--m-line);
+}
+#messageItem > .messageItemHeader {
+	padding-top: 10px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--m-line);
+	line-height: 1.45;
+}
+
+/* Subject line: title first, info + star as quiet icons on the right */
+.messageItemHeader .subjectParent {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	margin: 0 0 4px;
+	white-space: normal;
+}
+.messageItemHeader .subjectParent .subject {
+	order: 0;
+	flex: 1;
+	font-size: 20px;
+	font-weight: 650;
+	letter-spacing: -0.015em;
+	line-height: 1.3;
+	color: var(--m-text);
+}
+.messageItemHeader .subjectParent .infoParent,
+.messageItemHeader .subjectParent .flagParent {
+	order: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--m-r-sm);
+	color: var(--m-faint);
+	font-size: 15px;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: background-color .15s ease, color .15s ease;
+}
+.messageItemHeader .subjectParent .infoParent:hover,
+.messageItemHeader .subjectParent .flagParent:hover { background: var(--m-hover); color: var(--m-text); }
+.messageItemHeader .subjectParent .flagParent.flagOn { color: #f5a524; }
+.messageItemHeader .subjectParent .close { display: none; }
+.messageItemHeader .subjectParent { padding-right: 76px; }
+
+/* Reply + menu: absolutely positioned by the app; line them up with info + star */
+.messageView .message-fixed-button-toolbar {
+	top: 26px;
+	right: 24px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+.messageView .message-fixed-button-toolbar .btn-group,
+.messageView .message-fixed-button-toolbar .btn-group > span {
+	display: inline-flex !important;
+	align-items: center;
+	gap: 4px;
+	margin: 0 !important;
+}
+.messageView .message-fixed-button-toolbar .btn,
+.messageView .message-fixed-button-toolbar .btn.btn-transparent {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	min-width: 32px;
+	height: 32px;
+	min-height: 32px;
+	padding: 0 !important;
+	margin: 0;
+	border: 0 !important;
+	border-radius: var(--m-r-sm) !important;
+	background: transparent !important;
+	color: var(--m-faint);
+	opacity: 1;
+	font-size: 16px;
+	line-height: 1;
+	box-shadow: none !important;
+}
+.messageView .message-fixed-button-toolbar .btn:hover { background: var(--m-hover) !important; color: var(--m-text); }
+.messageView .message-fixed-button-toolbar .buttonEdit { color: var(--m-accent); }
+.messageItemHeader .subjectParent .infoParent,
+.messageItemHeader .subjectParent .flagParent { margin-top: -2px; opacity: 1; }
+
+/* Sender */
+.messageView .messageItemHeader:not(#messageItem > *) .informationShort {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	font-size: 14px;
+	color: var(--m-text);
+	font-weight: 600;
+	margin-bottom: 2px;
+}
+.messageItemHeader .informationShort .from a,
+.messageItemHeader .m-from-email {
+	color: var(--m-muted);
+	font-weight: 400;
+	text-decoration: none;
+}
+.messageItemHeader .informationShort .from a:hover { color: var(--m-accent); }
+
+/* DKIM / DMARC / SPF: hide "no data", keep pass/fail as small marks */
+.messageItemHeader .informationShort > i.icon-ban { display: none; }
+.messageItemHeader .informationShort > i {
+	font-size: 13px;
+	opacity: .8;
+}
+
+/* Date, To, Cc, spam, tags: compact secondary metadata */
+#messageItem > .messageItemHeader .date {
+	display: block;
+	color: var(--m-muted);
+	margin-bottom: 2px;
+}
+#messageItem > .messageItemHeader .informationShort {
+	color: var(--m-muted);
+	font-weight: 400;
+}
+#messageItem > .messageItemHeader .informationShort > span:first-child { color: var(--m-faint); }
+.messageItemHeader meter {
+	width: 72px;
+	height: 6px;
+	vertical-align: middle;
+	border: 0;
+	border-radius: 999px;
+	background: var(--m-surface-2);
+}
+.messageItemHeader meter::-webkit-meter-bar { background: var(--m-surface-2); border: 0; border-radius: 999px; height: 6px; }
+.messageItemHeader meter::-webkit-meter-optimum-value { background: #30a46c; border-radius: 999px; }
+.messageItemHeader meter::-webkit-meter-suboptimum-value { background: #f5a524; border-radius: 999px; }
+.messageItemHeader meter::-webkit-meter-even-less-good-value { background: var(--m-danger); border-radius: 999px; }
+.messageItemHeader .messageTags {
+	display: block;
+	margin-top: 2px;
+	color: var(--m-faint);
+}
+.messageItemHeader .messageTags .btn { height: 22px; min-height: 22px; min-width: 22px; padding: 0 4px; border: 0; background: transparent; box-shadow: none; }
+.messageItemHeader .messageAssignedTags { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: middle; }
+.messageItemHeader .messageAssignedTags span {
+	display: inline-flex;
+	align-items: center;
+	height: 20px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--m-surface-2);
+	color: var(--m-text-2);
+	font-size: 12px;
+	font-weight: 550;
+	line-height: 1;
+	white-space: nowrap;
+}
+.messageItemHeader .informationFull table td { padding: 3px 16px 3px 0; vertical-align: top; }
+.messageItemHeader .informationFull table td:first-child { color: var(--m-faint); white-space: nowrap; }
+.messageView .bodyText,
+.messageView .b-text-part { padding: 16px 32px 40px; line-height: 1.6; }
+
+/* "Display external images" (and other notices under the header): one slim row */
+.messageView .bodySubHeader { background: var(--m-reader, var(--m-surface)); }
+.messageView .bodySubHeader > * {
+	padding: 6px 26px;
+	border-bottom: 1px solid var(--m-line);
+}
+.messageView .bodySubHeader .showImages .btn {
+	min-height: 28px;
+	height: 28px;
+	padding: 0 8px;
+	gap: 6px;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: var(--m-accent);
+	font-size: 13px;
+	font-weight: 550;
+}
+.messageView .bodySubHeader .showImages .btn:hover { background: var(--m-accent-soft); }
+.attachmentsPlace { padding: 12px 32px; border-top: 1px solid var(--m-line); }
+
+/* =========================================================================
+   7. Menus, dialogs, inputs
+   ========================================================================= */
+.dropdown-menu {
+	background: var(--m-surface);
+	border: 1px solid var(--m-line);
+	border-radius: 12px;
+	box-shadow: var(--m-shadow-pop);
+	padding: 6px;
+	backdrop-filter: none;
+}
+.dropdown-menu a {
+	border-radius: var(--m-r-sm);
+	padding: 8px 12px;
+	font-size: 13.5px;
+	font-weight: 500;
+	color: var(--m-text-2);
+}
+.dropdown-menu a:hover { background: var(--m-hover); color: var(--m-text); }
+.dropdown-menu * + .dividerbar { margin-top: 6px; padding-top: 6px; }
+
+dialog {
+	border: 1px solid var(--m-line);
+	border-radius: 16px;
+	box-shadow: var(--m-shadow-dlg);
+}
+dialog::backdrop, .dialog-backdrop { background: rgba(13, 15, 20, .38); backdrop-filter: blur(2px); }
+dialog > header { padding: 16px 20px; border-bottom: 1px solid var(--m-line); }
+dialog > header h3 { font-size: 16px; font-weight: 650; }
+dialog .modal-body { padding: 20px; }
+dialog > footer { padding: 14px 20px; border-top: 1px solid var(--m-line); }
+
+input[type="text"], input[type="email"], input[type="password"], input[type="search"],
+input[type="url"], input[type="tel"], input[type="number"], textarea, select {
+	background: var(--m-surface-2);
+	border: 1px solid transparent;
+	border-radius: var(--m-r);
+	box-shadow: none;
+	color: var(--m-text);
+}
+input:focus, textarea:focus, select:focus {
+	background: var(--m-surface);
+	border-color: var(--m-accent);
+	box-shadow: 0 0 0 4px var(--m-accent-soft);
+	outline: none;
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--m-accent); }
+
+/* =========================================================================
+   8. Compose
+   ========================================================================= */
+#V-PopupsCompose {
+	width: min(960px, calc(100vw - 48px));
+	max-width: min(960px, calc(100vw - 48px));
+	height: min(860px, calc(100dvh - 48px));
+	margin: 24px auto;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+/* Header bar */
+#V-PopupsCompose header {
+	background: var(--m-surface);
+	color: var(--m-text);
+	border-bottom: 1px solid var(--m-line);
+	padding: 12px 16px 12px 20px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+#V-PopupsCompose header .btn {
+	background: transparent;
+	border: 0;
+	color: var(--m-muted);
+	height: 36px;
+	min-height: 36px;
+	padding: 0 12px;
+	border-radius: var(--m-r-sm);
+	font-weight: 500;
+	font-size: 13.5px;
+	gap: 8px;
+	box-shadow: none;
+	filter: none;
+	margin: 0;
+}
+#V-PopupsCompose header .btn:hover { background: var(--m-hover); color: var(--m-text); }
+
+/* Send is the only filled button, regardless of the state class the app adds */
+#V-PopupsCompose header > .btn:first-child,
+#V-PopupsCompose header > .btn.btn-success:first-child {
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-weight: 600;
+	font-size: 14px;
+	height: 38px;
+	padding: 0 20px;
+	border-radius: var(--m-r) !important;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#V-PopupsCompose header > .btn:first-child:hover { background: var(--m-accent-hover); color: var(--m-accent-fg); }
+#V-PopupsCompose header > .btn.btn-danger:first-child { background: var(--m-danger); color: #fff; }
+#V-PopupsCompose header .send-undo { background: #d97706 !important; color: #fff !important; }
+
+#V-PopupsCompose header .button-save { margin-left: 4px; }
+#V-PopupsCompose header .button-delete { color: var(--m-muted); }
+#V-PopupsCompose header .button-delete:hover { color: var(--m-danger); background: rgba(229,72,77,.08); }
+#V-PopupsCompose header .saved-text { color: var(--m-faint); font-size: 12px; margin-left: 8px; }
+
+#V-PopupsCompose header .pull-right {
+	margin-left: auto;
+	float: none;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+#V-PopupsCompose header .close,
+#V-PopupsCompose header .minimize-custom {
+	color: var(--m-muted);
+	border-color: var(--m-muted);
+	opacity: 1;
+	margin-left: 6px;
+	text-shadow: none;
+}
+#V-PopupsCompose header .close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: var(--m-r-sm);
+	font-size: 22px;
+	font-weight: 400;
+	line-height: 1;
+}
+#V-PopupsCompose header .close:hover { background: var(--m-hover); color: var(--m-text); }
+#V-PopupsCompose header .minimize-custom { height: 14px; width: 14px; border-bottom-width: 2px; margin-right: 6px; }
+
+/* Address block: hairline rows, no boxes */
+#V-PopupsCompose .b-header {
+	--m-compose-gutter: 24px;
+	position: relative;
+	background: var(--m-surface);
+	padding: 0;   /* gutter lives on the cells so row dividers run edge to edge */
+}
+#V-PopupsCompose .b-header table { border-collapse: collapse; width: 100%; }
+#V-PopupsCompose .b-header tr > td {
+	border-bottom: 1px solid var(--m-line);
+	padding: 0;
+	height: 46px;
+	vertical-align: middle;
+}
+#V-PopupsCompose .b-header tr:last-child > td { border-bottom: 0; }
+#V-PopupsCompose .b-header td:first-child {
+	width: 56px;
+	padding: 0 12px 0 var(--m-compose-gutter);
+	text-align: left;
+	color: var(--m-faint);
+	font-size: 13px;
+	font-weight: 500;
+	white-space: nowrap;
+}
+#V-PopupsCompose .b-header td:first-child label { margin: 0; color: inherit; font: inherit; }
+#V-PopupsCompose .b-header td:last-child { padding-right: var(--m-compose-gutter); }
+#V-PopupsCompose .b-header input[type="text"],
+#V-PopupsCompose .b-header .emailaddresses {
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+	height: 44px;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	line-height: 44px;
+	color: var(--m-text);
+}
+#V-PopupsCompose .b-header input[type="text"]:focus,
+#V-PopupsCompose .b-header .emailaddresses-focused { box-shadow: none; background: transparent; border: 0; }
+#V-PopupsCompose .b-header tr:focus-within > td { border-bottom-color: var(--m-accent); }
+#V-PopupsCompose .b-header tr:last-child:focus-within > td { border-bottom: 0; }
+#V-PopupsCompose .b-header .emailaddresses {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	height: auto;
+	min-height: 44px;
+	max-height: 7.5em;
+	padding: 6px 0;
+	line-height: 1.4;
+	box-sizing: border-box;
+}
+#V-PopupsCompose .b-header .emailaddresses input[type="text"] { height: 30px; line-height: 30px; }
+#V-PopupsCompose .b-header input[name="subject"] { font-weight: 550; padding-right: 96px; }
+#V-PopupsCompose .b-header #identity-toggle { color: var(--m-faint); }
+
+/* Recipient chips */
+.emailaddresses li[draggable] {
+	background: var(--m-surface-2);
+	border: 0;
+	border-radius: 999px;
+	box-shadow: none;
+	color: var(--m-text);
+	padding: 3px 6px 3px 12px;
+	font-size: 13px;
+	font-weight: 500;
+}
+.emailaddresses li[draggable] a { color: var(--m-faint); }
+.emailaddresses li[draggable] a:hover { color: var(--m-text); }
+.emailaddresses li.emailaddresses-selected { background: var(--m-accent-soft); color: var(--m-accent); }
+
+/* Attach / sign / encrypt row */
+/* Pulled up into the Subject row instead of taking its own empty row */
+#V-PopupsCompose .b-header > div[style*="flex"] {
+	position: absolute;
+	right: 18px;
+	bottom: 5px;
+	gap: 2px;
+	padding: 0;
+}
+#V-PopupsCompose .b-header > div[style*="flex"] > .btn-group:first-child { display: none; }
+#V-PopupsCompose .b-header .btn {
+	background: transparent;
+	border: 0;
+	color: var(--m-muted);
+	height: 34px;
+	min-width: 34px;
+	padding: 0 10px !important;
+	border-radius: var(--m-r-sm) !important;
+	box-shadow: none;
+}
+#V-PopupsCompose .b-header .btn:hover { background: var(--m-hover); color: var(--m-text); }
+#V-PopupsCompose .b-header .btn.btn-success { color: var(--m-accent); background: var(--m-accent-soft); }
+
+/* Text / Attachments tabs: underline style */
+#V-PopupsCompose .tabs {
+	background: var(--m-surface);
+	grid-auto-columns: max-content;
+	grid-template-columns: max-content max-content 1fr;
+	padding: 0 24px;
+	border-top: 1px solid var(--m-line);
+	margin-top: 0;
+}
+#V-PopupsCompose .tabs > label {
+	border: 0;
+	border-radius: 0;
+	margin: 0 20px -1px 0;
+	padding: 12px 2px;
+	opacity: 1;
+	color: var(--m-muted);
+	font-size: 13.5px;
+	font-weight: 500;
+	box-shadow: inset 0 -2px 0 transparent;
+	transition: color .15s ease, box-shadow .15s ease;
+}
+#V-PopupsCompose .tabs > label:hover { color: var(--m-text); }
+#V-PopupsCompose .tabs > [id^="tab"]:checked + label {
+	background: transparent;
+	color: var(--m-text);
+	box-shadow: inset 0 -2px 0 var(--m-accent);
+}
+#V-PopupsCompose .tabs .tab-content {
+	margin: 0 -24px;
+	border-top: 1px solid var(--m-line);
+}
+
+/* Formatting toolbar */
+.squire-toolbar {
+	background: var(--m-surface);
+	border-bottom: 1px solid var(--m-line);
+	padding: 8px 20px;
+	min-height: 0;
+	gap: 2px;
+}
+.squire-toolbar button,
+.squire-toolbar select,
+.squire-toolbar .btn {
+	background: transparent;
+	border: 0;
+	border-radius: 6px !important;
+	color: var(--m-muted);
+	height: 30px !important;
+	min-height: 30px !important;
+	min-width: 30px !important;
+	padding: 0 7px !important;
+	font-size: 13px !important;
+	box-shadow: none;
+}
+.squire-toolbar select { padding-right: 18px !important; }
+.squire-toolbar button:hover,
+.squire-toolbar select:hover { background: var(--m-hover); color: var(--m-text); }
+.squire-toolbar button.active,
+.squire-toolbar button[aria-pressed="true"] { background: var(--m-accent-soft); color: var(--m-accent); }
+.squire-toolbar .btn-group + .btn-group { margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--m-line); }
+
+.squire-wysiwyg, .squire-plain {
+	background: var(--m-surface);
+	color: var(--m-text);
+	padding: 24px 28px;
+	font-size: 15px;
+	line-height: 1.6;
+}
+.squire-plain { border: 0; border-radius: 0; box-shadow: none; }
+.squire-plain:focus { box-shadow: none; }
+
+#V-PopupsCompose .attachmentAreaParent { border-top: 0; padding: 24px; }
+#V-PopupsCompose .no-attachments-desc { font-size: 14px; color: var(--m-faint); opacity: 1; text-shadow: none; }
+
+/* =========================================================================
+   9. Settings
+   ========================================================================= */
+/* Left menu: same treatment as the folder list */
+#V-SettingsMenu .b-toolbar {
+	flex-shrink: 0;
+	height: var(--m-bar-h);
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0 12px 0 16px;
+	display: flex;
+	align-items: center;
+}
+#V-SettingsMenu .b-toolbar .btn[data-icon] {
+	gap: 8px;
+	padding: 0 12px 0 10px;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--m-text-2);
+}
+#V-SettingsMenu .b-toolbar .btn[data-icon]::before { color: var(--m-muted); }
+:is(#V-SettingsMenu, #V-AdminMenu) nav { padding: 4px 12px 16px 16px; }
+:is(#V-SettingsMenu, #V-AdminMenu) nav a {
+	display: flex;
+	align-items: center;
+	height: 36px;
+	max-height: none;
+	margin: 1px 0;
+	padding: 0 12px;
+	border-radius: var(--m-r-sm);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--m-text-2);
+	background: transparent;
+	transition: background-color .15s ease, color .15s ease;
+}
+:is(#V-SettingsMenu, #V-AdminMenu) nav a:hover,
+:is(#V-SettingsMenu, #V-AdminMenu) nav a:focus { background: var(--m-hover); color: var(--m-text); outline: none; }
+:is(#V-SettingsMenu, #V-AdminMenu) nav a.selected {
+	background: var(--m-surface);
+	color: var(--m-text);
+	font-weight: 600;
+	box-shadow: inset 0 0 0 1px var(--m-canvas-line), 0 1px 2px rgba(15,21,37,.06);
+}
+
+/* Content pane: one card, aligned with the mail panels */
+@media screen and (min-width: 800px) {
+	/* #rl-right already reserves the top bar and the outer gutters,
+	   so the pane just fills what's left */
+	#rl-right > :is(#V-SettingsPane, #V-AdminPane),
+	:is(#V-SettingsPane, #V-AdminPane) {
+		height: 100% !important;
+		margin: 0 !important;
+	}
+	/* Back is the way out of settings; the collapse chevron beside it read as a second back button */
+	#V-SettingsMenu .b-toolbar .toggleLeft { display: none; }
+}
+:is(#V-SettingsPane, #V-AdminPane) {
+	box-sizing: border-box;
+	height: calc(100% - var(--m-bar-h) - var(--m-pad));
+	margin: var(--m-bar-h) var(--m-pad) 0 0;
+	padding: 36px 44px 48px;
+	background: var(--m-surface);
+	border: 1px solid var(--m-canvas-line);
+	border-radius: var(--m-r-lg);
+	box-shadow: none;
+	color: var(--m-text);
+}
+:is(#V-SettingsPane, #V-AdminPane) > *:not(.btn-toolbar) { max-width: 780px; }
+
+/* Section headings */
+:is(#V-SettingsPane, #V-AdminPane) .legend,
+dialog .legend {
+	font-size: 17px;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	line-height: 1.3;
+	color: var(--m-text);
+	border-bottom: 1px solid var(--m-line);
+	padding: 0 0 12px;
+	margin: 40px 0 24px;
+}
+:is(#V-SettingsPane, #V-AdminPane) .legend:first-child,
+:is(#V-SettingsPane, #V-AdminPane) > div:first-child .legend:first-child,
+:is(#V-SettingsPane, #V-AdminPane) .form-horizontal:first-child > .legend:first-child { margin-top: 0; }
+
+/* Label / field rows as a two-column grid */
+:is(#V-SettingsPane, #V-AdminPane) .form-horizontal .control-group,
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group {
+	display: grid;
+	grid-template-columns: 200px minmax(0, 1fr);
+	column-gap: 24px;
+	align-items: start;   /* label lines up with the first field, not the middle of a stack */
+	margin: 0 0 18px;
+}
+:is(#V-SettingsPane, #V-AdminPane) .form-horizontal .control-group > label,
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group > label {
+	width: auto;
+	min-height: 38px;
+	display: flex;
+	align-items: center;
+	padding: 0;
+	text-align: left;
+	color: var(--m-text-2);
+	font-size: 13.5px;
+	font-weight: 500;
+}
+:is(#V-SettingsPane, #V-AdminPane) .form-horizontal .control-group > *:not(label),
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group > *:not(label) {
+	display: block;
+	margin-left: 0;
+	grid-column: 2;
+}
+:is(#V-SettingsPane, #V-AdminPane) .form-horizontal .control-group > :not(label):only-child,
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group > :not(label):only-child { grid-column: 2; }
+
+@media screen and (max-width: 900px) {
+	:is(#V-SettingsPane, #V-AdminPane) { padding: 24px; }
+	:is(#V-SettingsPane, #V-AdminPane) .form-horizontal .control-group,
+	dialog:not(#V-PopupsContacts) .form-horizontal .control-group { grid-template-columns: 1fr; row-gap: 8px; }
+	:is(#V-SettingsPane, #V-AdminPane) .form-horizontal .control-group > *:not(label),
+	dialog:not(#V-PopupsContacts) .form-horizontal .control-group > *:not(label) { grid-column: 1; }
+}
+
+
+/* Form dialogs (advanced search, identity, filters...): tighter label column,
+   fields fill the row */
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group {
+	grid-template-columns: 112px minmax(0, 1fr);
+	column-gap: 20px;
+	margin-bottom: 14px;
+}
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group > label { min-height: 40px; }
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group input[type="text"],
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group input[type="email"],
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group input[type="password"],
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group select,
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group textarea {
+	width: 100%;
+	min-width: 0;
+	height: 40px;
+	box-sizing: border-box;
+}
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group textarea { height: auto; min-height: 88px; }
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group input + * .e-checkbox,
+dialog:not(#V-PopupsContacts) .form-horizontal .control-group input + .e-checkbox { margin-top: 10px; }
+dialog:not(#V-PopupsContacts) .form-horizontal .e-checkbox { padding: 5px 0; }
+
+dialog .modal-body { padding: 24px 28px; }
+dialog:not(#V-PopupsCompose):not(#V-PopupsContacts):not(#V-PopupsCalendar) > header { padding: 18px 20px 18px 28px; display: flex; align-items: center; flex-direction: row-reverse; justify-content: space-between; }
+dialog:not(#V-PopupsCompose):not(#V-PopupsContacts):not(#V-PopupsCalendar) > header .close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	float: none;
+	width: 34px;
+	height: 34px;
+	margin: 0;
+	border-radius: var(--m-r-sm);
+	color: var(--m-muted);
+	font-size: 22px;
+	font-weight: 400;
+	line-height: 1;
+	opacity: 1;
+	text-shadow: none;
+}
+dialog:not(#V-PopupsCompose):not(#V-PopupsContacts):not(#V-PopupsCalendar) > header .close:hover { background: var(--m-hover); color: var(--m-text); }
+dialog > footer { padding: 14px 28px; display: flex; justify-content: flex-end; gap: 8px; }
+dialog > footer .btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 38px;
+	padding: 0 18px;
+	border-radius: var(--m-r) !important;
+	font-size: 14px;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+dialog > footer .btn:not(.btn-danger):not(.btn-warning) {
+	background: var(--m-accent);
+	border-color: var(--m-accent);
+	color: var(--m-accent-fg);
+}
+dialog > footer .btn:not(.btn-danger):not(.btn-warning):hover { filter: none; background: var(--m-accent-hover); border-color: var(--m-accent-hover); }
+
+/* Advanced search: the two inline-block columns become one */
+#advancedsearchform > div { display: block; margin: 0; }
+#V-PopupsAdvancedSearch { max-width: 600px; }
+#V-PopupsAdvancedSearch label { width: auto; }
+
+/* Fields */
+:is(#V-SettingsPane, #V-AdminPane) select,
+:is(#V-SettingsPane, #V-AdminPane) input[type="text"],
+:is(#V-SettingsPane, #V-AdminPane) input[type="email"],
+:is(#V-SettingsPane, #V-AdminPane) input[type="password"],
+:is(#V-SettingsPane, #V-AdminPane) input[type="number"],
+:is(#V-SettingsPane, #V-AdminPane) span.select,
+dialog .form-horizontal select,
+dialog .form-horizontal input[type="text"],
+dialog .form-horizontal input[type="email"],
+dialog .form-horizontal input[type="password"] {
+	box-sizing: border-box;
+	height: 38px;
+	min-width: 220px;
+	padding: 0 12px;
+	font-size: 14px;
+	line-height: 38px;
+}
+:is(#V-SettingsPane, #V-AdminPane) input[type="number"] { min-width: 0; width: 88px; }
+:is(#V-SettingsPane, #V-AdminPane) span.select {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: var(--m-surface-2);
+	border-radius: var(--m-r);
+	color: var(--m-text);
+	cursor: pointer;
+	transition: background-color .15s ease;
+}
+:is(#V-SettingsPane, #V-AdminPane) span.select:hover { background: var(--m-line); }
+:is(#V-SettingsPane, #V-AdminPane) textarea { padding: 10px 12px; font-size: 14px; line-height: 1.5; }
+:is(#V-SettingsPane, #V-AdminPane) .help-block {
+	display: block;
+	margin-top: 6px;
+	color: var(--m-muted);
+	font-size: 12.5px;
+	line-height: 1.5;
+}
+:is(#V-SettingsPane, #V-AdminPane) .editMainIdentity {
+	font-weight: 500;
+	color: var(--m-accent);
+	cursor: pointer;
+}
+
+/* Checkboxes become switches */
+.e-checkbox { display: inline-flex; align-items: center; gap: 12px; margin: 0; padding: 4px 0; font-size: 14px; color: var(--m-text-2); }
+.e-checkbox:focus-within { outline: none; }
+.e-checkbox.material-design > div {
+	flex-shrink: 0;
+	position: relative;
+	width: 36px;
+	height: 20px;
+}
+.e-checkbox.material-design > div > input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	z-index: 1;
+	cursor: pointer;
+}
+.e-checkbox.material-design > div > div,
+.e-checkbox.material-design input:checked + div {
+	position: absolute !important;
+	inset: 0 !important;
+	top: 0 !important;
+	left: 0 !important;
+	width: 36px !important;
+	height: 20px !important;
+	margin: 0 !important;
+	border: 0 !important;
+	border-radius: 999px !important;
+	transform: none !important;
+	animation: none !important;
+	background: var(--m-line-strong);
+	transition: background-color .18s ease;
+}
+.e-checkbox.material-design > div > div::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(17,19,24,.25);
+	transition: transform .18s ease;
+}
+.e-checkbox.material-design input:checked + div { background: var(--m-accent); }
+.e-checkbox.material-design input:checked + div::after { transform: translateX(16px); }
+.e-checkbox.material-design input:focus-visible + div { box-shadow: 0 0 0 4px var(--m-accent-soft); }
+.e-checkbox.material-design > span { margin: 0; }
+
+/* Buttons inside settings: secondary by default, accent for primary actions */
+:is(#V-SettingsPane, #V-AdminPane) .btn:not(.btn-toolbar .btn) {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 36px;
+	padding: 0 16px;
+	border: 1px solid var(--m-line-strong);
+	border-radius: var(--m-r-sm);
+	background: var(--m-surface);
+	color: var(--m-text);
+	font-size: 13.5px;
+	font-weight: 550;
+	box-shadow: 0 1px 2px rgba(17,19,24,.04);
+	filter: none;
+}
+:is(#V-SettingsPane, #V-AdminPane) .btn:not(.btn-toolbar .btn):hover { background: var(--m-surface-2); }
+:is(#V-SettingsPane, #V-AdminPane) .btn.btn-primary,
+:is(#V-SettingsPane, #V-AdminPane) .btn.btn-success {
+	background: var(--m-accent);
+	border-color: var(--m-accent);
+	color: var(--m-accent-fg);
+}
+:is(#V-SettingsPane, #V-AdminPane) .btn.btn-danger { background: transparent; border-color: var(--m-line-strong); color: var(--m-danger); }
+:is(#V-SettingsPane, #V-AdminPane) .btn.btn-thin { height: 30px; padding: 0 10px; }
+
+/* Lists (accounts, identities, folders, filters) */
+:is(#V-SettingsPane, #V-AdminPane) table { border-collapse: collapse; width: 100%; }
+:is(#V-SettingsPane, #V-AdminPane) td {
+	padding: 10px 12px;
+	line-height: 1.4;
+	border-bottom: 1px solid var(--m-line);
+	vertical-align: middle;
+}
+:is(#V-SettingsPane, #V-AdminPane) tr:hover > td { background: var(--m-hover); }
+
+/* Theme picker */
+:is(#V-SettingsPane, #V-AdminPane) figure {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 0 12px 12px 0;
+	padding: 8px;
+	border: 1px solid var(--m-line);
+	border-radius: 12px;
+	background: var(--m-surface);
+	cursor: pointer;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+:is(#V-SettingsPane, #V-AdminPane) figure:hover { border-color: var(--m-line-strong); }
+:is(#V-SettingsPane, #V-AdminPane) figure.selected { border-color: var(--m-accent); box-shadow: 0 0 0 3px var(--m-accent-soft); }
+:is(#V-SettingsPane, #V-AdminPane) figure img { border-radius: 8px; display: block; }
+:is(#V-SettingsPane, #V-AdminPane) figcaption { font-size: 13px; font-weight: 550; color: var(--m-text-2); padding: 0 2px; }
+
+/* =========================================================================
+   10. Contacts
+   ========================================================================= */
+#V-PopupsContacts {
+	width: min(980px, calc(100vw - 48px));
+	max-width: min(980px, calc(100vw - 48px));
+	height: min(820px, calc(100dvh - 48px));
+	min-height: 0;
+	margin: 24px auto;
+	border-radius: 16px;
+	overflow: hidden;
+	background: var(--m-surface);
+}
+
+/* Header */
+#V-PopupsContacts > header {
+	display: flex;
+	align-items: center;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	padding: 12px 14px 12px 16px;
+	background: var(--m-surface);
+	border-bottom: 1px solid var(--m-line);
+}
+#V-PopupsContacts > header .btn-toolbar { gap: 2px; }
+#V-PopupsContacts > header .btn-toolbar > .btn:first-child {
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-size: 14px;
+	font-weight: 600;
+	gap: 8px;
+	height: 38px;
+	padding: 0 16px 0 12px;
+	margin-right: 10px;
+	border-radius: var(--m-r) !important;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#V-PopupsContacts > header .btn-toolbar > .btn:first-child:hover { background: var(--m-accent-hover); color: var(--m-accent-fg); }
+#V-PopupsContacts > header .close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	float: none;
+	width: 36px;
+	height: 36px;
+	margin: 0;
+	border-radius: var(--m-r-sm);
+	color: var(--m-muted);
+	font-size: 22px;
+	font-weight: 400;
+	line-height: 1;
+	opacity: 1;
+	text-shadow: none;
+}
+#V-PopupsContacts > header .close:hover { background: var(--m-hover); color: var(--m-text); }
+#V-PopupsContacts .e-selection-count { color: var(--m-muted); font-size: 13px; margin: 0 6px; }
+
+/* Left: contact list */
+#V-PopupsContacts .modal-body { padding: 0; }
+#V-PopupsContacts .left {
+	flex: 0 0 280px;
+	max-width: 280px;
+	background: var(--m-surface-2);
+	border-right: 1px solid var(--m-line);
+}
+#V-PopupsContacts .b-list-toolbar {
+	display: flex;
+	gap: 8px;
+	padding: 14px 14px 10px;
+	border: 0;
+	background: transparent;
+}
+#V-PopupsContacts .b-list-toolbar .e-search {
+	flex: 1;
+	height: 38px;
+	padding: 0 14px;
+	margin: 0;
+	background: var(--m-surface);
+	border: 1px solid var(--m-line);
+	border-radius: var(--m-r);
+	font-size: 14px;
+}
+#V-PopupsContacts .b-list-toolbar .e-search:focus { border-color: var(--m-accent); }
+#V-PopupsContacts .b-list-content .listEmptyList,
+#V-PopupsContacts .b-list-content .listEmptySearchList,
+#V-PopupsContacts .b-list-content .listEmptyListLoading {
+	padding: 48px 24px;
+	text-align: center;
+	color: var(--m-faint);
+	font-size: 14px;
+	line-height: 1.5;
+}
+#V-PopupsContacts .e-contact-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 1px 8px;
+	padding: 0 10px;
+	height: 40px;
+	border: 0;
+	border-radius: var(--m-r-sm);
+	background: transparent;
+	color: var(--m-text-2);
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+}
+#V-PopupsContacts .e-contact-item:hover { background: var(--m-hover); }
+#V-PopupsContacts .e-contact-item.selected,
+#V-PopupsContacts .e-contact-item.focused {
+	background: var(--m-surface);
+	color: var(--m-text);
+	box-shadow: 0 0 0 1px var(--m-line), 0 1px 2px rgba(17,19,24,.04);
+}
+#V-PopupsContacts .e-contact-item .checkboxItem { color: var(--m-faint); }
+#V-PopupsContacts .e-contact-item .syncedItem { margin-left: auto; color: var(--m-faint); font-size: 13px; }
+#V-PopupsContacts .b-list-footer-toolbar {
+	border-top: 1px solid var(--m-line);
+	padding: 10px 14px;
+	min-height: 60px;
+	box-sizing: border-box;
+	background: transparent;
+}
+
+/* Right: editor */
+#V-PopupsContacts .right {
+	flex: 1;
+	max-width: none;
+	border-left: 0;
+	display: flex;
+	flex-direction: column;
+	background: var(--m-surface);
+}
+#V-PopupsContacts .b-view-content {
+	flex: 1;
+	height: auto;
+	padding: 0 32px;
+}
+#V-PopupsContacts .b-view-content .b-contact-view-desc {
+	padding-top: 96px;
+	font-size: 14px;
+	color: var(--m-faint);
+}
+
+/* Tabs: same underline style as compose */
+#V-PopupsContacts .tabs {
+	grid-template-columns: repeat(4, max-content) 1fr;
+	grid-auto-columns: max-content;
+}
+#V-PopupsContacts .tabs > label {
+	border: 0;
+	border-radius: 0;
+	margin: 0 24px -1px 0;
+	padding: 16px 2px 12px;
+	opacity: 1;
+	background: transparent;
+	color: var(--m-muted);
+	font-size: 13.5px;
+	font-weight: 500;
+	box-shadow: inset 0 -2px 0 transparent;
+	transition: color .15s ease, box-shadow .15s ease;
+}
+#V-PopupsContacts .tabs > label:hover { color: var(--m-text); border-color: transparent; }
+#V-PopupsContacts .tabs > [id^="tab"]:checked + label {
+	background: transparent;
+	color: var(--m-text);
+	border-color: transparent;
+	box-shadow: inset 0 -2px 0 var(--m-accent);
+}
+#V-PopupsContacts .tabs .tab-content {
+	grid-column: 1 / -1;
+	border-top: 1px solid var(--m-line);
+	padding: 28px 0 32px;
+}
+
+/* Form rows: small icon gutter + fields, icon aligned to the first field */
+#V-PopupsContacts .form-horizontal .control-group {
+	display: grid;
+	grid-template-columns: 36px minmax(0, 440px);
+	column-gap: 16px;
+	align-items: start;
+	margin: 0 0 28px;
+}
+#V-PopupsContacts .form-horizontal .control-group > label,
+#V-PopupsContacts .control-group label.iconsize24 {
+	width: auto;
+	height: 40px;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--m-faint);
+	font-size: 18px;
+	text-align: center;
+}
+#V-PopupsContacts .control-group > label:not(.iconsize24) {
+	justify-content: flex-start;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--m-muted);
+	grid-column: 1 / -1;
+	height: auto;
+	margin-bottom: 8px;
+}
+#V-PopupsContacts .form-horizontal .control-group > *:not(label) {
+	display: block;
+	margin: 0;
+	grid-column: 2;
+}
+
+#V-PopupsContacts .b-view-content .property-line {
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 8px;
+}
+#V-PopupsContacts .b-view-content input:not([type="checkbox"]):not([type="file"]),
+#V-PopupsContacts .b-view-content textarea,
+#V-PopupsContacts .b-view-content select {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: none;
+	height: 40px;
+	padding: 0 14px;
+	font-size: 14px;
+	background: var(--m-surface-2);
+	border: 1px solid transparent;
+	border-radius: var(--m-r);
+}
+#V-PopupsContacts .b-view-content textarea { height: auto; min-height: 88px; padding: 10px 14px; line-height: 1.5; }
+#V-PopupsContacts .b-view-content input:focus,
+#V-PopupsContacts .b-view-content textarea:focus,
+#V-PopupsContacts .b-view-content select:focus {
+	background: var(--m-surface);
+	border-color: var(--m-accent);
+	box-shadow: 0 0 0 4px var(--m-accent-soft);
+}
+#V-PopupsContacts .b-view-content hr {
+	border: 0;
+	border-top: 1px solid var(--m-line);
+	margin: 16px 0;
+}
+
+/* Row buttons: quiet trash, dashed "add another" */
+#V-PopupsContacts .b-view-content .btn {
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	color: var(--m-faint);
+	height: 36px;
+	min-width: 36px;
+	padding: 0 10px;
+	border-radius: var(--m-r-sm) !important;
+	filter: none;
+}
+#V-PopupsContacts .b-view-content .btn.icon-trash-2:hover { color: var(--m-danger); background: rgba(217,63,69,.08); }
+#V-PopupsContacts .b-view-content .btn.icon-plus {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: auto;
+	height: 34px;
+	padding: 0 14px;
+	border: 1px dashed var(--m-line-strong);
+	color: var(--m-muted);
+	font-size: 14px;
+}
+#V-PopupsContacts .b-view-content .btn.icon-plus:hover { border-color: var(--m-accent); color: var(--m-accent); background: var(--m-accent-soft); }
+
+/* Photo */
+#V-PopupsContacts .contact-photo { gap: 14px; }
+#V-PopupsContacts .contact-photo img {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px var(--m-line);
+}
+#V-PopupsContacts .contact-photo input[type="file"],
+#V-PopupsContacts .contact-photo input[type="file"]:focus {
+	width: auto;
+	max-width: 100%;
+	outline: none;
+	box-shadow: none;
+	padding: 0;
+	height: auto;
+	background: transparent;
+	border: 0;
+	color: var(--m-muted);
+	font-size: 13px;
+}
+#V-PopupsContacts .contact-photo input[type="file"]::file-selector-button {
+	margin-right: 12px;
+	height: 34px;
+	padding: 0 14px;
+	border: 1px solid var(--m-line-strong);
+	border-radius: var(--m-r-sm);
+	background: var(--m-surface);
+	color: var(--m-text);
+	font: 550 13px var(--m-font);
+	cursor: pointer;
+}
+#V-PopupsContacts .contact-photo input[type="file"]::file-selector-button:hover { background: var(--m-surface-2); }
+#V-PopupsContacts .contact-photo input[type="file"]:focus-visible::file-selector-button { box-shadow: 0 0 0 4px var(--m-accent-soft); border-color: var(--m-accent); }
+
+/* Tags */
+#V-PopupsContacts .tags-hint {
+	opacity: 1;
+	color: var(--m-muted);
+	font-size: 12.5px;
+	line-height: 1.5;
+	margin: 0 0 10px;
+}
+#V-PopupsContacts .b-view-content .tag-chips > .tag-chip {
+	background: var(--m-accent-soft);
+	border: 0;
+	border-radius: 999px;
+	color: var(--m-accent);
+	font-weight: 550;
+	padding: 3px 6px 3px 12px;
+}
+#V-PopupsContacts .b-view-content .tag-chip .icon-x { color: var(--m-accent); opacity: .6; }
+#V-PopupsContacts .b-view-content #contact-tag-input { max-width: none; }
+
+/* Footer actions */
+#V-PopupsContacts .b-view-content-toolbar {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 8px;
+	min-height: 60px;
+	box-sizing: border-box;
+	padding: 10px 20px;
+	border-top: 1px solid var(--m-line);
+	background: var(--m-surface);
+}
+#V-PopupsContacts .b-view-content-toolbar .btn-group { margin: 0; }
+#V-PopupsContacts .b-view-content-toolbar .button-save-contact {
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-size: 14px;
+	font-weight: 600;
+	gap: 8px;
+	height: 38px;
+	padding: 0 18px 0 14px;
+	border-radius: var(--m-r) !important;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#V-PopupsContacts .b-view-content-toolbar .button-save-contact:hover { background: var(--m-accent-hover); color: var(--m-accent-fg); }
+#V-PopupsContacts .b-view-content-toolbar #button-add-prop-dropdown-id {
+	height: 38px;
+	padding: 0 14px;
+	gap: 6px;
+	border: 1px solid var(--m-line-strong);
+	color: var(--m-text);
+	font-size: 14px;
+	font-weight: 550;
+	border-radius: var(--m-r) !important;
+}
+#V-PopupsContacts .contact-saved-notice { color: #30a46c; opacity: 1; font-size: 13px; font-weight: 500; }
+
+/* =========================================================================
+   11. Calendar
+   ========================================================================= */
+#V-PopupsCalendar {
+	width: min(1240px, calc(100vw - 48px));
+	max-width: min(1240px, calc(100vw - 48px));
+	height: calc(100dvh - 48px);
+	min-height: 0;
+	margin: 24px auto;
+	border-radius: 16px;
+	overflow: hidden;
+	background: var(--m-surface);
+}
+
+/* Header: close on the right, everything else left */
+#V-PopupsCalendar > header {
+	display: flex;
+	align-items: center;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	padding: 12px 14px 12px 16px;
+	background: var(--m-surface);
+	border-bottom: 1px solid var(--m-line);
+}
+#V-PopupsCalendar > header .btn-toolbar { gap: 8px; flex: 1; }
+#V-PopupsCalendar > header .close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	float: none;
+	width: 36px;
+	height: 36px;
+	margin: 0 0 0 8px;
+	border-radius: var(--m-r-sm);
+	color: var(--m-muted);
+	font-size: 22px;
+	font-weight: 400;
+	line-height: 1;
+	opacity: 1;
+	text-shadow: none;
+}
+#V-PopupsCalendar > header .close:hover { background: var(--m-hover); color: var(--m-text); }
+
+/* New event: primary */
+#V-PopupsCalendar > header .btn-toolbar > .btn.btn-success {
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-size: 14px;
+	font-weight: 600;
+	height: 38px;
+	padding: 0 16px;
+	margin-right: 8px;
+	border-radius: var(--m-r) !important;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#V-PopupsCalendar > header .btn-toolbar > .btn.btn-success:hover { background: var(--m-accent-hover); color: var(--m-accent-fg); }
+
+/* Prev/Today/Next and Month/Week/Day/List as segmented controls */
+#V-PopupsCalendar > header .btn-toolbar > .btn-group {
+	display: inline-flex;
+	gap: 2px;
+	padding: 3px;
+	margin: 0;
+	background: var(--m-surface-2);
+	border-radius: var(--m-r);
+}
+#V-PopupsCalendar > header .btn-toolbar > .btn-group > .btn {
+	height: 32px;
+	min-height: 32px;
+	min-width: 32px;
+	padding: 0 12px;
+	font-size: 13.5px;
+	font-weight: 500;
+	color: var(--m-text-2);
+	border-radius: 7px !important;
+}
+#V-PopupsCalendar > header .btn-toolbar > .btn-group > .btn.b-calendar-icon { padding: 0 8px; }
+#V-PopupsCalendar > header .btn-toolbar > .btn-group > .btn:hover { background: var(--m-hover); color: var(--m-text); }
+#V-PopupsCalendar > header .btn-toolbar > .btn-group > .btn.active {
+	background: var(--m-surface);
+	color: var(--m-text);
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(17,19,24,.08), 0 0 0 1px var(--m-line);
+}
+#V-PopupsCalendar .b-calendar-title {
+	flex: 1;
+	padding: 0 8px;
+	font-size: 17px;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	color: var(--m-text);
+}
+#V-PopupsCalendar .b-calendar-loading { color: var(--m-muted); }
+
+/* Left: calendar list */
+#V-PopupsCalendar .modal-body { padding: 0; }
+#V-PopupsCalendar .left {
+	flex: 0 0 240px;
+	max-width: 240px;
+	min-width: 0;
+	background: var(--m-surface-2);
+	border-right: 1px solid var(--m-line);
+}
+#V-PopupsCalendar .b-calendar-list { padding: 14px 10px; }
+#V-PopupsCalendar .b-calendar-list .e-calendar-item {
+	gap: 10px;
+	height: 36px;
+	padding: 0 10px;
+	margin: 1px 0;
+	border-radius: var(--m-r-sm);
+	color: var(--m-text-2);
+	font-size: 14px;
+	font-weight: 500;
+}
+#V-PopupsCalendar .b-calendar-list .e-calendar-item:hover { background: var(--m-hover); color: var(--m-text); }
+#V-PopupsCalendar .b-calendar-list .e-calendar-item input[type="checkbox"] { margin: 0; width: 15px; height: 15px; }
+#V-PopupsCalendar .b-calendar-list .e-calendar-color {
+	width: 10px;
+	height: 10px;
+	border: 0;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(17,19,24,.08);
+}
+#V-PopupsCalendar .b-calendar-list .e-calendar-readonly { color: var(--m-faint); opacity: 1; margin-left: auto; font-size: 12px; }
+#V-PopupsCalendar .b-calendar-list .listEmptyList { padding: 32px 12px; text-align: center; color: var(--m-faint); font-size: 13.5px; }
+
+#V-PopupsCalendar .right { background: var(--m-reader, var(--m-surface)); }
+#V-PopupsCalendar .b-calendar-error { padding: 10px 20px; color: var(--m-danger); font-size: 13.5px; }
+
+/* Grid: library tokens pointed at ours */
+#V-PopupsCalendar .ec,
+#V-PopupsCalendar .ec-dark .ec,
+#V-PopupsCalendar .ec-auto-dark .ec {
+	--ec-bg-color: var(--m-reader, var(--m-surface));
+	--ec-text-color: var(--m-text);
+	--ec-popup-bg-color: var(--m-surface);
+	--ec-border-color: var(--m-line);
+	--ec-last-line-color: var(--m-line);
+	--ec-today-bg-color: var(--m-accent-soft);
+	--ec-highlight-color: var(--m-accent-soft);
+	--ec-event-bg-color: var(--m-accent);
+	--ec-event-text-color: #fff;
+	--ec-now-indicator-color: var(--m-danger);
+	--ec-event-col-gap: 4px;
+	font-family: var(--m-font);
+	font-size: 13px;
+	color: var(--m-text);
+}
+
+/* The app supplies its own toolbar; the library's empty one still adds a 1em gap */
+#V-PopupsCalendar .ec-toolbar { display: none; }
+#V-PopupsCalendar .b-calendar-grid .ec { height: 100%; }
+#V-PopupsCalendar .ec-main { border: 0; }
+/* Month rows share the available height instead of stopping at 5em */
+#V-PopupsCalendar .ec-day-grid.ec-month-view .ec-main {
+	--ec-row-height: minmax(6.5em, 1fr);
+	flex-grow: 1;
+}
+#V-PopupsCalendar .ec-day-grid .ec-day:last-child,
+#V-PopupsCalendar .ec-header .ec-col-head:last-child { border-inline-end: 0; }
+
+/* Weekday header */
+#V-PopupsCalendar .ec-header,
+#V-PopupsCalendar .ec-col-head { border-color: var(--m-line); }
+#V-PopupsCalendar .ec-col-head {
+	padding: 10px 8px;
+	color: var(--m-muted);
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+}
+
+/* Month cells: date top-left, today as an accent circle instead of a filled cell */
+#V-PopupsCalendar .ec-day-grid.ec-month-view .ec-day-head { padding: 8px 10px 4px; flex-direction: row; }
+#V-PopupsCalendar .ec-day-head time {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 26px;
+	height: 26px;
+	padding: 0 4px;
+	box-sizing: border-box;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 550;
+	color: var(--m-text-2);
+}
+#V-PopupsCalendar .ec-day.ec-other-month .ec-day-head time { opacity: 1; color: var(--m-faint); font-weight: 400; }
+#V-PopupsCalendar .ec-day-grid .ec-day.ec-today { --ec-day-bg-color: transparent; }
+#V-PopupsCalendar .ec-day.ec-today .ec-day-head time {
+	background: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-weight: 650;
+}
+#V-PopupsCalendar .ec-col-head.ec-today { color: var(--m-accent); }
+
+/* Week/day time axis */
+#V-PopupsCalendar .ec-sidebar { color: var(--m-faint); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+
+/* Events */
+#V-PopupsCalendar .ec-event {
+	border-radius: 6px;
+	box-shadow: none;
+	padding: 2px 6px;
+	font-size: 12px;
+	font-weight: 550;
+	line-height: 1.45;
+}
+#V-PopupsCalendar .ec-event-time { opacity: .85; font-weight: 500; }
+#V-PopupsCalendar .ec-time-grid .ec-event { padding: 4px 6px; }
+
+/* List view */
+#V-PopupsCalendar .ec-list .ec-day-head {
+	padding: 10px 24px;
+	color: var(--m-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: .03em;
+	text-transform: uppercase;
+	background: var(--m-surface-2);
+}
+#V-PopupsCalendar .ec-list .ec-event { padding: 10px 24px; font-size: 14px; }
+#V-PopupsCalendar .ec-list .ec-event-tag { width: 8px; height: 8px; border-radius: 50%; align-self: center; }
+#V-PopupsCalendar .ec-no-events { padding: 48px 24px; color: var(--m-faint); }
+
+/* "+N more" popup */
+#V-PopupsCalendar .ec-popup {
+	border: 1px solid var(--m-line);
+	border-radius: 12px;
+	box-shadow: var(--m-shadow-pop);
+	padding: 8px;
+}
+
+/* Event editor (overlay inside the calendar) */
+#V-PopupsCalendar .b-calendar-editor { background: rgba(13, 15, 20, .32); backdrop-filter: blur(2px); }
+#V-PopupsCalendar .b-calendar-editor-form {
+	width: min(480px, 92%);
+	padding: 24px 24px 20px;
+	border: 1px solid var(--m-line);
+	border-radius: 16px;
+	background: var(--m-surface);
+	box-shadow: var(--m-shadow-dlg);
+}
+#V-PopupsCalendar .b-calendar-editor-form .b-calendar-editor-note {
+	padding: 10px 12px;
+	border-radius: var(--m-r);
+	background: var(--m-accent-soft);
+	color: var(--m-text-2);
+	font-size: 13px;
+	margin-bottom: 16px;
+}
+#V-PopupsCalendar .b-calendar-editor-form .control-group { display: block; margin: 0 0 14px; }
+#V-PopupsCalendar .b-calendar-editor-form label {
+	margin: 0 0 6px;
+	color: var(--m-muted);
+	font-size: 12.5px;
+	font-weight: 550;
+}
+#V-PopupsCalendar .b-calendar-editor-form input[type="text"],
+#V-PopupsCalendar .b-calendar-editor-form input[type="date"],
+#V-PopupsCalendar .b-calendar-editor-form select,
+#V-PopupsCalendar .b-calendar-editor-form textarea {
+	height: 40px;
+	padding: 0 12px;
+	font-size: 14px;
+	background: var(--m-surface-2);
+	border: 1px solid transparent;
+	border-radius: var(--m-r);
+}
+#V-PopupsCalendar .b-calendar-editor-form textarea { height: auto; min-height: 84px; padding: 10px 12px; line-height: 1.5; }
+#V-PopupsCalendar .b-calendar-editor-form input[type="checkbox"] { width: 16px; height: 16px; margin: 0; }
+#V-PopupsCalendar .b-calendar-editor-form .control-group:has(> input[type="checkbox"]) {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 10px;
+}
+#V-PopupsCalendar .b-calendar-editor-form .control-group:has(> input[type="checkbox"]) > label { margin: 0; color: var(--m-text-2); font-size: 14px; font-weight: 500; }
+#V-PopupsCalendar .b-calendar-editor-form .b-calendar-editor-static { color: var(--m-text); opacity: 1; font-size: 14px; }
+#V-PopupsCalendar .b-calendar-editor-form .b-calendar-when { gap: 8px; }
+#V-PopupsCalendar .b-calendar-editor-form .buttons {
+	margin-top: 22px;
+	padding-top: 16px;
+	border-top: 1px solid var(--m-line);
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+	gap: 8px;
+}
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn {
+	display: inline-flex;
+	align-items: center;
+	height: 38px;
+	padding: 0 16px;
+	border: 1px solid var(--m-line-strong);
+	border-radius: var(--m-r) !important;
+	background: var(--m-surface);
+	color: var(--m-text);
+	font-size: 14px;
+	font-weight: 550;
+	box-shadow: none;
+	filter: none;
+}
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn:hover { background: var(--m-surface-2); }
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn.btn-success {
+	background: var(--m-accent);
+	border-color: var(--m-accent);
+	color: var(--m-accent-fg);
+	font-weight: 600;
+}
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn.btn-success:hover { background: var(--m-accent-hover); }
+/* Visual order, right to left: Save, Cancel, then Delete pushed to the far left */
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn:not(.btn-success):not(.btn-danger) { order: 1; }
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn.btn-danger { order: 2; color: var(--m-danger); margin-right: auto; }
+#V-PopupsCalendar .b-calendar-editor-form .buttons .btn.btn-danger:hover { background: rgba(217,63,69,.08); border-color: var(--m-danger); }
+
+/* =========================================================================
+   12. Login
+   ========================================================================= */
+#V-Login, #V-AdminLogin { max-width: 400px; width: calc(100% - 32px); }
+.LoginView .login-logo { margin-bottom: 28px; }
+.LoginView .login-logo img,
+.LoginView .login-logo .login-logo-default { max-width: 180px; max-height: 64px; color: var(--m-text); }
+.LoginView .descWrapper { color: var(--m-text); font-size: 22px; font-weight: 650; letter-spacing: -0.015em; margin-bottom: 24px; text-shadow: none; }
+
+.LoginView form {
+	padding: 32px 32px 28px;
+	background: var(--m-surface);
+	border: 1px solid var(--m-line);
+	border-radius: 16px;
+	box-shadow: var(--m-shadow-dlg);
+	color: var(--m-text);
+	backdrop-filter: none;
+}
+.LoginView form * { color: var(--m-text); }
+.LoginView .controls,
+.LoginView .control-group { margin-bottom: 14px; }
+
+.LoginView form input {
+	width: 100%;
+	height: 44px;
+	box-sizing: border-box;
+	padding: 0 40px 0 42px !important;
+	font-size: 14.5px;
+	background: var(--m-surface-2);
+	border: 1px solid transparent;
+	border-radius: var(--m-r);
+	color: var(--m-text);
+}
+.LoginView form input::placeholder { color: var(--m-muted); opacity: 1; }
+.LoginView form input:hover { border-color: var(--m-line-strong); }
+.LoginView form input:focus {
+	background: var(--m-surface);
+	border-color: var(--m-accent);
+	box-shadow: 0 0 0 4px var(--m-accent-soft);
+}
+.LoginView .controls > [class^="icon-"]:first-child {
+	left: 14px;
+	top: 0;
+	line-height: 44px;
+	font-size: 16px;
+	color: var(--m-faint);
+}
+.LoginView .revealPassword { line-height: 44px; right: 12px; color: var(--m-faint); opacity: 1; }
+.LoginView .revealPassword:hover { color: var(--m-text); }
+
+/* Remember me + language */
+.LoginView .controls[style*="flex"] { align-items: center; margin: 4px 0 20px; }
+.LoginView .e-checkbox { gap: 8px; padding: 0; font-size: 13.5px; }
+.LoginView .e-checkbox, .LoginView .e-checkbox * { color: var(--m-text-2); }
+.LoginView .e-checkbox i { color: var(--m-faint); }
+.LoginView .e-checkbox .icon-square-check { color: var(--m-accent); }
+.LoginView .language-button { color: var(--m-faint); border-radius: var(--m-r-sm); }
+.LoginView .language-button:hover { color: var(--m-text); background: var(--m-hover); }
+
+.LoginView .btn.buttonLogin {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 44px;
+	background: var(--m-accent);
+	border: 0;
+	border-radius: var(--m-r) !important;
+	color: var(--m-accent-fg);
+	font-size: 14.5px;
+	font-weight: 600;
+	text-transform: none;
+	letter-spacing: 0;
+	box-shadow: 0 1px 2px rgba(17,19,24,.12), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.LoginView .btn.buttonLogin:hover { background: var(--m-accent-hover); filter: none; }
+.LoginView .btn.buttonLogin * { color: var(--m-accent-fg); }
+
+.LoginView .alert { border-radius: var(--m-r); }
+.LoginView .login-footer { margin-top: 20px; text-align: center; font-size: 12.5px; }
+.LoginView .login-footer a { color: var(--m-muted); }
+
+
+
+/* =========================================================================
+   Reader: close vs back, and a real reply glyph
+   ========================================================================= */
+/* Reply used a plain left arrow, which is the universal "back" glyph.
+   Use the curved reply arrow so ← can mean back. */
+#V-MailMessageView .buttonReply.icon-arrow-left::before { --tachyon-icon: var(--icon-reply); }
+
+/* Side-by-side: closing the reader just empties the pane (Esc still does it),
+   and an X next to delete invites mistakes. Hidden. */
+@media screen and (min-width: 800px) {
+	html.sm-msgView-side #V-MailMessageView .top-toolbar > .btn-group:has(.buttonClose) { display: none; }
+	html.sm-msgView-side #V-MailMessageView .top-toolbar > .btn-group:has(.buttonClose) + .btn-group::before,
+	html.sm-msgView-side #V-MailMessageView .top-toolbar > .btn-group:has(.buttonClose) + .btn-group[style*="none"] + .btn-group::before { display: none; }
+	html.sm-msgView-side #V-MailMessageView .top-toolbar > .btn-group:has(.buttonClose) + .btn-group:not([style*="none"]) { margin-left: 0; }
+	html.sm-msgView-side #V-MailMessageView .top-toolbar > .btn-group:has(.buttonClose) + .btn-group[style*="none"] + .btn-group { margin-left: 0; }
+}
+
+/* Everywhere else (full-page reading, bottom preview, mobile) closing returns
+   you to the list, so it's drawn as a back arrow */
+#V-MailMessageView .buttonClose.icon-x::before { --tachyon-icon: var(--icon-arrow-left); }
+
+/* =========================================================================
+   Tabbed dialogs: Help (keyboard shortcuts), Identity, admin Domain/Plugin
+   ========================================================================= */
+#V-PopupsKeyboardShortcutsHelp { max-width: 640px; }
+#V-PopupsIdentity { max-width: 640px; }
+
+/* Flex instead of the base grid: tabs size to their text, the panel takes
+   the full width, and only the active panel takes up space */
+#V-PopupsKeyboardShortcutsHelp .tabs,
+#V-PopupsIdentity .tabs,
+#V-PopupsDomain .tabs,
+#V-PopupsPlugin .tabs {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	column-gap: 24px;
+}
+#V-PopupsKeyboardShortcutsHelp .tabs > label,
+#V-PopupsIdentity .tabs > label,
+#V-PopupsDomain .tabs > label,
+#V-PopupsPlugin .tabs > label {
+	order: 0;
+	flex: 0 0 auto;
+	margin: 0 0 -1px;
+	padding: 4px 2px 12px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	opacity: 1;
+	color: var(--m-muted);
+	font-size: 13.5px;
+	font-weight: 500;
+	white-space: nowrap;
+	box-shadow: inset 0 -2px 0 transparent;
+	transition: color .15s ease, box-shadow .15s ease;
+}
+#V-PopupsKeyboardShortcutsHelp .tabs > label:hover,
+#V-PopupsIdentity .tabs > label:hover,
+#V-PopupsDomain .tabs > label:hover,
+#V-PopupsPlugin .tabs > label:hover { color: var(--m-text); border-color: transparent; }
+#V-PopupsKeyboardShortcutsHelp .tabs > [id^="tab"]:checked + label,
+#V-PopupsIdentity .tabs > [id^="tab"]:checked + label,
+#V-PopupsDomain .tabs > [id^="tab"]:checked + label,
+#V-PopupsPlugin .tabs > [id^="tab"]:checked + label {
+	background: transparent;
+	border-color: transparent;
+	color: var(--m-text);
+	font-weight: 600;
+	box-shadow: inset 0 -2px 0 var(--m-accent);
+}
+#V-PopupsKeyboardShortcutsHelp .tabs > label:focus-visible,
+#V-PopupsIdentity .tabs > label:focus-visible { outline: none; color: var(--m-accent); }
+
+#V-PopupsKeyboardShortcutsHelp .tabs .tab-content,
+#V-PopupsIdentity .tabs .tab-content,
+#V-PopupsDomain .tabs .tab-content,
+#V-PopupsPlugin .tabs .tab-content {
+	order: 1;
+	flex: 1 0 100%;
+	display: none;
+	visibility: visible;
+	margin: 0;
+	padding: 24px 0 4px;
+	border: 0;   /* the admin stylesheet boxes the Domain and Plugin panels */
+	border-top: 1px solid var(--m-line);
+	min-height: 260px;
+}
+#V-PopupsKeyboardShortcutsHelp .tabs > [id^="tab"]:checked + label + .tab-content,
+#V-PopupsIdentity .tabs > [id^="tab"]:checked + label + .tab-content,
+#V-PopupsDomain .tabs > [id^="tab"]:checked + label + .tab-content,
+#V-PopupsPlugin .tabs > [id^="tab"]:checked + label + .tab-content { display: block; }
+
+/* Help: shortcut rows instead of a striped, boxed table */
+#V-PopupsKeyboardShortcutsHelp .modal-body { padding-top: 16px; }
+#V-PopupsKeyboardShortcutsHelp .tab-content { padding-top: 8px; }
+#V-PopupsKeyboardShortcutsHelp table.table {
+	width: 100%;
+	margin: 0;
+	border: 0;
+	border-collapse: collapse;
+	border-radius: 0 !important;
+	background: transparent;
+}
+#V-PopupsKeyboardShortcutsHelp table.table tr,
+#V-PopupsKeyboardShortcutsHelp table.table tr:nth-child(odd) > td { background: transparent; }
+#V-PopupsKeyboardShortcutsHelp table.table td {
+	padding: 11px 0;
+	border: 0;
+	border-bottom: 1px solid var(--m-line);
+	vertical-align: middle;
+	color: var(--m-text-2);
+	font-size: 14px;
+	line-height: 1.4;
+}
+#V-PopupsKeyboardShortcutsHelp table.table tr:last-child > td { border-bottom: 0; }
+#V-PopupsKeyboardShortcutsHelp table.table td[class^="icon-"] {
+	width: 28px;
+	padding-right: 10px;
+	color: var(--m-faint);
+	font-size: 16px;
+	text-align: left;
+}
+#V-PopupsKeyboardShortcutsHelp table.table td:first-child:empty { width: 28px; padding-right: 10px; }
+#V-PopupsKeyboardShortcutsHelp table.table td:last-child {
+	text-align: right;
+	white-space: nowrap;
+	padding-left: 16px;
+}
+/* Key column: monospace so the combinations scan as keys */
+#V-PopupsKeyboardShortcutsHelp table.table td:last-child:not(:first-child) {
+	color: var(--m-text);
+	font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+	font-size: 12.5px;
+	font-weight: 500;
+}
+
+/* Identity */
+#V-PopupsIdentity .tab-content.form-horizontal .control-group:last-child { margin-bottom: 0; }
+#V-PopupsIdentity .textEmail { margin: 0; font-weight: 600; color: var(--m-text); min-height: 40px; display: flex; align-items: center; }
+#V-PopupsIdentity .e-signature-place {
+	border: 1px solid var(--m-line-strong);
+	border-radius: var(--m-r);
+	overflow: hidden;
+	margin-bottom: 16px;
+}
+#V-PopupsIdentity .e-signature-place .squire-toolbar { padding: 6px 8px; background: var(--m-surface-2); }
+#V-PopupsIdentity .e-signature-place .squire-wysiwyg,
+#V-PopupsIdentity .e-signature-place .squire-plain { min-height: 160px; padding: 14px 16px; font-size: 14px; }
+
+@media screen and (max-width: 799px) {
+	#V-PopupsKeyboardShortcutsHelp .tabs,
+	#V-PopupsIdentity .tabs { column-gap: 18px; flex-wrap: wrap; }
+	#V-PopupsKeyboardShortcutsHelp .tabs .tab-content,
+	#V-PopupsIdentity .tabs .tab-content { min-height: 0; }
+	#V-PopupsKeyboardShortcutsHelp table.table td:last-child { white-space: normal; }
+}
+
+
+/* =========================================================================
+   Close / minimize controls
+   ========================================================================= */
+/* The theme underlines every link on hover, including the × close links */
+a.close, a.close:hover, a.close:focus,
+.minimize-custom, .minimize-custom:hover { text-decoration: none !important; }
+
+/* Compose minimize was drawn as a bare underline (a 3px bottom border),
+   which read as a stray line next to the ×. Proper icon button instead. */
+#V-PopupsCompose header .minimize-custom {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	margin: 0 0 0 6px;
+	border: 0 !important;
+	border-radius: var(--m-r-sm);
+	color: var(--m-muted);
+	cursor: pointer;
+}
+#V-PopupsCompose header .minimize-custom::before {
+	content: "";
+	width: 16px;
+	height: 16px;
+	background-color: currentColor;
+	-webkit-mask: var(--icon-minimize-2) no-repeat center / contain;
+	mask: var(--icon-minimize-2) no-repeat center / contain;
+}
+#V-PopupsCompose header .minimize-custom:hover { background: var(--m-hover); color: var(--m-text); }
+#V-PopupsCompose header .close { margin-left: 0; }
+
+
+/* =========================================================================
+   Quoted text: collapse toggle + blockquotes
+   ========================================================================= */
+.messageView .sm-bq-switcher { margin: 20px 0 8px; }
+.messageView .sm-bq-switcher > summary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 22px;
+	min-width: 36px;
+	margin: 0;
+	padding: 0 10px 0 7px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--m-surface-2);
+	color: var(--m-muted);
+	opacity: 1;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: .12em;
+	line-height: 1;
+	list-style: none;       /* drops the ▼ disclosure marker */
+	cursor: pointer;
+	user-select: none;
+	transition: background-color .15s ease, color .15s ease;
+}
+.messageView .sm-bq-switcher > summary::-webkit-details-marker { display: none; }
+.messageView .sm-bq-switcher > summary::marker { content: ""; }
+/* State chevron: points right when collapsed, rotates down when open */
+.messageView .sm-bq-switcher > summary::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 12px;
+	height: 12px;
+	background-color: currentColor;
+	-webkit-mask: var(--icon-chevron-right) no-repeat center / contain;
+	mask: var(--icon-chevron-right) no-repeat center / contain;
+	transition: transform .15s ease;
+}
+.messageView .sm-bq-switcher[open] > summary::before { transform: rotate(90deg); }
+.messageView .sm-bq-switcher > summary:hover { background: var(--m-line); color: var(--m-text); }
+.messageView .sm-bq-switcher > summary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--m-accent-soft); }
+.messageView .sm-bq-switcher[open] > summary { background: var(--m-accent-soft); color: var(--m-accent); }
+.messageView .sm-bq-switcher[open] > summary + blockquote { margin-top: 12px; }
+
+/* Plain-text and HTML quotes: soft rule, muted text, nested quotes lighter */
+.messageView .b-text-part blockquote {
+	margin: 0;
+	padding: 2px 0 2px 14px;
+	border-left: 3px solid var(--m-line-strong);
+	color: var(--m-muted);
+	opacity: 1;
+}
+.messageView .b-text-part blockquote blockquote { border-left-color: var(--m-line); }
+
+
+/* =========================================================================
+   Paginator
+   ========================================================================= */
+.e-paginator {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 2px;
+}
+.e-paginator a,
+.e-paginator a.current {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 26px;
+	height: 26px;
+	padding: 0 6px;
+	box-sizing: border-box;
+	border-radius: 7px;
+	color: var(--m-muted);
+	font-size: 12.5px;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	opacity: 1;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color .12s ease, color .12s ease;
+}
+.e-paginator a:hover { background: var(--m-hover); color: var(--m-text); opacity: 1; text-decoration: none; }
+.e-paginator a.current {
+	background: var(--m-accent-soft);
+	color: var(--m-accent);
+	font-weight: 650;
+	cursor: default;
+}
+
+
+/* =========================================================================
+   Thread view
+   ========================================================================= */
+/* "Back to message list" bar at the top of an opened thread */
+.messageList .b-content .listThreadUidDesc {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 0 18px;
+	height: 40px;
+	background: var(--m-surface-2);
+	border: 0;
+	border-bottom: 1px solid var(--m-line);
+	color: var(--m-accent);
+	font-size: 13.5px;
+	font-weight: 550;
+	text-align: left;
+	text-shadow: none;
+	cursor: pointer;
+	transition: background-color .12s ease;
+}
+.messageList .b-content .listThreadUidDesc::before { width: 15px; height: 15px; margin: 0; }
+.messageList .b-content .listThreadUidDesc:hover { background: var(--m-accent-soft); }
+
+/* "Sorting unavailable" is shown as an X button, which reads as close.
+   It isn't clickable, so hide it. */
+#no-sort-list,
+#V-MailMessageList .btn-toolbar > .btn-group:has(> #no-sort-list) { display: none !important; }
+/* Whichever button ends the toolbar sits flush with its padding */
+#V-MailMessageList > .btn-toolbar > .btn-group { margin-right: 0; }
+
+/* Replied / forwarded markers before the sender: proper glyphs, spaced, muted */
+.messageListItem.msgflag-\\answered .senderParent::before,
+.messageListItem.msgflag-\$forwarded .senderParent::before {
+	width: 13px;
+	height: 13px;
+	margin-right: 6px;
+	vertical-align: -1px;
+	background-color: var(--m-faint);
+}
+.messageListItem.msgflag-\\answered .senderParent::before { --tachyon-icon: var(--icon-reply); }
+.messageListItem.msgflag-\$forwarded .senderParent::before { --tachyon-icon: var(--icon-forward); }
+.messageListItem.msgflag-\\answered.msgflag-\$forwarded .senderParent::before { --tachyon-icon: var(--icon-arrow-left-right); }
+
+/* =========================================================================
+   Account menu: unread counts
+   ========================================================================= */
+/* The base pins the count absolutely 3px from the edge; put it in the row */
+#V-SystemDropDown .dropdown-menu li > a[data-unread]::after {
+	position: static;
+	order: 2;
+	margin-left: auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 20px;
+	min-width: 20px;
+	padding: 0 7px;
+	box-sizing: border-box;
+	border-radius: 999px;
+	background: var(--m-accent-soft);
+	color: var(--m-accent);
+	font-size: 11.5px;
+	font-weight: 650;
+	line-height: 1;
+	text-shadow: none;
+}
+#V-SystemDropDown .dropdown-menu li > a.email-title {
+	padding-right: 8px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#V-SystemDropDown .color-scheme-toggle { margin-bottom: 4px; }
+
+
+/* =========================================================================
+   Message list surface, thread counts, hidden server keywords
+   ========================================================================= */
+/* List matches the reader: one white surface across both panes */
+#V-MailMessageList,
+#V-MailMessageList .messageList,
+#V-MailMessageList .messageList .b-footer,
+#V-MailMessageList .messageList .groupLabel { background-color: var(--m-reader, var(--m-surface)); }
+
+/* Thread count ("2 >"): soft pill like the other counts */
+.messageListItem .threads-len {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	height: 20px;
+	padding: 0 5px 0 8px;
+	box-sizing: border-box;
+	border: 0;
+	border-radius: 999px;
+	background: var(--m-surface-2);
+	color: var(--m-muted);
+	font-size: 11.5px;
+	font-weight: 650;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color .12s ease, color .12s ease;
+}
+.messageListItem .threads-len::after { width: 11px; height: 11px; }
+.messageListItem .threads-len:hover { background: var(--m-line); border: 0; color: var(--m-text); }
+.messageListItem .threads-len[data-unseen] { background: var(--m-accent-soft); color: var(--m-accent); border: 0; }
+.messageListItem.selected .threads-len { background: var(--m-surface); }
+
+/* Tags menu: the tag button sits near the reader's left edge, so the default
+   right-aligned menu ran off that edge and was clipped. Open it rightward. */
+#V-MailMessageView #tags-dropdown-id + .dropdown-menu,
+#V-MailMessageView #tags-dropdown-id + .dropdown-menu.right-edge {
+	left: 0;
+	right: auto;
+	max-height: min(60vh, 420px);
+}
+
+
+/* =========================================================================
+   Recipient chips and dialog close buttons
+   ========================================================================= */
+/* The base pins the chip's × absolutely in a 15px right gutter; our chip
+   padding left it sitting on the name. Put it in the row instead. */
+.emailaddresses li[draggable] {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	height: 26px;
+	padding: 0 4px 0 11px;
+	box-sizing: border-box;
+	vertical-align: middle;
+}
+.emailaddresses li[draggable] span { padding: 0; overflow: hidden; text-overflow: ellipsis; }
+.emailaddresses li[draggable] a {
+	position: static;
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	border-radius: 50%;
+	font-size: 13px;
+	line-height: 1;
+	color: var(--m-faint);
+	text-decoration: none;
+}
+.emailaddresses li[draggable] a:hover { background: var(--m-line); color: var(--m-text); }
+
+/* Close buttons: the × character sits low in most fonts and the base adds a
+   2px top margin. Draw the same X icon used elsewhere, centred in the button. */
+dialog > header .close,
+#V-PopupsCompose header .close {
+	margin-top: 0;
+	font-size: 0 !important;
+	line-height: 0 !important;
+}
+dialog > header .close::before,
+#V-PopupsCompose header .close::before {
+	content: "";
+	width: 18px;
+	height: 18px;
+	background-color: currentColor;
+	-webkit-mask: var(--icon-x) no-repeat center / contain;
+	mask: var(--icon-x) no-repeat center / contain;
+}
+#V-PopupsCompose header .close,
+#V-PopupsCompose header .minimize-custom { align-self: center; }
+
+
+/* =========================================================================
+   Theme picker (Settings → Themes)
+   ========================================================================= */
+/* Settings content is capped at 780px for readable forms; the picker grid
+   is exempt so it fills the pane like the other themes do. Headings and the
+   font options below it keep the cap. */
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes { max-width: none; }
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes > .legend,
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes > .form-horizontal { max-width: 780px; }
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes > br { display: none; }
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes > .form-horizontal { margin-top: 40px; }
+
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes > div[data-bind*="themesObjects"] {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+	gap: 16px;
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figure {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+	margin: 0;
+	padding: 10px 10px 12px;
+	border: 1px solid var(--m-line);
+	border-radius: 12px;
+	background: var(--m-surface);
+	cursor: pointer;
+	transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figure:hover {
+	border-color: var(--m-line-strong);
+	box-shadow: 0 4px 14px -6px rgba(15, 21, 37, .18);
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figure.selected,
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figure.selected:hover {
+	background: var(--m-accent-soft);
+	border-color: var(--m-accent);
+	box-shadow: 0 0 0 3px var(--m-accent-soft);
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figure img {
+	order: 0;
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	border-radius: 8px;
+	background: var(--m-surface-2);
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figcaption {
+	order: 1;
+	padding: 0 2px;
+	text-align: left;
+	font-size: 13.5px;
+	font-weight: 550;
+	color: var(--m-text-2);
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-Themes figure.selected figcaption { color: var(--m-accent); font-weight: 650; }
+
+
+/* =========================================================================
+   Footers line up; native resize grips off
+   ========================================================================= */
+@media screen and (min-width: 800px) {
+	/* List footer: 48px inside the card. The card's bottom edge sits
+	   --m-pad + 1px border above the window bottom, so the sidebar footer
+	   is that much taller and its divider lands on the same line. */
+	:root { --m-foot-h: 48px; }
+	#V-MailMessageList .messageList .b-footer {
+		height: var(--m-foot-h);
+		min-height: var(--m-foot-h);
+		padding: 0 14px;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+	}
+	/* Sidebar footer: icons on their own, no bar or divider (the folder list
+	   fades out above them). Button row centred on the list footer's row. */
+	#rl-left .b-folders .b-footer {
+		/* 48px row whose centre matches the list footer's (11% / pages),
+		   icons lined up with the folder icons and the count pills */
+		height: var(--m-foot-h);
+		margin: 0 12px calc(var(--m-pad) + 1px) 16px;
+		padding: 6px 2px;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 4px;
+		background: transparent;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+	#rl-left .b-folders .b-footer .btn-group { margin: 0; gap: 2px; }
+	#rl-left .b-folders .b-footer .btn { width: 36px; min-width: 36px; height: 36px; min-height: 36px; padding: 0; }
+	/* Folders fade out just above the toolbar instead of being cut off */
+	/* About a row and a half: whatever folder sits there shows half-faded,
+	   which reads as "more below". The matching bottom padding lets the last
+	   folder scroll fully clear of the fade. */
+	#rl-left .b-folders .b-content {
+		--m-fade: 64px;
+		-webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--m-fade)), rgba(0,0,0,.35) calc(100% - var(--m-fade) / 3), transparent);
+		mask-image: linear-gradient(to bottom, #000 calc(100% - var(--m-fade)), rgba(0,0,0,.35) calc(100% - var(--m-fade) / 3), transparent);
+		padding-bottom: var(--m-fade);
+	}
+	/* Top fade: grows in over the first 40px of scrolling, so it only shows
+	   once there's something above. Needs scroll-driven animations (Chrome,
+	   Edge, Safari 26); other browsers just don't get the top fade. */
+	@supports (animation-timeline: scroll()) {
+		#rl-left .b-folders .b-content {
+			-webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.35) calc(var(--m-fade-top) / 3), #000 var(--m-fade-top), #000 calc(100% - var(--m-fade)), rgba(0,0,0,.35) calc(100% - var(--m-fade) / 3), transparent);
+			mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.35) calc(var(--m-fade-top) / 3), #000 var(--m-fade-top), #000 calc(100% - var(--m-fade)), rgba(0,0,0,.35) calc(100% - var(--m-fade) / 3), transparent);
+			animation: m-fade-top linear both;
+			animation-timeline: scroll(self);
+			animation-range: 0 40px;
+		}
+	}
+	/* Collapsed rail: just the expand button, as a small square */
+	html.rl-left-panel-disabled #rl-left .b-folders .b-footer {
+		width: 44px;
+		margin: 0 auto calc(var(--m-pad) + 1px);
+		padding: 6px 0;
+		justify-content: center;
+	}
+
+	/* Rail: one centre line for Compose, every folder and the expand button.
+	   Remove everything that nudged them sideways: the base's 2px right
+	   padding on the folder column, the toolbar's trailing 3px margin on
+	   Compose, the list's side padding, and a scrollbar gutter. */
+	html.rl-left-panel-disabled #rl-left .b-folders { padding: 0; }
+	html.rl-left-panel-disabled #rl-left .b-folders .b-toolbar { justify-content: center; padding: 0; gap: 0; }
+	html.rl-left-panel-disabled #rl-left .b-folders .b-toolbar .btn.buttonCompose { margin: 0 !important; }
+	html.rl-left-panel-disabled #rl-left #V-MailFolderList .b-folders .b-content {
+		padding-left: 0;
+		padding-right: 0;
+		scrollbar-width: none;
+	}
+	html.rl-left-panel-disabled #rl-left #V-MailFolderList .b-folders .b-content::-webkit-scrollbar { display: none; }
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders .b-content li > a,
+	html.rl-left-panel-disabled .focused #V-MailFolderList .b-folders .b-content li > a {
+		width: 44px;
+		height: 44px;
+		margin: 2px auto;
+	}
+}
+
+/* The browser's own resize grip (////) on the sidebar and list. Tachyon has
+   its own drag strip on the same edges (.resizer), which keeps working. */
+#rl-left,
+html:not(.rl-left-panel-disabled) #rl-left,
+#V-MailMessageList .messageList,
+.sm-msgView-side #V-MailMessageList .messageList,
+#V-PopupsCompose { resize: none !important; }
+.resizer { transition: background-color .15s ease; }
+.resizer:hover { background: var(--m-accent-soft) !important; opacity: 1; }
+
+
+/* =========================================================================
+   Dialogs: centred, with a short fade-and-rise
+   Tachyon pins dialogs to the top and slides them down from -25%. The
+   script only toggles .animate and waits for the opacity transition to
+   end, so position and motion are ours to define (opacity must animate).
+   ========================================================================= */
+html dialog,
+html dialog:not(.animate) {
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: fit-content;
+}
+html dialog {
+	transition: opacity .18s ease, transform .22s cubic-bezier(.2, .8, .2, 1);
+	transform: none;
+}
+html dialog:not(.animate) {
+	opacity: 0;
+	transform: translateY(10px) scale(.98);
+	background-color: var(--dialog-bg-clr);
+}
+html dialog.animate { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+	html dialog, html dialog:not(.animate) { transform: none; transition: opacity .12s linear; }
+}
+/* The big sheets keep their own heights; they're centred the same way */
+html #V-PopupsCompose,
+html #V-PopupsContacts,
+html #V-PopupsCalendar { margin: auto; }
+@media screen and (max-width: 799px) {
+	html dialog, html dialog:not(.animate) { margin: auto; width: calc(100% - 24px); }
+	html #V-PopupsCompose,
+	html #V-PopupsContacts,
+	html #V-PopupsCalendar { margin: 0; width: 100%; }
+}
+
+
+/* =========================================================================
+   Inbox "flagged" shortcut: beside the count instead of against the name
+   ========================================================================= */
+#V-MailFolderList .b-folders .b-content li > a > .flag-icon {
+	order: 2;
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	margin: 0 0 0 auto;
+	border-radius: 6px;
+	color: var(--m-faint);
+	cursor: pointer;
+}
+#V-MailFolderList .b-folders .b-content li > a > .flag-icon::after { width: 15px; height: 15px; opacity: 1; }
+#V-MailFolderList .b-folders .b-content li > a > .flag-icon:hover { background: var(--m-hover); color: #d9930d; opacity: 1; }
+#V-MailFolderList .b-folders .b-content li > a.is-flagged > .flag-icon { opacity: 1; color: #f5a524; }
+/* count follows the star when both are there */
+#V-MailFolderList .b-folders .b-content li > a:has(> .flag-icon)[data-unread]::after { margin-left: 6px; }
+
+
+/* =========================================================================
+   Formatting toolbars scroll on their own
+   A tab panel is a flex/grid item, which by default won't shrink below its
+   widest content; the one-line Squire toolbar then widened the whole dialog
+   and the dialog scrolled. Let panels shrink so the toolbar scrolls inside.
+   ========================================================================= */
+.tabs .tab-content,
+#V-PopupsIdentity .e-signature-place,
+#V-PopupsIdentity .tabs .tab-content > * { min-width: 0; max-width: 100%; }
+.squire-toolbar {
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: thin;
+	box-sizing: border-box;
+}
+#V-PopupsIdentity .modal-body { overflow-x: hidden; }
+/* Compose's panel bleeds past the tab padding with negative margins, so a
+   100% cap would stop it short of the right edge */
+#V-PopupsCompose .tabs .tab-content { max-width: calc(100% + 48px); }
+@media screen and (max-width: 799px) { #V-PopupsCompose .tabs .tab-content { max-width: calc(100% + 32px); } }
+
+
+/* =========================================================================
+   Settings → General: identity
+   The base draws a dashed underline across the whole row. Show it as a
+   field-style button that opens the identity editor, like Language below.
+   ========================================================================= */
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity {
+	justify-self: start;
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	width: fit-content;
+	max-width: 100%;
+	height: 38px;
+	padding: 0 12px;
+	box-sizing: border-box;
+	border: 0;
+	border-radius: var(--m-r);
+	background: var(--m-surface-2);
+	color: var(--m-text);
+	font-size: 14px;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: pointer;
+	transition: background-color .15s ease;
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity::after {
+	content: "";
+	flex: 0 0 14px;
+	width: 14px;
+	height: 14px;
+	background-color: var(--m-faint);
+	-webkit-mask: var(--icon-pencil) no-repeat center / contain;
+	mask: var(--icon-pencil) no-repeat center / contain;
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity:hover { background: var(--m-line); }
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity:hover::after { background-color: var(--m-accent); }
+
+
+/* =========================================================================
+   Settings rhythm
+   One spacing system for every settings page and form dialog:
+     field height 38 · label column 200 · gap label→field 24
+     row → row 16 · within a field column 8 · section → section 40
+   ========================================================================= */
+:is(#V-SettingsPane, #V-AdminPane) {
+	--m-s-field: 38px;
+	--m-s-row: 16px;
+	--m-s-tight: 8px;
+	--m-s-section: 40px;
+}
+
+/* Section headings */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .legend {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: var(--m-s-section) 0 20px;
+	padding: 0 0 12px;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > .legend:first-child,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > :first-child > .legend:first-child,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > .form-horizontal:first-child > .legend:first-child { margin-top: 0; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .legend .icon-spinner { margin: 0 !important; }
+/* A section wrapped in its own container (Accounts → Identities, Security)
+   still gets the section gap; only the very first heading on a page is flush */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > :not(:first-child) > .legend:first-child,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > :not(:first-child) > .form-horizontal:first-child > .legend:first-child { margin-top: var(--m-s-section); }
+
+/* Label + field rows */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group {
+	display: grid;
+	grid-template-columns: 200px minmax(0, 1fr);
+	column-gap: 24px;
+	row-gap: var(--m-s-tight);
+	align-items: start;
+	margin: 0 0 var(--m-s-row);
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > label {
+	grid-column: 1;
+	min-height: var(--m-s-field);
+	display: flex;
+	align-items: center;
+	margin: 0;
+	padding: 0;
+	width: auto;
+	text-align: left;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > :not(label) {
+	grid-column: 2;
+	margin: 0;
+}
+/* A field column that holds several things (an input and its unit, a
+   select and its hint, a stack of switches) lays them out in one flow */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > div:not([data-bind*="component"]) {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--m-s-tight) 10px;
+	min-height: var(--m-s-field);
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > div > div,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > div > .help-block { flex: 0 0 100%; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > div > span:not(.help-block) { color: var(--m-text-2); font-size: 14px; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .help-block { margin: 0; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > .help-block { margin-top: calc(var(--m-s-tight) * -0.5); }
+
+/* Switches: one consistent row height, wherever they sit */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .e-checkbox {
+	min-height: 32px;
+	padding: 0;
+	margin: 0;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > div[data-bind*="component"]:has(.e-checkbox) {
+	min-height: var(--m-s-field);
+	display: flex;
+	align-items: center;
+}
+
+/* The one nested label + dropdown (Compose → Undo send) */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-group {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: var(--m-s-field);
+	margin: 0;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-group > label {
+	width: auto;
+	margin: 0;
+	padding: 0;
+	color: var(--m-text-2);
+	font-size: 14px;
+	font-weight: 400;
+	text-align: left;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-group > div { width: auto; padding: 0; float: none; }
+
+/* One standard field width; numbers stay compact, long URLs get the column */
+:is(#V-SettingsPane, #V-AdminPane) { --m-s-field-w: 320px; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] select,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="text"],
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="email"],
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="password"],
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="url"],
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] span.select,
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity {
+	width: var(--m-s-field-w);
+	min-width: 0;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+/* Block layout (not flex) so a long identity ends in "…", pencil pinned right */
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity {
+	display: block;
+	position: relative;
+	line-height: 38px;
+	padding: 0 38px 0 12px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+:is(#V-SettingsPane, #V-AdminPane) #V-Settings-General .editMainIdentity::after {
+	position: absolute;
+	right: 12px;
+	top: 12px;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input.input-xxlarge,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input.input-xlarge,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] textarea { width: 100%; max-width: 520px; }
+
+/* Number fields: compact, no native spinner box */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="number"] {
+	width: 88px;
+	min-width: 0;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="number"]::-webkit-inner-spin-button,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Things placed straight under a heading (Accounts, Folders, Filters,
+   Security): same row spacing as the forms */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > div[data-bind*="component"],
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > div > div[data-bind*="component"] { margin: 0 0 var(--m-s-tight) !important; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > .btn,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] > div > .btn { margin: var(--m-s-tight) 8px var(--m-s-row) 0; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table { margin: 0 0 var(--m-s-row); }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .alert { margin: 0 0 var(--m-s-row); }
+
+/* List tables */
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table td {
+	height: 44px;
+	padding: 0 12px;
+	border-top: 0;
+	border-bottom: 1px solid var(--m-line);
+	vertical-align: middle;
+	line-height: 1.4;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table tr:first-child > td { border-top: 1px solid var(--m-line); }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table td:first-child:has(.drag-handle),
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table td:first-child:empty { width: 28px; padding-right: 0; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .drag-handle { color: var(--m-faint); cursor: grab; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .e-action { cursor: pointer; color: var(--m-text); font-weight: 500; }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table [class*="icon-"].e-action,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .delete,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .delete-key {
+	width: 32px;
+	text-align: center;
+	color: var(--m-faint);
+	cursor: pointer;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .delete:hover,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .delete-key:hover,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .icon-trash-2.e-action:hover { color: var(--m-danger); }
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .btn.btn-small {
+	min-height: 28px;
+	height: 28px;
+	padding: 0 10px;
+	font-size: 12.5px;
+}
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .folder-size,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .key-id,
+:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] table.list-table .identity-default { color: var(--m-muted); font-size: 13px; }
+
+@media screen and (max-width: 900px) {
+	:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+	:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > :not(label) { grid-column: 1; }
+	:is(#V-SettingsPane, #V-AdminPane) [id^="V-Settings-"] .form-horizontal .control-group > label { min-height: 0; }
+}
+
+/* =========================================================================
+   Fluid desktop widths
+   ========================================================================= */
+@media screen and (min-width: 800px) and (max-width: 1199px) {
+	#rl-left { width: 208px; }
+	/* Prev/next go first when the reader gets narrow (j/k and the list still work) */
+	#V-MailMessageView .top-toolbar > .btn-group:has(.buttonUp) { display: none; }
+	.messageView .messageItemHeader { padding-left: 24px; padding-right: 24px; }
+	.messageView .bodyText,
+	.messageView .b-text-part { padding-left: 24px; padding-right: 24px; }
+	:is(#V-SettingsPane, #V-AdminPane) { padding: 28px 28px 40px; }
+}
+@media screen and (min-width: 800px) and (max-width: 999px) {
+	.sm-msgView-side #V-MailMessageList .messageList { min-width: 280px; }
+	#V-MailMessageList > .btn-toolbar { padding: 0 6px 0 8px; }
+	.messageListItem > div + div { padding-right: 12px; }
+}
+
+/* =========================================================================
+   Mobile (the app switches to a single pane under 800px)
+   ========================================================================= */
+@media screen and (max-width: 799px) {
+	:root { --m-mob-bar: 56px; }
+
+	#rl-right {
+		box-sizing: border-box;
+		padding: 0 8px 8px;
+	}
+
+	/* Toolbars stay on the canvas here: the account avatar shares their row */
+	#V-MailMessageList > .btn-toolbar,
+	#V-MailMessageView .top-toolbar {
+		box-sizing: border-box;
+		height: var(--m-mob-bar);
+		margin: 0;
+		padding: 0 52px 0 0;
+		display: flex;
+		align-items: center;
+		/* No scroll container here: overflow-x:auto also clips vertically,
+		   which trapped the sort and More menus inside the 56px bar */
+		overflow: visible;
+		position: relative;
+		z-index: 20;
+	}
+	#V-MailMessageList > .btn-toolbar .btn-group { position: relative; }
+	#V-MailMessageList > .btn-toolbar .dropdown-menu { z-index: 1001; }
+	/* Menus near the right edge open leftward so they stay on screen */
+	#V-MailMessageList > .btn-toolbar .btn-group:has(#sort-list-dropdown-id) .dropdown-menu,
+	#V-MailMessageList > .btn-toolbar .btn-group:has(#more-list-dropdown-id) .dropdown-menu {
+		position: absolute;
+		top: calc(100% + 6px);
+		left: auto;
+		right: 0;
+		max-width: calc(100vw - 16px);
+	}
+	/* Push More + sort to the right, before the avatar */
+	#V-MailMessageList > .btn-toolbar > .btn-group:has(#more-list-dropdown-id) { margin-left: auto; }
+	#V-MailMessageList > .btn-toolbar .btn,
+	#V-MailMessageView .top-toolbar .btn { flex-shrink: 0; }
+	#V-MailMessageList > .btn-toolbar .btn.buttonCompose {
+		height: 40px;
+		width: 40px;
+		min-width: 40px;
+		padding: 0;
+		margin: 0 4px;
+	}
+
+	#V-MailMessageList .messageList,
+	#V-MailMessageList.focused .messageList,
+	#V-MailMessageView .messageView,
+	#V-MailMessageView.focused .messageView {
+		height: calc(100% - var(--m-mob-bar));
+		background: var(--m-reader, var(--m-surface));
+		border: 1px solid var(--m-line);
+		border-radius: 12px;
+		box-shadow: var(--m-shadow-panel);
+		overflow: hidden;
+	}
+	#V-MailMessageView .messageView { background: var(--m-reader, var(--m-surface)); }
+
+	#V-SystemDropDown { padding: 8px 8px 0 0; }
+	#top-system-dropdown-id, #top-system-dropdown-id.btn { padding: 0 5px; gap: 0; }
+	#top-system-dropdown-id::after { display: none; }
+
+	/* Folder drawer */
+	#rl-left {
+		width: min(300px, 85vw);
+		background: var(--m-bg);
+		border-right: 1px solid var(--m-line);
+		box-shadow: 0 0 40px rgba(15,21,37,.18);
+	}
+	#rl-left .b-folders .b-toolbar { padding: 0 12px; }
+
+	/* List rows */
+	.messageList .second-toolbar { padding: 10px 10px 10px 12px; }
+	.messageListItem > div + div { padding: 12px 14px 12px 4px; }
+	.messageListItem .messageCheckbox { padding-left: 8px; }
+	.messageListItem.unseen::before { left: 12px; }
+
+	/* Reader */
+	.messageView .messageItemHeader { padding-left: 18px; padding-right: 18px; }
+	.messageView .messageItemHeader:not(#messageItem > *) { padding-top: 14px; padding-bottom: 10px; }
+	#messageItem > .messageItemHeader { padding-top: 8px; padding-bottom: 10px; }
+	.messageItemHeader .subjectParent .subject { font-size: 18px; }
+	.messageView .bodyText,
+	.messageView .b-text-part { padding: 14px 18px 32px; }
+	.messageView .bodySubHeader > * { padding: 6px 12px; }
+	.messageView .message-fixed-button-toolbar { top: 18px; right: 10px; }
+
+	/* Settings */
+	:is(#V-SettingsPane, #V-AdminPane) {
+		height: calc(100% - var(--m-mob-bar) - 8px);
+		margin: var(--m-mob-bar) 8px 8px;
+		padding: 20px 18px 32px;
+		border-radius: 12px;
+	}
+	#V-SettingsMenu .b-toolbar { padding: 0 12px; }
+
+	/* Full-screen sheets */
+	#V-PopupsCompose,
+	#V-PopupsContacts,
+	#V-PopupsCalendar {
+		width: 100%;
+		max-width: 100%;
+		height: 100dvh;
+		margin: 0;
+		border: 0;
+		border-radius: 0;
+	}
+	#V-PopupsCompose header,
+	#V-PopupsContacts > header,
+	#V-PopupsCalendar > header { padding: 8px 8px 8px 12px; }
+	#V-PopupsCompose header .pull-right { gap: 0; }
+	#V-PopupsCompose .b-header { --m-compose-gutter: 16px; }
+	#V-PopupsCompose .tabs { padding: 0 16px; }
+	#V-PopupsCompose .tabs .tab-content { margin: 0 -16px; }
+	.squire-toolbar { padding: 6px 10px; }
+	.squire-wysiwyg, .squire-plain { padding: 18px 16px; }
+
+	/* Contacts: list above editor */
+	#V-PopupsContacts .modal-body { flex-direction: column; }
+	#V-PopupsContacts .left {
+		flex: 0 0 auto;
+		max-width: none;
+		width: 100%;
+		max-height: 38%;
+		border-right: 0;
+		border-bottom: 1px solid var(--m-line);
+	}
+	#V-PopupsContacts .right { min-height: 0; }
+	#V-PopupsContacts .b-view-content { padding: 0 16px; }
+	#V-PopupsContacts .form-horizontal .control-group { grid-template-columns: 28px minmax(0, 1fr); column-gap: 10px; }
+	#V-PopupsContacts .tabs > label { margin-right: 16px; }
+	#V-PopupsContacts .b-list-footer-toolbar { display: none; }
+
+	/* Calendar: toolbar wraps onto two lines */
+	#V-PopupsCalendar > header .btn-toolbar { flex-wrap: wrap; row-gap: 8px; }
+	#V-PopupsCalendar .b-calendar-title { order: -1; flex: 1 0 100%; padding: 4px 4px 0; }
+	#V-PopupsCalendar > header .btn-toolbar > .btn.btn-success { margin-right: auto; }
+	#V-PopupsCalendar .b-calendar-editor-form { width: 100%; max-height: 100%; border-radius: 0; }
+
+	/* Dialog forms: labels above fields */
+	dialog:not(#V-PopupsContacts) .form-horizontal .control-group { grid-template-columns: 1fr; row-gap: 6px; }
+	dialog:not(#V-PopupsContacts) .form-horizontal .control-group > label { min-height: 0; }
+	dialog:not(#V-PopupsContacts) .form-horizontal .control-group > *:not(label) { grid-column: 1; }
+	dialog .modal-body { padding: 18px; }
+	dialog:not(#V-PopupsCompose):not(#V-PopupsContacts):not(#V-PopupsCalendar) > header { padding: 14px 12px 14px 18px; }
+	dialog > footer { padding: 12px 18px; }
+}
+
+/* =========================================================================
+   13. Misc
+   ========================================================================= */
+.alert { border-radius: var(--m-r); }
+* { scrollbar-width: thin; scrollbar-color: var(--m-line-strong) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+	background: var(--m-line-strong);
+	border: 3px solid transparent;
+	border-radius: 10px;
+	background-clip: padding-box;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Animatable length for the sidebar's top fade (see the folder list mask) */
+@property --m-fade-top { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes m-fade-top { from { --m-fade-top: 0px; } to { --m-fade-top: 40px; } }
+
+/* =========================================================================
+   Admin panel (?admin). Same pane and menu as user settings (shared via
+   :is() above); this block only handles the admin-only top bar and spacing.
+   ========================================================================= */
+@media screen and (min-width: 800px) {
+	#rl-right > #V-AdminPane { height: 100%; margin: 0; }
+}
+#V-AdminMenu nav { padding-top: var(--m-bar-h); }
+#V-AdminPane > .b-toolbar {
+	height: var(--m-bar-h);
+	box-sizing: border-box;
+	align-items: center;
+	gap: 8px;
+	padding: 0 var(--m-pad) 0 16px;
+	color: var(--m-c-text, var(--m-text));
+	text-shadow: none;
+	max-width: none;
+	z-index: 2;
+	pointer-events: none;
+}
+#V-AdminPane > .b-toolbar > * { pointer-events: auto; }
+#V-AdminPane > .b-toolbar h4 {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	color: inherit;
+}
+#rl-right #V-AdminPane > .b-toolbar .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--m-r-sm);
+	background: transparent;
+	box-shadow: none;
+	color: var(--m-c-muted, var(--m-muted));
+	font-size: 17px;
+}
+#rl-right #V-AdminPane > .b-toolbar .btn:hover { background: var(--m-c-hover, var(--m-hover)); color: var(--m-c-text, var(--m-text)); }
+#rl-right #V-AdminPane > .b-toolbar .btn::before { width: 18px; height: 18px; margin: 0; }
+
+/* Admin page details */
+/* A hidden notice row before the form shouldn't push the first heading down */
+#V-AdminPane .row[style*="none"]:first-child + .form-horizontal > .legend:first-child { margin-top: 0; }
+
+/* Notices at the top of a page (weak passphrase, unsupported features) */
+#V-AdminPane .row { margin: 0; }
+#V-AdminPane .row > .alert { margin: 0 0 32px !important; }
+#V-AdminPane .alert.span8 { width: auto; max-width: 780px; box-sizing: border-box; }
+#V-AdminPane .alert { padding: 14px 18px; border-radius: var(--m-r); font-size: 13.5px; line-height: 1.5; }
+#V-AdminPane .alert h4 { margin: 0 0 4px; font-size: 14px; font-weight: 650; }
+#V-AdminPane .alert h4 + br { display: none; }
+
+/* Buttons sitting in a form row keep their natural width */
+#V-AdminPane .form-horizontal .control-group > .btn,
+#V-AdminPane .form-horizontal .control-group > button { justify-self: start; width: auto; }
+
+/* Plain buttons (TOTP generate/clear, domain username test) */
+#V-AdminPane button:not(.btn),
+#V-AdminPane button.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 38px;
+	padding: 0 16px;
+	border: 1px solid var(--m-line-strong);
+	border-radius: var(--m-r);
+	background: var(--m-surface);
+	color: var(--m-text);
+	font: 500 14px/1 var(--m-font);
+	cursor: pointer;
+	box-shadow: none;
+	text-shadow: none;
+}
+#V-AdminPane button:not(.btn):hover,
+#V-AdminPane button.btn:hover { background: var(--m-hover); }
+#V-AdminPane .form-horizontal .control-group > input + button { margin-top: 8px; }
+
+/* Domain username test: one row, matching field height */
+#V-Settings-Domains > div:last-child { display: flex; gap: 8px; align-items: stretch; margin-top: 24px; }
+#V-AdminPane input:not([type]),
+#V-AdminPane input[type="search"] {
+	box-sizing: border-box;
+	height: 38px;
+	min-width: 220px;
+	padding: 0 12px;
+	font-size: 14px;
+	line-height: 38px;
+}
+#V-AdminPane input[type="search"] { width: var(--m-s-field-w, 320px); margin-bottom: 20px; }
+#V-Settings-Domains > div:last-child input { width: var(--m-s-field-w, 320px); margin: 0; }
+
+/* Config and extension tables */
+#V-AdminPane .table th {
+	background: var(--m-surface-2);
+	color: var(--m-text);
+	font-weight: 650;
+	text-transform: none;
+}
+
+/* Admin: Add / Edit Domain dialog */
+#V-PopupsDomain .modal-body > .row { margin: 0 0 24px !important; }
+/* Name: label on one line, then the field with Autoconfig beside it */
+#V-PopupsDomain .modal-body > .row > .span5:first-child {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	width: auto;
+	margin: 0;
+	float: none;
+}
+#V-PopupsDomain .modal-body > .row > .span5:first-child > span { font-size: 13.5px; font-weight: 500; color: var(--m-text-2); }
+#V-PopupsDomain .modal-body > .row > .span5:first-child > span + span { flex: 1 0 60%; font-weight: 400; color: var(--m-muted); opacity: 1 !important; }
+#V-PopupsDomain .modal-body > .row > .span5:first-child > br { display: none; }
+#V-PopupsDomain .modal-body > .row > .span5:first-child > input { flex: 1 1 260px; width: auto; max-width: 420px; height: 40px; margin: 0; box-sizing: border-box; }
+#V-PopupsDomain .modal-body > .row > .span5:first-child > .alert-error { order: 9; flex-basis: 100%; }
+#V-PopupsDomain .modal-body > .row > .domain-desc { margin: 12px 0 0; width: auto; float: none; border-radius: var(--m-r); padding: 10px 14px; }
+
+/* Server / Security / Port / Timeout as one aligned row of labelled fields */
+#V-PopupsDomain .tab-content .row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin: 0 0 20px;
+}
+#V-PopupsDomain .tab-content .row::before,
+#V-PopupsDomain .tab-content .row::after { display: none; }
+#V-PopupsDomain .tab-content .row > .span {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	float: none;
+	margin: 0;
+	min-width: 0;
+}
+#V-PopupsDomain .tab-content .row > .span:first-child { flex: 1 1 220px; }
+#V-PopupsDomain .tab-content .row > .span > span { font-size: 13px; font-weight: 500; color: var(--m-text-2); }
+#V-PopupsDomain .tab-content .row > .span > br { display: none; }
+#V-PopupsDomain .tab-content .row > .span > input,
+#V-PopupsDomain .tab-content .row > .span > select {
+	box-sizing: border-box;
+	height: 40px;
+	margin: 0;
+	min-width: 0;
+}
+#V-PopupsDomain .tab-content .row > .span > input[type="text"] { width: 100%; }
+#V-PopupsDomain .tab-content .row > .span > select { width: 150px; }
+#V-PopupsDomain .tab-content .row > .span > input[type="number"] { width: 96px !important; }
+#V-PopupsDomain .tab-content .row + br { display: none; }
+
+/* Checkbox rows with a grey example after them */
+#V-PopupsDomain .tab-content > div[style*="inline-block"],
+#V-PopupsDomain .tab-content > div > div[style*="inline-block"] { vertical-align: middle; }
+#V-PopupsDomain .tab-content span[style*="opacity"] { font-size: 13px; color: var(--m-muted); opacity: 1 !important; margin-left: 4px; vertical-align: middle; }
+#V-PopupsDomain .tab-content .e-checkbox { padding: 4px 0; }
+
+/* Sub-headings inside a tab */
+#V-PopupsDomain .tab-content h4 {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 24px 0 10px;
+	font-size: 14px;
+	font-weight: 650;
+	color: var(--m-text);
+}
+#V-PopupsDomain .tab-content h4 a { margin-left: 0 !important; text-decoration: none; color: var(--m-accent); }
+
+/* Limits: room for the longer labels */
+dialog#V-PopupsDomain .form-horizontal .control-group { grid-template-columns: 160px minmax(0, 1fr); }
+dialog#V-PopupsDomain .form-horizontal .control-group > input { height: 40px; box-sizing: border-box; }
+dialog#V-PopupsDomain .form-horizontal .control-group > input[type="number"] { width: 120px; }
+
+/* Footer: Test and Cancel are secondary, Save is the one primary action */
+#V-PopupsDomain > footer .btn:not(:last-child):not(.btn-success):not(.btn-danger) {
+	background: var(--m-surface);
+	border: 1px solid var(--m-line-strong);
+	color: var(--m-text);
+	box-shadow: none;
+}
+#V-PopupsDomain > footer .btn:not(:last-child):not(.btn-success):not(.btn-danger):hover { background: var(--m-hover); border-color: var(--m-line-strong); }
+#V-PopupsDomain > footer .btn:first-child { margin-right: auto; }
+/* Hint under a toggle (php mail()): its own line, lined up with the toggle's label */
+#V-PopupsDomain .tab-content > .help-block {
+	display: block;
+	margin: 0 0 8px 48px;
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: var(--m-muted);
+}
+
+/* Admin: Add Alias dialog */
+#V-PopupsDomainAlias { max-width: 420px; }
+#V-PopupsDomainAlias .control-group { display: grid; grid-template-columns: minmax(0, 1fr) !important; row-gap: 6px; margin: 0 0 16px; }
+#V-PopupsDomainAlias .control-group:last-child { margin-bottom: 0; }
+#V-PopupsDomainAlias .control-group > label { min-height: 0 !important; grid-column: 1; }
+#V-PopupsDomainAlias .control-group > div { grid-column: 1 !important; min-width: 0; }
+#V-PopupsDomainAlias .control-group input,
+#V-PopupsDomainAlias .control-group select {
+	width: 100% !important;
+	min-width: 0;
+	height: 40px;
+	box-sizing: border-box;
+	margin: 0;
+}
+
+/* Close / Cancel are secondary; the dialog's own action stays primary */
+#V-PopupsDomainAlias > footer .btn.buttonClose,
+#V-PopupsPlugin > footer .btn.buttonClose {
+	background: var(--m-surface);
+	border: 1px solid var(--m-line-strong);
+	color: var(--m-text);
+	box-shadow: none;
+}
+#V-PopupsDomainAlias > footer .btn.buttonClose:hover,
+#V-PopupsPlugin > footer .btn.buttonClose:hover { background: var(--m-hover); border-color: var(--m-line-strong); }
+
+/* Domains page: username test button matches the field height */
+#V-Settings-Domains > div:last-child .btn { height: auto; max-height: none; min-height: 38px; margin: 0; padding: 0 16px; }
+
+
+/* =========================================================================
+   Palettes
+   Each block is its upstream theme's palette, scoped to its data-accent
+   value. The defaults above use :where(), so these win in any order.
+   ========================================================================= */
+
+/* Evergreen: Deep green accent on a warm paper canvas. */
+:root[data-accent="evergreen"] {
+	--m-bg:           #e9e7e0;
+	--m-surface:      #fbfaf7;
+	--m-surface-2:    #f0eee8;
+	--m-text:         #1b1f1c;
+	--m-text-2:       #3a403b;
+	--m-muted:        #5c635c;
+	--m-faint:        #878d87;
+	--m-line:         #e3e1d9;
+	--m-line-strong:  #cfccc2;
+	--m-accent:       #1f7a5c;
+	--m-accent-hover: #18664c;
+	--m-accent-fg:    #ffffff;
+	--m-accent-soft:  rgba(31, 122, 92, 0.12);
+	--m-hover:        rgba(27, 31, 28, 0.055);
+	--m-canvas-line:  rgba(27, 31, 28, 0.10);
+	--m-info-bg:      #e8f3ee;
+	--m-info-line:    #bfdccf;
+}
+
+:root[data-accent="evergreen"][data-color-scheme="dark"] {
+	--m-bg:           #0d0f14;
+	--m-surface:      #15181f;
+	--m-surface-2:    #1c2029;
+	--m-text:         #eceef2;
+	--m-text-2:       #c3c7d1;
+	--m-muted:        #8a90a0;
+	--m-faint:        #5d6372;
+	--m-line:         #232733;
+	--m-line-strong:  #2e3341;
+	--m-accent:       #3fbf8f;
+	--m-accent-hover: #5fd2a5;
+	--m-accent-fg:    #0d0f14;
+	--m-accent-soft:  rgba(63, 191, 143, 0.14);
+	--m-hover:        rgba(255, 255, 255, 0.045);
+	--m-canvas-line:  rgba(255, 255, 255, 0.07);
+	--m-info-bg:      rgba(63, 191, 143, 0.10);
+	--m-info-line:    rgba(63, 191, 143, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="evergreen"]:not([data-color-scheme="light"]) {
+		--m-bg:           #0d0f14;
+		--m-surface:      #15181f;
+		--m-surface-2:    #1c2029;
+		--m-text:         #eceef2;
+		--m-text-2:       #c3c7d1;
+		--m-muted:        #8a90a0;
+		--m-faint:        #5d6372;
+		--m-line:         #232733;
+		--m-line-strong:  #2e3341;
+		--m-accent:       #3fbf8f;
+		--m-accent-hover: #5fd2a5;
+		--m-accent-fg:    #0d0f14;
+		--m-accent-soft:  rgba(63, 191, 143, 0.14);
+		--m-hover:        rgba(255, 255, 255, 0.045);
+		--m-canvas-line:  rgba(255, 255, 255, 0.07);
+		--m-info-bg:      rgba(63, 191, 143, 0.10);
+		--m-info-line:    rgba(63, 191, 143, 0.28);
+	}
+}
+
+/* Midnight: Dark navy chrome around light panels, indigo accent. */
+:root[data-accent="midnight"] {
+	--m-bg:            #151b2e;
+	--m-accent:        #4f5fe8;
+	--m-accent-hover:  #4352d6;
+	--m-accent-soft:   rgba(79, 95, 232, 0.12);
+	--m-canvas-line:   rgba(255, 255, 255, 0.08);
+	--m-info-bg:       #eef0fe;
+	--m-info-line:     #cdd2fa;
+	--m-shadow-panel:  0 1px 2px rgba(0,0,0,.25), 0 10px 30px -10px rgba(0,0,0,.45);
+	--m-c-text:        #eef1fa;
+	--m-c-text-2:      #c9cfe0;
+	--m-c-muted:       #959db6;
+	--m-c-faint:       #7a83a0;
+	--m-c-hover:       rgba(255, 255, 255, 0.06);
+	--m-c-chip:        #252e4a;
+	--m-c-field:       rgba(255, 255, 255, 0.06);
+	--m-c-line:        rgba(255, 255, 255, 0.08);
+	--m-c-line-strong: rgba(255, 255, 255, 0.16);
+	--m-c-accent-text: #aab4ff;
+}
+
+:root[data-accent="midnight"][data-color-scheme="dark"] {
+	--m-bg:            #0b1020;
+	--m-accent:        #8592ff;
+	--m-accent-hover:  #9ea8ff;
+	--m-accent-soft:   rgba(133, 146, 255, 0.14);
+	--m-canvas-line:   rgba(255, 255, 255, 0.07);
+	--m-info-bg:       rgba(133, 146, 255, 0.10);
+	--m-info-line:     rgba(133, 146, 255, 0.28);
+	--m-shadow-panel:  0 1px 2px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+	--m-c-text:        var(--m-text);
+	--m-c-text-2:      var(--m-text-2);
+	--m-c-muted:       var(--m-muted);
+	--m-c-faint:       var(--m-faint);
+	--m-c-hover:       var(--m-hover);
+	--m-c-chip:        var(--m-surface);
+	--m-c-field:       var(--m-surface-2);
+	--m-c-line:        var(--m-line);
+	--m-c-line-strong: var(--m-line-strong);
+	--m-c-accent-text: var(--m-accent);
+	--m-accent-fg:     #0b1020;
+	--m-surface:       #131a2c;
+	--m-surface-2:     #1a2236;
+	--m-line:          #222b40;
+	--m-line-strong:   #2c3650;
+	--m-text:          #e9ecf5;
+	--m-text-2:        #c2c8d9;
+	--m-muted:         #8a92ab;
+	--m-faint:         #5e6782;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="midnight"]:not([data-color-scheme="light"]) {
+		--m-bg:            #0b1020;
+		--m-accent:        #8592ff;
+		--m-accent-hover:  #9ea8ff;
+		--m-accent-soft:   rgba(133, 146, 255, 0.14);
+		--m-canvas-line:   rgba(255, 255, 255, 0.07);
+		--m-info-bg:       rgba(133, 146, 255, 0.10);
+		--m-info-line:     rgba(133, 146, 255, 0.28);
+		--m-shadow-panel:  0 1px 2px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+		--m-c-text:        var(--m-text);
+		--m-c-text-2:      var(--m-text-2);
+		--m-c-muted:       var(--m-muted);
+		--m-c-faint:       var(--m-faint);
+		--m-c-hover:       var(--m-hover);
+		--m-c-chip:        var(--m-surface);
+		--m-c-field:       var(--m-surface-2);
+		--m-c-line:        var(--m-line);
+		--m-c-line-strong: var(--m-line-strong);
+		--m-c-accent-text: var(--m-accent);
+		--m-accent-fg:     #0b1020;
+		--m-surface:       #131a2c;
+		--m-surface-2:     #1a2236;
+		--m-line:          #222b40;
+		--m-line-strong:   #2c3650;
+		--m-text:          #e9ecf5;
+		--m-text-2:        #c2c8d9;
+		--m-muted:         #8a92ab;
+		--m-faint:         #5e6782;
+	}
+}
+
+/* Clay: Terracotta accent, sand canvas, warm brown grays. */
+:root[data-accent="clay"] {
+	--m-bg:           #ede6dc;
+	--m-surface:      #fffdf9;
+	--m-surface-2:    #f4eee6;
+	--m-text:         #2a1f18;
+	--m-text-2:       #4a3c32;
+	--m-muted:        #6b5c50;
+	--m-faint:        #998a7d;
+	--m-line:         #e9e1d6;
+	--m-line-strong:  #d8cdbf;
+	--m-accent:       #a8481f;
+	--m-accent-hover: #8f3c19;
+	--m-accent-fg:    #ffffff;
+	--m-accent-soft:  rgba(168, 72, 31, 0.11);
+	--m-hover:        rgba(42, 31, 24, 0.05);
+	--m-canvas-line:  rgba(42, 31, 24, 0.10);
+	--m-info-bg:      #fbeee7;
+	--m-info-line:    #efcdbd;
+}
+
+:root[data-accent="clay"][data-color-scheme="dark"] {
+	--m-bg:           #120e0b;
+	--m-surface:      #1b1612;
+	--m-surface-2:    #231d18;
+	--m-text:         #f2ece6;
+	--m-text-2:       #d2c8bf;
+	--m-muted:        #9e9187;
+	--m-faint:        #6e635a;
+	--m-line:         #2d2520;
+	--m-line-strong:  #3a3029;
+	--m-accent:       #f08a5d;
+	--m-accent-hover: #f5a07a;
+	--m-accent-fg:    #120c09;
+	--m-accent-soft:  rgba(240, 138, 93, 0.14);
+	--m-hover:        rgba(255, 255, 255, 0.045);
+	--m-canvas-line:  rgba(255, 255, 255, 0.07);
+	--m-info-bg:      rgba(240, 138, 93, 0.10);
+	--m-info-line:    rgba(240, 138, 93, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="clay"]:not([data-color-scheme="light"]) {
+		--m-bg:           #120e0b;
+		--m-surface:      #1b1612;
+		--m-surface-2:    #231d18;
+		--m-text:         #f2ece6;
+		--m-text-2:       #d2c8bf;
+		--m-muted:        #9e9187;
+		--m-faint:        #6e635a;
+		--m-line:         #2d2520;
+		--m-line-strong:  #3a3029;
+		--m-accent:       #f08a5d;
+		--m-accent-hover: #f5a07a;
+		--m-accent-fg:    #120c09;
+		--m-accent-soft:  rgba(240, 138, 93, 0.14);
+		--m-hover:        rgba(255, 255, 255, 0.045);
+		--m-canvas-line:  rgba(255, 255, 255, 0.07);
+		--m-info-bg:      rgba(240, 138, 93, 0.10);
+		--m-info-line:    rgba(240, 138, 93, 0.28);
+	}
+}
+
+/* Graphite: Charcoal chrome around light panels, teal accent. */
+:root[data-accent="graphite"] {
+	--m-bg:            #26292f;
+	--m-surface:       #fafafa;
+	--m-surface-2:     #f0f1f3;
+	--m-text:          #16181d;
+	--m-text-2:        #383c44;
+	--m-muted:         #5d636e;
+	--m-faint:         #8a909b;
+	--m-line:          #e5e7eb;
+	--m-line-strong:   #d2d5db;
+	--m-accent:        #0b7d72;
+	--m-accent-hover:  #09685f;
+	--m-accent-fg:     #ffffff;
+	--m-accent-soft:   rgba(11, 125, 114, 0.12);
+	--m-hover:         rgba(22, 24, 29, 0.05);
+	--m-canvas-line:   rgba(255, 255, 255, 0.08);
+	--m-info-bg:       #e6f4f2;
+	--m-info-line:     #bfe0dc;
+	--m-shadow-panel:  0 1px 2px rgba(0,0,0,.25), 0 10px 30px -10px rgba(0,0,0,.45);
+	--m-c-text:        #f1f2f4;
+	--m-c-text-2:      #c8ccd4;
+	--m-c-muted:       #9096a1;
+	--m-c-faint:       #767c87;
+	--m-c-hover:       rgba(255, 255, 255, 0.06);
+	--m-c-chip:        #373b44;
+	--m-c-field:       rgba(255, 255, 255, 0.06);
+	--m-c-line:        rgba(255, 255, 255, 0.08);
+	--m-c-line-strong: rgba(255, 255, 255, 0.16);
+	--m-c-accent-text: #5fd4c6;
+}
+
+:root[data-accent="graphite"][data-color-scheme="dark"] {
+	--m-bg:            #111214;
+	--m-surface:       #1a1c20;
+	--m-surface-2:     #22252a;
+	--m-text:          #eef0f2;
+	--m-text-2:        #c7cbd2;
+	--m-muted:         #8f95a0;
+	--m-faint:         #626873;
+	--m-line:          #2a2d33;
+	--m-line-strong:   #353940;
+	--m-accent:        #2cc3b3;
+	--m-accent-hover:  #4fd2c4;
+	--m-accent-fg:     #0b0d0f;
+	--m-accent-soft:   rgba(44, 195, 179, 0.14);
+	--m-hover:         rgba(255, 255, 255, 0.045);
+	--m-canvas-line:   rgba(255, 255, 255, 0.07);
+	--m-info-bg:       rgba(44, 195, 179, 0.10);
+	--m-info-line:     rgba(44, 195, 179, 0.28);
+	--m-shadow-panel:  0 1px 2px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+	--m-c-text:        var(--m-text);
+	--m-c-text-2:      var(--m-text-2);
+	--m-c-muted:       var(--m-muted);
+	--m-c-faint:       var(--m-faint);
+	--m-c-hover:       var(--m-hover);
+	--m-c-chip:        var(--m-surface);
+	--m-c-field:       var(--m-surface-2);
+	--m-c-line:        var(--m-line);
+	--m-c-line-strong: var(--m-line-strong);
+	--m-c-accent-text: var(--m-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="graphite"]:not([data-color-scheme="light"]) {
+		--m-bg:            #111214;
+		--m-surface:       #1a1c20;
+		--m-surface-2:     #22252a;
+		--m-text:          #eef0f2;
+		--m-text-2:        #c7cbd2;
+		--m-muted:         #8f95a0;
+		--m-faint:         #626873;
+		--m-line:          #2a2d33;
+		--m-line-strong:   #353940;
+		--m-accent:        #2cc3b3;
+		--m-accent-hover:  #4fd2c4;
+		--m-accent-fg:     #0b0d0f;
+		--m-accent-soft:   rgba(44, 195, 179, 0.14);
+		--m-hover:         rgba(255, 255, 255, 0.045);
+		--m-canvas-line:   rgba(255, 255, 255, 0.07);
+		--m-info-bg:       rgba(44, 195, 179, 0.10);
+		--m-info-line:     rgba(44, 195, 179, 0.28);
+		--m-shadow-panel:  0 1px 2px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+		--m-c-text:        var(--m-text);
+		--m-c-text-2:      var(--m-text-2);
+		--m-c-muted:       var(--m-muted);
+		--m-c-faint:       var(--m-faint);
+		--m-c-hover:       var(--m-hover);
+		--m-c-chip:        var(--m-surface);
+		--m-c-field:       var(--m-surface-2);
+		--m-c-line:        var(--m-line);
+		--m-c-line-strong: var(--m-line-strong);
+		--m-c-accent-text: var(--m-accent);
+	}
+}
+
+/* Ink: Monochrome: neutral grays with a black accent. */
+:root[data-accent="ink"] {
+	--m-bg:           #ececec;
+	--m-surface:      #fcfcfc;
+	--m-surface-2:    #f1f1f1;
+	--m-text:         #111111;
+	--m-text-2:       #333333;
+	--m-muted:        #5e5e5e;
+	--m-faint:        #8c8c8c;
+	--m-line:         #e6e6e6;
+	--m-line-strong:  #d4d4d4;
+	--m-accent:       #111111;
+	--m-accent-hover: #333333;
+	--m-accent-fg:    #ffffff;
+	--m-accent-soft:  rgba(17, 17, 17, 0.07);
+	--m-hover:        rgba(0, 0, 0, 0.05);
+	--m-canvas-line:  rgba(0, 0, 0, 0.10);
+	--m-info-bg:      #f2f2f2;
+	--m-info-line:    #dcdcdc;
+}
+
+:root[data-accent="ink"][data-color-scheme="dark"] {
+	--m-bg:           #0e0e0e;
+	--m-surface:      #171717;
+	--m-surface-2:    #1f1f1f;
+	--m-text:         #f2f2f2;
+	--m-text-2:       #cfcfcf;
+	--m-muted:        #9a9a9a;
+	--m-faint:        #6b6b6b;
+	--m-line:         #262626;
+	--m-line-strong:  #333333;
+	--m-accent:       #f2f2f2;
+	--m-accent-hover: #ffffff;
+	--m-accent-fg:    #111111;
+	--m-accent-soft:  rgba(255, 255, 255, 0.10);
+	--m-hover:        rgba(255, 255, 255, 0.045);
+	--m-canvas-line:  rgba(255, 255, 255, 0.07);
+	--m-info-bg:      rgba(255, 255, 255, 0.06);
+	--m-info-line:    rgba(255, 255, 255, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="ink"]:not([data-color-scheme="light"]) {
+		--m-bg:           #0e0e0e;
+		--m-surface:      #171717;
+		--m-surface-2:    #1f1f1f;
+		--m-text:         #f2f2f2;
+		--m-text-2:       #cfcfcf;
+		--m-muted:        #9a9a9a;
+		--m-faint:        #6b6b6b;
+		--m-line:         #262626;
+		--m-line-strong:  #333333;
+		--m-accent:       #f2f2f2;
+		--m-accent-hover: #ffffff;
+		--m-accent-fg:    #111111;
+		--m-accent-soft:  rgba(255, 255, 255, 0.10);
+		--m-hover:        rgba(255, 255, 255, 0.045);
+		--m-canvas-line:  rgba(255, 255, 255, 0.07);
+		--m-info-bg:      rgba(255, 255, 255, 0.06);
+		--m-info-line:    rgba(255, 255, 255, 0.18);
+	}
+}
+
+/* Plum: Violet accent on a lavender-gray canvas. */
+:root[data-accent="plum"] {
+	--m-bg:           #ebe8f1;
+	--m-surface:      #fcfbfe;
+	--m-surface-2:    #f2eff7;
+	--m-text:         #1c1726;
+	--m-text-2:       #3c3548;
+	--m-muted:        #5f5770;
+	--m-faint:        #8d859b;
+	--m-line:         #e6e2ee;
+	--m-line-strong:  #d4cde0;
+	--m-accent:       #6d3fd1;
+	--m-accent-hover: #5b31b6;
+	--m-accent-fg:    #ffffff;
+	--m-accent-soft:  rgba(109, 63, 209, 0.12);
+	--m-hover:        rgba(28, 23, 38, 0.055);
+	--m-canvas-line:  rgba(28, 23, 38, 0.10);
+	--m-info-bg:      #f3eefc;
+	--m-info-line:    #dccff5;
+}
+
+:root[data-accent="plum"][data-color-scheme="dark"] {
+	--m-bg:           #0d0f14;
+	--m-surface:      #15181f;
+	--m-surface-2:    #1c2029;
+	--m-text:         #eceef2;
+	--m-text-2:       #c3c7d1;
+	--m-muted:        #8a90a0;
+	--m-faint:        #5d6372;
+	--m-line:         #232733;
+	--m-line-strong:  #2e3341;
+	--m-accent:       #a98bff;
+	--m-accent-hover: #bba3ff;
+	--m-accent-fg:    #140d22;
+	--m-accent-soft:  rgba(169, 139, 255, 0.14);
+	--m-hover:        rgba(255, 255, 255, 0.045);
+	--m-canvas-line:  rgba(255, 255, 255, 0.07);
+	--m-info-bg:      rgba(169, 139, 255, 0.10);
+	--m-info-line:    rgba(169, 139, 255, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="plum"]:not([data-color-scheme="light"]) {
+		--m-bg:           #0d0f14;
+		--m-surface:      #15181f;
+		--m-surface-2:    #1c2029;
+		--m-text:         #eceef2;
+		--m-text-2:       #c3c7d1;
+		--m-muted:        #8a90a0;
+		--m-faint:        #5d6372;
+		--m-line:         #232733;
+		--m-line-strong:  #2e3341;
+		--m-accent:       #a98bff;
+		--m-accent-hover: #bba3ff;
+		--m-accent-fg:    #140d22;
+		--m-accent-soft:  rgba(169, 139, 255, 0.14);
+		--m-hover:        rgba(255, 255, 255, 0.045);
+		--m-canvas-line:  rgba(255, 255, 255, 0.07);
+		--m-info-bg:      rgba(169, 139, 255, 0.10);
+		--m-info-line:    rgba(169, 139, 255, 0.28);
+	}
+}

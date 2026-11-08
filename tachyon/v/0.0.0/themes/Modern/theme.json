@@ -1,0 +1,33 @@
+{
+	"default": "modern",
+	"accents": {
+		"modern": {
+			"name": "Modern",
+			"swatch": "#3b55e6"
+		},
+		"evergreen": {
+			"name": "Evergreen",
+			"swatch": "#1f7a5c"
+		},
+		"midnight": {
+			"name": "Midnight",
+			"swatch": "#151b2e"
+		},
+		"clay": {
+			"name": "Clay",
+			"swatch": "#a8481f"
+		},
+		"graphite": {
+			"name": "Graphite",
+			"swatch": "#0b7d72"
+		},
+		"ink": {
+			"name": "Ink",
+			"swatch": "#111111"
+		},
+		"plum": {
+			"name": "Plum",
+			"swatch": "#6d3fd1"
+		}
+	}
+}
