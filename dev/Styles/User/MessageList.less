@@ -211,6 +211,21 @@
 	-webkit-line-clamp: 2;
 }
 
+// A one-line row has to wrap for the preview to get a line of its own. The
+// subject starts from nothing so a long one stays beside the sender instead of
+// wrapping too. The two-line rows below already wrap and size it themselves.
+html:not(.sm-msgView-side):not(.rl-mobile) .messageListPlace[data-preview-lines] .messageListItem > div + div {
+	flex-wrap: wrap;
+
+	.subjectParent {
+		flex: 1 1 0;
+	}
+
+	.previewParent {
+		flex: 1 0 100%;
+	}
+}
+
 .messageListItem {
 	cursor: pointer;
 	border: 0;
