@@ -1,259 +1,228 @@
-/* Color scheme overrides (light/dark mode toggle) */
-:root[data-color-scheme="light"] {
+/*
+ * Tachyon theme
+ *
+ * Everything below is written against the --t-* tokens. The neutral ones
+ * change with light and dark mode; the accent ones also change with the
+ * palette picked under Settings → Themes (listed in theme.json), which
+ * Tachyon sets as data-accent on <html>. Blue is the default and lives in
+ * the plain :root rules, so the page is right before that attribute is set.
+ */
+
+/* ── Neutral tokens ─────────────────────────────────────────────────────── */
+:root {
 	color-scheme: light;
 
-	--main-color: #1d1d1f;
-	--main-bg-color: #f5f5f7;
-	--link-color: #005dc2;
-	--border-color: #d2d2d7;
-	--hr-color: #d2d2d7;
-	--panel-bg-clr: #ffffff;
+	--t-bg:          #f5f5f7;
+	--t-surface:     #ffffff;
+	--t-surface-2:   #f0f0f3;
+	--t-text:        #1d1d1f;
+	--t-text-2:      #3a3a3c;
+	--t-muted:       #6e6e73;
+	--t-faint:       #8e8e93;
+	--t-line:        #e3e3e8;
+	--t-line-strong: #d2d2d7;
+	--t-hover:       rgba(0, 0, 0, 0.045);
+	--t-press:       rgba(0, 0, 0, 0.08);
+	--t-danger:      #c0202a;
+	--t-success:     #1a7f37;
+	--t-warn:        #b45309;
+	--t-unread:      var(--t-accent);
 
-	--loading-color: #1d1d1f;
-	--spinner-color: #005dc2;
+	--t-shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.06);
+	--t-shadow:      0 1px 3px rgba(0, 0, 0, 0.05), 0 6px 20px -8px rgba(0, 0, 0, 0.12);
+	--t-shadow-pop:  0 10px 32px -8px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.06);
 
-	--login-color: #1d1d1f;
-	--login-bg-color: rgba(255,255,255,0.9);
-	--login-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-	--login-border: 1px solid #d2d2d7;
-	--login-border-radius: 14px;
+	--t-r-lg: 14px;
+	--t-r:    10px;
+	--t-r-sm: 8px;
 
-	--dropdown-menu-color: #1d1d1f;
-	--dropdown-menu-bg-color: rgba(255,255,255,0.96);
-	--dropdown-menu-hover-bg-color: rgba(0, 93, 194, 0.08);
-	--dropdown-menu-hover-color: #005dc2;
-	--dropdown-menu-disable-color: #86868b;
-	--dropdown-menu-border-clr: rgba(0,0,0,0.10);
+	--t-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
 
-	--folders-color: #1d1d1f;
-	--folders-disabled-color: #86868b;
-	--folders-selected-color: #005dc2;
-	--folders-selected-bg-color: rgba(0,93,194,0.08);
-	--folders-focused-color: #005dc2;
-	--folders-focused-bg-color: rgba(0,93,194,0.12);
-	--folders-hover-color: #1d1d1f;
-	--folders-hover-bg-color: rgba(0,0,0,0.04);
-	--folders-drop-color: #005dc2;
-	--folders-drop-bg-color: rgba(0,93,194,0.10);
-	--unread-count-color: #fff;
-	--unread-count-bg-color: #005dc2;
-
-	--settings-menu-color: #1d1d1f;
-	--settings-menu-selected-color: #005dc2;
-	--settings-menu-selected-bg-color: rgba(0,93,194,0.08);
-	--settings-menu-hover-color: #1d1d1f;
-	--settings-menu-hover-bg-color: rgba(0,0,0,0.04);
-
-	--message-list-toolbar-bg-color: #f5f5f7;
-	--message-header-bg-clr: #f5f5f7;
-
-	--dialog-clr: #1d1d1f;
-	--dialog-bg-clr: #ffffff;
-	--dialog-border-clr: #d2d2d7;
-	--dialog-border-radius: 14px;
-
-	--btn-clr: #ffffff;
-	--btn-bg-clr: #005dc2;
-	--btn-border-clr: #005dc2;
-	--btn-border-radius: 20px;
-	--btn-success-bg-clr: #1a8f3c;
-	--btn-danger-bg-clr: #c0202a;
-
-	--input-clr: #1d1d1f;
-	--input-bg-clr: #ffffff;
-	--input-border-clr: #c7c7cc;
-	--input-border-radius: 8px;
-	--input-focus-border-clr: #005dc2;
-
-	--tr-hover-bg-clr: rgba(0,0,0,0.03);
-	--tr-odd-bg-clr: rgba(0,0,0,0.015);
-
-	--tab-active-bg-clr: #ffffff;
-	--tab-hover-border-clr: #d2d2d7;
-
-	--warning-clr: #92400e;
-	--warning-bg-clr: #fef3c7;
-	--warning-border-clr: #fde68a;
-	--error-clr: #991b1b;
-	--error-bg-clr: #fee2e2;
-	--error-border-clr: #fecaca;
-	--info-clr: #005dc2;
-	--info-bg-clr: #eff6ff;
-	--info-border-clr: #bfdbfe;
+	/* Blue, the default palette */
+	--t-accent:    #005dc2;
+	--t-accent-fg: #ffffff;
 }
 
 :root[data-color-scheme="dark"] {
 	color-scheme: dark;
 
-	--main-color: #f5f5f7;
-	--main-bg-color: #1c1c1e;
-	--link-color: #4da3ff;
-	--border-color: #38383a;
-	--hr-color: #38383a;
-	--panel-bg-clr: #2c2c2e;
+	--t-bg:          #1c1c1e;
+	--t-surface:     #2c2c2e;
+	--t-surface-2:   #3a3a3c;
+	--t-text:        #f5f5f7;
+	--t-text-2:      #d1d1d6;
+	--t-muted:       #98989d;
+	--t-faint:       #6e6e73;
+	--t-line:        #38383a;
+	--t-line-strong: #48484a;
+	--t-hover:       rgba(255, 255, 255, 0.06);
+	--t-press:       rgba(255, 255, 255, 0.10);
+	--t-danger:      #ff453a;
+	--t-success:     #32d74b;
+	--t-warn:        #fbbf24;
 
-	--loading-color: #f5f5f7;
-	--spinner-color: #4da3ff;
+	--t-shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+	--t-shadow:      0 1px 3px rgba(0, 0, 0, 0.3), 0 6px 20px -8px rgba(0, 0, 0, 0.5);
+	--t-shadow-pop:  0 10px 32px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
 
-	--login-color: #f5f5f7;
-	--login-bg-color: rgba(44,44,46,0.95);
-	--login-box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-	--login-border: 1px solid #48484a;
-	--login-border-radius: 14px;
-
-	--dropdown-menu-color: #f5f5f7;
-	--dropdown-menu-bg-color: rgba(44,44,46,0.97);
-	--dropdown-menu-hover-bg-color: rgba(77,163,255,0.12);
-	--dropdown-menu-hover-color: #4da3ff;
-	--dropdown-menu-disable-color: #636366;
-	--dropdown-menu-border-clr: rgba(255,255,255,0.10);
-
-	--folders-color: #f5f5f7;
-	--folders-disabled-color: #636366;
-	--folders-selected-color: #4da3ff;
-	--folders-selected-bg-color: rgba(77,163,255,0.12);
-	--folders-focused-color: #4da3ff;
-	--folders-focused-bg-color: rgba(77,163,255,0.16);
-	--folders-hover-color: #f5f5f7;
-	--folders-hover-bg-color: rgba(255,255,255,0.06);
-	--folders-drop-color: #4da3ff;
-	--folders-drop-bg-color: rgba(77,163,255,0.15);
-	--unread-count-bg-color: #4da3ff;
-	--unread-count-color: #000;
-
-	--settings-menu-color: #f5f5f7;
-	--settings-menu-selected-color: #4da3ff;
-	--settings-menu-selected-bg-color: rgba(77,163,255,0.12);
-	--settings-menu-hover-color: #f5f5f7;
-	--settings-menu-hover-bg-color: rgba(255,255,255,0.06);
-
-	--message-list-toolbar-bg-color: #2c2c2e;
-	--message-header-bg-clr: #1c1c1e;
-
-	--dialog-clr: #f5f5f7;
-	--dialog-bg-clr: #2c2c2e;
-	--dialog-border-clr: #48484a;
-	--dialog-border-radius: 14px;
-
-	--btn-clr: #000000;
-	--btn-bg-clr: #4da3ff;
-	--btn-border-clr: #4da3ff;
-	--btn-border-radius: 20px;
-	--btn-success-bg-clr: #32d74b;
-	--btn-danger-bg-clr: #ff453a;
-
-	--input-clr: #f5f5f7;
-	--input-bg-clr: #3a3a3c;
-	--input-border-clr: #48484a;
-	--input-border-radius: 8px;
-	--input-focus-border-clr: #4da3ff;
-
-	--tr-hover-bg-clr: rgba(255,255,255,0.05);
-	--tr-odd-bg-clr: rgba(255,255,255,0.025);
-
-	--tab-active-bg-clr: #2c2c2e;
-	--tab-hover-border-clr: #48484a;
-
-	--warning-clr: #fbbf24;
-	--warning-bg-clr: #2d1f00;
-	--warning-border-clr: #78480f;
-	--error-clr: #f87171;
-	--error-bg-clr: #2d0000;
-	--error-border-clr: #7f1d1d;
-	--info-clr: #4da3ff;
-	--info-bg-clr: rgba(77,163,255,0.10);
-	--info-border-clr: rgba(77,163,255,0.25);
+	--t-accent:    #4da3ff;
+	--t-accent-fg: #000000;
 }
 
-:root {
-	color-scheme: light;
+@media (prefers-color-scheme: dark) {
+	:root:not([data-color-scheme="light"]) {
+		color-scheme: dark;
 
-	--main-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", sans-serif;
-	--main-font-size: 14px;
+		--t-bg:          #1c1c1e;
+		--t-surface:     #2c2c2e;
+		--t-surface-2:   #3a3a3c;
+		--t-text:        #f5f5f7;
+		--t-text-2:      #d1d1d6;
+		--t-muted:       #98989d;
+		--t-faint:       #6e6e73;
+		--t-line:        #38383a;
+		--t-line-strong: #48484a;
+		--t-hover:       rgba(255, 255, 255, 0.06);
+		--t-press:       rgba(255, 255, 255, 0.10);
+		--t-danger:      #ff453a;
+		--t-success:     #32d74b;
+		--t-warn:        #fbbf24;
+
+		--t-shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+		--t-shadow:      0 1px 3px rgba(0, 0, 0, 0.3), 0 6px 20px -8px rgba(0, 0, 0, 0.5);
+		--t-shadow-pop:  0 10px 32px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+		--t-accent:    #4da3ff;
+		--t-accent-fg: #000000;
+	}
+}
+
+/* ── Palettes ───────────────────────────────────────────────────────────── */
+/* Each sets the accent and the text drawn on it, once for light, once for
+   dark picked in Tachyon and once for a system set to dark. Every pair
+   clears 4.5:1, both as text on the accent and as the accent on a panel. */
+:root[data-accent="teal"]     { --t-accent: #0f766e; --t-accent-fg: #ffffff; }
+:root[data-accent="green"]    { --t-accent: #1a7f37; --t-accent-fg: #ffffff; }
+:root[data-accent="purple"]   { --t-accent: #7c3aed; --t-accent-fg: #ffffff; }
+:root[data-accent="pink"]     { --t-accent: #c0266d; --t-accent-fg: #ffffff; }
+:root[data-accent="orange"]   { --t-accent: #b45309; --t-accent-fg: #ffffff; }
+:root[data-accent="graphite"] { --t-accent: #3f4a5a; --t-accent-fg: #ffffff; }
+
+:root[data-accent="teal"][data-color-scheme="dark"]     { --t-accent: #2dd4bf; --t-accent-fg: #04201d; }
+:root[data-accent="green"][data-color-scheme="dark"]    { --t-accent: #4ade80; --t-accent-fg: #052e14; }
+:root[data-accent="purple"][data-color-scheme="dark"]   { --t-accent: #b197fc; --t-accent-fg: #1a1033; }
+:root[data-accent="pink"][data-color-scheme="dark"]     { --t-accent: #f472b6; --t-accent-fg: #2a0618; }
+:root[data-accent="orange"][data-color-scheme="dark"]   { --t-accent: #fb923c; --t-accent-fg: #2a1300; }
+:root[data-accent="graphite"][data-color-scheme="dark"] { --t-accent: #c2c9d4; --t-accent-fg: #111111; }
+
+@media (prefers-color-scheme: dark) {
+	:root[data-accent="teal"]:not([data-color-scheme="light"])     { --t-accent: #2dd4bf; --t-accent-fg: #04201d; }
+	:root[data-accent="green"]:not([data-color-scheme="light"])    { --t-accent: #4ade80; --t-accent-fg: #052e14; }
+	:root[data-accent="purple"]:not([data-color-scheme="light"])   { --t-accent: #b197fc; --t-accent-fg: #1a1033; }
+	:root[data-accent="pink"]:not([data-color-scheme="light"])     { --t-accent: #f472b6; --t-accent-fg: #2a0618; }
+	:root[data-accent="orange"]:not([data-color-scheme="light"])   { --t-accent: #fb923c; --t-accent-fg: #2a1300; }
+	:root[data-accent="graphite"]:not([data-color-scheme="light"]) { --t-accent: #c2c9d4; --t-accent-fg: #111111; }
+}
+
+/* ── Derived tokens and Tachyon's own variables ─────────────────────────── */
+/* Declared after the palettes on the same elements, so every derived
+   value follows whichever accent and scheme are in effect. */
+:root, :root[data-color-scheme], :root[data-accent] {
+	--t-accent-hover: color-mix(in srgb, var(--t-accent) 86%, var(--t-text));
+	--t-accent-soft:  color-mix(in srgb, var(--t-accent) 12%, transparent);
+	--t-accent-softer: color-mix(in srgb, var(--t-accent) 7%, transparent);
+	--t-accent-ring:  color-mix(in srgb, var(--t-accent) 30%, transparent);
 
 	/* MAIN */
-	--main-color: #1d1d1f;
-	--main-bg-color: #f5f5f7;
+	--main-font-family: var(--t-font);
+	--fontSans: var(--t-font);
+	--main-font-size: 14px;
+	--main-color: var(--t-text);
+	--main-bg-color: var(--t-bg);
 	--main-bg-image: none;
 	--main-bg-size: auto;
 	--main-bg-repeat: repeat;
-	--link-color: #005dc2;
-	--border-color: #d2d2d7;
-	--hr-color: #d2d2d7;
-	--panel-bg-clr: #ffffff;
+	--link-color: var(--t-accent);
+	--border-color: var(--t-line);
+	--border-radius: var(--t-r);
+	--hr-color: var(--t-line);
+	--panel-bg-clr: var(--t-surface);
+	--smMainShadow: none;
 
 	/* LOADING */
-	--loading-color: #1d1d1f;
+	--loading-color: var(--t-text);
 	--loading-text-shadow: none;
-	--spinner-color: #005dc2;
+	--spinner-color: var(--t-accent);
 
 	/* LOGIN */
-	--login-color: #1d1d1f;
-	--login-bg-color: rgba(255,255,255,0.9);
-	--login-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-	--login-border: 1px solid #d2d2d7;
-	--login-border-radius: 14px;
+	--login-color: var(--t-text);
+	--login-bg-color: var(--t-surface);
+	--login-box-shadow: var(--t-shadow-pop);
+	--login-border: 1px solid var(--t-line);
+	--login-border-radius: var(--t-r-lg);
 
 	/* MENU */
-	--dropdown-menu-color: #1d1d1f;
-	--dropdown-menu-bg-color: rgba(255,255,255,0.96);
-	--dropdown-menu-hover-bg-color: rgba(0, 93, 194, 0.08);
-	--dropdown-menu-hover-color: #005dc2;
-	--dropdown-menu-disable-color: #86868b;
-	--dropdown-menu-border-clr: rgba(0,0,0,0.10);
+	--dropdown-menu-color: var(--t-text);
+	--dropdown-menu-bg-color: var(--t-surface);
+	--dropdown-menu-hover-bg-color: var(--t-hover);
+	--dropdown-menu-hover-color: var(--t-text);
+	--dropdown-menu-disable-color: var(--t-faint);
+	--dropdown-menu-disabled-color: var(--t-faint);
+	--dropdown-menu-border-clr: var(--t-line);
 
 	/* FOLDERS */
-	--folders-color: #1d1d1f;
-	--folders-disabled-color: #86868b;
-	--folders-selected-color: #005dc2;
-	--folders-selected-bg-color: rgba(0,93,194,0.08);
-	--folders-focused-color: #005dc2;
-	--folders-focused-bg-color: rgba(0,93,194,0.12);
-	--folders-hover-color: #1d1d1f;
-	--folders-hover-bg-color: rgba(0,0,0,0.04);
-	--folders-drop-color: #005dc2;
-	--folders-drop-bg-color: rgba(0,93,194,0.10);
-	--unread-count-color: #fff;
-	--unread-count-bg-color: #005dc2;
+	--folders-color: var(--t-text-2);
+	--folders-disabled-color: var(--t-faint);
+	--folders-selected-color: var(--t-accent);
+	--folders-selected-bg-color: var(--t-accent-soft);
+	--folders-focused-color: var(--t-text);
+	--folders-focused-bg-color: var(--t-hover);
+	--folders-hover-color: var(--t-text);
+	--folders-hover-bg-color: var(--t-hover);
+	--folders-drop-color: var(--t-accent);
+	--folders-drop-bg-color: var(--t-accent-soft);
+	--unread-count-color: var(--t-accent-fg);
+	--unread-count-bg-color: var(--t-accent);
 
 	/* SETTINGS */
-	--settings-menu-color: #1d1d1f;
-	--settings-menu-selected-color: #005dc2;
-	--settings-menu-selected-bg-color: rgba(0,93,194,0.08);
-	--settings-menu-hover-color: #1d1d1f;
-	--settings-menu-hover-bg-color: rgba(0,0,0,0.04);
+	--settings-menu-color: var(--t-text-2);
+	--settings-menu-selected-color: var(--t-accent);
+	--settings-menu-selected-bg-color: var(--t-accent-soft);
+	--settings-menu-hover-color: var(--t-text);
+	--settings-menu-hover-bg-color: var(--t-hover);
 
 	/* MESSAGES */
-	--message-list-toolbar-bg-color: #f5f5f7;
-	--message-header-bg-clr: #f5f5f7;
+	--message-list-toolbar-bg-color: var(--t-surface);
+	--message-header-bg-clr: var(--t-surface);
 
 	/* DIALOGS */
-	--dialog-clr: #1d1d1f;
-	--dialog-bg-clr: #ffffff;
-	--dialog-border-clr: #d2d2d7;
-	--dialog-border-radius: 14px;
+	--dialog-clr: var(--t-text);
+	--dialog-bg-clr: var(--t-surface);
+	--dialog-border-clr: var(--t-line);
+	--dialog-border-radius: var(--t-r-lg);
 
-	/* FORMS */
-	--btn-clr: #ffffff;
-	--btn-bg-clr: #005dc2;
-	--btn-border-clr: #005dc2;
-	--btn-border-radius: 20px;
-	--btn-success-bg-clr: #1a8f3c;
-	--btn-danger-bg-clr: #c0202a;
+	/* FORMS: a plain .btn is the quiet secondary button; the primary ones
+	   are picked out below */
+	--btn-clr: var(--t-text);
+	--btn-bg-clr: var(--t-surface);
+	--btn-border-clr: var(--t-line-strong);
+	--btn-border-radius: var(--t-r-sm);
+	--btn-success-bg-clr: var(--t-accent);
+	--btn-danger-bg-clr: var(--t-danger);
 
-	--input-clr: #1d1d1f;
-	--input-bg-clr: #ffffff;
-	--input-border-clr: #c7c7cc;
-	--input-border-radius: 8px;
-	--input-focus-border-clr: #005dc2;
+	--input-clr: var(--t-text);
+	--input-bg-clr: var(--t-surface);
+	--input-border-clr: var(--t-line-strong);
+	--input-border-radius: var(--t-r-sm);
+	--input-focus-border-clr: var(--t-accent);
 
 	/* TABLES */
-	--tr-hover-bg-clr: rgba(0,0,0,0.03);
-	--tr-odd-bg-clr: rgba(0,0,0,0.015);
+	--tr-hover-bg-clr: var(--t-hover);
+	--tr-odd-bg-clr: transparent;
 
 	/* TABS */
-	--tab-active-bg-clr: #ffffff;
-	--tab-hover-border-clr: #d2d2d7;
+	--tab-active-bg-clr: var(--t-surface);
+	--tab-hover-border-clr: var(--t-line-strong);
 
 	/* ALERTS */
 	--warning-clr: #92400e;
@@ -262,94 +231,27 @@
 	--error-clr: #991b1b;
 	--error-bg-clr: #fee2e2;
 	--error-border-clr: #fecaca;
-	--info-clr: #005dc2;
-	--info-bg-clr: #eff6ff;
-	--info-border-clr: #bfdbfe;
+	--info-clr: var(--t-accent);
+	--info-bg-clr: var(--t-accent-softer);
+	--info-border-clr: var(--t-accent-ring);
 }
 
+:root[data-color-scheme="dark"] {
+	--warning-clr: #fbbf24;
+	--warning-bg-clr: #2d1f00;
+	--warning-border-clr: #78480f;
+	--error-clr: #f87171;
+	--error-bg-clr: #2d0000;
+	--error-border-clr: #7f1d1d;
+}
 @media (prefers-color-scheme: dark) {
-	:root {
-		color-scheme: dark;
-
-		--main-color: #f5f5f7;
-		--main-bg-color: #1c1c1e;
-		--link-color: #4da3ff;
-		--border-color: #38383a;
-		--hr-color: #38383a;
-		--panel-bg-clr: #2c2c2e;
-
-		--loading-color: #f5f5f7;
-		--spinner-color: #4da3ff;
-
-		--login-color: #f5f5f7;
-		--login-bg-color: rgba(44,44,46,0.95);
-		--login-box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-		--login-border: 1px solid #48484a;
-		--login-border-radius: 14px;
-
-		--dropdown-menu-color: #f5f5f7;
-		--dropdown-menu-bg-color: rgba(44,44,46,0.97);
-		--dropdown-menu-hover-bg-color: rgba(77,163,255,0.12);
-		--dropdown-menu-hover-color: #4da3ff;
-		--dropdown-menu-disable-color: #636366;
-		--dropdown-menu-border-clr: rgba(255,255,255,0.10);
-
-		--folders-color: #f5f5f7;
-		--folders-disabled-color: #636366;
-		--folders-selected-color: #4da3ff;
-		--folders-selected-bg-color: rgba(77,163,255,0.12);
-		--folders-focused-color: #4da3ff;
-		--folders-focused-bg-color: rgba(77,163,255,0.16);
-		--folders-hover-color: #f5f5f7;
-		--folders-hover-bg-color: rgba(255,255,255,0.06);
-		--folders-drop-color: #4da3ff;
-		--folders-drop-bg-color: rgba(77,163,255,0.15);
-		--unread-count-bg-color: #4da3ff;
-		--unread-count-color: #000;
-
-		--settings-menu-color: #f5f5f7;
-		--settings-menu-selected-color: #4da3ff;
-		--settings-menu-selected-bg-color: rgba(77,163,255,0.12);
-		--settings-menu-hover-color: #f5f5f7;
-		--settings-menu-hover-bg-color: rgba(255,255,255,0.06);
-
-		--message-list-toolbar-bg-color: #2c2c2e;
-		--message-header-bg-clr: #1c1c1e;
-
-		--dialog-clr: #f5f5f7;
-		--dialog-bg-clr: #2c2c2e;
-		--dialog-border-clr: #48484a;
-		--dialog-border-radius: 14px;
-
-		/* Dark mode buttons: black text on the lighter blue for WCAG contrast */
-		--btn-clr: #000000;
-		--btn-bg-clr: #4da3ff;
-		--btn-border-clr: #4da3ff;
-		--btn-border-radius: 20px;
-		--btn-success-bg-clr: #32d74b;
-		--btn-danger-bg-clr: #ff453a;
-
-		--input-clr: #f5f5f7;
-		--input-bg-clr: #3a3a3c;
-		--input-border-clr: #48484a;
-		--input-border-radius: 8px;
-		--input-focus-border-clr: #4da3ff;
-
-		--tr-hover-bg-clr: rgba(255,255,255,0.05);
-		--tr-odd-bg-clr: rgba(255,255,255,0.025);
-
-		--tab-active-bg-clr: #2c2c2e;
-		--tab-hover-border-clr: #48484a;
-
+	:root:not([data-color-scheme="light"]) {
 		--warning-clr: #fbbf24;
 		--warning-bg-clr: #2d1f00;
 		--warning-border-clr: #78480f;
 		--error-clr: #f87171;
 		--error-bg-clr: #2d0000;
 		--error-border-clr: #7f1d1d;
-		--info-clr: #4da3ff;
-		--info-bg-clr: rgba(77,163,255,0.10);
-		--info-border-clr: rgba(77,163,255,0.25);
 	}
 }
 
@@ -357,32 +259,139 @@
 body, button, input, select, textarea {
 	font-family: var(--main-font-family);
 }
+html, body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 .btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	gap: 6px;
 	min-height: 34px;
-	padding: 7px 18px;
-	font-weight: 600;
+	padding: 0 14px;
+	font-weight: 500;
 	font-size: 13px;
-	letter-spacing: 0.1px;
-	text-transform: none;
-	box-shadow: none;
-	text-shadow: none;
 	line-height: 1.2;
+	text-transform: none;
 	text-decoration: none;
+	text-shadow: none;
+	box-shadow: none;
+	opacity: 1;
+	transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+.btn:hover, .btn:focus {
+	background-color: var(--t-surface-2);
+	color: var(--t-text);
+	text-decoration: none;
+	opacity: 1;
+}
+.btn:active, .btn.active { background-color: var(--t-press); box-shadow: none; }
+.btn.disabled, .btn[disabled] { opacity: .45; box-shadow: none; }
+.btn-block { display: flex; }
+.btn.btn-thin { padding: 0 9px; }
+
+.btn, .btn:focus, .dropdown-toggle:focus { outline: none; }
+.btn:focus-visible { box-shadow: 0 0 0 3px var(--t-accent-ring) !important; }
+
+/* Primary actions: compose, send, save, and anything the app marks as
+   the confirming button */
+.btn.btn-success,
+.btn.btn-primary,
+.buttonCompose,
+.buttonLogin {
+	background-color: var(--t-accent);
+	border-color: var(--t-accent);
+	color: var(--t-accent-fg);
+	font-weight: 600;
+}
+.btn.btn-success:hover, .btn.btn-success:focus,
+.btn.btn-primary:hover, .btn.btn-primary:focus,
+.buttonCompose:hover, .buttonCompose:focus,
+.buttonLogin:hover, .buttonLogin:focus {
+	background-color: var(--t-accent-hover);
+	border-color: var(--t-accent-hover);
+	color: var(--t-accent-fg);
+}
+.btn.btn-danger {
+	background-color: var(--t-danger);
+	border-color: var(--t-danger);
+	color: #fff;
+}
+.btn.btn-danger:hover, .btn.btn-danger:focus {
+	background-color: color-mix(in srgb, var(--t-danger) 86%, #000);
+	color: #fff;
+}
+.btn.btn-warning {
+	background-color: var(--t-warn);
+	border-color: var(--t-warn);
+	color: #fff;
 }
 
-/* block buttons need flex too so text stays centred */
-.btn-block { display: flex; }
+/* Button groups: Bootstrap rounds only a group's first and last child, so a
+   group ending in a hidden button (undelete, not spam) or a menu kept one
+   square end. Every button is rounded on its own instead, with a small gap. */
+.btn-group {
+	display: inline-flex;
+	gap: 4px;
+	vertical-align: middle;
+}
+.btn-group > *,
+.btn-group > * + * {
+	margin-left: 0;
+}
+.btn-group > .btn,
+.btn-group > .btn:first-child,
+.btn-group > .btn:last-child,
+.btn-group > .dropdown-toggle {
+	border-radius: var(--btn-border-radius);
+}
+dialog > footer .btn-group .btn + .btn { margin-left: 0; }
 
-/* thin icon buttons: keep horizontal padding narrow but same height */
-.btn.btn-thin { padding: 7px 10px; }
+/* Toolbars: icon actions are quiet until hovered; only the primary ones fill */
+.btn-toolbar .btn:not(.btn-success):not(.btn-primary):not(.btn-danger):not(.btn-warning):not(.buttonCompose),
+.squire-toolbar .btn,
+.squire-toolbar button {
+	background-color: transparent;
+	border-color: transparent;
+	color: var(--t-text-2);
+}
+.btn-toolbar .btn:not(.btn-success):not(.btn-primary):not(.btn-danger):not(.btn-warning):not(.buttonCompose):hover,
+.btn-toolbar .btn:not(.btn-success):not(.btn-primary):not(.btn-danger):not(.btn-warning):not(.buttonCompose):focus-visible,
+.squire-toolbar .btn:hover,
+.squire-toolbar button:hover {
+	background-color: var(--t-hover);
+	color: var(--t-text);
+}
+.btn-toolbar .btn:not(.btn-success):not(.btn-primary):not(.btn-danger):not(.btn-warning):not(.buttonCompose):active,
+.btn-toolbar .btn-group.open > .btn.dropdown-toggle,
+.btn-toolbar .dropdown.show > .btn.dropdown-toggle {
+	background-color: var(--t-press);
+	color: var(--t-text);
+}
+.btn-toolbar .btn { min-width: 34px; }
+.dropdown.show { box-shadow: none; }
 
-.btn:hover, .btn:focus { text-decoration: none; filter: brightness(0.9); }
-.btn:active  { filter: brightness(0.78); }
+/* Refresh: the idle loading ring read as "busy"; a refresh glyph instead */
+#V-MailMessageList .btn-toolbar .icon-spinner.not-animated {
+	width: 1em;
+	height: 1em;
+	border: 0 !important;
+	border-radius: 0;
+	margin: 0;
+	vertical-align: middle;
+}
+#V-MailMessageList .btn-toolbar .icon-spinner.not-animated::before {
+	content: "";
+	display: block;
+	width: 1em;
+	height: 1em;
+	background-color: currentColor;
+	-webkit-mask: var(--icon-refresh-cw) no-repeat center / contain;
+	mask: var(--icon-refresh-cw) no-repeat center / contain;
+}
 
 /* ── Inputs ─────────────────────────────────────────────────────────────── */
 input[type="text"],
@@ -395,173 +404,368 @@ input[type="number"],
 textarea,
 select {
 	border-radius: var(--input-border-radius);
-	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 input:focus, textarea:focus, select:focus {
 	outline: none;
 	border-color: var(--input-focus-border-clr);
-	box-shadow: 0 0 0 3px rgba(0, 93, 194, 0.18);
+	box-shadow: 0 0 0 3px var(--t-accent-ring);
 }
 
-@media (prefers-color-scheme: dark) {
-	input:focus, textarea:focus, select:focus {
-		box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.22);
-	}
+input[type="checkbox"],
+input[type="radio"] {
+	accent-color: var(--t-accent);
 }
 
-/* ── Dropdown menu ──────────────────────────────────────────────────────── */
-/*
- * Do NOT set overflow:hidden here — the base already has overflow:auto
- * which enables scrolling. overflow:hidden would clip items and break
- * the scrollability of tall menus.
- */
+/* Settings checkboxes draw a check mark; it was a fixed green. The colour
+   comes from an animation with fill-mode forwards, which only !important
+   outranks. */
+.e-checkbox.material-design input:checked + div {
+	border-color: var(--t-accent) !important;
+}
+
+/* Search: the advanced search toggle was a filled square beside a rounded
+   field; now a quiet button of the same height and radius */
+#V-MailMessageList .second-toolbar {
+	align-items: center;
+	gap: 6px;
+}
+#V-MailMessageList .inputSearch {
+	height: 34px;
+	background: var(--t-surface-2);
+	border-color: transparent;
+}
+#V-MailMessageList .inputSearch:focus {
+	background: var(--t-surface);
+	border-color: var(--t-accent);
+}
+.messageList .btn.buttonMoreSearch {
+	min-height: 34px;
+	padding: 0 10px;
+	background: transparent;
+	border-color: transparent;
+	color: var(--t-muted);
+	font-size: 11px;
+}
+.messageList .btn.buttonMoreSearch:hover { background: var(--t-hover); color: var(--t-text); }
+
+/* ── Login ──────────────────────────────────────────────────────────────── */
+/* The login form draws its fields and button as white outlines for a dark
+   wallpaper, which vanish on this theme's light box */
+.LoginView form input {
+	background: var(--t-surface-2);
+	border: 1px solid transparent;
+	color: var(--t-text);
+}
+.LoginView form input:hover {
+	border-color: var(--t-line-strong);
+}
+.LoginView form input:focus {
+	background: var(--t-surface);
+	border-color: var(--t-accent);
+}
+.LoginView form .btn.buttonLogin {
+	background-color: var(--t-accent);
+	border: 1px solid var(--t-accent);
+	color: var(--t-accent-fg);
+	height: 40px;
+	font-size: 14px;
+	text-transform: none;
+}
+.LoginView form .btn.buttonLogin:hover,
+.LoginView form .btn.buttonLogin:focus {
+	background-color: var(--t-accent-hover);
+	border-color: var(--t-accent-hover);
+}
+
+/* ── Dropdown menus ─────────────────────────────────────────────────────── */
+/* Don't set overflow:hidden: the base's overflow:auto is what lets a tall
+   menu scroll. */
 .dropdown-menu {
-	border-radius: 10px;
-	box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
 	border: none;
-	padding: 4px;
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-}
-
-@media (prefers-color-scheme: dark) {
-	.dropdown-menu {
-		box-shadow: 0 4px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08);
-	}
+	border-radius: var(--t-r);
+	box-shadow: var(--t-shadow-pop);
+	padding: 5px;
 }
 
 .dropdown-menu a {
 	border-radius: 6px;
-	padding: 6px 12px;
+	padding: 7px 12px;
 	font-size: 13px;
-	font-weight: 500;
-	transition: background-color 0.10s ease, color 0.10s ease;
+	transition: background-color .1s ease, color .1s ease;
 }
 
 .dropdown-menu .dividerbar {
-	margin: 4px;
+	margin-top: 5px;
+	padding-top: 5px;
+	border-top-color: var(--t-line);
 }
 
-/* ── Color scheme toggle ────────────────────────────────────────────────── */
-.color-scheme-toggle {
-	padding: 6px 4px;
-	margin: 4px;
-	display: flex;
-	justify-content: center;
+/* ── Account button and menu ────────────────────────────────────────────── */
+#top-system-dropdown-id {
+	background: var(--t-surface);
+	border: 1px solid var(--t-line-strong);
+	color: var(--t-text);
+	border-radius: 999px;
+	padding: 0 12px;
+	font-weight: 500;
+}
+#top-system-dropdown-id:hover,
+#V-SystemDropDown .dropdown.show #top-system-dropdown-id {
+	background: var(--t-surface-2);
+	color: var(--t-text);
+}
+#top-system-dropdown-id b {
+	font-weight: 600;
 }
 
-.color-scheme-buttons {
+/* Light / system / dark: a full-width segmented control */
+#V-SystemDropDown .color-scheme-toggle {
+	display: block;
+	margin: 2px 2px 6px;
+	padding: 0;
+}
+#V-SystemDropDown .color-scheme-buttons {
 	display: flex;
 	gap: 2px;
-	background-color: rgba(0, 0, 0, 0.05);
+	padding: 3px;
+	background: var(--t-surface-2);
+	border-radius: var(--t-r-sm);
+}
+#V-SystemDropDown .color-scheme-btn {
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	min-width: 56px;
+	padding: 0;
+	border: 0;
 	border-radius: 6px;
-	padding: 4px;
-}
-
-@media (prefers-color-scheme: dark) {
-	.color-scheme-buttons {
-		background-color: rgba(255, 255, 255, 0.06);
-	}
-}
-
-.color-scheme-btn {
-	background: none;
-	border: none;
-	padding: 4px 8px;
-	border-radius: 4px;
+	background: transparent;
+	color: var(--t-muted);
+	font-size: 15px;
 	cursor: pointer;
-	font-size: 16px;
-	transition: background-color 0.10s ease, color 0.10s ease;
-	color: var(--dropdown-menu-color);
+	transition: background-color .12s ease, color .12s ease;
+}
+#V-SystemDropDown .color-scheme-btn:hover {
+	background: transparent;
+	color: var(--t-text);
+}
+#V-SystemDropDown .color-scheme-btn.active,
+#V-SystemDropDown .color-scheme-btn.active:hover {
+	background: var(--t-surface);
+	color: var(--t-accent);
+	box-shadow: var(--t-shadow-sm), 0 0 0 1px var(--t-line);
+}
+#V-SystemDropDown .color-scheme-btn:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--t-accent-ring);
 }
 
-.color-scheme-btn:hover {
-	background-color: var(--dropdown-menu-hover-bg-color);
-	color: var(--dropdown-menu-hover-color);
+/* Logout turns red on hover, so it is not mistaken for another account */
+#V-SystemDropDown .dropdown-menu a[data-icon="log-out"]:hover {
+	color: var(--t-danger);
+	background: color-mix(in srgb, var(--t-danger) 10%, transparent);
 }
 
-.color-scheme-btn.active {
-	background-color: var(--link-color);
-	color: #ffffff;
+/* ── Folder list ────────────────────────────────────────────────────────── */
+#V-MailFolderList .b-folders li a {
+	border-radius: var(--t-r-sm);
 }
-
-@media (prefers-color-scheme: dark) {
-	.color-scheme-btn.active {
-		background-color: #4da3ff;
-		color: #000000;
-	}
+#V-MailFolderList li a.selected {
+	font-weight: 600;
+}
+#V-MailFolderList .b-folders-system a[data-unread]::after,
+#V-MailFolderList .b-folders-user a[data-unread]:not(.system)::after {
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	min-width: 20px;
+	text-align: center;
 }
 
 /* ── Message list ───────────────────────────────────────────────────────── */
-/* Unseen messages: warm amber tint (subtle in both modes, not harsh) */
+/* Unread: a bar in the accent and bold text, instead of the yellow wash and
+   orange bar of the base theme */
+.messageListItem {
+	border-left-width: 3px;
+	border-bottom-color: var(--t-line);
+}
+.messageListItem.unseen,
+.messageListItem.unseen.focused {
+	background-color: transparent;
+	border-left-color: var(--t-unread);
+	border-right-color: var(--t-unread) !important;
+}
 .messageListItem [data-unseen] {
-	background-color: rgba(255, 175, 0, 0.07);
-	border-color: rgba(200, 130, 0, 0.25);
+	background-color: var(--t-accent-softer);
+	border-color: var(--t-accent-ring);
+}
+.messageListItem.focused {
+	background-color: var(--t-hover);
+	border-left-color: var(--t-line-strong);
+}
+.messageListItem.checked {
+	background-color: var(--t-accent-softer);
+	border-left-color: var(--t-accent-ring);
+}
+.messageListItem.selected,
+.messageListItem.selected.focused,
+.messageListItem.selected.unseen {
+	background-color: var(--t-accent-soft);
+	border-bottom-color: var(--t-line);
+	border-left-color: var(--t-accent);
+	border-right-color: var(--t-accent) !important;
+}
+.messageListItem time,
+.messageListItem .sizeParent {
+	color: var(--t-muted);
+	opacity: 1;
 }
 
-@media (prefers-color-scheme: dark) {
-	.messageListItem [data-unseen] {
-		background-color: rgba(255, 200, 50, 0.06);
-		border-color: rgba(180, 140, 0, 0.20);
-	}
+/* Page numbers were 22 to 25px, as tall as the rows above them */
+.messageList .e-paginator a {
+	display: inline-block;
+	min-width: 26px;
+	padding: 3px 6px;
+	border-radius: 6px;
+	font-size: 13px;
+	text-align: center;
+	color: var(--t-muted);
+	opacity: 1;
+}
+.messageList .e-paginator a:hover {
+	background: var(--t-hover);
+	color: var(--t-text);
+}
+.messageList .e-paginator a.current {
+	font-size: 13px;
+	font-weight: 600;
+	background: var(--t-accent-soft);
+	color: var(--t-accent);
 }
 
-/* Selected message */
-.messageListItem.selected {
-	background-color: rgba(0, 93, 194, 0.09);
-	border-left-color: #005dc2;
-	border-right-color: #005dc2 !important;
+/* ── Message view ───────────────────────────────────────────────────────── */
+#V-MailMessageView .messageItemHeader {
+	border-bottom-color: var(--t-line);
 }
 
-@media (prefers-color-scheme: dark) {
-	.messageListItem.selected {
-		background-color: rgba(77, 163, 255, 0.11);
-		border-left-color: #4da3ff;
-		border-right-color: #4da3ff !important;
-	}
+/* ── Compose ────────────────────────────────────────────────────────────── */
+/* The header bar was a fixed near-black in every theme and mode */
+#V-PopupsCompose header {
+	background-color: var(--t-surface-2);
+	border-bottom: 1px solid var(--t-line);
+	color: var(--t-text);
+}
+#V-PopupsCompose header .close,
+#V-PopupsCompose header .minimize-custom {
+	border-color: var(--t-text-2);
+	color: var(--t-text-2);
+}
+#V-PopupsCompose .b-header {
+	background-color: var(--t-surface);
+	border-bottom: 1px solid var(--t-line);
+}
+
+/* Editor toolbar: quiet buttons, no filled pills */
+.squire-toolbar {
+	gap: 2px;
+	padding: 4px 6px;
+	background: var(--t-surface);
+	border-bottom: 1px solid var(--t-line);
+}
+.squire-toolbar .btn-group {
+	gap: 1px;
+	margin-right: 6px;
+}
+.squire-toolbar .btn,
+.squire-toolbar button {
+	min-height: 30px;
+	min-width: 30px;
+	padding: 0 7px;
+}
+.squire-toolbar select {
+	background-color: transparent;
+	border-color: transparent;
+	color: var(--t-text-2);
+	border-radius: var(--t-r-sm);
+}
+.squire-toolbar select:hover {
+	background-color: var(--t-hover);
+}
+.squire-toolbar .active,
+.squire-toolbar button.active {
+	background-color: var(--t-accent-soft);
+	color: var(--t-accent);
+}
+
+/* ── Settings ───────────────────────────────────────────────────────────── */
+/* Menu entries ran edge to edge; rows like the folder list instead */
+#V-SettingsMenu nav {
+	padding: 0 8px;
+}
+#V-SettingsMenu nav a {
+	border-radius: var(--t-r-sm);
+	font-size: 14px;
+	line-height: 34px;
+	max-height: 34px;
+	margin-bottom: 2px;
+	padding: 0 12px;
+}
+#V-SettingsMenu nav a.selected {
+	font-weight: 600;
+}
+
+/* Theme picker: an accent ring and tint instead of a green wash */
+#V-Settings-Themes figure {
+	border-radius: var(--t-r);
+	transition: border-color .12s ease, background-color .12s ease;
+}
+#V-Settings-Themes figure:hover {
+	border-color: var(--t-line-strong);
+}
+#V-Settings-Themes figure.selected {
+	background-color: var(--t-accent-softer);
+	border-color: var(--t-accent);
+}
+#V-Settings-Themes figure img {
+	border-radius: 6px;
+}
+#V-Settings-Themes .theme-accents button:hover {
+	border-color: var(--t-line-strong);
+}
+#V-Settings-Themes .theme-accents button.selected {
+	border-color: var(--t-accent);
 }
 
 /* ── Panels & dialogs ───────────────────────────────────────────────────── */
 .panel, .dialog {
 	border-radius: var(--dialog-border-radius);
-	box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+	box-shadow: var(--t-shadow);
 }
-
-@media (prefers-color-scheme: dark) {
-	.panel, .dialog {
-		box-shadow: 0 2px 16px rgba(0,0,0,0.35);
-	}
+dialog {
+	box-shadow: var(--t-shadow-pop);
 }
 
 /* ── Scrollbars (WebKit) ────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-	background: rgba(0,0,0,0.18);
-	border-radius: 4px;
+	background: color-mix(in srgb, var(--t-text) 20%, transparent);
+	border-radius: 5px;
 	border: 2px solid transparent;
 	background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-	background: rgba(0,0,0,0.30);
+	background: color-mix(in srgb, var(--t-text) 34%, transparent);
 	background-clip: padding-box;
-}
-
-@media (prefers-color-scheme: dark) {
-	::-webkit-scrollbar-thumb {
-		background: rgba(255,255,255,0.18);
-		background-clip: padding-box;
-	}
-	::-webkit-scrollbar-thumb:hover {
-		background: rgba(255,255,255,0.30);
-		background-clip: padding-box;
-	}
 }
 
 /* ── Alerts ─────────────────────────────────────────────────────────────── */
 .alert {
-	border-radius: 8px;
+	border-radius: var(--t-r-sm);
 	border: 1px solid;
 	padding: 10px 14px;
 	font-size: 13px;
@@ -571,12 +775,7 @@ input:focus, textarea:focus, select:focus {
 .alert-danger, .alert-error { background-color: var(--error-bg-clr); color: var(--error-clr); border-color: var(--error-border-clr); }
 .alert-info { background-color: var(--info-bg-clr); color: var(--info-clr); border-color: var(--info-border-clr); }
 
-/* ── Links / Checkboxes ─────────────────────────────────────────────────── */
+/* ── Links ──────────────────────────────────────────────────────────────── */
 a { color: var(--link-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
 a.btn:hover, a.btn:focus { text-decoration: none; }
-
-input[type="checkbox"],
-input[type="radio"] {
-	accent-color: var(--link-color);
-}

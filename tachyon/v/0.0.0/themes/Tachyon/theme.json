@@ -1,0 +1,33 @@
+{
+	"default": "blue",
+	"accents": {
+		"blue": {
+			"name": "Blue",
+			"swatch": "#005dc2"
+		},
+		"teal": {
+			"name": "Teal",
+			"swatch": "#0f766e"
+		},
+		"green": {
+			"name": "Green",
+			"swatch": "#1a7f37"
+		},
+		"purple": {
+			"name": "Purple",
+			"swatch": "#7c3aed"
+		},
+		"pink": {
+			"name": "Pink",
+			"swatch": "#c0266d"
+		},
+		"orange": {
+			"name": "Orange",
+			"swatch": "#b45309"
+		},
+		"graphite": {
+			"name": "Graphite",
+			"swatch": "#3f4a5a"
+		}
+	}
+}
