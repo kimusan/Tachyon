@@ -442,7 +442,11 @@ class SearchCriterias
 			}
 			switch ($sName) {
 				case 'DATE':
-					$mValue = \rtrim($mValue,'/') . '/';
+					// A lone date means from that day on. Adding the slash to a
+					// from/to range as well gave it three parts, and it was dropped.
+					if (false === \strpos($mValue, '/')) {
+						$mValue .= '/';
+					}
 				case 'BODY':
 				case 'EMAIL':
 				case 'FROM':

@@ -51,15 +51,28 @@
 	<div>
 		<div class="control-group">
 			<label data-i18n="SEARCH/DATE"></label>
-			<div data-bind="component: {
-				name: 'Select',
-				params: {
-					options: selectedDates,
-					value: selectedDateValue,
-					optionsText: 'name',
-					optionsValue: 'id'
-				}
-			}"></div>
+			<div>
+				<div data-bind="component: {
+					name: 'Select',
+					params: {
+						options: selectedDates,
+						value: selectedDateValue,
+						optionsText: 'name',
+						optionsValue: 'id'
+					}
+				}"></div>
+				<div class="date-range" data-bind="visible: 'range' === selectedDateValue()">
+					<input type="date" data-bind="datePicker: dateFrom" data-i18n="[placeholder]SEARCH/DATE_FROM">
+					<input type="date" data-bind="datePicker: dateTo" data-i18n="[placeholder]SEARCH/DATE_TO">
+				</div>
+				<div data-bind="visible: 0 !== selectedDateValue(), component: {
+					name: 'Checkbox',
+					params: {
+						label: 'SEARCH/SENT_DATE',
+						value: sentDate
+					}
+				}"></div>
+			</div>
 		</div>
 		<div class="control-group">
 			<label data-i18n="SEARCH/REPLIED"></label>

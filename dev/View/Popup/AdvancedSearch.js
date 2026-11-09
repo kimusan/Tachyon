@@ -8,6 +8,13 @@ import { MessagelistUserStore } from 'Stores/User/Messagelist';
 import { AbstractViewPopup } from 'Knoin/AbstractViews';
 import { FolderUserStore, isAllowedKeyword } from 'Stores/User/Folder';
 
+const isoDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : '',
+	// IMAP BEFORE excludes its own date, the "To" field includes it
+	shiftDay = (value, days) => {
+		const [y, m, d] = value.split('-');
+		return new Date(Date.UTC(y, m - 1, +d + days)).toISOString().split('T')[0];
+	};
+
 export class AdvancedSearchPopupView extends AbstractViewPopup {
 	constructor() {
 		super('AdvancedSearch');
@@ -20,6 +27,12 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 			keyword: '',
 			repliedValue: -1,
 			selectedDateValue: 0,
+			dateFrom: '',
+			dateTo: '',
+			// SENTSINCE and friends match the Date header. INTERNALDATE, which the
+			// plain keys match, is when the server took the message, and for an
+			// imported mailbox that is the day of the import.
+			sentDate: false,
 			selectedTreeValue: '',
 
 			hasAttachment: false,
@@ -67,6 +80,7 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 				let prefix_before = 'SEARCH/BEFORE_';
 				return [
 					{ id: 0, name: i18n('SEARCH/DATE_ALL') },
+					{ id: 'range', name: i18n('SEARCH/DATE_RANGE') },
 					{ id: 3, name: i18n(prefix + '3_DAYS') },
 					{ id: 7, name: i18n(prefix + '7_DAYS') },
 					{ id: 30, name: i18n(prefix + 'MONTH') },
@@ -115,15 +129,24 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		append('text', self.text().trim());
 		append('keyword', self.keyword());
 		append('in', self.selectedTreeValue());
-		if (0 < self.selectedDateValue()) {
+		const dateKey = self.sentDate() ? 'sent' : '';
+		if ('range' === self.selectedDateValue()) {
+			let from = self.dateFrom(), to = self.dateTo();
+			if (from && to && from > to) {
+				[from, to] = [to, from];
+			}
+			from && append(dateKey + 'since', from);
+			to && append(dateKey + 'before', shiftDay(to, 1));
+		}
+		else if (0 < self.selectedDateValue()) {
 			let d = new Date();
 			d.setDate(d.getDate() - self.selectedDateValue());
-			append('since', d.toISOString().split('T')[0]);
+			append(dateKey + 'since', d.toISOString().split('T')[0]);
 		}
 		else if (-1 > self.selectedDateValue()) {
 			let d = new Date();
 			d.setDate(d.getDate() + self.selectedDateValue());
-			append('before', d.toISOString().split('T')[0]);
+			append(dateKey + 'before', d.toISOString().split('T')[0]);
 		}
 
 		let result = decodeURIComponent(new URLSearchParams(data).toString());
@@ -161,7 +184,15 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		self.text(pString(params.get('text')));
 		self.keyword(pString(params.get('keyword')));
 		self.selectedTreeValue(pString(params.get('in')));
-		self.selectedDateValue(0);
+		// Any date comes back as a range: a preset was relative to the day it ran,
+		// so "up to 1 week old" cannot be told apart from the dates it produced
+		const dateKey = ['sentsince', 'sentbefore', 'senton'].some(key => params.has(key)) ? 'sent' : '',
+			on = isoDate(pString(params.get(dateKey + 'on'))),
+			before = isoDate(pString(params.get(dateKey + 'before')));
+		self.dateFrom(on || isoDate(pString(params.get(dateKey + 'since'))));
+		self.dateTo(on || (before && shiftDay(before, -1)));
+		self.selectedDateValue(self.dateFrom() || self.dateTo() ? 'range' : 0);
+		self.sentDate(!!dateKey);
 		self.alsoCc(!params.has('to-only'));
 		self.hasAttachment(params.has('attachment'));
 		self.starred(params.has('flagged'));
