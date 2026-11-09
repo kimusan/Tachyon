@@ -153,7 +153,7 @@ trait User
 			// Checked against the theme saved with it, else the one in use
 			$this->setSettingsFromParams($oSettingsLocal, 'ThemeAccent', 'string', function ($sAccent) use ($self, $oSettingsLocal, $oConfig) {
 				return $self->ValidateThemeAccent(
-					$self->ValidateTheme((string) $oSettingsLocal->GetConf('Theme', $oConfig->Get('webmail', 'theme', 'Default'))),
+					$self->ValidateTheme((string) $oSettingsLocal->GetConf('Theme', $oConfig->Get('webmail', 'theme', 'Tachyon'))),
 					$sAccent
 				);
 			});

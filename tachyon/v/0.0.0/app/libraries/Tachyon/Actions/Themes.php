@@ -9,8 +9,8 @@ trait Themes
 	/**
 	 * Themes that were a light and a dark build of one design, now merged into a
 	 * single theme that carries both. Retiring a name would otherwise drop
-	 * everyone using it onto Default, because ValidateTheme falls back rather
-	 * than failing. The value is the theme that replaced it.
+	 * everyone using it onto the default theme, because ValidateTheme falls
+	 * back rather than failing. The value is the theme that replaced it.
 	 */
 	public const MERGED_THEMES = array(
 		'StripesDark' => 'Stripes',
@@ -21,6 +21,14 @@ trait Themes
 		'BlackWood'   => 'Wood',
 		'NightShine'  => 'Shine',
 		'DarkShine'   => 'Shine'
+	);
+
+	/**
+	 * Themes that kept their look under a new name. Default stopped being the
+	 * default when Tachyon took over, and was renamed after where it came from.
+	 */
+	public const RENAMED_THEMES = array(
+		'Default' => 'Snappymail'
 	);
 
 	/**
@@ -61,7 +69,7 @@ trait Themes
 	{
 		static $sTheme;
 		if (!$sTheme) {
-			$sTheme = $this->Config()->Get('webmail', 'theme', 'Default');
+			$sTheme = $this->Config()->Get('webmail', 'theme', 'Tachyon');
 			if (!$bAdmin
 			 && ($oAccount = $this->getAccountFromToken(false))
 			 && $this->GetCapa(Capa::THEMES)
@@ -84,7 +92,6 @@ trait Themes
 		}
 
 		$bClear = false;
-		$bDefault = false;
 		$aCache = array();
 		$sDir = APP_VERSION_ROOT_PATH . 'themes';
 		if (\is_dir($sDir)) {
@@ -93,9 +100,7 @@ trait Themes
 				while (($sFile = \readdir($rDirH)) !== false) {
 					if ('.' !== $sFile[0] && \is_dir($sDir . '/' . $sFile)
 					 && (\file_exists("{$sDir}/{$sFile}/styles.css") || \file_exists("{$sDir}/{$sFile}/styles.less"))) {
-						if ('Default' === $sFile) {
-							$bDefault = true;
-						} else if ('Clear' === $sFile) {
+						if ('Clear' === $sFile) {
 							$bClear = true;
 						} else {
 							$aCache[] = $sFile;
@@ -135,10 +140,6 @@ trait Themes
 
 		$aCache = \array_unique($aCache);
 		\sort($aCache);
-
-		if ($bDefault) {
-			\array_unshift($aCache, 'Default');
-		}
 
 		if ($bClear) {
 			\array_push($aCache, 'Clear');
@@ -230,6 +231,9 @@ trait Themes
 		if (isset(static::MERGED_THEME_ACCENTS[$sTheme]) && !\in_array($sTheme, $this->GetThemes())) {
 			[$sTheme, $this->sMergedThemeAccent] = static::MERGED_THEME_ACCENTS[$sTheme];
 		}
+		if (isset(static::RENAMED_THEMES[$sTheme]) && !\in_array($sTheme, $this->GetThemes())) {
+			$sTheme = static::RENAMED_THEMES[$sTheme];
+		}
 		if (isset(static::MERGED_THEMES[$sTheme]) && !\in_array($sTheme, $this->GetThemes())) {
 			// 'DarkShine' was the light half despite the name, so only the ones
 			// that really were dark ask the client to switch mode
@@ -237,9 +241,9 @@ trait Themes
 			$sTheme = static::MERGED_THEMES[$sTheme];
 		}
 		if (!\in_array($sTheme, $this->GetThemes())) {
-			$sTheme = $this->Config()->Get('webmail', 'theme', 'Default');
+			$sTheme = $this->Config()->Get('webmail', 'theme', 'Tachyon');
 			if (!\in_array($sTheme, $this->GetThemes())) {
-				$sTheme = 'Default';
+				$sTheme = 'Tachyon';
 			}
 		}
 		return $sTheme;

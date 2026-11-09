@@ -65,7 +65,7 @@ class ActionsAdmin extends Actions
 		});
 		// After Theme, so it is checked against the theme saved with it
 		$this->setConfigFromParams($oConfig, 'ThemeAccent', 'webmail', 'theme_accent', 'string', function ($sAccent) use ($self, $oConfig) {
-			return $self->ValidateThemeAccent($self->ValidateTheme((string) $oConfig->Get('webmail', 'theme', 'Default')), $sAccent);
+			return $self->ValidateThemeAccent($self->ValidateTheme((string) $oConfig->Get('webmail', 'theme', 'Tachyon')), $sAccent);
 		});
 
 		$this->setConfigFromParams($oConfig, 'proxyExternalImages', 'labs', 'use_local_proxy_for_external_images', 'bool');

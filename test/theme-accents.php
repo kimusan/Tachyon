@@ -61,15 +61,18 @@ try {
 	check(['blue', 'teal', 'green', 'purple', 'pink', 'orange', 'graphite'] === array_keys($aTachyon['accents']),
 		'Tachyon palettes: '.json_encode(array_keys($aTachyon['accents'] ?? [])));
 
-	check([] === $oActions->GetThemeAccents('Default'), 'a theme without theme.json has palettes');
+	check([] === $oActions->GetThemeAccents('Snappymail'), 'a theme without theme.json has palettes');
 	check([] === $oActions->GetThemeAccents('../themes/Modern'), 'a theme name that is not installed is read');
 	check([] === $oActions->GetThemeAccents('AccentTest'), 'a custom theme is read without its @custom suffix');
 
 	check('plum' === $oActions->ValidateThemeAccent('Modern', 'plum'), 'a declared palette is refused');
 	check('' === $oActions->ValidateThemeAccent('Modern', 'nope'), 'an undeclared palette is accepted');
-	check('' === $oActions->ValidateThemeAccent('Default', 'plum'), 'a palette is accepted for a theme without any');
+	check('' === $oActions->ValidateThemeAccent('Snappymail', 'plum'), 'a palette is accepted for a theme without any');
 	check('' === $oActions->ValidateThemeAccent('Tachyon', 'plum'), "another theme's palette is accepted");
 	check('' === $oActions->ValidateThemeAccent('AccentTest@custom', 'tag'), 'a dropped palette is accepted');
+
+	// Saved before the rename, by a user or in the admin's application.ini
+	check('Snappymail' === $oActions->ValidateTheme('Default'), 'Default does not become Snappymail');
 
 	// The upstream variants map to Modern with their palette once removed
 	check('Modern' === $oActions->ValidateTheme('ModernPlum@custom'), 'ModernPlum@custom does not become Modern');
