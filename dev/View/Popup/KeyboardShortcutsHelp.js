@@ -1,10 +1,12 @@
-import { addShortcut } from 'Common/Globals';
+import { addShortcut, Settings } from 'Common/Globals';
 import { AbstractViewPopup } from 'Knoin/AbstractViews';
 
 export class KeyboardShortcutsHelpPopupView extends AbstractViewPopup {
 	constructor() {
 		super('KeyboardShortcutsHelp');
 		this.metaKey = shortcuts.getMetaKey();
+		// Already public: every static asset URL carries it
+		this.version = Settings.app('version');
 	}
 
 	onBuild(dom) {
