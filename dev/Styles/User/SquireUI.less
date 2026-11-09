@@ -54,6 +54,7 @@
 }
 
 .squire-wysiwyg {
+	container-type: inline-size;
 	font-family: var(--fontSans);
 
 	/* Prevent collapse of empty elements so that the caret can be placed in there
@@ -115,6 +116,19 @@
 
 	img {
 		vertical-align: bottom;
+		max-width: 100%;
+		height: auto;
+	}
+	/* Capped like the message view (MessageView.less), or a quoted logo with
+	   no size of its own shows at its full 1333px in a reply. */
+	table img {
+		max-width: 100cqw;
+	}
+	blockquote {
+		container-type: inline-size;
+	}
+	table blockquote {
+		container-type: normal;
 	}
 
 	/* Inserted tables carry inline styles, mail clients drop stylesheets.
