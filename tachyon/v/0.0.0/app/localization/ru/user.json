@@ -82,7 +82,11 @@
 		"SUBFOLDERS_SUBTREE_ONE": "Один уровень",
 		"REPLIED": "Отвеченные",
 		"KEYWORD": "Метка",
-		"ALSO_CC": "Копия"
+		"ALSO_CC": "Копия",
+		"DATE_RANGE": "Между датами",
+		"DATE_FROM": "С",
+		"DATE_TO": "По",
+		"SENT_DATE": "Использовать дату отправки, а не получения"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Написать",
@@ -180,7 +184,7 @@
 		"MENU_PRINT": "Распечатать",
 		"EMPTY_SUBJECT_TEXT": "(Без темы)",
 		"LABEL_DATE": "Дата",
-		"LABEL_FROM_SHORT": "От",
+		"LABEL_FROM_SHORT": "от",
 		"LABEL_TO_SHORT": "Кому",
 		"PRINT_LABEL_ATTACHMENTS": "Файлы",
 		"MESSAGE_VIEW_DESC": "Выберите сообщение для просмотра.",
@@ -607,7 +611,8 @@
 		"BUTTON_UPLOAD_BACKGROUND_IMAGE": "Загрузить фоновую картинку (JPG, PNG)",
 		"ERROR_FILE_IS_TOO_BIG": "Файл слишком большой",
 		"ERROR_FILE_TYPE_ERROR": "Неверный тип файла (только JPG и PNG)",
-		"ERROR_UNKNOWN": "Ошибка загрузки файла"
+		"ERROR_UNKNOWN": "Ошибка загрузки файла",
+		"LABEL_ACCENT": "Цвет"
 	},
 	"SETTINGS_FOLDERS": {
 		"LEGEND_FOLDERS": "Список Папок",
@@ -694,7 +699,12 @@
 		"LABEL_SEND_MESSAGE": "Отправить сообщение",
 		"LABEL_CLOSE_COMPOSE": "Закрыть сообщение",
 		"LABEL_TOGGLE_TAG": "Переключить метку: Важное, Работа, Личное, Сделать, Позже",
-		"LABEL_REMOVE_TAGS": "Удалить все эти пять меток"
+		"LABEL_REMOVE_TAGS": "Удалить все эти пять меток",
+		"TAB_ABOUT": "О приложении",
+		"LABEL_VERSION": "Версия",
+		"LABEL_WEBSITE": "Веб-сайт",
+		"LABEL_SOURCE": "Исходный код",
+		"LABEL_LICENSE": "Лицензия"
 	},
 	"NOTIFICATIONS": {
 		"RequestError": "Запрос не выполнен",
