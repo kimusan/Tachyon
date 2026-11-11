@@ -16,7 +16,10 @@ trait CalDAV
 
 	public function setDAVClientConfig(?array $aConfig)
 	{
-		if (isset($aConfig['User'], $aConfig['Password'], $aConfig['Url']) && !empty($aConfig['Mode'])) {
+		// Without a URL there is nothing to sync with, and it went to localhost (#199)
+		if (isset($aConfig['User'], $aConfig['Password'], $aConfig['Url']) && !empty($aConfig['Mode'])
+			&& \strlen(\trim($aConfig['Url']))
+		) {
 			$this->aDAVConfig = $aConfig;
 		} else {
 			$this->aDAVConfig = ['Mode' => 0];
