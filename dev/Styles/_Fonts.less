@@ -1,0 +1,20 @@
+/*
+ * Inter, for themes that name it in their font list. Declared once here so
+ * every theme shares one copy, and a browser downloads it only when a theme
+ * puts text in it. The LESS path quirk turns ../../fonts into ../fonts,
+ * which is static/fonts. SIL Open Font License, see static/fonts/OFL.txt.
+ */
+@font-face {
+	font-family: "Inter";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url(../../fonts/InterVariable.woff2) format("woff2");
+}
+@font-face {
+	font-family: "Inter";
+	font-style: italic;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url(../../fonts/InterVariable-Italic.woff2) format("woff2");
+}

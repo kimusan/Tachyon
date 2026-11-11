@@ -36,7 +36,7 @@
 	--t-r:    10px;
 	--t-r-sm: 8px;
 
-	--t-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
+	--t-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
 
 	/* Blue, the default palette */
 	--t-accent:    #005dc2;
