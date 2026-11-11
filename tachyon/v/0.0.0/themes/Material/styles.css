@@ -461,3 +461,130 @@ dialog, .modal, .b-compose {
 
 /* Thin, unobtrusive scrollbars */
 * { scrollbar-width: thin; scrollbar-color: var(--g-scrollbar) transparent; }
+
+/* ------------------------------------------------------------------ */
+/* Collapsed sidebar: Gmail's icon rail, expanding over the list on    */
+/* hover. The chevron at the foot of the folder list switches between  */
+/* this and the full sidebar. Desktop only: on a phone the panel is a  */
+/* drawer and "collapsed" means hidden, which is left as it is.        */
+/* ------------------------------------------------------------------ */
+@media screen and (min-width: 800px) {
+	html.rl-left-panel-disabled #rl-left {
+		width: 72px !important;
+		overflow: visible;
+		z-index: 3;
+	}
+
+	/* The panel itself keeps its 72px in the layout; the folder list inside
+	   it is what grows, so the message list never reflows under the pointer */
+	html.rl-left-panel-disabled #V-MailFolderList {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 72px;
+		overflow: hidden;
+		background: var(--g-bg);
+		border-radius: 0 16px 16px 0;
+		transition: width .2s cubic-bezier(.4, 0, .2, 1), box-shadow .2s;
+	}
+	html.rl-left-panel-disabled #rl-left:hover #V-MailFolderList,
+	html.rl-left-panel-disabled #rl-left:has(input:focus) #V-MailFolderList {
+		width: 256px;
+		box-shadow: 0 1px 2px rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
+	}
+	html.rl-left-panel-disabled #V-MailFolderList .b-folders { width: 256px; }
+
+	/* Undo the core collapsed state's dimming and hidden controls */
+	html.rl-left-panel-disabled #rl-left .b-content {
+		opacity: 1;
+		min-width: 0;
+	}
+
+	/* The core collapsed state pins the list's More menu to the top-left of the
+	   window, where it would now cover the rail; drop it under its button */
+	html.rl-left-panel-disabled #more-list-dropdown-id + .dropdown-menu {
+		position: absolute;
+		top: 100%;
+	}
+
+	/* ---- Rail (not hovered) ---- */
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-content {
+		padding-right: 0;
+		overflow: hidden;
+	}
+
+	/* Compose shrinks to its icon, a 56px square like Gmail's FAB */
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .buttonCompose {
+		min-width: 0;
+		width: 56px;
+		padding: 0;
+		justify-content: center;
+		flex: 0 0 auto;
+	}
+
+	/* Folders: an icon pill, the name and count faded out */
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-folders li a {
+		width: 56px;
+		margin-left: 8px;
+		padding-left: 18px;
+		border-radius: 16px;
+		overflow: hidden;
+		color: transparent !important;
+	}
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-folders li a::before {
+		flex: 0 0 auto;
+		background-color: var(--g-text-2);
+	}
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-folders li a.selected::before { background-color: var(--g-nav-active-text); }
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-folders li a .e-collapsed-sign,
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-folders li a .flag-icon { display: none; }
+
+	/* Unread count becomes a small badge on the icon's corner */
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-folders li a[data-unread]::after {
+		position: absolute;
+		top: 2px;
+		left: 32px;
+		right: auto;
+		margin: 0;
+		min-width: 16px;
+		padding: 0 4px;
+		border-radius: 8px;
+		line-height: 16px;
+		font-size: 10px;
+		text-align: center;
+		background: var(--g-badge) !important;
+		color: var(--g-badge-text) !important;
+	}
+
+	/* Filter box and the unread-only toggle keep their space, so nothing
+	   jumps when the panel opens, but aren't shown in the rail */
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-content > .search-input-wrp,
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-content > .e-checkbox { visibility: hidden; }
+
+	html.rl-left-panel-disabled #rl-left:not(:hover):not(:has(input:focus)) .b-footer { padding-left: 16px; }
+
+	/* ---- Expanded over the list (hovered) ---- */
+	html.rl-left-panel-disabled #rl-left:is(:hover, :has(input:focus)) .buttonComposeText,
+	html.rl-left-panel-disabled #rl-left:is(:hover, :has(input:focus)) .buttonCalendar,
+	html.rl-left-panel-disabled #rl-left:is(:hover, :has(input:focus)) .buttonContacts { display: revert; }
+	html.rl-left-panel-disabled #rl-left:is(:hover, :has(input:focus)) .hide-on-panel-disabled { display: inline-block; }
+	/* Fade the names in once the panel has room for them */
+	html.rl-left-panel-disabled #rl-left:is(:hover, :has(input:focus)) .b-folders li a { transition: color .1s .1s; }
+}
+
+/* User folders get a folder icon, so they have something to show in the
+   rail; the expand chevron moves in front of it */
+.b-folders-user li a::before {
+	content: "";
+	display: block;
+	flex: 0 0 auto;
+	width: 14px;
+	height: 14px;
+	margin-right: 7px;
+	background-color: currentcolor;
+	--tachyon-icon: var(--icon-folder);
+	mask: var(--tachyon-icon) no-repeat center/contain;
+	-webkit-mask: var(--tachyon-icon) no-repeat center/contain;
+}
+.b-folders-user li a .e-collapsed-sign { order: -1; }
