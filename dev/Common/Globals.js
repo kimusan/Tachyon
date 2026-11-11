@@ -1,4 +1,6 @@
 import ko from 'ko';
+import * as Local from 'Storage/Client';
+import { ClientSideKeyNameLeftPanelCollapsed } from 'Common/EnumsUser';
 
 let keyScopeFake = 'all';
 
@@ -22,7 +24,17 @@ export const
 	dropdownVisibility = ko.observable(false).extend({ rateLimit: 0 }),
 
 	leftPanelDisabled = ko.observable(false),
-	toggleLeftPanel = () => leftPanelDisabled(!leftPanelDisabled()),
+	/**
+	 * Whether the user collapsed the folder panel on a wide screen. That choice
+	 * is remembered across reloads; on a phone the panel opens and closes by
+	 * itself as part of navigating, so nothing is stored there.
+	 */
+	leftPanelCollapsed = () => !!Local.get(ClientSideKeyNameLeftPanelCollapsed),
+	toggleLeftPanel = () => {
+		leftPanelDisabled(!leftPanelDisabled());
+		$htmlCL.contains('rl-mobile')
+			|| Local.set(ClientSideKeyNameLeftPanelCollapsed, leftPanelDisabled() ? 1 : 0);
+	},
 
 	createElement = (name, attr) => {
 		let el = doc.createElement(name);

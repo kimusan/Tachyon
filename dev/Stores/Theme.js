@@ -1,5 +1,5 @@
 import ko from 'ko';
-import { $htmlCL, appEl, elementById, leftPanelDisabled, Settings, SettingsGet } from 'Common/Globals';
+import { $htmlCL, appEl, elementById, leftPanelCollapsed, leftPanelDisabled, Settings, SettingsGet } from 'Common/Globals';
 import { isArray, arrayLength } from 'Common/Utils';
 import { cssLink, serverRequestRaw } from 'Common/Links';
 import { SaveSettingStatus } from 'Common/Enums';
@@ -45,7 +45,7 @@ export const
 		ThemeStore.fontSerif(SettingsGet('fontSerif'));
 		ThemeStore.fontMono(SettingsGet('fontMono'));
 
-		leftPanelDisabled(ThemeStore.isMobile());
+		leftPanelDisabled(ThemeStore.isMobile() || leftPanelCollapsed());
 	},
 
 	changeTheme = (value, themeTrigger = ()=>0) => {
@@ -122,7 +122,7 @@ addSubscribablesTo(ThemeStore, {
 isMobile.onchange = e => {
 	ThemeStore.isMobile(e.matches);
 	$htmlCL.toggle('rl-mobile', e.matches);
-	/*$htmlCL.contains('sm-msgView-side') || */leftPanelDisabled(e.matches);
+	/*$htmlCL.contains('sm-msgView-side') || */leftPanelDisabled(e.matches || leftPanelCollapsed());
 };
 isMobile.onchange(isMobile);
 
