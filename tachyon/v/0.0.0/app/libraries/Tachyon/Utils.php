@@ -153,17 +153,32 @@ class Utils
 		return true;
 	}
 
-	public static function saveFile(string $filename, string $data) : void
+	/**
+	 * $atomic writes beside the file and renames it into place, so a reader never
+	 * sees it half written: file_put_contents() empties the file first. Not the
+	 * default, because a rename cannot replace a file mounted on its own, which is
+	 * how Docker setups often provide application.ini.
+	 */
+	public static function saveFile(string $filename, string $data, bool $atomic = false) : void
 	{
 		$dir = \dirname($filename);
 		if (!\is_dir($dir) && !\mkdir($dir, 0700, true)) {
 			throw new \RuntimeException('Failed to create directory "'.$dir.'"');
 		}
+		$target = $filename;
+		if ($atomic) {
+			$filename .= '.' . \bin2hex(\random_bytes(6)) . '.tmp';
+		}
 		if (false === \file_put_contents($filename, $data)) {
-			throw new \RuntimeException('Failed to save file "'.$filename.'"');
+			\is_file($filename) && $atomic && \unlink($filename);
+			throw new \RuntimeException('Failed to save file "'.$target.'"');
 		}
 		\clearstatcache();
 		\chmod($filename, 0600);
+		if ($atomic && !\rename($filename, $target)) {
+			\unlink($filename);
+			throw new \RuntimeException('Failed to save file "'.$target.'"');
+		}
 /*
 		try {
 		} catch (\Throwable $oException) {

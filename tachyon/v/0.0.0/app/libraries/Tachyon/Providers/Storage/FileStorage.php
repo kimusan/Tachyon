@@ -25,7 +25,9 @@ class FileStorage implements \Tachyon\Providers\Storage\IStorage
 	{
 		$sFileName = $this->generateFileName($mAccount, $iStorageType, $sKey, true);
 		try {
-			$sFileName && \Tachyon\Utils::saveFile($sFileName, $sValue);
+			// Atomic: requests run in parallel, and one reading a session record
+			// while another rewrote it found it empty and ended the session (#198)
+			$sFileName && \Tachyon\Utils::saveFile($sFileName, $sValue, true);
 			return true;
 		} catch (\Throwable $e) {
 			\Tachyon\Util\Log::warning('FileStorage', $e->getMessage());
