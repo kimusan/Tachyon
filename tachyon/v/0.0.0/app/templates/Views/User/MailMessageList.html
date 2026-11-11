@@ -21,15 +21,15 @@
 		<a class="btn icon-trash-2" data-bind="command: undeleteCommand, hidden: hideDeleted" data-i18n="[title]GLOBAL/UNDELETE" style="transform:rotate(-180deg)"></a>
 -->
 	</div>
+	<!-- One read/unread toggle, as in Gmail: "mark as read" while anything
+		checked is still unread, otherwise "mark as unread" -->
+	<div class="btn-group onCheckedShow">
+		<a class="btn buttonSetSeen icon-mail-open" data-bind="visible: messageList.listCheckedOrSelected().some(m => m.isUnseen()), click: listSetSeen, css: {'disabled': !messageList.hasCheckedOrSelected()}" data-i18n="[title]MESSAGE_LIST/MENU_SET_SEEN"></a>
+		<a class="btn buttonUnsetSeen icon-mail" data-bind="visible: !messageList.listCheckedOrSelected().some(m => m.isUnseen()), click: listUnsetSeen, css: {'disabled': !messageList.hasCheckedOrSelected()}" data-i18n="[title]MESSAGE_LIST/MENU_UNSET_SEEN"></a>
+	</div>
 	<div class="btn-group dropdown" data-bind="registerBootstrapDropdown: true">
 		<a id="more-list-dropdown-id" class="btn dropdown-toggle icon-menu" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"></a>
 		<menu class="dropdown-menu" role="menu" aria-labelledby="more-list-dropdown-id">
-			<li role="presentation" data-bind="click: listUnsetSeen, css: {'disabled': !messageList.hasCheckedOrSelected()}">
-				<a href="#" tabindex="-1" data-icon="mail" data-i18n="MESSAGE_LIST/MENU_UNSET_SEEN"></a>
-			</li>
-			<li role="presentation" data-bind="click: listSetSeen, css: {'disabled': !messageList.hasCheckedOrSelected()}">
-				<a href="#" tabindex="-1" data-icon="mail-open" data-i18n="MESSAGE_LIST/MENU_SET_SEEN"></a>
-			</li>
 			<li role="presentation" data-bind="click: listSetFlags, css: {'disabled': !messageList.hasCheckedOrSelected()}">
 				<a href="#" tabindex="-1" data-icon="star" data-i18n="MESSAGE_LIST/MENU_SET_FLAG"></a>
 			</li>
