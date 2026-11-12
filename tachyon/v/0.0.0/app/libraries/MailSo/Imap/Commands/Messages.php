@@ -242,10 +242,16 @@ trait Messages
 
 		$this->FolderSelect($sFromFolder);
 
-		return $this->SendRequestGetResponse(
-			$oRange->UID ? 'UID COPY' : 'COPY',
-			array((string) $oRange, $this->EscapeFolderName($sToFolder))
-		);
+		$oResult = new ResponseCollection;
+		foreach ($oRange->chunks() as $sRange) {
+			foreach ($this->SendRequestGetResponse(
+				$oRange->UID ? 'UID COPY' : 'COPY',
+				array($sRange, $this->EscapeFolderName($sToFolder))
+			) as $oResponse) {
+				$oResult->append($oResponse);
+			}
+		}
+		return $oResult;
 	}
 
 	/**
@@ -262,10 +268,12 @@ trait Messages
 
 		if ($this->hasCapability('MOVE')) {
 			$this->FolderSelect($sFromFolder);
-			$this->SendRequestGetResponse(
-				$oRange->UID ? 'UID MOVE' : 'MOVE',
-				array((string) $oRange, $this->EscapeFolderName($sToFolder))
-			);
+			foreach ($oRange->chunks() as $sRange) {
+				$this->SendRequestGetResponse(
+					$oRange->UID ? 'UID MOVE' : 'MOVE',
+					array($sRange, $this->EscapeFolderName($sToFolder))
+				);
+			}
 		} else {
 			$this->MessageCopy($sFromFolder, $sToFolder, $oRange);
 			$this->MessageDelete($sFromFolder, $oRange, true);
@@ -369,10 +377,16 @@ trait Messages
 
 		$aInputStoreItems = \array_map('\\MailSo\\Base\\Utils::Utf8ToUtf7Modified', $aInputStoreItems);
 
-		return $this->SendRequestGetResponse(
-			$oRange->UID ? 'UID STORE' : 'STORE',
-			array((string) $oRange, $eStoreAction->value, $aInputStoreItems)
-		);
+		$oResult = new ResponseCollection;
+		foreach ($oRange->chunks() as $sRange) {
+			foreach ($this->SendRequestGetResponse(
+				$oRange->UID ? 'UID STORE' : 'STORE',
+				array($sRange, $eStoreAction->value, $aInputStoreItems)
+			) as $oResponse) {
+				$oResult->append($oResponse);
+			}
+		}
+		return $oResult;
 	}
 
 	/**

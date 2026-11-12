@@ -71,36 +71,67 @@ class SequenceSet /*extends \SplFixedArray*/ implements \Countable
 
 	public function __toString(): string
 	{
+		return \implode(',', $this->parts());
+	}
+
+	/**
+	 * The set as strings no longer than $iMaxLength, to send one command each.
+	 * Servers cap the command line (Dovecot at 64k by default) and RFC 7162
+	 * asks clients to stay under 8192 octets. Selecting every message in a big
+	 * folder easily goes past that.
+	 * Only for UIDs: a sequence number moves once an earlier MOVE or EXPUNGE
+	 * removes messages, so a sequence set has to go in one command.
+	 */
+	public function chunks(int $iMaxLength = 8000): array
+	{
+		if (!$this->UID) {
+			return [(string) $this];
+		}
+		$aResult = [];
+		$sChunk = '';
+		foreach ($this->parts() as $sPart) {
+			if (\strlen($sChunk) && \strlen($sChunk) + 1 + \strlen($sPart) > $iMaxLength) {
+				$aResult[] = $sChunk;
+				$sChunk = '';
+			}
+			$sChunk .= (\strlen($sChunk) ? ',' : '') . $sPart;
+		}
+		\strlen($sChunk) && $aResult[] = $sChunk;
+		return $aResult;
+	}
+
+	/**
+	 * Runs of consecutive numbers become ranges. The numbers are sorted first,
+	 * since a set has no order in IMAP and the client sends a message list
+	 * newest first, which left nothing to merge: 11,000 messages went out as
+	 * 11,000 numbers.
+	 */
+	private function parts(): array
+	{
 		$aResult = array();
-		$iStart = null;
-		$iPrev = null;
-
+		$aNumbers = array();
 		foreach ($this->data as $mItem) {
-			if (false !== \strpos($mItem, ':')) {
-				$aResult[] = $mItem;
-				continue;
-			}
-
-			if (null === $iStart || null === $iPrev) {
-				$iStart = $mItem;
-				$iPrev = $mItem;
-				continue;
-			}
-
-			if ($iPrev === $mItem - 1) {
-				$iPrev = $mItem;
+			if (\is_int($mItem) || \ctype_digit((string) $mItem)) {
+				$aNumbers[] = (int) $mItem;
 			} else {
-				$aResult[] = $iStart === $iPrev ? $iStart : $iStart.':'.$iPrev;
-				$iStart = $mItem;
-				$iPrev = $mItem;
+				$aResult[] = (string) $mItem;
 			}
 		}
+		$aNumbers = \array_unique($aNumbers);
+		\sort($aNumbers);
 
-		if (null !== $iStart && null !== $iPrev) {
-			$aResult[] = $iStart === $iPrev ? $iStart : $iStart.':'.$iPrev;
+		$iStart = $iPrev = null;
+		foreach ($aNumbers as $iItem) {
+			if (null !== $iPrev && $iPrev + 1 === $iItem) {
+				$iPrev = $iItem;
+				continue;
+			}
+			null === $iStart || $aResult[] = $iStart === $iPrev ? (string) $iStart : $iStart.':'.$iPrev;
+			$iStart = $iPrev = $iItem;
 		}
+		null === $iStart || $aResult[] = $iStart === $iPrev ? (string) $iStart : $iStart.':'.$iPrev;
 
-		return \implode(',', $aResult);
+		return $aResult;
 	}
 
 	/**

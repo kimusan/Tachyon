@@ -287,19 +287,17 @@ trait Folders
 	 */
 	public function FolderExpunge(?SequenceSet $oUidRange = null) : void
 	{
-		$sCmd = 'EXPUNGE';
-		$aArguments = array();
-
-		if ($oUidRange && \count($oUidRange) && $oUidRange->UID && $this->hasCapability('UIDPLUS')) {
-			$sCmd = 'UID '.$sCmd;
-			$aArguments = array((string) $oUidRange);
-		}
-
 		// https://datatracker.ietf.org/doc/html/rfc5162#section-3.5
 		// Before returning an OK to the client, those messages that are removed
 		// are reported using a VANISHED response or EXPUNGE responses.
 
-		$this->SendRequestGetResponse($sCmd, $aArguments);
+		if ($oUidRange && \count($oUidRange) && $oUidRange->UID && $this->hasCapability('UIDPLUS')) {
+			foreach ($oUidRange->chunks() as $sRange) {
+				$this->SendRequestGetResponse('UID EXPUNGE', array($sRange));
+			}
+		} else {
+			$this->SendRequestGetResponse('EXPUNGE');
+		}
 	}
 
 	/**
