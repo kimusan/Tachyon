@@ -238,3 +238,154 @@ html.rl-left-panel-disabled {
 		width: auto;
 	}
 }
+
+/*
+ * Collapsed folder panel on a wide screen: an icon rail that expands over the
+ * message list on hover. Mailbox only; the settings menus keep the plain
+ * collapsed strip. A theme with its own collapsed design sets --left-rail: none,
+ * which drops the rl-left-rail class. On a phone the panel is a drawer and
+ * collapsed means hidden, so none of this applies there.
+ */
+// Escaped, as this LESS cannot parse a relative selector inside :has()
+@leftRail: ~"html.rl-left-rail.rl-left-panel-disabled #rl-left:has(> #V-MailFolderList:not([hidden]))";
+
+@media screen and (min-width: @maxMobileWidth + 1px) {
+	@{leftRail} {
+		width: 72px !important;
+		overflow: visible;
+		z-index: 3;
+
+		/* The panel keeps its 72px in the layout; the folder list inside it is
+		   what grows, so the message list never reflows under the pointer */
+		#V-MailFolderList {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			inset-inline-start: 0;
+			width: 72px;
+			overflow: hidden;
+			background: var(--left-rail-bg, var(--main-bg-color, #fff));
+			border-start-end-radius: var(--left-rail-radius, 16px);
+			border-end-end-radius: var(--left-rail-radius, 16px);
+			transition: width .2s cubic-bezier(.4, 0, .2, 1), box-shadow .2s;
+		}
+		.b-folders {
+			width: 256px;
+		}
+
+		/* Undo the plain collapsed strip's dimming */
+		.b-content {
+			opacity: 1;
+			min-width: 0;
+		}
+
+		/* ---- Rail ---- */
+		&:not(:hover):not(:has(input:focus)) {
+			.b-content {
+				padding-inline-end: 0;
+				overflow: hidden;
+			}
+
+			.buttonCompose {
+				min-width: 0;
+				width: 56px;
+				padding: 0;
+				justify-content: center;
+				flex: 0 0 auto;
+			}
+
+			/* Folders become icon pills, their names faded out */
+			.b-folders li a {
+				width: 56px;
+				margin-inline-start: 8px;
+				padding-inline: ~"calc((56px - 1em) / 2)" 0;
+				border-radius: 16px;
+				/* No clipping here, or the pill's rounded corner cuts the unread
+				   badge; the 72px panel already hides the faded name */
+				overflow: visible;
+				text-indent: 0;
+				color: transparent !important;
+
+				&::before {
+					flex: 0 0 auto;
+					margin: 0;
+					margin-inline-end: 1em;
+					background-color: var(--folders-color, #333);
+				}
+				&.selected::before {
+					background-color: var(--folders-selected-color, #eee);
+				}
+				.e-collapsed-sign,
+				.flag-icon {
+					display: none;
+				}
+			}
+
+			/* User folders carry no icon of their own, so they get a folder */
+			.b-folders-user li a::before {
+				.icon-mask(folder);
+				background-color: var(--folders-color, #333);
+			}
+
+			/* The unread count becomes a small badge on the icon's corner */
+			.b-folders li a[data-unread]::after {
+				position: absolute;
+				top: 2px;
+				inset-inline-start: 32px;
+				inset-inline-end: auto;
+				margin: 0;
+				/* Themes centre the count on the row with a translate, which
+				   would lift the badge out of the row and clip it */
+				transform: none;
+				min-width: 16px;
+				padding: 0 4px;
+				border-radius: 8px;
+				line-height: 16px;
+				font-size: 10px;
+				text-align: center;
+				text-shadow: none;
+				background-color: var(--unread-count-bg-color, #999) !important;
+				color: var(--unread-count-color, #fff) !important;
+			}
+
+			/* The filter box and unread-only toggle keep their space, so nothing
+			   jumps when the panel opens, but stay out of the rail */
+			.b-content > .search-input-wrp,
+			.b-content > .e-checkbox {
+				visibility: hidden;
+			}
+
+			.b-footer {
+				padding-inline-start: 16px;
+			}
+		}
+
+		/* ---- Expanded over the list ---- */
+		&:hover,
+		&:has(input:focus) {
+			#V-MailFolderList {
+				width: 256px;
+				box-shadow: 0 1px 2px rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
+			}
+			.buttonComposeText,
+			.buttonCalendar,
+			.buttonContacts {
+				display: revert;
+			}
+			.hide-on-panel-disabled {
+				display: inline-block;
+			}
+			/* Fade the names in once the panel has room for them */
+			.b-folders li a {
+				transition: color .1s .1s;
+			}
+		}
+	}
+
+	/* The plain collapsed strip pins the list's More menu to the top of the
+	   window, where it would cover the rail; drop it under its button */
+	html.rl-left-rail.rl-left-panel-disabled:has(#V-MailFolderList:not([hidden])) #more-list-dropdown-id + .dropdown-menu {
+		position: absolute;
+		top: 100%;
+	}
+}

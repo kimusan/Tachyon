@@ -1,6 +1,18 @@
 import ko from 'ko';
+import * as Local from 'Storage/Client';
+import {
+	ClientSideKeyNameAdminLeftPanelCollapsed,
+	ClientSideKeyNameLeftPanelCollapsed,
+	ClientSideKeyNameSettingsLeftPanelCollapsed
+} from 'Common/EnumsUser';
 
 let keyScopeFake = 'all';
+
+// The mailbox, the user settings and the admin panel each remember their own
+// collapsed panel, though they share the browser's storage
+let leftPanelKey = rl.adminArea()
+	? ClientSideKeyNameAdminLeftPanelCollapsed
+	: ClientSideKeyNameLeftPanelCollapsed;
 
 export const
 	ScopeMenu = 'Menu',
@@ -22,7 +34,27 @@ export const
 	dropdownVisibility = ko.observable(false).extend({ rateLimit: 0 }),
 
 	leftPanelDisabled = ko.observable(false),
-	toggleLeftPanel = () => leftPanelDisabled(!leftPanelDisabled()),
+	/**
+	 * Whether the user collapsed the left panel on a wide screen. That choice
+	 * is remembered across reloads; on a phone the panel opens and closes by
+	 * itself as part of navigating, so nothing is stored there.
+	 */
+	leftPanelCollapsed = () => !!Local.get(leftPanelKey),
+	/**
+	 * A screen calls this as it shows, to switch to its own collapsed state
+	 * @param {boolean} isSettings
+	 */
+	useLeftPanelOf = isSettings => {
+		leftPanelKey = rl.adminArea()
+			? ClientSideKeyNameAdminLeftPanelCollapsed
+			: (isSettings ? ClientSideKeyNameSettingsLeftPanelCollapsed : ClientSideKeyNameLeftPanelCollapsed);
+		$htmlCL.contains('rl-mobile') || leftPanelDisabled(leftPanelCollapsed());
+	},
+	toggleLeftPanel = () => {
+		leftPanelDisabled(!leftPanelDisabled());
+		$htmlCL.contains('rl-mobile')
+			|| Local.set(leftPanelKey, leftPanelDisabled() ? 1 : 0);
+	},
 
 	createElement = (name, attr) => {
 		let el = doc.createElement(name);

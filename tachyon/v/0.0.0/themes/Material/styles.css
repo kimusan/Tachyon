@@ -461,3 +461,19 @@ dialog, .modal, .b-compose {
 
 /* Thin, unobtrusive scrollbars */
 * { scrollbar-width: thin; scrollbar-color: var(--g-scrollbar) transparent; }
+
+/* User folders get a folder icon, like the system folders; the expand
+   chevron moves in front of it */
+.b-folders-user li a::before {
+	content: "";
+	display: block;
+	flex: 0 0 auto;
+	width: 14px;
+	height: 14px;
+	margin-right: 7px;
+	background-color: currentcolor;
+	--tachyon-icon: var(--icon-folder);
+	mask: var(--tachyon-icon) no-repeat center/contain;
+	-webkit-mask: var(--tachyon-icon) no-repeat center/contain;
+}
+.b-folders-user li a .e-collapsed-sign { order: -1; }

@@ -4,6 +4,9 @@
  * @author Rene Hampölz (@hampoelz), SnappyMail, Nextcloud Team
  */
 
+/* This theme has its own collapsed folder panel, so no core icon rail */
+:root { --left-rail: none; }
+
 /*
  * Default Nextcloud (v25+) theme variables and colors
  * based on https://github.com/nextcloud/server/blob/master/core/css/variables.scss

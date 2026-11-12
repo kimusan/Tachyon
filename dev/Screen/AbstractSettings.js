@@ -2,7 +2,7 @@ import ko from 'ko';
 
 import { pString } from 'Common/Utils';
 import { settings } from 'Common/Links';
-import { createElement/*, elementById*/, fireEvent } from 'Common/Globals';
+import { createElement/*, elementById*/, fireEvent, useLeftPanelOf } from 'Common/Globals';
 
 import { AbstractScreen } from 'Knoin/AbstractScreen';
 import { i18nToNodes } from 'Common/Translator';
@@ -92,6 +92,10 @@ export class AbstractSettingsScreen extends AbstractScreen {
 		} else {
 			hasher.replaceHash(settings());
 		}
+	}
+
+	onShow() {
+		useLeftPanelOf(true);
 	}
 
 	onHide() {
