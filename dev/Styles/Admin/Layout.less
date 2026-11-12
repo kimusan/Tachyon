@@ -69,11 +69,10 @@
 	padding-right: 12px;
 }
 
-/* desktop */
-@media screen and (min-width: @maxMobileWidth + 1px) {
-	.toggleLeft {
-		display: none;
-	}
+/* Outranks the mailbox icon rails that Modern and NextcloudV25+ force with !important */
+html.rl-left-panel-disabled #rl-app #rl-content > #rl-left {
+	overflow: hidden;
+	width: 0 !important;
 }
 
 /* desktop-large */
@@ -91,11 +90,5 @@
 	#V-AdminPane {
 		margin-right: 0;
 		padding: 10px;
-	}
-
-	html.rl-left-panel-disabled {
-		#rl-left {
-			width: 0;
-		}
 	}
 }
