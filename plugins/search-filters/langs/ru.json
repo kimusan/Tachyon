@@ -1,21 +1,21 @@
 {
     "SFILTERS": {
-        "WHEN_MESSAGE_MATCH_SEARCH_CRITERIA": "",
-        "FILTERS": "",
-        "FILTER": "",
-        "MOVE_TO_FOLDER": "",
-        "CREATE_FILTER": "",
-        "EDIT_FILTERS": "",
-        "MATCHES": "",
-        "DO_THIS": "",
-        "SAVE": "",
-        "EDIT": "",
-        "REMOVE": "",
-        "NO_FILTERS": "",
-        "THE_FOLLOWING_FILTERS_ARE_APPLIED": "",
-        "MARK_AS_READ": "",
-        "STAR_IT": "",
-        "PRIORITY_LABLE": "",
-        "PRIORITY_POINTS": ""
+        "WHEN_MESSAGE_MATCH_SEARCH_CRITERIA": "Если письмо точно соответствует вашим критериям поиска:",
+        "FILTERS": "Фильтры",
+        "FILTER": "Фильтр",
+        "MOVE_TO_FOLDER": "Переместить в папку: ",
+        "CREATE_FILTER": "Создать фильтр",
+        "EDIT_FILTERS": "Редактировать фильтры",
+        "MATCHES": "Совпадения: ",
+        "DO_THIS": "Делать следующее: ",
+        "SAVE": "Сохранить",
+        "EDIT": "Редактировать",
+        "REMOVE": "Удалить",
+        "NO_FILTERS": "Вы еще не добавили ни одного фильтра.",
+        "THE_FOLLOWING_FILTERS_ARE_APPLIED": "Ко всей входящей почте применяются следующие фильтры: ",
+        "MARK_AS_READ": "Отметить как прочитанное",
+        "STAR_IT": "Отметить звездочкой",
+        "PRIORITY_LABLE": "Баллы приоритета, фильтры с большим значением применяются в первую очередь",
+        "PRIORITY_POINTS": "Приоритет"
     }
 }
