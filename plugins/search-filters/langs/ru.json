@@ -1,0 +1,21 @@
+{
+    "SFILTERS": {
+        "WHEN_MESSAGE_MATCH_SEARCH_CRITERIA": "",
+        "FILTERS": "",
+        "FILTER": "",
+        "MOVE_TO_FOLDER": "",
+        "CREATE_FILTER": "",
+        "EDIT_FILTERS": "",
+        "MATCHES": "",
+        "DO_THIS": "",
+        "SAVE": "",
+        "EDIT": "",
+        "REMOVE": "",
+        "NO_FILTERS": "",
+        "THE_FOLLOWING_FILTERS_ARE_APPLIED": "",
+        "MARK_AS_READ": "",
+        "STAR_IT": "",
+        "PRIORITY_LABLE": "",
+        "PRIORITY_POINTS": ""
+    }
+}
