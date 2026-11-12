@@ -71,6 +71,7 @@ export class SettingsUserScreen extends AbstractSettingsScreen {
 	}
 
 	onShow() {
+		super.onShow();
 		this.setSettingsTitle();
 		keyScope(ScopeSettings);
 	}

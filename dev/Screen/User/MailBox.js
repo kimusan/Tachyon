@@ -1,5 +1,5 @@
 import { ScopeMessageList } from 'Common/Enums';
-import { doc, createElement, Settings } from 'Common/Globals';
+import { doc, createElement, Settings, useLeftPanelOf } from 'Common/Globals';
 import { pString, pInt } from 'Common/Utils';
 import { moveAction } from 'Common/UtilsUser';
 import { getFolderFromHashMap, getFolderInboxName } from 'Common/Cache';
@@ -56,6 +56,7 @@ export class MailBoxUserScreen extends AbstractScreen {
 	 * @returns {void}
 	 */
 	onShow() {
+		useLeftPanelOf(false);
 		this.updateWindowTitle();
 		AppUserStore.focusedState('none');
 		AppUserStore.focusedState(ScopeMessageList);

@@ -300,7 +300,9 @@ html.rl-left-panel-disabled {
 				margin-inline-start: 8px;
 				padding-inline: ~"calc((56px - 1em) / 2)" 0;
 				border-radius: 16px;
-				overflow: hidden;
+				/* No clipping here, or the pill's rounded corner cuts the unread
+				   badge; the 72px panel already hides the faded name */
+				overflow: visible;
 				text-indent: 0;
 				color: transparent !important;
 
@@ -332,6 +334,9 @@ html.rl-left-panel-disabled {
 				inset-inline-start: 32px;
 				inset-inline-end: auto;
 				margin: 0;
+				/* Themes centre the count on the row with a translate, which
+				   would lift the badge out of the row and clip it */
+				transform: none;
 				min-width: 16px;
 				padding: 0 4px;
 				border-radius: 8px;
