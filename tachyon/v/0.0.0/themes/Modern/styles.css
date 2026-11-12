@@ -10,6 +10,9 @@
  * seven separate themes of the upstream repository without other changes.
  */
 
+/* This theme has its own collapsed folder panel, so no core icon rail */
+:root { --left-rail: none; }
+
 /*
  * Modern, a theme for Tachyon webmail : shared base
  *

@@ -1,8 +1,13 @@
 import ko from 'ko';
 import * as Local from 'Storage/Client';
-import { ClientSideKeyNameLeftPanelCollapsed } from 'Common/EnumsUser';
+import { ClientSideKeyNameAdminLeftPanelCollapsed, ClientSideKeyNameLeftPanelCollapsed } from 'Common/EnumsUser';
 
 let keyScopeFake = 'all';
+
+// Admin and webmail share the browser's storage, but not the collapsed panel
+const leftPanelKey = rl.adminArea()
+	? ClientSideKeyNameAdminLeftPanelCollapsed
+	: ClientSideKeyNameLeftPanelCollapsed;
 
 export const
 	ScopeMenu = 'Menu',
@@ -29,11 +34,11 @@ export const
 	 * is remembered across reloads; on a phone the panel opens and closes by
 	 * itself as part of navigating, so nothing is stored there.
 	 */
-	leftPanelCollapsed = () => !!Local.get(ClientSideKeyNameLeftPanelCollapsed),
+	leftPanelCollapsed = () => !!Local.get(leftPanelKey),
 	toggleLeftPanel = () => {
 		leftPanelDisabled(!leftPanelDisabled());
 		$htmlCL.contains('rl-mobile')
-			|| Local.set(ClientSideKeyNameLeftPanelCollapsed, leftPanelDisabled() ? 1 : 0);
+			|| Local.set(leftPanelKey, leftPanelDisabled() ? 1 : 0);
 	},
 
 	createElement = (name, attr) => {

@@ -1,5 +1,5 @@
 import ko from 'ko';
-import { $htmlCL, appEl, elementById, leftPanelCollapsed, leftPanelDisabled, Settings, SettingsGet } from 'Common/Globals';
+import { $htmlCL, appEl, doc, elementById, leftPanelCollapsed, leftPanelDisabled, Settings, SettingsGet } from 'Common/Globals';
 import { isArray, arrayLength } from 'Common/Utils';
 import { cssLink, serverRequestRaw } from 'Common/Links';
 import { SaveSettingStatus } from 'Common/Enums';
@@ -36,6 +36,7 @@ export const
 		ThemeStore.themeAccents = Settings.app('themeAccents') || {};
 		ThemeStore.theme(theme);
 		changeTheme(theme);
+		syncLeftRail();
 		ThemeStore.themeAccent(SettingsGet('ThemeAccent') || '');
 		if (!ThemeStore.isMobile()) {
 			ThemeStore.userBackgroundName(SettingsGet('userBackgroundName'));
@@ -47,6 +48,13 @@ export const
 
 		leftPanelDisabled(ThemeStore.isMobile() || leftPanelCollapsed());
 	},
+
+	/**
+	 * The collapsed folder panel is an icon rail unless the theme brings its own
+	 * collapsed design, which it says with --left-rail: none
+	 */
+	syncLeftRail = () => $htmlCL.toggle('rl-left-rail',
+		'none' !== getComputedStyle(doc.documentElement).getPropertyValue('--left-rail').trim()),
 
 	changeTheme = (value, themeTrigger = ()=>0) => {
 		const themeStyle = elementById('app-theme-style'),
@@ -65,6 +73,7 @@ export const
 					if (2 === arrayLength(data)) {
 						themeStyle.textContent = data[1];
 						themeStyle.dataset.name = value;
+						syncLeftRail();
 						themeTrigger(SaveSettingStatus.Success);
 					}
 					clearTimer();
