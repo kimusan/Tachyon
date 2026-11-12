@@ -105,10 +105,27 @@ ko.bindingHandlers.datePicker = {
 		button.tabIndex = -1;
 		element.after(button);
 
+		// The mobile layout dims the page with one overlay shared by every picker,
+		// which the first picker creates in the library's container on body. With
+		// a container of our own that one is never built, so creating the overlay
+		// threw halfway through the first picker's constructor, before it listened
+		// for focus: on a phone the first date field anywhere did nothing (#207).
+		// Built here, and the overlay moved into this dialog before showing, since
+		// on body it sits underneath the dialog's top layer and cannot be tapped.
+		const container = element.closest('dialog'),
+			adoptOverlay = () => {
+				const overlay = document.querySelector('.air-datepicker-overlay');
+				container && overlay && overlay.parentNode !== container && container.append(overlay);
+			};
+		element.addEventListener('focus', adoptOverlay);
+
 		loadPicker().then(() => {
 			const locale = localeFor(),
-				chosen = SettingsUserStore.dateFormat();
-			picker = new window.AirDatepicker(element, {
+				chosen = SettingsUserStore.dateFormat(),
+				AirDatepicker = window.AirDatepicker;
+			document.getElementById(AirDatepicker.defaultGlobalContainerId)
+				|| AirDatepicker.buildGlobalContainer(AirDatepicker.defaultGlobalContainerId);
+			picker = new AirDatepicker(element, {
 				locale: locale,
 				dateFormat: chosen || (locale && locale.dateFormat),
 				// Popups here are dialog elements opened with showModal, which puts
@@ -116,7 +133,7 @@ ko.bindingHandlers.datePicker = {
 				// is painted underneath that and cannot be clicked, so it looked
 				// like the field itself was dead. Rendering inside the dialog keeps
 				// it in the same layer.
-				container: element.closest('dialog') || undefined,
+				container: container || undefined,
 				// The reading week starts on whichever day the calendar settings
 				// say, rather than on the locale's own idea of it
 				firstDay: parseInt(SettingsUserStore.calendarFirstDay(), 10) || 0,
@@ -125,7 +142,10 @@ ko.bindingHandlers.datePicker = {
 				isMobile: 500 > innerWidth,
 				onSelect: ({ date }) => observable(toISO(date))
 			});
-			button.addEventListener('click', () => picker.show());
+			button.addEventListener('click', () => {
+				adoptOverlay();
+				picker.show();
+			});
 			render();
 		});
 
