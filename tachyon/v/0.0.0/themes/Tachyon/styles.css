@@ -740,6 +740,13 @@ input[type="radio"] {
 	border-color: var(--t-accent);
 }
 
+/* Admin title: white with a black shadow for the dark backdrops of the old
+   themes, which on this light background read as an outline (#205) */
+#V-AdminPane > .b-toolbar {
+	color: var(--t-text);
+	text-shadow: none;
+}
+
 /* ── Panels & dialogs ───────────────────────────────────────────────────── */
 .panel, .dialog {
 	border-radius: var(--dialog-border-radius);
