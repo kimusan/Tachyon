@@ -1,3 +1,48 @@
+## 4.6.0 - 2026-11-12
+
+Your inbox called. It wants to look like it was made this decade.
+
+4.6.0 is the colour release. The Tachyon theme is redesigned and comes in seven palettes, and Chris Jones's Modern theme moves in with seven more. Pick one under Settings, Themes and the whole app changes colour on the spot, no reload, no squinting at a grey toolbar wondering if it is 2009 again. Collapse the folder panel and it folds into a tidy icon rail with unread badges, in every theme.
+
+The theme that shipped as Default is now called Snappymail. It earned the name: it is the look we forked from, and it is still there for anyone who misses the warm, grey glow of 2010s webmail. We won't judge. Much.
+
+Under all that paint there are security fixes, so update even if you hate colour: a logged-in user could read files outside the avatars directory, and a folder name could put markup into a confirm dialog.
+
+### New look
+- **The Tachyon theme, redesigned.** Seven palettes: Blue, Teal, Green, Purple, Pink, Orange and Graphite. Anyone already on the Tachyon theme gets the new look with the update, whether they asked for it or not
+- **Modern, a theme by Chris Jones** (@christopherjones), with the palettes Modern, Evergreen, Midnight, Clay, Graphite, Ink and Plum. Upstream it is seven separate themes; here it is one theme with a palette picker, because seven near-identical entries in a dropdown is how a theme menu turns into a scrolling exercise. Contributed under the MIT licence from tachyon-theme-modern (#186)
+- **Any theme can offer palettes.** A theme lists them in a `theme.json` next to its `styles.css`, and Settings, Themes shows them as swatches. Switching palette loads no new stylesheet. Admins set the default palette under Admin, General, and the page paints in it from the first frame. `themes/example.css` documents the format
+- **Inter ships with the app.** Modern and Tachyon asked for Inter but only got it where it happened to be installed; everywhere else the system font faked the medium and semibold weights and the text looked mixed. Inter now lives in `static/fonts` and is downloaded only when a theme uses it. Macs and iPhones keep San Francisco in the Tachyon theme, since Apple would sulk otherwise
+- **An icon rail for the collapsed folder panel.** On a wide screen the collapsed panel becomes a 72px rail of folder icons with unread badges. Hover it, or focus the folder filter, and it opens over the message list without pushing it around. It works in every theme; Modern and NextcloudV25+ keep their own collapsed designs. Started life as a Material design by @DanClarke-io (#202)
+- The collapsed state survives a reload, kept separately for the mailbox, user settings and the admin panel, so folding one leaves the others alone
+- The admin menu collapses on desktop too. Before, some themes showed its toggle there, and a click only flipped the arrow, which was a very small and very sad animation
+- The theme called Default is now called Snappymail, since Tachyon has been the default for a while and the name was starting to feel like a lie. A saved "Default" opens as Snappymail, and a theme that no longer exists falls back to Tachyon
+
+### Added
+- **A read/unread button in the message list toolbar**, next to Archive, Spam and Delete. It says "Mark as read" while anything selected is unread, otherwise "Mark as unread". By @DanClarke-io (#201)
+- Advanced search takes a date range, both days included, and can search on the date a message was sent instead of the day the server received it. For an imported mailbox, the received date is the day of the import. Asked for by @lvarnava (#146)
+- An About tab under Help with the version, website, source and licence. Asked for by @lvarnava (#195)
+
+### Security
+- **A logged-in user could read files outside the avatars directory.** The avatars plugin put the requested address into `glob()` patterns unchecked, so an address like `x@../configs/application` returned `application.ini` as the avatar, and the same worked for other files under the private data directory. The plugin (1.29) now stops at a domain that is not a plain host name, and every `glob()` has a check of its own. Reported by Fathi Ben Nasr, Convergent Cloud Computing (GHSA-323m-8c8g-6xwj)
+- **A folder name was rendered as HTML in two confirm dialogs.** Moving or copying every message a folder or search holds (new in 4.5.0) and purging a folder (inherited from SnappyMail) put the folder name into the dialog unescaped. A folder in a shared namespace is named by another user, who could put markup into a dialog you were about to confirm. Reported by @ZaphodB (GHSA-w5qm-c43v-c7cq)
+- Links in a message body keep their href only for an allowed scheme. Before, `javascript:`, `data:`, `vbscript:` and `file:` links came through. Inherited from SnappyMail and ported from its fix (GHSA-7463-5wp4-wx54)
+
+### Fixed
+- **Moving, copying or deleting more than about 11,000 messages at once failed** with "Too long argument" on Dovecot, which made select-all from 4.5.0 useless on big folders. Each message went into the IMAP command on its own; runs of messages are now sent as ranges, and a long list is split over several commands. Reported by @lvarnava (discussion #203)
+- Images in fixed width cells stretched to the full width of the pane since 4.5.0. MJML mail was hit hardest: a 12px icon rendered 259px wide. Reported by @peterkeist (#197)
+- A table declaring a narrow width squeezed its images down to it, so a newsletter with 700px images in a 40px table rendered as a 74px column (#178)
+- The content of unknown elements was dropped from message bodies, so a mail wrapping its text in a made-up tag showed up empty. Reported by @kellej1983 (#191)
+- Since 4.5.0 a session could end at random while the server rewrote its record, and the browser window reloaded. Reported by @codiflow (#198)
+- CalDAV and CardDAV sync could be switched on with no URL, and then synced against localhost. An empty URL now means sync is off. Reported by @codiflow (#199)
+- A change to a domain's SMTP "Use short login" setting was ignored until the user logged in again. Reported by @docbill (#194)
+- A quoted image with no size of its own showed at full size in the reply editor
+- Preview lines squeezed full-width message list rows onto one line (#148)
+- Modern squeezed the sender out of short list rows and hid the list star on touch screens
+
+### Changed
+- Translations updated for Polish and Russian
+
 ## 4.5.0 - 2026-11-05
 
 A feature release, the first since 4.4.0. You can now select every message in a folder or a search, not just the page on screen, and act on all of them at once. Two new plugins: one keeps reusable messages as templates, the other translates mail through DeepL. Thunderbird's 1 to 5 tag keys work, and the Nextcloud integration gets a default save folder.
