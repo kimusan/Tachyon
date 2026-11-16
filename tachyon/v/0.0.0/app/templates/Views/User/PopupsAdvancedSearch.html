@@ -61,9 +61,11 @@
 						optionsValue: 'id'
 					}
 				}"></div>
-				<div class="date-range" data-bind="visible: 'range' === selectedDateValue()">
-					<input type="date" data-bind="datePicker: dateFrom" data-i18n="[placeholder]SEARCH/DATE_FROM">
-					<input type="date" data-bind="datePicker: dateTo" data-i18n="[placeholder]SEARCH/DATE_TO">
+				<div class="date-range" data-bind="visible: 'range' === selectedDateValue() || 'on' === selectedDateValue()">
+					<input type="date" data-bind="datePicker: dateFrom, attr: { placeholder: dateFromLabel }">
+					<span data-bind="visible: 'range' === selectedDateValue()">
+						<input type="date" data-bind="datePicker: dateTo" data-i18n="[placeholder]SEARCH/DATE_TO">
+					</span>
 				</div>
 				<div data-bind="visible: 0 !== selectedDateValue(), component: {
 					name: 'Checkbox',

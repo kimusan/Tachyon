@@ -66,6 +66,7 @@
 		"DATE": "Date",
 		"DATE_ALL": "All",
 		"DATE_RANGE": "Between dates",
+		"DATE_ON": "On date",
 		"DATE_FROM": "From",
 		"DATE_TO": "To",
 		"SENT_DATE": "Use the date it was sent, not received",

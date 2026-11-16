@@ -60,6 +60,11 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 				return keywords
 			},
 
+			dateFromLabel: () => {
+				translateTrigger();
+				return i18n('on' === this.selectedDateValue() ? 'SEARCH/DATE' : 'SEARCH/DATE_FROM');
+			},
+
 			showKeywords: () => FolderUserStore.currentFolder().permanentFlags().some(isAllowedKeyword),
 
 			repliedOptions: () => {
@@ -81,6 +86,7 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 				return [
 					{ id: 0, name: i18n('SEARCH/DATE_ALL') },
 					{ id: 'range', name: i18n('SEARCH/DATE_RANGE') },
+					{ id: 'on', name: i18n('SEARCH/DATE_ON') },
 					{ id: 3, name: i18n(prefix + '3_DAYS') },
 					{ id: 7, name: i18n(prefix + '7_DAYS') },
 					{ id: 30, name: i18n(prefix + 'MONTH') },
@@ -130,7 +136,10 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		append('keyword', self.keyword());
 		append('in', self.selectedTreeValue());
 		const dateKey = self.sentDate() ? 'sent' : '';
-		if ('range' === self.selectedDateValue()) {
+		if ('on' === self.selectedDateValue()) {
+			append(dateKey + 'on', self.dateFrom());
+		}
+		else if ('range' === self.selectedDateValue()) {
 			let from = self.dateFrom(), to = self.dateTo();
 			if (from && to && from > to) {
 				[from, to] = [to, from];
@@ -184,14 +193,14 @@ export class AdvancedSearchPopupView extends AbstractViewPopup {
 		self.text(pString(params.get('text')));
 		self.keyword(pString(params.get('keyword')));
 		self.selectedTreeValue(pString(params.get('in')));
-		// Any date comes back as a range: a preset was relative to the day it ran,
-		// so "up to 1 week old" cannot be told apart from the dates it produced
+		// A date comes back as one day or as a range: a preset was relative to the
+		// day it ran, so "up to 1 week old" cannot be told apart from its dates
 		const dateKey = ['sentsince', 'sentbefore', 'senton'].some(key => params.has(key)) ? 'sent' : '',
 			on = isoDate(pString(params.get(dateKey + 'on'))),
 			before = isoDate(pString(params.get(dateKey + 'before')));
 		self.dateFrom(on || isoDate(pString(params.get(dateKey + 'since'))));
-		self.dateTo(on || (before && shiftDay(before, -1)));
-		self.selectedDateValue(self.dateFrom() || self.dateTo() ? 'range' : 0);
+		self.dateTo(on ? '' : (before && shiftDay(before, -1)));
+		self.selectedDateValue(on ? 'on' : (self.dateFrom() || self.dateTo() ? 'range' : 0));
 		self.sentDate(!!dateKey);
 		self.alsoCc(!params.has('to-only'));
 		self.hasAttachment(params.has('attachment'));
