@@ -18,8 +18,8 @@
 		<a class="btn btn-thin buttonUp icon-chevron-left" data-bind="command: goUpCommand"></a>
 		<a class="btn btn-thin buttonDown icon-chevron-right" data-bind="command: goDownCommand"></a>
 	</div>
-	<!-- ko foreach: pluginToolbarButtons -->
-	<!-- ko template: { name: $data, data: $parent } --><!-- /ko -->
+	<!-- ko foreach: $root.pluginSlot('messageView.toolbar') -->
+	<!-- ko template: { name: template, data: data } --><!-- /ko -->
 	<!-- /ko -->
 </div>
 <div class="messageView">
@@ -131,8 +131,8 @@
 								<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: downloadLink() }" data-icon="inbox" data-i18n="MESSAGE/MENU_DOWNLOAD_ORIGINAL"></a>
 							</li>
 						</div>
-						<!-- ko foreach: pluginMenuItems -->
-						<!-- ko template: { name: $data, data: $parent } --><!-- /ko -->
+						<!-- ko foreach: $root.pluginSlot('messageView.menu') -->
+						<!-- ko template: { name: template, data: data } --><!-- /ko -->
 						<!-- /ko -->
 					</menu>
 				</div>
@@ -154,6 +154,9 @@
 			</div>
 		</div>
 		<div id="messageItem">
+			<!-- ko foreach: $root.pluginSlot('messageView.beforeMessage') -->
+			<!-- ko template: { name: template, data: data } --><!-- /ko -->
+			<!-- /ko -->
 			<div class="messageItemHeader" data-bind="if: message, i18nUpdate: message">
 				<div data-bind="hidden: showFullInfo">
 					<time class="date" data-time-format="FULL" data-bind="visible: 0 < message().dateTimestamp(), time: message().dateTimestamp()"></time>
@@ -241,6 +244,9 @@
 				</div>
 
 				<div data-bind="hidden: messageLoadingThrottle">
+					<!-- ko foreach: $root.pluginSlot('messageView.beforeBody') -->
+					<!-- ko template: { name: template, data: data } --><!-- /ko -->
+					<!-- /ko -->
 					<div class="bodySubHeader" data-bind="if: message, i18nUpdate: message">
 						<div class="readReceipt" data-bind="visible: askReadReceipt, click: readReceipt"
 							data-icon="mail" data-i18n="MESSAGE/BUTTON_NOTIFY_READ_RECEIPT"></div>
@@ -365,6 +371,9 @@
 					</div>
 
 					<div class="bodyText" dir="auto"></div>
+					<!-- ko foreach: $root.pluginSlot('messageView.afterMessage') -->
+					<!-- ko template: { name: template, data: data } --><!-- /ko -->
+					<!-- /ko -->
 				</div>
 			</div>
 		</div>

@@ -352,7 +352,21 @@
 		}
 	}
 
-	rl.addMessageViewToolbarButton('MessageViewToolbarDeeplTranslate');
+	// Core draws these like the toolbar buttons around them; the state they
+	// read is set up on the message view below
+	const canTranslate = view => view.deeplConfigured && !!view.message();
+	rl.addButton('messageView.toolbar', {
+		label: 'DEEPL/TRANSLATE',
+		icon: view => view.deeplBusy() ? 'spinner' : 'globe',
+		visible: view => canTranslate(view) && !view.deeplTranslated(),
+		action: view => view.deeplTranslate()
+	});
+	rl.addButton('messageView.toolbar', {
+		label: 'DEEPL/SHOW_ORIGINAL',
+		icon: 'undo',
+		visible: view => canTranslate(view) && view.deeplTranslated(),
+		action: view => view.deeplTranslate()
+	});
 	rl.addComposeHeaderRow('ComposeDeeplTranslate');
 	rl.addSettingsViewModel(DeeplSettingsTab, 'STabDeeplTranslate', 'DeepL', 'deepl');
 

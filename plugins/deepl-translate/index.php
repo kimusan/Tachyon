@@ -15,9 +15,9 @@ class DeeplTranslatePlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME     = 'DeepL Translate',
 		AUTHOR   = 'Tachyon',
 		URL      = 'https://github.com/kimusan/Tachyon',
-		VERSION  = '0.3',
+		VERSION  = '0.4',
 		RELEASE  = '2026-10-28',
-		REQUIRED = '4.5.0',
+		REQUIRED = '4.7.0',
 		CATEGORY = 'General',
 		LICENSE  = 'MIT',
 		DESCRIPTION = 'Translate a received message in place, or a draft before sending, using DeepL';
@@ -34,7 +34,6 @@ class DeeplTranslatePlugin extends \Tachyon\Plugins\AbstractPlugin
 		$this->UseLangs(true);
 
 		$this->addJs('js/DeeplTranslate.js');
-		$this->addTemplate('templates/MessageViewToolbarDeeplTranslate.html');
 		$this->addTemplate('templates/PopupsDeeplTranslate.html');
 		$this->addTemplate('templates/ComposeDeeplTranslate.html');
 		$this->addTemplate('templates/STabDeeplTranslate.html');

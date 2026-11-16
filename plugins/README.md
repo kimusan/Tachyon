@@ -518,6 +518,56 @@ Converts HTML to text
 ## rl.Utils.plainToHtml(plain)
 Converts text to HTML
 
+## rl.addButton(slot, button)​
+Adds a button to a toolbar or menu, drawn with the same markup as the core
+buttons around it, so it needs no template and no styles and follows every
+theme.
+
+```js
+rl.addButton('messageView.toolbar', {
+	label: 'MY_PLUGIN/ACTION',       // translation key, also the tooltip
+	icon: 'globe',                   // icon name without "icon-"
+	action: view => …,               // called with the view the button sits in
+	visible: view => !!view.message(),
+	enabled: view => …
+});
+```
+
+`label`, `icon`, `visible` and `enabled` may each be a value or a function of
+the view, and a function is re-read when the observables it reads change: an
+icon can turn into a spinner while the plugin works. Buttons are taken by
+`messageView.toolbar`, `messageView.menu`, `messageList.toolbar`,
+`messageList.menu`, `folderList.footer` and `compose.buttons`; any other slot
+throws. Example in
+* ./deepl-translate/js/DeeplTranslate.js
+
+## rl.addToSlot(slot, template, factory)​
+Renders a plugin template in a named place of the interface. Register the
+template with `addTemplate()`; the name here is its filename without `.html`.
+Without `factory` the template is bound to the view it sits in. With it,
+`factory(view)` is called once per view and what it returns is the template's
+data, so the plugin keeps its own state instead of adding it to the core view
+model.
+
+| Slot | Where |
+|---|---|
+| `messageView.toolbar` | top toolbar of the message view, after previous/next; template holds a `<div class="btn-group">` |
+| `messageView.menu` | the message view's menu beside Reply; template holds an `<li>` |
+| `messageView.beforeMessage` | top of the scrolling message, under the pinned subject line, above date and recipients |
+| `messageView.beforeBody` | between the message header and the body |
+| `messageView.afterMessage` | below the body |
+| `messageList.toolbar` | message list toolbar, after the More menu |
+| `messageList.menu` | the message list's More menu; template holds an `<li>` |
+| `folderList.footer` | under the folder list, beside its buttons |
+| `compose.buttons` | beside the attach button; template holds an `<a class="btn">` |
+| `compose.headerRows` | the compose header table, under Subject; template holds a `<tr>` |
+
+A slot is one line in a core template, so asking for a new place is a small
+change. Slots are listed in `dev/Common/PluginSlots.js`.
+
+The four functions below came first and stay as shorthands for
+`rl.addToSlot()` with the view as the template's data.
+
 ## rl.addComposeButton(template)​
 Renders a plugin template beside the attach button of the compose window.
 The template is bound to the ComposePopupView, so a `click:` binding names a
@@ -543,8 +593,6 @@ names a method the plugin added on `rl-view-model.create`.
 Renders a plugin template in the message view's top toolbar, after the
 previous/next buttons. The template holds a `<div class="btn-group">` and is
 bound to the same view model as the menu item above.
-Example in
-* ./deepl-translate/js/DeeplTranslate.js
 
 ## rl.addSettingsViewModel(SettingsViewModelClass, template, labelName, route)​
 Examples in

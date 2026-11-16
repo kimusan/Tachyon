@@ -142,8 +142,8 @@
 					<input type="text" name="subject" autocomplete="off" data-bind="textInput: subject, attr:{spellcheck:allowSpellcheck()?'true':'false'}">
 				</td>
 			</tr>
-			<tbody data-bind="foreach: pluginHeaderRows">
-				<!-- ko template: { name: $data, data: $parent } --><!-- /ko -->
+			<tbody data-bind="foreach: $root.pluginSlot('compose.headerRows')">
+				<!-- ko template: { name: template, data: data } --><!-- /ko -->
 			</tbody>
 		</table>
 		<div style="display:flex">
@@ -162,8 +162,8 @@
 			<div class="btn-group">
 				<a class="btn icon-paperclip" style="padding-left: 10px; padding-right: 10px;" id="composeUploadButton"
 					data-bind="visible: addAttachmentEnabled()" data-i18n="[title]COMPOSE/ATTACH_FILES"></a>
-				<!-- ko foreach: pluginButtons -->
-				<!-- ko template: { name: $data, data: $parent } --><!-- /ko -->
+				<!-- ko foreach: $root.pluginSlot('compose.buttons') -->
+				<!-- ko template: { name: template, data: data } --><!-- /ko -->
 				<!-- /ko -->
 			</div>
 		</div>

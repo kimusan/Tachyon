@@ -75,8 +75,14 @@
 			<li role="presentation" data-bind="visible: allowDangerousActions, click: clear">
 				<a href="#" tabindex="-1" data-icon="flame" data-i18n="MESSAGE_LIST/BUTTON_EMPTY_FOLDER"></a>
 			</li>
+			<!-- ko foreach: $root.pluginSlot('messageList.menu') -->
+			<!-- ko template: { name: template, data: data } --><!-- /ko -->
+			<!-- /ko -->
 		</menu>
 	</div>
+	<!-- ko foreach: $root.pluginSlot('messageList.toolbar') -->
+	<!-- ko template: { name: template, data: data } --><!-- /ko -->
+	<!-- /ko -->
 	<div class="btn-group dropdown onCheckedHide" data-bind="visible: !sortSupported()">
 		<div id="no-sort-list" class="btn icon-x" data-i18n="[title]MESSAGE_LIST/NO_SORT"></div>
 	</div>

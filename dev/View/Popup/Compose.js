@@ -20,7 +20,6 @@ import { folderInformation } from 'Common/Folders';
 import { serverRequest } from 'Common/Links';
 import { i18n, translateTrigger, getNotification, getUploadErrorDescByCode, timestampToString } from 'Common/Translator';
 import { setFolderETag } from 'Common/Cache';
-import { composeHeaderRows, composeButtons } from 'Common/Plugins';
 import { SettingsCapa, SettingsGet, elementById, addShortcut, createElement } from 'Common/Globals';
 //import { exitFullscreen, isFullscreen, toggleFullscreen } from 'Common/Fullscreen';
 
@@ -221,12 +220,6 @@ export class ComposePopupView extends AbstractViewPopup {
 		this.allowContacts = AppUserStore.allowContacts();
 		this.allowIdentities = SettingsCapa('Identities');
 		this.allowSpellcheck = SettingsUserStore.allowSpellcheck;
-
-		// Where a plugin puts its own row or button, see rl.addComposeHeaderRow()
-		// and rl.addComposeButton(). Read once, because a plugin registers while
-		// its script loads and this view model is built when a compose first opens.
-		this.pluginHeaderRows = composeHeaderRows;
-		this.pluginButtons = composeButtons;
 
 		addObservablesTo(this, {
 			// bootstrap dropdown

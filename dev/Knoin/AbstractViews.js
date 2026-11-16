@@ -5,6 +5,7 @@ import { keyScope, addShortcut, SettingsGet, toggleLeftPanel, elementById } from
 import { ViewTypePopup, showScreenPopup } from 'Knoin/Knoin';
 
 import { SaveSettingStatus } from 'Common/Enums';
+import { pluginSlot } from 'Common/PluginSlots';
 
 class AbstractView {
 	constructor(templateID, type)
@@ -25,6 +26,14 @@ class AbstractView {
 				keyScope(this.previous);
 			}
 		};
+	}
+
+	/**
+	 * What plugins put in a named place of this view's template, see
+	 * Common/PluginSlots. Called from the template as $root.pluginSlot(name).
+	 */
+	pluginSlot(name) {
+		return pluginSlot(name, this);
 	}
 
 /*

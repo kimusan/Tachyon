@@ -42,5 +42,8 @@
 			<a class="btn icon-folder-plus" data-bind="click: createFolder" data-i18n="[title]POPUPS_CREATE_FOLDER/TITLE_CREATE_FOLDER"></a>
 			<a class="btn icon-settings" data-bind="click: configureFolders" data-i18n="[title]SETTINGS_LABELS/FOLDERS"></a>
 		</div>
+		<!-- ko foreach: $root.pluginSlot('folderList.footer') -->
+		<!-- ko template: { name: template, data: data } --><!-- /ko -->
+		<!-- /ko -->
 	</div>
 </div>
