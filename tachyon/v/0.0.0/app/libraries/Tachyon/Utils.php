@@ -155,9 +155,10 @@ class Utils
 
 	/**
 	 * $atomic writes beside the file and renames it into place, so a reader never
-	 * sees it half written: file_put_contents() empties the file first. Not the
-	 * default, because a rename cannot replace a file mounted on its own, which is
-	 * how Docker setups often provide application.ini.
+	 * sees it half written: file_put_contents() empties the file first. A rename
+	 * cannot replace a file mounted on its own, which is how Docker setups often
+	 * provide application.ini, so when the rename is refused the file is written
+	 * in place after all.
 	 */
 	public static function saveFile(string $filename, string $data, bool $atomic = false) : void
 	{
@@ -175,9 +176,11 @@ class Utils
 		}
 		\clearstatcache();
 		\chmod($filename, 0600);
-		if ($atomic && !\rename($filename, $target)) {
+		if ($atomic && !@\rename($filename, $target)) {
 			\unlink($filename);
-			throw new \RuntimeException('Failed to save file "'.$target.'"');
+			if (false === \file_put_contents($target, $data)) {
+				throw new \RuntimeException('Failed to save file "'.$target.'"');
+			}
 		}
 /*
 		try {

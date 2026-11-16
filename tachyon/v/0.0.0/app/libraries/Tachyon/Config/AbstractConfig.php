@@ -14,6 +14,10 @@ abstract class AbstractConfig implements \ArrayAccess, \JsonSerializable
 
 	private string $sFileHeader;
 
+	// The file exists but could not be read, so what this object holds is the
+	// defaults, and saving them would replace the real configuration
+	private bool $bReadFailed = false;
+
 	public function __construct(string $sFileName, string $sFileHeader = '', string $sAdditionalFileName = '')
 	{
 		$this->sFile = \APP_PRIVATE_DATA.'configs/'.\trim($sFileName);
@@ -195,6 +199,7 @@ abstract class AbstractConfig implements \ArrayAccess, \JsonSerializable
 
 	public function Load() : bool
 	{
+		$this->bReadFailed = false;
 		$sFile = $this->sFile;
 		if (!\file_exists($sFile) && \str_ends_with($sFile, '.json')) {
 			$sFile = \str_replace('.json', '.ini', $sFile);
@@ -204,12 +209,8 @@ abstract class AbstractConfig implements \ArrayAccess, \JsonSerializable
 				return true;
 			}
 
-			if (\str_ends_with($sFile, '.json')) {
-				$aData = \json_decode(\file_get_contents($sFile), true);
-			} else {
-				$aData = \parse_ini_file($sFile, true);
-			}
-			if ($aData && \count($aData)) {
+			$aData = $this->readFile($sFile);
+			if (null !== $aData) {
 				foreach ($aData as $sSectionKey => $aSectionValue) {
 					if (\is_array($aSectionValue)) {
 						foreach ($aSectionValue as $sParamKey => $mParamValue) {
@@ -245,18 +246,50 @@ abstract class AbstractConfig implements \ArrayAccess, \JsonSerializable
 			}
 		}
 
+		// An unreadable file used to fall through to Save() below, which wrote the
+		// defaults over it. Another request saving at that moment was enough, and
+		// the admin password, branding and DAV settings were gone (#211). Run this
+		// request on the defaults instead, and let nothing it does save them.
+		if (\file_exists($sFile)) {
+			$this->bReadFailed = true;
+			\error_log('Tachyon: '.$sFile.' could not be read, running on defaults without saving');
+			return false;
+		}
+
 		return $this->Save();
+	}
+
+	/**
+	 * Empty or unparsable can be a write in progress elsewhere: on a file mounted
+	 * on its own the save is not atomic. So it is read again a few times first.
+	 */
+	private function readFile(string $sFile) : ?array
+	{
+		$bJson = \str_ends_with($sFile, '.json');
+		for ($i = 0; $i < 5; ++$i) {
+			$i && \usleep(20000);
+			$sData = (string) @\file_get_contents($sFile);
+			if (\strlen(\trim($sData))) {
+				$aData = $bJson ? \json_decode($sData, true) : @\parse_ini_string($sData, true);
+				// A plugin without settings is saved as an empty JSON array; an
+				// INI file always has sections, so an empty one was cut short
+				if (\is_array($aData) && ($bJson || \count($aData))) {
+					return $aData;
+				}
+			}
+		}
+		return null;
 	}
 
 	public function Save() : bool
 	{
-		if (\file_exists($this->sFile) && !\is_writable($this->sFile)) {
+		if ($this->bReadFailed || (\file_exists($this->sFile) && !\is_writable($this->sFile))) {
 			return false;
 		}
 
 		if (\str_ends_with($this->sFile, '.json')) {
 			$this->clearCache();
-			\Tachyon\Utils::saveFile($this->sFile, \json_encode($this, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+			\Tachyon\Utils::saveFile($this->sFile, \json_encode($this, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), true);
 			// Remove old .ini file
 			$sFile = \str_replace('.json', '.ini', $this->sFile);
 			\file_exists($sFile) && \unlink($sFile);
@@ -314,7 +347,7 @@ abstract class AbstractConfig implements \ArrayAccess, \JsonSerializable
 
 		\Tachyon\Utils::saveFile($this->sFile,
 			(\strlen($this->sFileHeader) ? $this->sFileHeader : '').
-			$sNewLine.\implode($sNewLine, $aResultLines));
+			$sNewLine.\implode($sNewLine, $aResultLines), true);
 
 		return true;
 	}
