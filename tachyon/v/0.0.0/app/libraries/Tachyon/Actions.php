@@ -584,7 +584,7 @@ class Actions
 			'Plugins' => array(),
 			'System' => array(
 				'version' => APP_VERSION,
-				'token' => Utils::GetCsrfToken(),
+				'token' => Utils::GetCsrfToken($bAdmin),
 				'languages' => \Tachyon\Util\L10n::getLanguages(false),
 				'webPath' => \Tachyon\Utils::WebPath(),
 				'webVersionPath' => \Tachyon\Utils::WebVersionPath()

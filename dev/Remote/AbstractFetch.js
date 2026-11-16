@@ -7,12 +7,31 @@ let iJsonErrorCount = 0;
 
 const getURL = (add = '') => serverRequest('Json') + pString(add),
 
+// The reload fetches a fresh token, or the login. Straight away: five seconds
+// of a page ignoring every click looked like a hang (#212). Only a reload that
+// follows another within a minute still waits, so a token that keeps failing
+// cannot reload the page in a loop.
+reloadForSession = () => {
+	let last = 0;
+	try {
+		last = +sessionStorage.getItem('rlInvalidTokenReload') || 0;
+		sessionStorage.setItem('rlInvalidTokenReload', Date.now());
+	} catch { /* empty */ }
+	setTimeout(rl.logoutReload, 60000 > Date.now() - last ? 5000 : 0);
+},
+
 checkResponseError = data => {
 	const err = data ? data.code : null;
 	if (Notifications.InvalidToken === err) {
 		console.error(getNotification(err) + ` (${data.messageAdditional})`);
 //		alert(getNotification(err));
-		setTimeout(rl.logoutReload, 5000);
+		reloadForSession();
+	} else if (Notifications.AuthError === err && rl.adminArea() && 'AdminLogin' !== data.Action) {
+		// In the admin panel, outside a wrong password at the login, this only
+		// means the admin login is gone, which a mail tab in the same browser
+		// logging out also does: show the login rather than a panel whose every
+		// request fails
+		reloadForSession();
 	} else if ([
 			Notifications.AuthError,
 			Notifications.ConnectionError,

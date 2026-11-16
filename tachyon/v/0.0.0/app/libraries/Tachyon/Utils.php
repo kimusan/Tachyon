@@ -77,6 +77,11 @@ class Utils
 			}
 			return '1-' . \sha1(APP_SALT.$oAccount->Hash());
 		}
+		return self::browserToken();
+	}
+
+	private static function browserToken() : string
+	{
 		$sToken = \Tachyon\Util\Cookies::get(self::CONNECTION_TOKEN);
 		if (!$sToken) {
 			$sToken = \MailSo\Base\Utils::Sha1Rand(APP_SALT);
@@ -85,9 +90,15 @@ class Utils
 		return '0-' . \sha1('Connection'.APP_SALT.$sToken.'Token'.APP_SALT);
 	}
 
-	public static function GetCsrfToken() : string
+	/**
+	 * The admin panel's token leaves out the mail account. It shares the cookies
+	 * of a mail tab in the same browser, so logging in or out there, a session
+	 * ending, or a switch to another account changed the admin panel's token
+	 * under it, and its next request failed with InvalidToken (#212).
+	 */
+	public static function GetCsrfToken(bool $bAdmin = false) : string
 	{
-		return self::GetConnectionToken();
+		return $bAdmin ? self::browserToken() : self::GetConnectionToken();
 //		return \sha1('Csrf'.APP_SALT.self::GetConnectionToken().'Token'.APP_SALT);
 	}
 

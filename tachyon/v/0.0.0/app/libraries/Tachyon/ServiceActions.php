@@ -93,7 +93,7 @@ class ServiceActions
 			}
 
 			if ('Logout' !== $sAction) {
-				$token = Utils::GetCsrfToken();
+				$token = Utils::GetCsrfToken($this->oActions instanceof ActionsAdmin);
 				if (isset($_SERVER['HTTP_X_SM_TOKEN'])) {
 					if ($_SERVER['HTTP_X_SM_TOKEN'] !== $token) {
 						$oAccount = $this->oActions->getAccountFromToken(false);
