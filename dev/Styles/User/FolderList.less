@@ -388,4 +388,12 @@ html.rl-left-panel-disabled {
 		position: absolute;
 		top: 100%;
 	}
+
+	/* The opened rail lies over the message list, but a selected row sets
+	   z-index 101 and, with nothing around it to contain that, painted over
+	   the rail (#208). The right side becomes one layer under it instead of
+	   the rail having to outbid every z-index in there. */
+	html.rl-left-rail.rl-left-panel-disabled:has(#V-MailFolderList:not([hidden])) #rl-right {
+		isolation: isolate;
+	}
 }
