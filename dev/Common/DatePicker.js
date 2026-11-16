@@ -28,14 +28,43 @@ const loadPicker = (() => {
 })();
 
 /**
- * The locale data shipped with the picker, for the interface language. Each one
- * carries its own dateFormat and firstDay, which is where "follow the language"
- * gets its answer from rather than a table maintained here.
+ * The picker's locale for the interface language, built from Intl. The picker
+ * ships names for a handful of languages only, so the other thirty-odd this
+ * application is translated into showed an English calendar. Intl knows every
+ * one of them, and its idea of the date format is the one "follow the
+ * language" already shows on the settings screen.
  */
 const localeFor = () => {
-	const all = window.AirDatepickerLocales || {},
-		lang = (document.documentElement.lang || 'en').toLowerCase();
-	return all[lang] || all[lang.split('-')[0]] || all.en;
+	const lang = document.documentElement.lang || undefined,
+		upper = s => s.charAt(0).toLocaleUpperCase(lang) + s.slice(1),
+		names = (options, date) => Array.from({ length: options.month ? 12 : 7 },
+			(v, i) => upper(new Intl.DateTimeFormat(lang, options).format(date(i)))),
+		// 2026-11-01 is a Sunday, the day the picker counts weeks from
+		day = i => new Date(2026, 10, 1 + i),
+		month = i => new Date(2026, i, 1),
+		daysShort = names({ weekday: 'short' }, day),
+		dateFormat = new Intl.DateTimeFormat(lang, { day: '2-digit', month: '2-digit', year: 'numeric' })
+			.formatToParts(new Date(2026, 10, 1))
+			.map(part => ({ day: 'dd', month: 'MM', year: 'yyyy' })[part.type] || part.value)
+			.join('');
+	return {
+		days: names({ weekday: 'long' }, day),
+		daysShort: daysShort,
+		daysMin: [
+			daysShort.map(name => name.replace(/\.$/, '').slice(0, 2)),
+			names({ weekday: 'narrow' }, day),
+			daysShort.map(name => name.replace(/\.$/, '').slice(0, 3))
+		// Two letters tell the days apart in most languages, but not in all:
+		// Arabic would show the article on every column, Latvian Pi twice
+		].find(list => 7 === new Set(list).size) || daysShort,
+		months: names({ month: 'long' }, month),
+		monthsShort: names({ month: 'short' }, month).map(name => name.replace(/\.$/, '')),
+		today: '',
+		clear: '',
+		dateFormat: dateFormat,
+		timeFormat: 'HH:mm',
+		firstDay: 0
+	};
 };
 
 /**
@@ -142,10 +171,25 @@ ko.bindingHandlers.datePicker = {
 				isMobile: 500 > innerWidth,
 				onSelect: ({ date }) => observable(toISO(date))
 			});
+			// The icon goes through the field's focus, like a click on the field.
+			// Calling show() directly opened a picker the field never knew about:
+			// no blur ever closed it, so two could be open at once, and a click
+			// outside left them standing. Keeping the focus on the field while the
+			// icon is pressed lets a second press close the picker again.
+			button.addEventListener('mousedown', event => event.preventDefault());
 			button.addEventListener('click', () => {
-				adoptOverlay();
-				picker.show();
+				if (document.activeElement !== element) {
+					element.focus();
+				} else if (picker.visible) {
+					picker.hide();
+				} else {
+					adoptOverlay();
+					picker.show();
+				}
 			});
+			// A picker still open when its dialog closed was open again, with the
+			// dialog, the next time
+			container?.addEventListener('close', () => picker.visible && picker.hide());
 			render();
 		});
 

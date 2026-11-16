@@ -53,7 +53,7 @@ const jsCalendar = () => {
 // Date picker (loaded on demand by whichever editor needs a date first)
 const jsDatePicker = () => {
 	return gulp
-		.src(['vendors/air-datepicker/air-datepicker.js', 'vendors/air-datepicker/locales.js'])
+		.src(['vendors/air-datepicker/air-datepicker.js'])
 		.pipe(concat('datepicker.js', { separator: '\n\n' }))
 		.pipe(gulp.dest(config.paths.staticJS));
 };
