@@ -53,7 +53,8 @@
 		"LABEL_MESSAGES_PER_PAGE": "Nachrichten pro Seite",
 		"HINT_MESSAGES_PER_PAGE": "Standardeinstellung für einen Benutzer, der keine eigene Auswahl getroffen hat.",
 		"LABEL_MESSAGES_PER_PAGE_MAX": "Begrenzung der Nachrichten pro Seite",
-		"HINT_MESSAGES_PER_PAGE_MAX": "Vom Benutzer maximal wählbarer Wert. Ein höherer Standardwert wird entsprechend begrenzt."
+		"HINT_MESSAGES_PER_PAGE_MAX": "Vom Benutzer maximal wählbarer Wert. Ein höherer Standardwert wird entsprechend begrenzt.",
+		"LABEL_THEME_ACCENT": "Farbe"
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Anmeldebildschirm",

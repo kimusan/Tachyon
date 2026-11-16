@@ -11,7 +11,7 @@
 		"CLOSE": "Schließen",
 		"CONTACTS": "Kontakte",
 		"DELETE": "Löschen",
-		"UNDELETE": "Undelete",
+		"UNDELETE": "Wiederherstellen",
 		"DONE": "Erledigt",
 		"EMAIL": "E-Mail",
 		"FROM": "Von",
@@ -50,7 +50,7 @@
 	},
 	"LOGIN": {
 		"LABEL_LOGIN": "Anmeldung",
-		"LABEL_SIGN_ME": "Anmeldung merken",
+		"LABEL_SIGN_ME": "Angemeldet bleiben",
 		"BUTTON_SIGN_IN": "Anmelden"
 	},
 	"TOP_TOOLBAR": {
@@ -82,7 +82,11 @@
 		"SUBFOLDERS_SUBTREE": "Alle",
 		"SUBFOLDERS_SUBTREE_ONE": "Eine Ebene",
 		"REPLIED": "Beantwortet",
-		"KEYWORD": "Schlagwort"
+		"KEYWORD": "Schlagwort",
+		"DATE_RANGE": "Zwischen Terminen",
+		"DATE_FROM": "Von",
+		"DATE_TO": "Bis",
+		"SENT_DATE": "Sende- statt Empfangsdatum verwenden"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Erstellen",
@@ -124,15 +128,15 @@
 		"MENU_SELECT_FLAGGED": "Markiert",
 		"MENU_SELECT_UNFLAGGED": "Nicht markiert",
 		"DOWNLOAD_ALL_ATTACHMENTS": "Alle Anhänge herunterladen",
-		"EMPTY_LIST": "Liste ist leer",
-		"EMPTY_SEARCH_LIST": "Keine Treffer für Ihre Suche",
+		"EMPTY_LIST": "Liste ist leer.",
+		"EMPTY_SEARCH_LIST": "Keine Treffer für Ihre Suche.",
 		"SEARCH_RESULT_FOR": "Suchergebnisse für \"%SEARCH%\"",
 		"BACK_TO_MESSAGE_LIST": "Zurück zur Nachrichtenliste",
-		"PUT_MESSAGE_HERE": "Ziehen Sie die Nachricht hierhin, um sie in der Liste anzuzeigen.",
+		"PUT_MESSAGE_HERE": "Ziehen Sie die Nachricht hierhin, um sie in der Liste anzuzeigen",
 		"TODAY_AT": "Heute um %TIME%",
 		"YESTERDAY_AT": "Gestern um %TIME%",
 		"NEW_MESSAGE_NOTIFICATION": "Sie haben %COUNT% neue Nachrichten!",
-		"QUOTA_SIZE": "Sie nutzen <strong>%SIZE% (%PROC%%)</strong> von <strong>%LIMIT%</strong>.",
+		"QUOTA_SIZE": "Sie nutzen <strong>%SIZE% (%PROC%%)</strong> von <strong>%LIMIT%</strong>",
 		"SORT": "Sortieren",
 		"NO_SORT": "Ihr Mailserver unterstützt das Sortieren von E-Mails nicht",
 		"SORT_ARRIVAL_ASC": "Eingang aufsteigend",
@@ -144,7 +148,16 @@
 		"SORT_SUBJECT_ASC": "Betreff A-Z",
 		"SORT_SUBJECT_DESC": "Betreff Z-A",
 		"SORT_FROM_ASC": "Von A-Z",
-		"SORT_FROM_DESC": "Von Z-A"
+		"SORT_FROM_DESC": "Von Z-A",
+		"PAGE_SELECTED": "Alle %COUNT% Nachrichten auf dieser Seite sind ausgewählt.",
+		"SELECT_ALL_MATCHING": "Alle Nachrichten in diesem Ordner auswählen",
+		"SELECT_ALL_MATCHING_SEARCH": "Alle Nachrichten auswählen, die dieser Suche entsprechen",
+		"ALL_MATCHING_SELECTED": "Alle %COUNT% Nachrichten in diesem Ordner sind ausgewählt.",
+		"ALL_MATCHING_SEARCH_SELECTED": "Alle %COUNT% Nachrichten sind ausgewählt, die dieser Suche entsprechen.",
+		"CLEAR_SELECTION": "Auswahl aufheben",
+		"CONFIRM_ALL_MOVE": "Alle %COUNT% ausgewählten Nachrichten in %FOLDER% bewegen?",
+		"CONFIRM_ALL_COPY": "Alle %COUNT% ausgewählten Nachrichten in %FOLDER% kopieren?",
+		"CONFIRM_ALL_DELETE": "Alle %COUNT% ausgewählten Nachrichten dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
 	},
 	"MESSAGE": {
 		"BUTTON_EDIT": "Bearbeiten",
@@ -286,7 +299,7 @@
 		"BUTTON_SEND": "Senden",
 		"BUTTON_MINIMIZE": "Minimieren",
 		"SAVED_TIME": "Gespeichert um %TIME%",
-		"SAVED_ERROR_ON_SEND": "Die Nachricht wurde gesendet, konnte aber nicht im Gesendet-Ordner gespeichert werden.",
+		"SAVED_ERROR_ON_SEND": "Die Nachricht wurde gesendet, konnte aber nicht im Gesendet-Ordner gespeichert werden",
 		"DISCARD_UNSAVED_DATA": "Nicht gespeicherte Daten löschen?",
 		"ATTACH_FILES": "Dateien anhängen",
 		"ATTACH_DROP_FILES_DESC": "Fügen Sie hier Dateien ein",
@@ -362,7 +375,7 @@
 		"CHANGE_PASS": "Passphrase ändern",
 		"CURRENT_PASS": "Aktuelle Passphrase",
 		"NEW_PASS": "Neue Passphrase",
-		"ASK_CRYPTKEY_PASS": "Ihr Anmeldekennwort wurde geändert. Bitte geben Sie Ihr altes Kennwort ein, um die Daten zu entschlüsseln."
+		"ASK_CRYPTKEY_PASS": "Ihr Anmeldekennwort wurde geändert. Bitte geben Sie Ihr altes Kennwort ein, um die Daten zu entschlüsseln"
 	},
 	"OPENPGP": {
 		"POPUP_IMPORT_TITLE": "OpenPGP-Schlüssel importieren",
@@ -446,7 +459,7 @@
 		"NOTIFICATION_SENT": "Sie haben keinen \"Gesendet\"-Systemordner gewählt, in dem Nachrichten nach dem Versenden gespeichert werden.\nFalls Sie versandte Nachrichten nicht speichern möchten, wählen Sie die Option \"Nicht anwenden\".\n",
 		"NOTIFICATION_DRAFTS": "Sie haben keinen \"Entwürfe\"-Systemordner gewählt, in dem Nachrichten beim Erstellen gespeichert werden.",
 		"NOTIFICATION_SPAM": "Sie haben keinen \"Spam\"-Systemordner gewählt, in dem die Spam-Nachrichten abgelegt werden.\nFalls Sie Spam-Nachrichten endgültig löschen möchten, wählen Sie die Option \"Nicht anwenden\".\n",
-		"NOTIFICATION_TRASH": "Sie haben keinen  \"Papierkorb\"-Systemordner gewählt, in dem die gelöschten Nachrichten abgelegt werden.\nFalls Sie gelöschte Nachrichten endgültig löschen möchten, wählen Sie die Option \"Nicht anwenden\".\n",
+		"NOTIFICATION_TRASH": "Sie haben keinen \"Papierkorb\"-Systemordner gewählt, in dem die gelöschten Nachrichten abgelegt werden.\nFalls Sie gelöschte Nachrichten endgültig löschen möchten, wählen Sie die Option \"Nicht anwenden\".\n",
 		"NOTIFICATION_ARCHIVE": "Sie haben keinen \"Archiv\"-Systemordner gewählt, in dem die archivierten Nachrichten abgelegt werden."
 	},
 	"TITLES": {
@@ -455,7 +468,7 @@
 	},
 	"UPLOAD": {
 		"ERROR_FILE_IS_TOO_BIG": "Datei ist zu groß",
-		"ERROR_FILE_PARTIALLY_UPLOADED": "Die Datei wurde aus einem unbekannten Grund unvollständig hochgeladen.",
+		"ERROR_FILE_PARTIALLY_UPLOADED": "Die Datei wurde aus einem unbekannten Grund unvollständig hochgeladen",
 		"ERROR_NO_FILE_UPLOADED": "Keine Datei hochgeladen",
 		"ERROR_MISSING_TEMP_FOLDER": "Die temporäre Datei fehlt",
 		"ERROR_ON_SAVING_FILE": "Ein unbekannter Fehler trat beim Hochladen auf",
@@ -598,7 +611,8 @@
 		"BUTTON_UPLOAD_BACKGROUND_IMAGE": "Hintergrundbild hochladen (JPG, PNG)",
 		"ERROR_FILE_IS_TOO_BIG": "Datei ist zu groß",
 		"ERROR_FILE_TYPE_ERROR": "Ungültiger Dateityp (nur JPG und PNG)",
-		"ERROR_UNKNOWN": "Ein unbekannter Fehler trat beim Hochladen auf"
+		"ERROR_UNKNOWN": "Ein unbekannter Fehler trat beim Hochladen auf",
+		"LABEL_ACCENT": "Farbe"
 	},
 	"SETTINGS_FOLDERS": {
 		"LEGEND_FOLDERS": "Ordnerliste",
@@ -623,7 +637,8 @@
 		"TYPE_FILES": "Dateien",
 		"TYPE_JOURNAL": "Tagebuch",
 		"TYPE_NOTES": "Aufzeichnungen",
-		"TYPE_TASKS": "Aufgaben"
+		"TYPE_TASKS": "Aufgaben",
+		"TOTAL_MESSAGES": "Nachrichten in allen Ordnern:"
 	},
 	"SETTINGS_ACCOUNTS": {
 		"LEGEND_ACCOUNTS": "Konten",
@@ -631,7 +646,7 @@
 		"LEGEND_ACCOUNTS_AND_IDENTITIES": "Konten und Identitäten",
 		"BUTTON_ADD_ACCOUNT": "Konto hinzufügen",
 		"BUTTON_ADD_IDENTITY": "Identität hinzufügen",
-		"LOADING_PROCESS": "Aktualisiere Kontenliste",
+		"LOADING_PROCESS": "Aktualisiere...",
 		"SHOW_UNREAD": "Zeige Zahl der ungelesenen Nachrichten aller Konten"
 	},
 	"SETTINGS_OPENPGP": {
@@ -681,7 +696,14 @@
 		"LABEL_OPEN_IDENTITIES_DROPDOWN": "Identitätsauswahl öffnen",
 		"LABEL_SAVE_MESSAGE": "Nachricht speichern",
 		"LABEL_SEND_MESSAGE": "Nachricht senden",
-		"LABEL_CLOSE_COMPOSE": "Popup schließen"
+		"LABEL_CLOSE_COMPOSE": "Popup schließen",
+		"TAB_ABOUT": "Über",
+		"LABEL_VERSION": "Version",
+		"LABEL_WEBSITE": "Website",
+		"LABEL_SOURCE": "Quellcode",
+		"LABEL_LICENSE": "Lizenz",
+		"LABEL_TOGGLE_TAG": "Ein Tag ein- oder ausschalten: Wichtig, Arbeit, Persönlich, Zu erledigen, Später",
+		"LABEL_REMOVE_TAGS": "Entferne alle fünf dieser Tags"
 	},
 	"NOTIFICATIONS": {
 		"RequestError": "Anfrage fehlgeschlagen",
@@ -691,8 +713,8 @@
 		"AuthError": "Authentifizierung fehlgeschlagen",
 		"ConnectionError": "Serververbindung kann nicht hergestellt werden",
 		"DomainAlreadyExists": "Diese Domain existiert bereits",
-		"DomainNotAllowed": "Diese Domain ist nicht zugelassen.",
-		"AccountNotAllowed": "Konto ist nicht zugelassen.",
+		"DomainNotAllowed": "Diese Domain ist nicht zugelassen",
+		"AccountNotAllowed": "Konto ist nicht zugelassen",
 		"CryptKeyError": "Ihr Anmeldekennwort wurde geändert",
 		"ContactsSyncError": "Fehler bei Kontakte-Synchronisierung",
 		"CantGetMessageList": "Die Nachrichtenliste ist nicht verfügbar",
@@ -717,9 +739,9 @@
 		"DemoSendMessageError": "Dieses Demokonto darf aus Sicherheitsgründen keine Nachrichten an externe E-Mail-Adressen versenden!",
 		"DemoAccountError": "Aus Sicherheitsgründen ist dieses Konto nicht zu dieser Aktion berechtigt!",
 		"AccountAlreadyExists": "Dieses Konto existiert bereits",
-		"AccountDoesNotExist": "Dieser Account existiert nicht.",
+		"AccountDoesNotExist": "Konto existiert nicht",
 		"AccountSwitchFailed": "Konto wechseln \"%EMAIL%\" versagt",
-		"MailServerError": "Beim Zugriff auf den E-Mail-Server trat ein Fehler auf.",
+		"MailServerError": "Beim Zugriff auf den E-Mail-Server trat ein Fehler auf",
 		"InvalidInputArgument": "Ungültige Eingabe",
 		"UnknownError": "Unbekannter Fehler",
 		"CalendarSyncError": "Kalendersynchronisierung fehlgeschlagen"

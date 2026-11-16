@@ -82,7 +82,11 @@
 		"SUBFOLDERS_SUBTREE_ONE": "Jeden poziom",
 		"REPLIED": "Odebrano",
 		"KEYWORD": "Tag",
-		"ALSO_CC": "Szukaj również w DW"
+		"ALSO_CC": "Szukaj również w DW",
+		"DATE_RANGE": "Pomiędzy datami",
+		"DATE_FROM": "Od",
+		"DATE_TO": "Do",
+		"SENT_DATE": "Użyj daty wysłania, a nie otrzymania"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Stwórz",
@@ -607,7 +611,8 @@
 		"BUTTON_UPLOAD_BACKGROUND_IMAGE": "Prześlij własne tło (JPG, PNG)",
 		"ERROR_FILE_IS_TOO_BIG": "Plik jest za duży",
 		"ERROR_FILE_TYPE_ERROR": "Nieprawidłowy format pliku (obsługiwane są wyłącznie pliki JPG i PNG)",
-		"ERROR_UNKNOWN": "Wystąpił nieznany błąd w trakcie przesyłania pliku na serwer"
+		"ERROR_UNKNOWN": "Wystąpił nieznany błąd w trakcie przesyłania pliku na serwer",
+		"LABEL_ACCENT": "Kolor"
 	},
 	"SETTINGS_FOLDERS": {
 		"LEGEND_FOLDERS": "Lista folderów",
@@ -694,7 +699,12 @@
 		"LABEL_SEND_MESSAGE": "Wyślij wiadomość",
 		"LABEL_CLOSE_COMPOSE": "Zamknij okno tworzenia wiadomości",
 		"LABEL_TOGGLE_TAG": "Przełącz tag: Ważne, Praca, Osobiste, Do zrobienia, Później",
-		"LABEL_REMOVE_TAGS": "Usuń wszystkie pięć tych znaczników"
+		"LABEL_REMOVE_TAGS": "Usuń wszystkie pięć tych znaczników",
+		"TAB_ABOUT": "O programie",
+		"LABEL_VERSION": "Wersja",
+		"LABEL_WEBSITE": "Strona WWW",
+		"LABEL_SOURCE": "Kod źródłowy",
+		"LABEL_LICENSE": "Licencja"
 	},
 	"NOTIFICATIONS": {
 		"RequestError": "Zapytanie zakończone niepowodzeniem",

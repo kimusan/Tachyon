@@ -53,7 +53,8 @@
 		"LABEL_MESSAGES_PER_PAGE": "Wiadomości na stronę",
 		"HINT_MESSAGES_PER_PAGE": "Ustawienie domyślne dla użytkownika, który nie dokonał własnego wyboru.",
 		"LABEL_MESSAGES_PER_PAGE_MAX": "Limit wiadomości na stronę",
-		"HINT_MESSAGES_PER_PAGE_MAX": "Najwyższa wartość jaką może wybrać użytkownik. Wartość domyślna przekraczająca ten limit jest do niego ograniczana."
+		"HINT_MESSAGES_PER_PAGE_MAX": "Najwyższa wartość jaką może wybrać użytkownik. Wartość domyślna przekraczająca ten limit jest do niego ograniczana.",
+		"LABEL_THEME_ACCENT": "Kolor"
 	},
 	"TAB_LOGIN": {
 		"LEGEND_LOGIN_SCREEN": "Ekran logowania",
