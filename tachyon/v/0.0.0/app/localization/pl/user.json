@@ -86,7 +86,8 @@
 		"DATE_RANGE": "Pomiędzy datami",
 		"DATE_FROM": "Od",
 		"DATE_TO": "Do",
-		"SENT_DATE": "Użyj daty wysłania, a nie otrzymania"
+		"SENT_DATE": "Użyj daty wysłania, a nie otrzymania",
+		"DATE_ON": "W dniu"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Stwórz",
