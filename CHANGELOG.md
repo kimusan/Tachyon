@@ -1,3 +1,23 @@
+## 4.7.0 - 2026-11-17
+
+Update soon if you use the admin panel: saving settings could reset application.ini to its defaults, and that includes switching every plugin off. Beyond that, plugins get a proper way to add buttons and panels without touching core templates, advanced search can look up a single day, and a round of fixes for the admin panel, the date picker and the folder rail.
+
+### Fixed
+- **Admin settings could reset to their defaults.** Saving the configuration emptied application.ini before writing it, and a request that read the file in that moment found nothing and wrote the defaults over it. The admin password, branding, CardDAV and CalDAV, time zone and logging settings were lost, and every plugin was switched off, two-factor-auth included, while domains and plugin settings survived in their own files. Changing the admin password or reinstalling the Nextcloud app was enough to set it off. The file is now written beside the old one and swapped in when complete, and a file that cannot be read is never written over. If it happened to you, check the settings above and the enabled plugins; a lost admin password has been replaced by a generated one in `admin_password.txt` in the data folder. Reported by @lvarnava (#211)
+- **The admin panel froze for five seconds and then reloaded** when a mail tab in the same browser logged in, logged out or had its session end. The panel's security token was tied to the mail account, so its requests were rejected. It now has a token of its own, and a rejected token reloads the page at once instead of after five silent seconds. Logging out of mail still logs you out of the admin panel, but it now goes straight to the login. Reported by @lvarnava (#212)
+- On a phone, the first date field on a page opened no calendar: in advanced search that was From, while To worked. The same hit the first date field in the contacts and calendar dialogs. Reported by @lvarnava (#207)
+- The date picker's calendar icon opened a calendar that no click outside would close, two could be open at once, and one left open came back with the dialog. The calendar was also in English for every language but English, Danish, German, Spanish and French; it now follows the interface language for month and day names and the date format. Danish shows dd.MM.yyyy. Reported by @lvarnava (discussion #146)
+- With the folder panel collapsed, a selected message showed through the icon rail when it opened over the list. Reported by @ivnmad (#208)
+- The Tachyon theme drew the admin panel's title as a white outline in light mode. Reported by @ivnmad (#205)
+
+### Added
+- **On date in advanced search**, for a single day instead of the same date in From and To. With "Use the date it was sent" it matches the Date header. Asked for by @lvarnava (discussion #146)
+- **Plugin slots.** `rl.addButton(slot, { label, icon, action, visible, enabled })` adds a toolbar or menu button drawn with the core markup, so it needs no template or styles and follows every theme. `rl.addToSlot(slot, template, factory)` puts a template in a named place, with the plugin's own state if it wants it. New places in the message view above the message, before the body and below it, in the message list's toolbar and menu, and under the folder list. A new place is one line in a core template. The four older functions keep working. See plugins/README.md. Prompted by @FathiBenNasr (#210)
+
+### Changed
+- deepl-translate 0.4 draws its message view buttons through `rl.addButton()` and needs 4.7.0
+- Translations updated for German, Polish and Russian, and the search-filters plugin is now in Russian
+
 ## 4.6.0 - 2026-11-12
 
 Your inbox called. It wants to look like it was made this decade.
