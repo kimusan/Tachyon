@@ -70,12 +70,12 @@
 		"BEFORE_3_MONTHS": "Старше 3 месяцев",
 		"BEFORE_6_MONTHS": "Старше полугода",
 		"BEFORE_YEAR": "Старше года",
-		"SINCE_3_DAYS": "За три дня",
-		"SINCE_7_DAYS": "За неделю",
-		"SINCE_MONTH": "За месяц",
-		"SINCE_3_MONTHS": "За 3 месяца",
-		"SINCE_6_MONTHS": "За полгода",
-		"SINCE_YEAR": "За год",
+		"SINCE_3_DAYS": "Не старше 3 дней",
+		"SINCE_7_DAYS": "Не старше 1 недели",
+		"SINCE_MONTH": "Не старше 1 месяца",
+		"SINCE_3_MONTHS": "Не старше 3 месяцев",
+		"SINCE_6_MONTHS": "Не старше 6 месяцев",
+		"SINCE_YEAR": "Не старше 1 года",
 		"SUBFOLDERS": "Подпапки",
 		"SUBFOLDERS_NONE": "Ничего",
 		"SUBFOLDERS_SUBTREE": "Все",
@@ -86,7 +86,8 @@
 		"DATE_RANGE": "Период",
 		"DATE_FROM": "С",
 		"DATE_TO": "По",
-		"SENT_DATE": "Использовать дату отправки, а не получения"
+		"SENT_DATE": "Использовать дату отправки, а не получения",
+		"DATE_ON": "Дата"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Написать",
