@@ -448,6 +448,12 @@ trait UserAuth
 			catch (\Throwable $oException)
 			{
 				\Tachyon\Util\Log::warning(self::AUTH_SIGN_ME_TOKEN_KEY, $oException->getMessage());
+				// A mail server that could not be reached says nothing about the token.
+				// Clearing it here signed people out for good over a network blip, so it
+				// is kept and the next request signs in with it again.
+				if ($oException instanceof ClientException && Notifications::ConnectionError === $oException->getCode()) {
+					throw $oException;
+				}
 				$this->ClearSignMeData();
 			}
 		}
@@ -506,7 +512,13 @@ trait UserAuth
 			$oAccount->ImapConnectAndLogin($this->Plugins(), $oImapClient, $this->Config());
 		} catch (ClientException $oException) {
 			throw $oException;
-		} catch (\MailSo\Net\Exceptions\ConnectionException $oException) {
+		} catch (\MailSo\Net\Exceptions\ConnectionException
+			| \MailSo\Net\Exceptions\SocketReadException
+			| \MailSo\Net\Exceptions\SocketReadTimeoutException
+			| \MailSo\Net\Exceptions\SocketWriteException $oException) {
+			// The read and write failures are not ConnectionExceptions, so a connection
+			// dropped halfway through the login fell through to the catch-all below and
+			// was reported as AuthError, as if the password were wrong.
 			throw new ClientException(Notifications::ConnectionError, $oException);
 		} catch (\MailSo\Imap\Exceptions\LoginBadCredentialsException $oException) {
 			if ($bAuthLog) {
