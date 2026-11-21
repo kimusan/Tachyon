@@ -17,7 +17,11 @@ class Cookies
 			$oConfig = \Tachyon\Api::Config();
 			static::$DefaultPath = $oConfig->Get('labs', 'cookie_default_path', '');
 			static::$SameSite = $oConfig->Get('security', 'cookie_samesite', 'Strict');
-			static::$Secure = isset($_SERVER['HTTPS'])
+			// IsSecure() also honours X-Forwarded-Proto/-Ssl, so cookies keep the
+			// Secure flag behind a TLS-terminating proxy. Trusting the header is
+			// safe here: a client that fakes it only gets Secure cookies over a
+			// plain connection, which its own browser then does not send back.
+			static::$Secure = \MailSo\Base\Http::SingletonInstance()->IsSecure()
 				|| 'None' == static::$SameSite
 				|| !!$oConfig->Get('labs', 'cookie_default_secure', false);
 			$bOne = true;
