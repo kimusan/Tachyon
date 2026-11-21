@@ -71,22 +71,34 @@ class SmtpClient extends \MailSo\Net\NetClient
 
 	public static function EhloHelper() : string
 	{
-		$sEhloHost = empty($_SERVER['SERVER_NAME']) ? '' : \trim($_SERVER['SERVER_NAME']);
-		if (empty($sEhloHost)) {
-			$sEhloHost = empty($_SERVER['HTTP_HOST']) ? '' : \trim($_SERVER['HTTP_HOST']);
+		// RFC 5321 4.1.1.1: a domain name or an address literal. The first of these
+		// that is one wins: nginx passes its catch-all `server_name _;` as is, and
+		// a strict server refuses "EHLO _"
+		foreach ([
+			$_SERVER['SERVER_NAME'] ?? '',
+			$_SERVER['HTTP_HOST'] ?? '',
+			\function_exists('gethostname') ? \gethostname() : ''
+		] as $sEhloHost) {
+			$sEhloHost = \trim((string) $sEhloHost);
+			// A port goes, from "[::1]:8080" as from "host:8080", but an IPv6
+			// address without brackets is all colons and stays as it is
+			if (\preg_match('/^\[([^\]]+)\](?::\d+)?$/', $sEhloHost, $aMatch)) {
+				$sEhloHost = $aMatch[1];
+			} else if (1 === \substr_count($sEhloHost, ':')) {
+				$sEhloHost = \preg_replace('/:\d+$/', '', $sEhloHost);
+			}
+			if (\filter_var($sEhloHost, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
+				return '['.$sEhloHost.']';
+			}
+			if (\filter_var($sEhloHost, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+				return '[IPv6:'.$sEhloHost.']';
+			}
+			$sEhloHost = \Tachyon\Util\IDN::toAscii($sEhloHost);
+			if (\preg_match('/^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i', $sEhloHost)) {
+				return $sEhloHost;
+			}
 		}
-
-		if (empty($sEhloHost)) {
-			$sEhloHost = \function_exists('gethostname') ? \gethostname() : 'localhost';
-		}
-
-		$sEhloHost = \trim(\preg_replace('/:\d+$/', '', \trim($sEhloHost)));
-
-		if (\preg_match('/^\d+\.\d+\.\d+\.\d+$/', $sEhloHost)) {
-			$sEhloHost = '['.$sEhloHost.']';
-		}
-
-		return empty($sEhloHost) ? 'localhost' : $sEhloHost;
+		return 'localhost';
 	}
 
 	/**
