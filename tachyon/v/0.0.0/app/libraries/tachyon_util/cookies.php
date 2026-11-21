@@ -38,7 +38,8 @@ class Cookies
 					$aParts[$sCookieName] = $_COOKIE[$sCookieName];
 				}
 			}
-			\ksort($aParts);
+			// Naturally: sorted as strings, "name~10" came before "name~2"
+			\ksort($aParts, \SORT_NATURAL);
 			return \implode('', $aParts);
 		}
 		return null;
