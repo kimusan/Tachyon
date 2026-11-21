@@ -10,8 +10,8 @@ class LoginGMailPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Login GMail OAuth2',
-		VERSION  = '2.39',
-		RELEASE  = '2026-09-27',
+		VERSION  = '2.40',
+		RELEASE  = '2026-11-21',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'GMail IMAP, Sieve & SMTP login using RFC 7628 OAuth2';
@@ -57,6 +57,7 @@ class LoginGMailPlugin extends \Tachyon\Plugins\AbstractPlugin
 		$this->addHook('filter.http-paths', 'httpPaths');
 
 		$this->addHook('json.after-AccountDelete', 'afterAccountDelete');
+		$this->addHook('main.cryptkey-rotate', 'oauthRotateCryptKey');
 	}
 
 	public function afterAccountDelete(array &$aResponse) : void

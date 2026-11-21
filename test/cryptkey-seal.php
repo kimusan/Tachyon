@@ -3,7 +3,8 @@
 // Run with: php test/cryptkey-seal.php
 // .cryptkey is sealed with Argon2id instead of sha1(password . APP_SALT), new
 // CryptKeys are random instead of derived from the password, and old seals
-// are opened and sealed anew.
+// are opened and their (password-derived) key is replaced by a random one.
+// What the keys encrypt is covered by test/cryptkey-rotation.php.
 
 namespace Tachyon\Util {
 	abstract class Log
@@ -17,6 +18,7 @@ namespace Tachyon {
 	{
 		public static array $config = [];
 		public static ?object $storage = null;
+		public static array $hooks = [];
 		public static function Config() : object
 		{
 			return new class {
@@ -30,6 +32,12 @@ namespace Tachyon {
 			return new class {
 				public function StorageProvider() : object { return Api::$storage; }
 				public function logMask(string $s) : void {}
+				public function Plugins() : object
+				{
+					return new class {
+						public function RunHook(string $sName, array $aArgs = []) : object { Api::$hooks[] = $sName; return $this; }
+					};
+				}
 			};
 		}
 	}
@@ -72,6 +80,7 @@ namespace {
 			}
 			return true;
 		}
+		public function GenerateFilePath($mAccount, int $iType) : string { return ''; }
 		public function Get($mAccount, int $iType, string $sKey, $mDefault = false)
 		{
 			return $this->data[$this->k($mAccount, $sKey)] ?? $mDefault;
@@ -119,12 +128,18 @@ namespace {
 	check($iPuts === $storage->puts, 'a current seal was written again');
 	check(refused(fn() => account('a@example.com', 'wrong')->CryptKey()), 'wrong password opened the seal');
 
-	// Old seal, sha1(password . APP_SALT): the key stays, the seal is renewed
+	// Old seal, sha1(password . APP_SALT): opens, and its password-derived key
+	// is replaced by a random one once the data is re-encrypted
 	$sOld = sha1('cpass'.APP_SALT);
 	$storage->data['c@example.com/.cryptkey'] = \Tachyon\Util\Crypt::EncryptToJSON($sOld, 'cpass');
-	check(hex2bin($sOld) === (string) account('c@example.com', 'cpass')->CryptKey(), 'old seal no longer opens');
+	\Tachyon\Api::$hooks = [];
+	$sKeyC = (string) account('c@example.com', 'cpass')->CryptKey();
+	check(32 === strlen($sKeyC) && hex2bin($sOld) !== $sKeyC, 'key of an old seal not replaced');
+	check(['main.cryptkey-rotate'] === \Tachyon\Api::$hooks, 'plugins not asked to re-encrypt');
 	check(2 === (seal('c@example.com')['v'] ?? 0), 'old seal not renewed');
-	check(hex2bin($sOld) === (string) account('c@example.com', 'cpass')->CryptKey(), 'renewed seal lost the key');
+	check($sKeyC === hex2bin($Main::unsealCryptKey($storage->data['c@example.com/.cryptkey'], 'cpass', $b, $aOld)) && [] === $aOld,
+		'old key still pending after the rotation');
+	check($sKeyC === (string) account('c@example.com', 'cpass')->CryptKey(), 'renewed seal lost the key');
 	check(null === $Main::unsealCryptKey($storage->data['c@example.com/.cryptkey'], 'wrong'), 'renewed seal opens with a wrong password');
 
 	// Password changed: refused until resealed with the old one
@@ -133,10 +148,15 @@ namespace {
 	check(account('d@example.com', 'new')->resealCryptKey(new \Tachyon\Util\SensitiveString('old')), 'reseal failed');
 	check($sKeyD === (string) account('d@example.com', 'new')->CryptKey(), 'reseal changed the key');
 	check(refused(fn() => account('d@example.com', 'new')->resealCryptKey(new \Tachyon\Util\SensitiveString('wrong'))), 'reseal with a wrong old password');
-	// ... also from an old-format seal
+	// ... also from an old-format seal: its key is replaced as well
 	$storage->data['e@example.com/.cryptkey'] = \Tachyon\Util\Crypt::EncryptToJSON(sha1('eold'.APP_SALT), 'eold');
 	check(account('e@example.com', 'enew')->resealCryptKey(new \Tachyon\Util\SensitiveString('eold')), 'reseal of an old seal failed');
-	check(hex2bin(sha1('eold'.APP_SALT)) === (string) account('e@example.com', 'enew')->CryptKey(), 'reseal of an old seal lost the key');
+	check(null !== $Main::unsealCryptKey($storage->data['e@example.com/.cryptkey'], 'enew', $b, $aOld) && [sha1('eold'.APP_SALT)] === $aOld,
+		'reseal of an old seal did not keep the old key for re-encryption');
+	$sKeyE = (string) account('e@example.com', 'enew')->CryptKey();
+	check(32 === strlen($sKeyE) && hex2bin(sha1('eold'.APP_SALT)) !== $sKeyE, 'reseal of an old seal kept the password-derived key');
+	check(null !== $Main::unsealCryptKey($storage->data['e@example.com/.cryptkey'], 'enew', $b, $aOld) && [] === $aOld,
+		'old key still pending after the rotation');
 
 	// A seal with a lower cost is renewed with the current one
 	eval('class CheapMainAccount extends \Tachyon\Model\MainAccount { const CRYPTKEY_OPSLIMIT = 1, CRYPTKEY_MEMLIMIT = 8192 * 1024; }');

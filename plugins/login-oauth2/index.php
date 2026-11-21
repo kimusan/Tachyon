@@ -14,8 +14,8 @@ class LoginOAuth2Plugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'OAuth2',
-		VERSION  = '2.1',
-		RELEASE  = '2026-09-29',
+		VERSION  = '2.2',
+		RELEASE  = '2026-11-21',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'IMAP, Sieve & SMTP login using RFC 7628 OAuth2, for any provider';
@@ -73,6 +73,7 @@ class LoginOAuth2Plugin extends \Tachyon\Plugins\AbstractPlugin
 		$this->addHook('filter.http-paths', 'httpPaths');
 
 		$this->addHook('json.after-AccountDelete', 'afterAccountDelete');
+		$this->addHook('main.cryptkey-rotate', 'oauthRotateCryptKey');
 	}
 
 	public function configMapping() : array

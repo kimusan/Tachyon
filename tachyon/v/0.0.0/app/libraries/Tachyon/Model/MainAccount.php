@@ -37,7 +37,8 @@ class MainAccount extends Account
 	}
 
 	/**
-	 * Seal the hex encoded CryptKey with a secret.
+	 * Seal the hex encoded CryptKey with a secret. $aOld are keys it replaces
+	 * whose data is not re-encrypted yet (see CryptKeyRotation).
 	 *
 	 * The key derived from the secret used to be sha1(secret . APP_SALT): with
 	 * a copy of the data folder (which holds SALT.php) every guess at a user's
@@ -45,7 +46,7 @@ class MainAccount extends Account
 	 * seal. Without sodium (it ships with PHP, but can be left out) the old
 	 * seal is kept.
 	 */
-	public static function sealCryptKey(string $sKey, string $sSecret) : string
+	public static function sealCryptKey(string $sKey, string $sSecret, array $aOld = []) : string
 	{
 		if (!\is_callable('sodium_crypto_pwhash')) {
 			return \Tachyon\Util\Crypt::EncryptToJSON($sKey, $sSecret);
@@ -59,18 +60,23 @@ class MainAccount extends Account
 			'ops' => $iOps,
 			'mem' => $iMem,
 			'salt' => \base64_encode($sSalt),
-			'data' => \Tachyon\Util\Crypt::EncryptToJSON($sKey, static::sealKey($sSecret, $sSalt, $iOps, $iMem))
+			'data' => \Tachyon\Util\Crypt::EncryptToJSON($aOld ? ['key' => $sKey, 'old' => \array_values($aOld)] : $sKey,
+				static::sealKey($sSecret, $sSalt, $iOps, $iMem))
 		]);
 	}
 
 	/**
 	 * The hex encoded CryptKey, or null when $sSecret does not open the seal.
 	 * $bCurrent tells whether the seal is in the current format with the
-	 * current cost, i.e. does not need to be sealed again.
+	 * current cost, i.e. does not need to be sealed again. $aOld are the keys
+	 * it replaces whose data still needs re-encrypting; for a seal in the old
+	 * format, whose key was derived from the password, $bLegacy is set.
 	 */
-	public static function unsealCryptKey(string $sSealed, string $sSecret, ?bool &$bCurrent = null) : ?string
+	public static function unsealCryptKey(string $sSealed, string $sSecret, ?bool &$bCurrent = null,
+		?array &$aOld = null, ?bool &$bLegacy = null) : ?string
 	{
-		$bCurrent = false;
+		$bCurrent = $bLegacy = false;
+		$aOld = [];
 		$aSealed = \json_decode($sSealed, true);
 		if (isset($aSealed['v'])) {
 			if (2 !== $aSealed['v'] || 'argon2id13' !== ($aSealed['kdf'] ?? '')
@@ -89,11 +95,17 @@ class MainAccount extends Account
 			}
 			$sKey = \Tachyon\Util\Crypt::DecryptFromJSON((string) ($aSealed['data'] ?? ''),
 				static::sealKey($sSecret, $sSalt, $iOps, $iMem));
+			if (\is_array($sKey)) {
+				$aOld = \array_values(\array_filter((array) ($sKey['old'] ?? []),
+					fn($s) => \is_string($s) && \ctype_xdigit($s)));
+				$sKey = $sKey['key'] ?? null;
+			}
 			$bCurrent = $iOps >= static::CRYPTKEY_OPSLIMIT && $iMem >= static::CRYPTKEY_MEMLIMIT;
 		} else {
 			// Sealed with sha1(secret . APP_SALT)
 			$sKey = \Tachyon\Util\Crypt::DecryptFromJSON($sSealed, $sSecret);
 			$bCurrent = !\is_callable('sodium_crypto_pwhash');
+			$bLegacy = !$bCurrent;
 		}
 		return \is_string($sKey) && \strlen($sKey) && \ctype_xdigit($sKey) ? $sKey : null;
 	}
@@ -109,13 +121,18 @@ class MainAccount extends Account
 		$oStorage = \Tachyon\Api::Actions()->StorageProvider();
 		$sSealed = $oStorage->Get($this, StorageType::ROOT, '.cryptkey');
 		if ($sSealed) {
-			$sKey = static::unsealCryptKey($sSealed, (string) $oOldPass);
+			$sKey = static::unsealCryptKey($sSealed, (string) $oOldPass, $bCurrent, $aOld, $bLegacy);
 			$sSecret = $this->cryptKeySecrets()[0] ?? '';
 			if (null === $sKey || !\strlen($sSecret)) {
 				throw new ClientException(Notifications::CryptKeyError);
 			}
+			if ($bLegacy) {
+				// Derived from the password: replace it, CryptKey() re-encrypts
+				$aOld[] = $sKey;
+				$sKey = \bin2hex(\random_bytes(32));
+			}
 			$this->sCryptKey = null;
-			if ($oStorage->Put($this, StorageType::ROOT, '.cryptkey', static::sealCryptKey($sKey, $sSecret))) {
+			if ($oStorage->Put($this, StorageType::ROOT, '.cryptkey', static::sealCryptKey($sKey, $sSecret, $aOld))) {
 				return true;
 			}
 		}
@@ -144,12 +161,22 @@ class MainAccount extends Account
 			}
 			$sKey = null;
 			foreach ($aSecrets as $i => $sSecret) {
-				$sKey = static::unsealCryptKey($sSealed, $sSecret, $bCurrent);
+				$sKey = static::unsealCryptKey($sSealed, $sSecret, $bCurrent, $aOld, $bLegacy);
 				if (null !== $sKey) {
-					if ($i || !$bCurrent) {
+					if ($bLegacy) {
+						// Derived from the password: replace it with a random key
+						// and re-encrypt what the old one protects (below). The
+						// old key stays in the seal until that is done.
+						$aOld[] = $sKey;
+						$sKey = \bin2hex(\random_bytes(32));
+					}
+					if ($i || !$bCurrent || $bLegacy) {
 						// Old format or cost, or an older secret: seal it anew
-						$oStorage->Put($this, StorageType::ROOT, '.cryptkey',
-							static::sealCryptKey($sKey, $aSecrets[0]));
+						if (!$oStorage->Put($this, StorageType::ROOT, '.cryptkey',
+							static::sealCryptKey($sKey, $aSecrets[0], $aOld))
+						) {
+							throw new ClientException(Notifications::CryptKeyError);
+						}
 					}
 					break;
 				}
@@ -158,8 +185,30 @@ class MainAccount extends Account
 				throw new ClientException(Notifications::CryptKeyError);
 			}
 			$this->sCryptKey = new SensitiveString(\hex2bin($sKey));
+			if ($aOld) {
+				$this->rotateCryptKey($aOld, $sKey, $aSecrets[0]);
+			}
 		}
 		return $this->sCryptKey;
+	}
+
+	/**
+	 * Re-encrypt what the old keys protect under the current one, and drop
+	 * them from the seal once that worked. On failure they stay, and the next
+	 * request tries again; data the step did not reach meanwhile reads as if
+	 * encrypted with an unknown key (e.g. a sync password to enter again).
+	 */
+	private function rotateCryptKey(array $aOld, string $sKey, string $sSecret) : void
+	{
+		try {
+			foreach ($aOld as $sOld) {
+				CryptKeyRotation::run($this, \hex2bin($sOld), \hex2bin($sKey));
+			}
+			\Tachyon\Api::Actions()->StorageProvider()->Put($this, StorageType::ROOT, '.cryptkey',
+				static::sealCryptKey($sKey, $sSecret));
+		} catch (\Throwable $e) {
+			\Tachyon\Util\Log::warning('CryptKey', 'rotation incomplete: ' . $e->getMessage());
+		}
 	}
 
 /*
