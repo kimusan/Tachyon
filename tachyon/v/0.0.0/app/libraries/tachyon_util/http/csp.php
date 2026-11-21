@@ -98,8 +98,14 @@ class CSP implements \Stringable
 		\http_response_code(204);
 		$json = \file_get_contents('php://input');
 		$report = \json_decode($json, true);
+		// report-uri posts one {"csp-report":{...}}, report-to (the Reporting API,
+		// which Chromium uses) a list of {"type":"csp-violation","body":{...}}. The
+		// first was read for both, so each report-to report raised a PHP warning.
+		$sources = isset($report['csp-report'])
+			? [$report['csp-report']['source-file'] ?? '']
+			: \array_map(fn($entry) => \is_array($entry) ? ($entry['body']['sourceFile'] ?? '') : '', \is_array($report) ? $report : []);
 		// Useless to log 'moz-extension' as there's no clue which extension violates
-		if ($json && $report && 'moz-extension' !== $report['csp-report']['source-file']) {
+		if ($json && $report && \array_diff($sources, ['moz-extension'])) {
 			\Tachyon\Util\Log::error('CSP', $json);
 		}
 		exit;
