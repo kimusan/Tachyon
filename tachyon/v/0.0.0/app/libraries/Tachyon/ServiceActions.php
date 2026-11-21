@@ -476,7 +476,11 @@ class ServiceActions
 		$bCacheEnabled = !$bAppDebug && $this->Config()->Get('cache', 'system_data', true);
 		$sCacheFileName = '';
 		if ($bCacheEnabled) {
-			$sCacheFileName = KeyPathHelper::PluginsJsCache($this->oActions->Plugins()->Hash()) . $sMinify;
+			// Admin and user get different scripts from the same plugins, so they
+			// need their own cache entry: sharing one served whichever came first
+			$sCacheFileName = KeyPathHelper::PluginsJsCache($this->oActions->Plugins()->Hash())
+				. ($bAdmin ? 'admin' : 'user')
+				. $sMinify;
 			$this->oActions->verifyCacheByKey(\md5($sCacheFileName));
 			$sResult = $this->Cacher()->Get($sCacheFileName);
 		}
