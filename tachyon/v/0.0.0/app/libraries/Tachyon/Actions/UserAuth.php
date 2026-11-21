@@ -23,11 +23,13 @@ trait UserAuth
 
 	public function DoResealCryptKey() : array
 	{
-		return $this->DefaultResponse(
-			$this->getMainAccountFromToken()->resealCryptKey(
-				new SensitiveString($this->GetActionParam('passphrase', ''))
-			)
+		$oMainAccount = $this->getMainAccountFromToken();
+		$bResult = $oMainAccount->resealCryptKey(
+			new SensitiveString($this->GetActionParam('passphrase', ''))
 		);
+		// The login cookie carries the CryptKey: it was missing while locked
+		$bResult && $this->SetAuthToken($oMainAccount);
+		return $this->DefaultResponse($bResult);
 	}
 
 	/**
@@ -367,7 +369,7 @@ trait UserAuth
 	public function SetAuthToken(MainAccount $oAccount): void
 	{
 		$this->SetMainAuthAccount($oAccount);
-		Cookies::setSecure(self::AUTH_SPEC_TOKEN_KEY, $oAccount);
+		Cookies::setSecure(self::AUTH_SPEC_TOKEN_KEY, $oAccount->tokenArray());
 	}
 
 	public function SetAdditionalAuthToken(?AdditionalAccount $oAccount): void

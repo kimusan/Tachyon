@@ -11,15 +11,51 @@ use Tachyon\Util\SensitiveString;
 class MainAccount extends Account
 {
 	/**
-	 * Argon2id cost for sealing .cryptkey: the OWASP minimum (19 MiB, two
-	 * passes). The cost is paid by every request that opens the seal, and the
-	 * values are stored with each seal, so they can be raised later.
+	 * Argon2id cost for sealing .cryptkey: libsodium's "interactive" level
+	 * (64 MiB, two passes; about 75 ms here). The seal is opened once per
+	 * login, later requests take the key from the login cookie (tokenArray()).
+	 * The values are stored with each seal; cheaper seals are renewed.
 	 */
 	const
 		CRYPTKEY_OPSLIMIT = 2,
-		CRYPTKEY_MEMLIMIT = 19 * 1024 * 1024;
+		CRYPTKEY_MEMLIMIT = 64 * 1024 * 1024;
 
 	private ?SensitiveString $sCryptKey = null;
+
+	/**
+	 * The login cookie's content (UserAuth::SetAuthToken()): the account and
+	 * its unsealed CryptKey, so that later requests of the session need not
+	 * open the Argon2id seal. The cookie already carries the IMAP password,
+	 * which opens the seal, so this adds little: unlike the password, the key
+	 * still works after a password change, for whoever kept an old cookie and
+	 * later gets the data folder (which they need to read the cookie at all).
+	 * Not jsonSerialize(): that is also the remember-me record stored on the
+	 * server, and restoring from it is a login, which opens the seal anyway.
+	 */
+	public function tokenArray() : array
+	{
+		$aToken = $this->jsonSerialize();
+		try {
+			$aToken['cryptkey'] = \bin2hex((string) $this->CryptKey());
+		} catch (ClientException $e) {
+			// Locked, e.g. still sealed with a previous password: asked for
+			// (ResealCryptKey) when something needs it
+		}
+		return $aToken;
+	}
+
+	public static function NewInstanceFromTokenArray(
+		\Tachyon\Actions $oActions,
+		array $aAccountHash,
+		bool $bThrowExceptionOnFalse = false): ?self
+	{
+		$oAccount = parent::NewInstanceFromTokenArray($oActions, $aAccountHash, $bThrowExceptionOnFalse);
+		$sKey = $aAccountHash['cryptkey'] ?? null;
+		if ($oAccount && \is_string($sKey) && 40 <= \strlen($sKey) && !(\strlen($sKey) % 2) && \ctype_xdigit($sKey)) {
+			$oAccount->sCryptKey = new SensitiveString(\hex2bin($sKey));
+		}
+		return $oAccount;
+	}
 
 	/**
 	 * The secrets .cryptkey may be sealed with, preferred first: the IMAP
