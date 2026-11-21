@@ -1,8 +1,8 @@
 {
     "SFILTERS": {
-        "WHEN_MESSAGE_MATCH_SEARCH_CRITERIA": "",
-        "FILTERS": "",
-        "FILTER": "",
+        "WHEN_MESSAGE_MATCH_SEARCH_CRITERIA": "Wenn eine Nachricht genau Ihren Suchkriterien entspricht:",
+        "FILTERS": "Filter",
+        "FILTER": "Filter",
         "MOVE_TO_FOLDER": "",
         "CREATE_FILTER": "",
         "EDIT_FILTERS": "",
