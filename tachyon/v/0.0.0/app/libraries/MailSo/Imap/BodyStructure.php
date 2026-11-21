@@ -312,26 +312,28 @@ class BodyStructure implements \JsonSerializable
 			if (2 === \count($aValueParts)) {
 				$sCharset = isset($aValueParts[0]) ? $aValueParts[0] : \MailSo\Base\Enumerations\Charset::UTF_8;
 				$sResult = \MailSo\Base\Utils::ConvertEncoding(
-					\urldecode($aValueParts[1]), $sCharset, \MailSo\Base\Enumerations\Charset::UTF_8);
+					\rawurldecode($aValueParts[1]), $sCharset, \MailSo\Base\Enumerations\Charset::UTF_8);
 			} else {
-				$sResult = \urldecode($aParams[$sParamName.'*']);
+				$sResult = \rawurldecode($aParams[$sParamName.'*']);
 			}
 		} else {
+			// RFC 2231 sections: name*0, name*1 ... as plain text, or name*0*,
+			// name*1* ... percent encoded with charset'language' leading the first.
+			// The plain form, which mailers use to cut a long ASCII file name,
+			// used to be skipped, so the attachment came up with no name
 			$sCharset = '';
-			$sCharsetIndex = -1;
-
 			$aFileNames = array();
 			foreach ($aParams as $sName => $sValue) {
 				$aMatches = array();
-				if (\preg_match('/^'.\preg_quote($sParamName, '/').'\*([0-9]+)\*$/i', $sName, $aMatches)) {
+				if (\preg_match('/^'.\preg_quote($sParamName, '/').'\*([0-9]+)(\*?)$/iD', $sName, $aMatches)) {
 					$iIndex = (int) $aMatches[1];
-					if ($sCharsetIndex < $iIndex && false !== \strpos($sValue, "''")) {
-						$aValueParts = \explode("''", $sValue, 2);
-						if (2 === \count($aValueParts) && \strlen($aValueParts[0])) {
-							$sCharsetIndex = $iIndex;
-							$sCharset = $aValueParts[0];
-							$sValue = $aValueParts[1];
+					if ('*' === $aMatches[2]) {
+						if (0 === $iIndex && \preg_match("/^([^']*)'[^']*'(.*)$/sD", $sValue, $aValueParts)) {
+							$sCharset = $aValueParts[1];
+							$sValue = $aValueParts[2];
 						}
+						// rawurldecode(): a + is a +, only %XX is encoded
+						$sValue = \rawurldecode($sValue);
 					}
 					$aFileNames[$iIndex] = $sValue;
 				}
@@ -339,8 +341,7 @@ class BodyStructure implements \JsonSerializable
 
 			if (\count($aFileNames)) {
 				\ksort($aFileNames, SORT_NUMERIC);
-				$sResult = \implode(\array_values($aFileNames));
-				$sResult = \urldecode($sResult);
+				$sResult = \implode($aFileNames);
 				if (\strlen($sCharset)) {
 					$sResult = \MailSo\Base\Utils::ConvertEncoding($sResult,
 						$sCharset, \MailSo\Base\Enumerations\Charset::UTF_8);

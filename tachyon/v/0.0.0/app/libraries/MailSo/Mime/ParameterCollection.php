@@ -99,70 +99,48 @@ class ParameterCollection extends \MailSo\Base\Collection
 	}
 */
 
+	/**
+	 * RFC 2231: name*0, name*1 ... is one value cut into sections, and a star
+	 * after the name or the section number marks that part as percent encoded,
+	 * the first one led by charset'language'. Both forms come up: name*0="..."
+	 * from mailers cutting a long plain file name, name*0*=utf-8''... from
+	 * those encoding it.
+	 */
 	private function reParseParameters() : void
 	{
 		$aDataToReParse = $this->getArrayCopy();
-		$sCharset = \MailSo\Base\Enumerations\Charset::UTF_8;
 
 		$this->Clear();
 
 		$aPreParams = array();
+		$aCharsets = array();
 		foreach ($aDataToReParse as $oParam) {
 			$aMatch = array();
-			$sParamName = $oParam->Name();
-
-			if (\preg_match('/([^\*]+)\*([\d]{1,2})\*/', $sParamName, $aMatch) && isset($aMatch[1], $aMatch[2])
-				&& \strlen($aMatch[1]) && \is_numeric($aMatch[2]))
-			{
-				if (!isset($aPreParams[$aMatch[1]])) {
-					$aPreParams[$aMatch[1]] = array();
-				}
-
+			if (\preg_match('/^([^*]+)\*(\d*)(\*?)$/D', $oParam->Name(), $aMatch)) {
+				$sName = $aMatch[1];
+				$iSection = (int) $aMatch[2];
 				$sValue = $oParam->Value();
-
-				if (false !== \strpos($sValue, "''")) {
-					$aValueParts = \explode("''", $sValue, 2);
-					if (\is_array($aValueParts) && 2 === \count($aValueParts) && \strlen($aValueParts[1])) {
-						$sCharset = $aValueParts[0];
-						$sValue = $aValueParts[1];
+				if ('' === $aMatch[2] || '*' === $aMatch[3]) {
+					if (0 === $iSection && \preg_match("/^([^']*)'[^']*'(.*)$/sD", $sValue, $aMatch)) {
+						\strlen($aMatch[1]) && $aCharsets[$sName] = $aMatch[1];
+						$sValue = $aMatch[2];
 					}
+					// rawurldecode(): a + is a +, only %XX is encoded
+					$sValue = \rawurldecode($sValue);
 				}
-
-				$aPreParams[$aMatch[1]][(int) $aMatch[2]] = $sValue;
-			}
-			else if (\preg_match('/([^\*]+)\*/', $sParamName, $aMatch) && isset($aMatch[1]))
-			{
-				if (!isset($aPreParams[$aMatch[1]])) {
-					$aPreParams[$aMatch[1]] = array();
-				}
-
-				$sValue = $oParam->Value();
-				if (false !== \strpos($sValue, "''")) {
-					$aValueParts = \explode("''", $sValue, 2);
-					if (\is_array($aValueParts) && 2 === \count($aValueParts) && \strlen($aValueParts[1])) {
-						$sCharset = $aValueParts[0];
-						$sValue = $aValueParts[1];
-					}
-				}
-
-				$aPreParams[$aMatch[1]][0] = $sValue;
-			}
-			else
-			{
+				$aPreParams[$sName][$iSection] = $sValue;
+			} else {
 				$this->append($oParam);
 			}
 		}
 
 		foreach ($aPreParams as $sName => $aValues) {
 			\ksort($aValues);
-			$sResult = \implode(\array_values($aValues));
-			$sResult = \urldecode($sResult);
-
-			if (\strlen($sCharset)) {
+			$sResult = \implode($aValues);
+			if (isset($aCharsets[$sName])) {
 				$sResult = \MailSo\Base\Utils::ConvertEncoding($sResult,
-					$sCharset, \MailSo\Base\Enumerations\Charset::UTF_8);
+					$aCharsets[$sName], \MailSo\Base\Enumerations\Charset::UTF_8);
 			}
-
 			$this->append(new Parameter($sName, $sResult));
 		}
 	}
