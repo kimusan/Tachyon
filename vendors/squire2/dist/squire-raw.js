@@ -45,6 +45,7 @@
   // source/Constants.ts
   var ELEMENT_NODE = 1;
   var TEXT_NODE = 3;
+  var COMMENT_NODE = 8;
   var DOCUMENT_FRAGMENT_NODE = 11;
   var ZWS = "\u200B";
   var ua = navigator.userAgent;
@@ -55,7 +56,7 @@
   var isWebKit = /WebKit\//.test(ua);
   var ctrlKey = isMac || isIOS ? "Meta-" : "Ctrl-";
   var cantFocusEmptyTextNodes = isWebKit;
-  var notWS = /[^ \t\r\n]/;
+  var notWS = /[^ \t\r\n\u200B]/;
 
   // source/node/Category.ts
   var inlineNodeNames = /^(?:#text|A(?:BBR|CRONYM)?|B(?:R|D[IO])?|C(?:ITE|ODE)|D(?:ATA|EL|FN)|EM|FONT|HR|I(?:MG|NS)?|KBD|Q|R(?:P|T|UBY)|S(?:AMP|MALL|PAN|TR(?:IKE|ONG)|U[BP])?|TIME|U|VAR|WBR)$/;
@@ -71,6 +72,7 @@
   var isLeaf = (node) => leafNodeNames.has(node.nodeName);
   var getNodeCategory = (node) => {
     switch (node.nodeType) {
+      case COMMENT_NODE:
       case TEXT_NODE:
         return INLINE;
       case ELEMENT_NODE:
@@ -252,11 +254,12 @@
       return nodeStartAfterStart && nodeEndBeforeEnd;
     }
   };
+  var canDescendInto = (node) => node instanceof Text || node.nodeType === ELEMENT_NODE && !isLeaf(node);
   var moveRangeBoundariesDownTree = (range) => {
     let { startContainer, startOffset, endContainer, endOffset } = range;
     while (!(startContainer instanceof Text)) {
       let child = startContainer.childNodes[startOffset];
-      if (!child || isLeaf(child)) {
+      if (!child || !canDescendInto(child)) {
         if (startOffset) {
           child = startContainer.childNodes[startOffset - 1];
           if (child instanceof Text) {
@@ -278,7 +281,7 @@
     if (endOffset) {
       while (!(endContainer instanceof Text)) {
         const child = endContainer.childNodes[endOffset - 1];
-        if (!child || isLeaf(child)) {
+        if (!child || !canDescendInto(child)) {
           if (child && child.nodeName === "BR" && !isLineBreak(child)) {
             --endOffset;
             continue;
@@ -291,7 +294,7 @@
     } else {
       while (!(endContainer instanceof Text)) {
         const child = endContainer.firstChild;
-        if (!child || isLeaf(child)) {
+        if (!child || !canDescendInto(child)) {
           break;
         }
         endContainer = child;
@@ -368,7 +371,7 @@
       replace(classNames, family) {
         return createElement("SPAN", {
           class: classNames.fontFamily,
-          style: "font-family:" + family
+          style: { fontFamily: family }
         });
       }
     },
@@ -377,7 +380,7 @@
       replace(classNames, size) {
         return createElement("SPAN", {
           class: classNames.fontSize,
-          style: "font-size:" + size
+          style: { fontSize: size }
         });
       }
     },
@@ -484,9 +487,9 @@
       return el;
     }
   };
-  var allowedBlock = /^(?:A(?:DDRESS|RTICLE|SIDE|UDIO)|BLOCKQUOTE|CAPTION|D(?:[DLT]|IV)|F(?:IGURE|IGCAPTION|OOTER)|H[1-6]|HEADER|L(?:ABEL|EGEND|I)|O(?:L|UTPUT)|P(?:RE)?|SECTION|T(?:ABLE|BODY|D|FOOT|H|HEAD|R)|COL(?:GROUP)?|UL)$/;
+  var allowedBlock = /^(?:A(?:DDRESS|RTICLE|SIDE|UDIO)?|BLOCKQUOTE|CAPTION|D(?:[DLT]|IV)|F(?:IGURE|IGCAPTION|OOTER)|H[1-6]|HEADER|L(?:ABEL|EGEND|I)|O(?:L|UTPUT)|P(?:RE)?|SECTION|T(?:ABLE|BODY|D|FOOT|H|HEAD|R)|COL(?:GROUP)?|UL)$/;
   var blacklist = /* @__PURE__ */ new Set(["HEAD", "META", "STYLE"]);
-  var cleanTree = (node, config, preserveWS) => {
+  var cleanTree = (node, config, preserveWS, wsCache = { before: /* @__PURE__ */ new WeakMap(), after: /* @__PURE__ */ new WeakMap() }) => {
     const children = node.childNodes;
     let nonInlineParent = node;
     while (isInline(nonInlineParent)) {
@@ -513,7 +516,12 @@
           continue;
         }
         if (childLength) {
-          cleanTree(child, config, preserveWS || nodeName === "PRE");
+          cleanTree(
+            child,
+            config,
+            preserveWS || nodeName === "PRE",
+            wsCache
+          );
         }
       }
     }
@@ -539,11 +547,6 @@
     let l = brs.length;
     while (l--) {
       const br = brs[l], parent = br.parentElement;
-      // parent is null for a BR that is a fragment's own last child, which
-      // :last-child does match. Reading children off it threw, and the callers
-      // are setHTML and insertHTML: pasting or inserting anything ending in a
-      // BR silently inserted nothing, and loading a body ending in one threw
-      // out of setHTML. Tachyon issue #117.
       if (parent && !br.nextSibling && 1 === parent.children.length && parent.textContent.trim().length) {
         br.remove();
       }
@@ -562,6 +565,9 @@
   };
   var fixContainer = (container) => {
     let wrapper = null;
+    if (/^(?:TABLE|TBODY|TR|TH|TD|P)/.test(container.nodeName)) {
+      return container;
+    }
     [...container.childNodes].forEach((child) => {
       if (isInline(child)) {
         wrapper || (wrapper = createElement("DIV"));
@@ -571,10 +577,13 @@
         wrapper = null;
       }
     });
-    wrapper && container.append(wrapper);
+    wrapper && container.append(fixCursor(wrapper));
     return container;
   };
   var split = (node, offset, stopNode, root) => {
+    if (!stopNode.contains(node)) {
+      throw new Error("split: stopNode does not contain node");
+    }
     if (node instanceof Text && node !== stopNode) {
       if (typeof offset !== "number") {
         throw new Error("Offset must be a number to split text node!");
@@ -1025,7 +1034,7 @@
     }
     moveRangeBoundariesDownTree(range);
     range.collapse(false);
-    const stopPoint = getClosest(range.endContainer, root, "BLOCKQUOTE") || root;
+    let stopPoint = getClosest(range.endContainer, root, "BLOCKQUOTE") || root;
     let block = getStartBlockOfRange(range, root);
     let blockContentsAfterSplit = null;
     const firstBlockInFrag = getNextBlock(frag, frag);
@@ -1044,17 +1053,9 @@
           getPreviousBlock(container, root) || root,
           root
         );
-        /**
-         * Splitting at the end of a link leaves the clone of it with nothing in
-         * it, and this path never cleaned that up: inserting anything beside a
-         * link left an empty one behind, which then travelled in the sent
-         * message. splitBlock() meets the same case and swaps the empty link
-         * for an empty text node, which keeps the position this needs.
-         */
-        if (nodeAfterSplit && "A" === nodeAfterSplit.nodeName
-         && (!nodeAfterSplit.textContent || ZWS === nodeAfterSplit.textContent)) {
+        if (nodeAfterSplit && nodeAfterSplit.nodeName === "A" && (!nodeAfterSplit.textContent || nodeAfterSplit.textContent === ZWS)) {
           const text = document.createTextNode("");
-          replaceWith(nodeAfterSplit, text);
+          nodeAfterSplit.replaceWith(text);
           nodeAfterSplit = text;
         }
         container = nodeAfterSplit.parentNode;
@@ -1072,17 +1073,28 @@
         }
       }
       mergeWithBlock(container, firstBlockInFrag, range, root);
-      offset = Array.from(container.parentNode.childNodes).indexOf(
-        container
-      ) + 1;
-      container = container.parentNode;
-      range.setEnd(container, offset);
+      if (container === root) {
+        range.setEnd(root, getLength(root));
+      } else {
+        offset = Array.from(container.parentNode.childNodes).indexOf(
+          container
+        ) + 1;
+        container = container.parentNode;
+        range.setEnd(container, offset);
+      }
     }
     if (getLength(frag)) {
       if (replaceBlock && block) {
         range.setEndBefore(block);
         range.collapse(false);
         detach(block);
+      }
+      if (!stopPoint.contains(range.endContainer)) {
+        if (!root.contains(range.endContainer)) {
+          range.setEnd(root, getLength(root));
+          range.collapse(false);
+        }
+        stopPoint = getClosest(range.endContainer, root, "BLOCKQUOTE") || root;
       }
       moveRangeBoundariesUpTree(range, stopPoint, stopPoint, root);
       let nodeAfterSplit = split(
@@ -1167,29 +1179,25 @@
 
   // source/Clipboard.ts
   var indexOf = Array.prototype.indexOf;
-  var extractRangeToClipboard = (event, range, root, removeRangeFromDocument, toCleanHTML, toPlainText, plainTextOnly) => {
-    const clipboardData = event.clipboardData;
-    if (!clipboardData) {
-      return false;
-    }
+  var extractRange = (range, root, removeRangeFromDocument, toCleanHTML, toPlainText) => {
     let text = toPlainText ? "" : getTextContentsOfRange(range);
     const startBlock = getStartBlockOfRange(range, root);
     const endBlock = getEndBlockOfRange(range, root);
+    let parent = range.commonAncestorContainer;
     let copyRoot = root;
-    if (startBlock === endBlock && startBlock?.contains(range.commonAncestorContainer)) {
+    if (startBlock === endBlock && startBlock?.contains(parent)) {
       copyRoot = startBlock;
     }
     let contents;
     if (removeRangeFromDocument) {
       contents = deleteContentsOfRange(range, root);
+      if (!parent.isConnected) {
+        parent = range.commonAncestorContainer;
+      }
     } else {
-      range = range.cloneRange();
-      moveRangeBoundariesDownTree(range);
-      moveRangeBoundariesUpTree(range, copyRoot, copyRoot, root);
       contents = range.cloneContents();
     }
-    let parent = range.commonAncestorContainer;
-    if (parent instanceof Text) {
+    while (parent && !(parent instanceof Element)) {
       parent = parent.parentNode;
     }
     while (parent && parent !== copyRoot) {
@@ -1201,7 +1209,7 @@
     let html;
     if (contents.childNodes.length === 1 && contents.childNodes[0] instanceof Text) {
       text = contents.childNodes[0].data.replace(/ /g, " ");
-      plainTextOnly = true;
+      html = void 0;
     } else {
       const node = createElement("DIV");
       node.append(contents);
@@ -1213,15 +1221,34 @@
     if (toPlainText && html !== void 0) {
       text = toPlainText(html);
     }
+    if (text === html) {
+      html = void 0;
+    }
     if (isWin) {
       text = text.replace(/\r?\n/g, "\r\n");
     }
-    if (!plainTextOnly && html && text !== html) {
+    if (html) {
       html = "<!-- squire -->" + html;
+    }
+    return [text, html];
+  };
+  var extractRangeToClipboard = (event, range, root, removeRangeFromDocument, toCleanHTML, toPlainText, plainTextOnly) => {
+    const clipboardData = event.clipboardData;
+    if (!clipboardData) {
+      return false;
+    }
+    let [text, html] = extractRange(
+      range,
+      root,
+      removeRangeFromDocument,
+      toCleanHTML,
+      toPlainText
+    );
+    event.preventDefault();
+    if (!plainTextOnly && html) {
       clipboardData.setData("text/html", html);
     }
     clipboardData.setData("text/plain", text);
-    event.preventDefault();
     return true;
   };
   var _onCut = function(event) {
@@ -1269,7 +1296,11 @@
   var _onPaste = function(event) {
     const clipboardData = event.clipboardData;
     const items = clipboardData.items;
-    const choosePlain = this._isShiftDown;
+    const choosePlain = this._isShiftDown || !!getNearest(
+      this.getSelection().commonAncestorContainer,
+      this._root,
+      "PRE"
+    );
     let hasRTF = false;
     let hasImage = false;
     let plainItem = null;
@@ -1288,7 +1319,7 @@
         hasImage = true;
       }
     }
-    if (hasImage && !(hasRTF && htmlItem)) {
+    if (hasImage && !(hasRTF && htmlItem) && !plainItem) {
       event.preventDefault();
       this.fireEvent("pasteImage", {
         clipboardData
@@ -1302,42 +1333,122 @@
       });
     } else if (plainItem) {
       plainItem.getAsString((text) => {
-        let isLink = false;
         const range = this.getSelection();
         if (!range.collapsed && notWS.test(range.toString())) {
           const match = this.linkRegExp.exec(text);
-          isLink = !!match && match[0].length === text.length;
+          const isLink = !!match && match[0].length === text.length;
+          if (isLink) {
+            const href = match[1] ? /^(?:ht|f)tps?:/i.test(match[1]) ? match[1] : "http://" + match[1] : "mailto:" + match[0];
+            this.makeLink(href);
+            return;
+          }
         }
-        if (isLink) {
-          this.makeLink(text);
-        } else {
-          this.insertPlainText(text, true);
-        }
+        this.insertPlainText(text, true);
       });
     }
   };
+  var _onDragStart = function() {
+    const range = this.getSelection();
+    if (range && !range.collapsed && this._root.contains(range.commonAncestorContainer)) {
+      this._dragRange = range.cloneRange();
+    } else {
+      this._dragRange = null;
+    }
+  };
+  var _onDragEnd = function() {
+    this._dragRange = null;
+  };
+  var getCaretRangeFromPoint = (x, y, root) => {
+    let range = null;
+    const doc = document;
+    if (doc.caretPositionFromPoint) {
+      const pos = doc.caretPositionFromPoint(x, y);
+      if (pos) {
+        range = document.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+      }
+    } else if (doc.caretRangeFromPoint) {
+      range = doc.caretRangeFromPoint(x, y);
+    }
+    if (range && !root.contains(range.commonAncestorContainer)) {
+      return null;
+    }
+    return range;
+  };
+  var pointIsWithinRange = (point, source) => {
+    return point.compareBoundaryPoints(Range.START_TO_START, source) >= 0 && point.compareBoundaryPoints(Range.END_TO_END, source) <= 0;
+  };
   var _onDrop = function(event) {
-    if (!event.dataTransfer) {
+    const dataTransfer = event.dataTransfer;
+    if (!dataTransfer) {
       return;
     }
-    const types = event.dataTransfer.types;
-    let l = types.length;
+    const types = dataTransfer.types;
     let hasPlain = false;
     let hasHTML = false;
-    while (l--) {
-      switch (types[l]) {
+    for (let i = 0, l = types.length; i < l; i += 1) {
+      switch (types[i]) {
         case "text/plain":
           hasPlain = true;
           break;
         case "text/html":
           hasHTML = true;
           break;
-        default:
-          return;
       }
     }
-    if (hasHTML || hasPlain && this.saveUndoState) {
-      this.saveUndoState();
+    if (!hasPlain && !hasHTML) {
+      return;
+    }
+    event.preventDefault();
+    const root = this._root;
+    let dropRange = getCaretRangeFromPoint(event.clientX, event.clientY, root);
+    const dragRange = this._dragRange;
+    this._dragRange = null;
+    if (!dropRange) {
+      return;
+    }
+    let text, html;
+    if (dragRange) {
+      if (pointIsWithinRange(dropRange, dragRange)) {
+        return;
+      }
+      this._recordUndoState(dragRange, this._isInUndoState);
+      const bookmark = document.createComment("");
+      dropRange.insertNode(bookmark);
+      this._getRangeAndRemoveBookmark(dragRange);
+      [text, html] = extractRange(
+        dragRange,
+        root,
+        dataTransfer.dropEffect !== "copy",
+        this._config.willCutCopy,
+        this._config.toPlainText
+      );
+      bookmark.replaceWith(
+        createElement("INPUT", {
+          id: this.startSelectionId,
+          type: "hidden"
+        }),
+        createElement("INPUT", {
+          id: this.endSelectionId,
+          type: "hidden"
+        })
+      );
+      this._getRangeAndRemoveBookmark(dropRange);
+      resetNodeCategoryCache();
+    } else {
+      this.saveUndoState(dropRange);
+      if (hasHTML) {
+        html = dataTransfer.getData("text/html");
+      } else {
+        text = dataTransfer.getData("text/plain");
+      }
+    }
+    this.setSelection(dropRange);
+    if (html !== void 0) {
+      this.insertHTML(html, true);
+    } else if (text !== void 0) {
+      this.insertPlainText(text, true);
     }
   };
 
@@ -1655,8 +1766,9 @@
     }
     key = modifiers + key;
     const range = this.getSelection();
-    if (this._keyHandlers[key]) {
-      this._keyHandlers[key](this, event, range);
+    const handler = this._keyHandlers[key];
+    if (handler) {
+      handler(this, event, range);
     } else if (!range.collapsed && !event.ctrlKey && !event.metaKey && key.length === 1) {
       this.saveUndoState(range);
       deleteContentsOfRange(range, this._root);
@@ -1683,7 +1795,7 @@
         do {
           if (node.nodeName === "CODE") {
             let next = node.nextSibling;
-            if (!(next instanceof Text)) {
+            if (!(next instanceof Text) || next.length === 0) {
               const textNode = document.createTextNode("\xA0");
               node.parentNode.insertBefore(textNode, next);
               next = textNode;
@@ -1777,6 +1889,7 @@
 
   // source/Editor.ts
   var Squire = class {
+    //    _imageResizer: ImageResizer;
     constructor(root, config) {
       /**
        * Subscribing to these events won't automatically add a listener to the
@@ -1810,13 +1923,15 @@
                   'www\\d{0,3}[.]' +
                   // or
                   '|' +
-                  // foo90.com/
-                  '[a-z0-9][a-z0-9.\\-]*[.][a-z]{2,}\\/' +
+                  // foo90.com/ (bounded by the 253-character limit on
+                  // domain names, so a long dotted run can't make every
+                  // boundary in it rescan the rest)
+                  '[a-z0-9][a-z0-9.\\-]{0,252}[.][a-z]{2,}\\/' +
               ')' +
               // Then we get one or more:
               '(?:' +
-                  // Run of non-spaces, non ()<>
-                  '[^\\s()<>]+' +
+                  // Non-space, non ()<>
+                  '[^\\s()<>]' +
                   // or
                   '|' +
                   // balanced parentheses (one level deep only)
@@ -1833,8 +1948,9 @@
               ')' +
           // Capture group 2: Emails
           ')|(' +
-              // Add links to emails
-              '[\\w\\-.%+]+@(?:[\\w\\-]+\\.)+[a-z]{2,}\\b' +
+              // Add links to emails (local part bounded by the 64-character
+              // limit, for the same reason as the domain above)
+              '[\\w\\-.%+]{1,64}@(?:[\\w\\-]+\\.)+[a-z]{2,}\\b' +
               // Allow query parameters in the mailto: style
               '(?:' +
                   '[?][^&?\\s]+=[^\\s?&`!()\\[\\]{};:\'".,<>«»“”‘’]+' +
@@ -1844,7 +1960,7 @@
           'i'
       );
       */
-      this.linkRegExp = /\b(?:((?:(?:ht|f)tps?:\/\/|www\d{0,3}[.]|[a-z0-9][a-z0-9.\-]*[.][a-z]{2,}\/)(?:[^\s()<>]+|\([^\s()<>]+\))+(?:[^\s?&`!()\[\]{};:'".,<>«»“”‘’]|\([^\s()<>]+\)))|([\w\-.%+]+@(?:[\w\-]+\.)+[a-z]{2,}\b(?:[?][^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+(?:&[^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+)*)?))/i;
+      this.linkRegExp = /\b(?:((?:(?:ht|f)tps?:\/\/|www\d{0,3}[.]|[a-z0-9][a-z0-9.\-]{0,252}[.][a-z]{2,}\/)(?:[^\s()<>]|\([^\s()<>]+\))+(?:[^\s?&`!()\[\]{};:'".,<>«»“”‘’]|\([^\s()<>]+\)))|([\w\-.%+]{1,64}@(?:[\w\-]+\.)+[a-z]{2,}\b(?:[?][^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+(?:&[^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+)*)?))/i;
       this.tagAfterSplit = {
         DT: "DD",
         DD: "DT",
@@ -1859,6 +1975,7 @@
       this._mayHaveZWS = false;
       this._lastAnchorNode = null;
       this._lastFocusNode = null;
+      this._lastPathRange = null;
       this._path = "";
       this._events = /* @__PURE__ */ new Map();
       this._undoIndex = -1;
@@ -1877,6 +1994,9 @@
       this.addEventListener("cut", _onCut);
       this.addEventListener("copy", _onCopy);
       this.addEventListener("paste", _onPaste);
+      this._dragRange = null;
+      this.addEventListener("dragstart", _onDragStart);
+      this.addEventListener("dragend", _onDragEnd);
       this.addEventListener("drop", _onDrop);
       this.addEventListener(
         "keydown",
@@ -1979,7 +2099,7 @@
           event.preventDefault();
           this.bold();
           break;
-        case "formaItalic":
+        case "formatItalic":
           event.preventDefault();
           this.italic();
           break;
@@ -2173,9 +2293,11 @@
     }
     _getRangeAndRemoveBookmark(range) {
       const root = this._root;
-      const start = root.querySelector("#" + this.startSelectionId);
-      const end = root.querySelector("#" + this.endSelectionId);
-      if (start && end) {
+      const starts = root.querySelectorAll("#" + this.startSelectionId);
+      const ends = root.querySelectorAll("#" + this.endSelectionId);
+      const start = starts[0];
+      const end = ends[0];
+      if (start && end && !!(start.compareDocumentPosition(end) & Node.DOCUMENT_POSITION_FOLLOWING)) {
         let startContainer = start.parentNode;
         let endContainer = end.parentNode;
         const startOffset = Array.from(startContainer.childNodes).indexOf(
@@ -2209,6 +2331,12 @@
             }
           }
         }
+      }
+      for (let i = 0; i < starts.length; i += 1) {
+        starts[i].remove();
+      }
+      for (let i = 0; i < ends.length; i += 1) {
+        ends[i].remove();
       }
       return range || null;
     }
@@ -2295,10 +2423,23 @@
     }
     _updatePathOnEvent() {
       if (this._isFocused) {
-        this._updatePath(this.getSelection());
+        const lastPathRange = this._lastPathRange;
+        const selection = this.getSelection();
+        if (!lastPathRange || !lastPathRange.commonAncestorContainer.isConnected || selection.compareBoundaryPoints(
+          0,
+          // Range.START_TO_START,
+          lastPathRange
+        ) !== 0 || selection.compareBoundaryPoints(
+          2,
+          //Range.END_TO_END
+          lastPathRange
+        ) !== 0) {
+          this._updatePath(selection);
+        }
       }
     }
     _updatePath(range, force) {
+      this._lastPathRange = range.cloneRange();
       const anchor = range.startContainer;
       const focus = range.endContainer;
       let newPath;
@@ -2438,9 +2579,16 @@
       return this;
     }
     saveUndoState(range) {
-      range || (range = this.getSelection());
+      let rangeIsFromSelection = false;
+      if (!range) {
+        range = this.getSelection();
+        rangeIsFromSelection = true;
+      }
       this._recordUndoState(range, this._isInUndoState);
       this._getRangeAndRemoveBookmark(range);
+      if (rangeIsFromSelection) {
+        this.setSelection(range);
+      }
       return this;
     }
     undo() {
@@ -2500,14 +2648,26 @@
     }
     getHTML(withBookmark) {
       let range;
-      if (withBookmark) {
-        range = this.getSelection();
-        this._saveRangeToBookmark(range);
-      }
-      const html = this._getRawHTML().replace(/\u200B/g, "");
-      if (withBookmark) {
-        this._getRangeAndRemoveBookmark(range);
-      }
+      let html = "";
+      this.modifyDocument(() => {
+        if (withBookmark) {
+          range = this.getSelection();
+          this._saveRangeToBookmark(range);
+        }
+        const resizeContainer = this._root.querySelector(
+          ".squire-image-resize-container"
+        );
+        if (resizeContainer) {
+          resizeContainer.remove();
+        }
+        html = this._getRawHTML().replace(/\u200B/g, "");
+        if (resizeContainer) {
+          this._root.append(resizeContainer);
+        }
+        if (withBookmark) {
+          this._getRangeAndRemoveBookmark(range);
+        }
+      });
       return html;
     }
     setHTML(html) {
@@ -2656,20 +2816,6 @@
     insertPlainText(plainText, isPaste) {
       const range = this.getSelection();
       if (range.collapsed && getClosest(range.startContainer, this._root, "PRE")) {
-        const startContainer = range.startContainer;
-        let offset = range.startOffset;
-        let textNode;
-        if (!startContainer || !(startContainer instanceof Text)) {
-          const text = document.createTextNode("");
-          startContainer.insertBefore(
-            text,
-            startContainer.childNodes[offset]
-          );
-          textNode = text;
-          offset = 0;
-        } else {
-          textNode = startContainer;
-        }
         let doInsert = true;
         if (isPaste) {
           const event = new CustomEvent("willPaste", {
@@ -2683,6 +2829,27 @@
           doInsert = !event.defaultPrevented;
         }
         if (doInsert) {
+          this.saveUndoState(range);
+          const startContainer = range.startContainer;
+          let offset = range.startOffset;
+          let textNode;
+          if (startContainer instanceof Text) {
+            textNode = startContainer;
+          } else {
+            let nodeBeforeCursor = offset ? startContainer.childNodes[offset - 1] : null;
+            if (nodeBeforeCursor instanceof Text) {
+              textNode = nodeBeforeCursor;
+              offset = textNode.length;
+            } else {
+              const text = document.createTextNode("");
+              startContainer.insertBefore(
+                text,
+                startContainer.childNodes[offset]
+              );
+              textNode = text;
+              offset = 0;
+            }
+          }
           textNode.insertData(offset, plainText);
           range.setStart(textNode, offset + plainText.length);
           range.collapse(true);
@@ -3054,8 +3221,11 @@
     // --- Block formatting
     _ensureBottomLine() {
       const root = this._root;
-      const last = root.lastElementChild;
-      if (!last || last.nodeName !== this._config.blockTag || !isBlock(last)) {
+      let last = root;
+      do {
+        last = last.lastElementChild;
+      } while (last && isContainer(last));
+      if (!last || !isBlock(last)) {
         root.append(this.createDefaultBlock());
       }
     }
@@ -3092,10 +3262,11 @@
       if (block && (parent = getClosest(block, root, "PRE"))) {
         moveRangeBoundariesDownTree(range);
         node = range.startContainer;
-        const offset2 = range.startOffset;
+        let offset2 = range.startOffset;
         if (!(node instanceof Text)) {
           node = document.createTextNode("");
           parent.insertBefore(node, parent.firstChild);
+          offset2 = 0;
         }
         if (!lineBreakOnly && node instanceof Text && (node.data.charAt(offset2 - 1) === "\n" || rangeDoesStartAtBlockBoundary(range, root)) && (node.data.charAt(offset2) === "\n" || rangeDoesEndAtBlockBoundary(range, root))) {
           node.deleteData(offset2 && offset2 - 1, offset2 ? 2 : 1);
@@ -3117,7 +3288,9 @@
           range.setStart(node, 0);
         } else {
           node.insertData(offset2, "\n");
-          fixCursor(parent);
+          if (!node.nextSibling) {
+            parent.append(createElement("BR"));
+          }
           if (node.length === offset2 + 1) {
             range.setStartAfter(node);
           } else {
@@ -3131,17 +3304,6 @@
         return this;
       }
       if (!block && !lineBreakOnly) {
-        /**
-         * No block to split, so this used to insert a bare BR. That BR is then
-         * the last node of its line, which no browser renders as a line break,
-         * and Firefox drops it on the next keystroke: the line the user just
-         * made disappeared and their typing continued on the line above.
-         * Reachable by typing at the very top of a reply, where the caret sits
-         * at the root itself and Firefox leaves the text there unwrapped.
-         * Wrap the loose inline run into a block and split that instead. The
-         * bookmark is needed because fixContainer() detaches the nodes, and
-         * removing a node collapses any live range inside it. Tachyon #165.
-         */
         this._saveRangeToBookmark(range);
         fixContainer(root);
         this._getRangeAndRemoveBookmark(range);
@@ -3152,15 +3314,6 @@
         const br = createElement("BR");
         insertNodeInRange(range, br);
         range.collapse(false);
-        /**
-         * With nothing after it in the line this BR renders as no break at all,
-         * and Firefox drops it on the next keystroke, so shift+enter at the end
-         * of a paragraph did nothing. A second BR gives the new line something
-         * to be, the way fixCursor() does for an empty block, and the caret
-         * goes between the two. A trailing BR is not rendered by anything, so
-         * the filler costs the sent message no blank line. isLineBreak() is
-         * Squire's own test for whether a BR has anything after it in its line.
-         */
         if (!isLineBreak(br)) {
           const filler = createElement("BR");
           br.after(filler);
@@ -3700,9 +3853,9 @@
       this._updatePath(range, true);
     }
     setConfig(config) {
-      this._config = mergeObjects({
+      this._config = Object.assign({
         addLinks: true
-      }, config, true);
+      }, config);
       return this;
     }
   };

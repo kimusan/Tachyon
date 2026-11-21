@@ -1,0 +1,124 @@
+diff --git a/source/Clean.ts b/source/Clean.ts
+index 4bbb6bd..0957ff0 100644
+--- a/source/Clean.ts
++++ b/source/Clean.ts
+@@ -366,7 +366,12 @@ const cleanupBRs = (
+         // anything useful. We'll add it back later if required by the
+         // browser.
+ //        if (!isLineBreak(br)) {
+-        if (!br.nextSibling && 1 === parent.children.length && parent.textContent.trim().length) {
++        // parent is null for a BR that is a fragment's own last child, which
++        // :last-child does match. Reading children off it threw, and the callers
++        // are setHTML and insertHTML: pasting or inserting anything ending in a
++        // BR silently inserted nothing, and loading a body ending in one threw
++        // out of setHTML. Tachyon issue #117.
++        if (parent && !br.nextSibling && 1 === parent.children.length && parent.textContent!.trim().length) {
+             br.remove();
+         }
+     }
+diff --git a/source/Editor.ts b/source/Editor.ts
+index c07ee83..19f3a67 100644
+--- a/source/Editor.ts
++++ b/source/Editor.ts
+@@ -2009,13 +2009,47 @@ class Squire {
+             return this;
+         }
+ 
++        if (!block && !lineBreakOnly) {
++            /**
++             * No block to split, so this used to insert a bare BR. That BR is then
++             * the last node of its line, which no browser renders as a line break,
++             * and Firefox drops it on the next keystroke: the line the user just
++             * made disappeared and their typing continued on the line above.
++             * Reachable by typing at the very top of a reply, where the caret sits
++             * at the root itself and Firefox leaves the text there unwrapped.
++             * Wrap the loose inline run into a block and split that instead. The
++             * bookmark is needed because fixContainer() detaches the nodes, and
++             * removing a node collapses any live range inside it. Tachyon #165.
++             */
++            this._saveRangeToBookmark(range);
++            fixContainer(root);
++            this._getRangeAndRemoveBookmark(range);
++            block = getStartBlockOfRange(range, root);
++        }
++
+         // If this is a malformed bit of document or in a table;
+         // just play it safe and insert a <br>.
+         if (!block || lineBreakOnly || /^T[HD]$/.test(block.nodeName)) {
+             // If inside an <a>, move focus out
+             moveRangeBoundaryOutOf(range, 'A', root);
+-            insertNodeInRange(range, createElement('BR'));
++            const br = createElement('BR');
++            insertNodeInRange(range, br);
+             range.collapse(false);
++            /**
++             * With nothing after it in the line this BR renders as no break at all,
++             * and Firefox drops it on the next keystroke, so shift+enter at the end
++             * of a paragraph did nothing. A second BR gives the new line something
++             * to be, the way fixCursor() does for an empty block, and the caret
++             * goes between the two. A trailing BR is not rendered by anything, so
++             * the filler costs the sent message no blank line. isLineBreak() is
++             * Squire's own test for whether a BR has anything after it in its line.
++             */
++            if (!isLineBreak(br)) {
++                const filler = createElement('BR');
++                br.after(filler);
++                range.setStartBefore(filler);
++                range.collapse(true);
++            }
+             this.setSelection(range);
+             this._updatePath(range, true);
+             return this;
+diff --git a/source/keyboard/Space.ts b/source/keyboard/Space.ts
+index 48c187c..af6c4a2 100644
+--- a/source/keyboard/Space.ts
++++ b/source/keyboard/Space.ts
+@@ -32,8 +32,6 @@ const Space = (self: Squire, event: KeyboardEvent, range: Range): void => {
+             const text = block.textContent?.trimEnd().replace(ZWS, '');
+             if (text === '*' || text === '1.') {
+                 event.preventDefault();
+-                self.insertPlainText(' ', false);
+-                self._docWasChanged();
+                 self.saveUndoState(range);
+                 const walker = createTreeWalker<Text>(block, SHOW_TEXT);
+                 let textNode: Text | null;
+diff --git a/source/range/InsertDelete.ts b/source/range/InsertDelete.ts
+index e22f80c..5cd3fbd 100644
+--- a/source/range/InsertDelete.ts
++++ b/source/range/InsertDelete.ts
+@@ -1,4 +1,5 @@
+ import { cleanupBRs } from '../Clean';
++import { ZWS } from '../Constants';
+ import {
+     split,
+     fixCursor,
+@@ -352,12 +353,28 @@ const insertTreeFragmentIntoRange = (
+         cleanupBRs(block as HTMLElement);
+         if (isInline(container)) {
+             // Split up to block parent.
+-            const nodeAfterSplit = split(
++            let nodeAfterSplit = split(
+                 container,
+                 offset,
+                 getPreviousBlock(container, root) || root,
+                 root,
+             ) as Node;
++            /**
++             * Splitting at the end of a link leaves the clone of it with nothing in
++             * it, and this path never cleaned that up: inserting anything beside a
++             * link left an empty one behind, which then travelled in the sent
++             * message. splitBlock() meets the same case and swaps the empty link
++             * for an empty text node, which keeps the position this needs.
++             */
++            if (
++                nodeAfterSplit &&
++                nodeAfterSplit.nodeName === 'A' &&
++                (!nodeAfterSplit.textContent || nodeAfterSplit.textContent === ZWS)
++            ) {
++                const text = document.createTextNode('');
++                (nodeAfterSplit as ChildNode).replaceWith(text);
++                nodeAfterSplit = text;
++            }
+             container = nodeAfterSplit.parentNode!;
+             offset = Array.from(container.childNodes).indexOf(
+                 nodeAfterSplit as ChildNode,
