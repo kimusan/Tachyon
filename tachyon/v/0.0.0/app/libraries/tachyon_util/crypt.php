@@ -75,7 +75,10 @@ abstract class Crypt
 	}
 
 	/**
-	 * When $key is empty, it will use the smctoken.
+	 * When $key is empty, the key of the encrypted login cookies
+	 * (Cookies::setSecure/getSecure): derived from APP_SALT and the session
+	 * cookie, so neither the server nor a single leaked cookie value is enough
+	 * to read them, and a new session (login, logout) gets a new key.
 	 */
 	private static function Passphrase(
 		#[\SensitiveParameter]
@@ -83,11 +86,8 @@ abstract class Crypt
 	) : string
 	{
 		if (!$key) {
-			if (empty($_COOKIE['smctoken'])) {
-				\Tachyon\Util\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
-//				throw new \RuntimeException('Missing smctoken');
-			}
-			$key = $_COOKIE['smctoken'] . APP_VERSION;
+			return \hash_hkdf('sha256', APP_SALT, 32, 'tachyon-cookie-v1/' . APP_VERSION,
+				(string) Cookies::get(\Tachyon\Utils::SESSION_TOKEN));
 		}
 		return \sha1($key . APP_SALT, true);
 	}

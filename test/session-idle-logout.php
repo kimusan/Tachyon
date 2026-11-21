@@ -75,8 +75,9 @@ $request = function ($storedValue, ?int $autoLogout, bool $signMe = false) use (
 {
 	$cached->setValue($actions, false);
 	$_COOKIE = [];
-	$_COOKIE[\Tachyon\Actions::AUTH_SPEC_TOKEN_KEY] = \MailSo\Base\Utils::UrlSafeBase64Encode(\Tachyon\Util\Crypt::EncryptToJSON($token));
+	// The session cookie first: the login cookie's key is bound to it
 	$_COOKIE[\Tachyon\Utils::SESSION_TOKEN] = $sessionCookie;
+	$_COOKIE[\Tachyon\Actions::AUTH_SPEC_TOKEN_KEY] = \MailSo\Base\Utils::UrlSafeBase64Encode(\Tachyon\Util\Crypt::EncryptToJSON($token));
 	$signMe && $_COOKIE[\Tachyon\Actions::AUTH_SIGN_ME_TOKEN_KEY] = 'present';
 	$storage->data = [$sessionKey => (string) $storedValue];
 	$settings->data = null === $autoLogout ? [] : ['AutoLogout' => $autoLogout];

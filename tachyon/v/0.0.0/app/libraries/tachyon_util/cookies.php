@@ -57,6 +57,8 @@ class Cookies
 		if (\is_null($data)) {
 			static::clear($sName);
 		} else {
+			// The key is bound to the session cookie (Crypt::Passphrase)
+			\Tachyon\Utils::GetSessionToken();
 			static::set(
 				$sName,
 				\MailSo\Base\Utils::UrlSafeBase64Encode(Crypt::EncryptToJSON($data))
