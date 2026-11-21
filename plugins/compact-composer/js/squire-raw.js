@@ -1,5 +1,4 @@
 "use strict";
-// v2.3.2
 (() => {
   // source/node/TreeIterator.ts
   var SHOW_ELEMENT = 1;
@@ -100,6 +99,7 @@
   // source/Constants.ts
   var ELEMENT_NODE = 1;
   var TEXT_NODE = 3;
+  var COMMENT_NODE = 8;
   var DOCUMENT_FRAGMENT_NODE = 11;
   var ZWS = "\u200B";
   var ua = navigator.userAgent;
@@ -113,7 +113,7 @@
   var ctrlKey = isMac || isIOS ? "Meta-" : "Ctrl-";
   var cantFocusEmptyTextNodes = isWebKit;
   var supportsInputEvents = "onbeforeinput" in document && "inputType" in new InputEvent("input");
-  var notWS = /[^ \t\r\n]/;
+  var notWS = /[^ \t\r\n\u200B]/;
 
   // source/node/Category.ts
   var inlineNodeNames = /^(?:#text|A(?:BBR|CRONYM)?|B(?:R|D[IO])?|C(?:ITE|ODE)|D(?:ATA|EL|FN)|EM|FONT|HR|I(?:FRAME|MG|NPUT|NS)?|KBD|Q|R(?:P|T|UBY)|S(?:AMP|MALL|PAN|TR(?:IKE|ONG)|U[BP])?|TIME|U|VAR|WBR)$/;
@@ -131,6 +131,7 @@
   };
   var getNodeCategory = (node) => {
     switch (node.nodeType) {
+      case COMMENT_NODE:
       case TEXT_NODE:
         return INLINE;
       case ELEMENT_NODE:
@@ -332,11 +333,12 @@
       return nodeStartAfterStart && nodeEndBeforeEnd;
     }
   };
+  var canDescendInto = (node) => node instanceof Text || node.nodeType === ELEMENT_NODE && !isLeaf(node);
   var moveRangeBoundariesDownTree = (range) => {
     let { startContainer, startOffset, endContainer, endOffset } = range;
     while (!(startContainer instanceof Text)) {
       let child = startContainer.childNodes[startOffset];
-      if (!child || isLeaf(child)) {
+      if (!child || !canDescendInto(child)) {
         if (startOffset) {
           child = startContainer.childNodes[startOffset - 1];
           if (child instanceof Text) {
@@ -358,7 +360,7 @@
     if (endOffset) {
       while (!(endContainer instanceof Text)) {
         const child = endContainer.childNodes[endOffset - 1];
-        if (!child || isLeaf(child)) {
+        if (!child || !canDescendInto(child)) {
           if (child && child.nodeName === "BR" && !isLineBreak(child, false)) {
             endOffset -= 1;
             continue;
@@ -371,7 +373,7 @@
     } else {
       while (!(endContainer instanceof Text)) {
         const child = endContainer.firstChild;
-        if (!child || isLeaf(child)) {
+        if (!child || !canDescendInto(child)) {
           break;
         }
         endContainer = child;
@@ -450,7 +452,7 @@
           fixer = document.createTextNode("");
         }
       }
-    } else if ((node instanceof Element || node instanceof DocumentFragment) && !node.querySelector("BR")) {
+    } else if ((node instanceof Element || node instanceof DocumentFragment) && !node.querySelector("BR") && !notWS.test(node.textContent || "")) {
       fixer = createElement("BR");
       let parent = node;
       let child;
@@ -458,17 +460,24 @@
         parent = child;
       }
       node = parent;
+      if (node instanceof HTMLElement && node.contentEditable === "true") {
+        node = createElement("DIV");
+        parent.appendChild(node);
+      }
     }
     if (fixer) {
       try {
         node.appendChild(fixer);
-      } catch (error) {
+      } catch (e) {
       }
     }
     return node;
   };
   var fixContainer = (container, root) => {
     let wrapper = null;
+    if (/^(?:TABLE|TBODY|TR|TH|TD|P)/.test(container.nodeName)) {
+      return container;
+    }
     Array.from(container.childNodes).forEach((child) => {
       const isBR = child.nodeName === "BR";
       if (!isBR && isInline(child)) {
@@ -498,6 +507,9 @@
     return container;
   };
   var split = (node, offset, stopNode, root) => {
+    if (!stopNode.contains(node)) {
+      throw new Error("split: stopNode does not contain node");
+    }
     if (node instanceof Text && node !== stopNode) {
       if (typeof offset !== "number") {
         throw new Error("Offset must be a number to split text node!");
@@ -656,19 +668,21 @@
     "font-family": {
       regexp: notWS,
       replace(classNames, family) {
-        return createElement("SPAN", {
-          class: classNames.fontFamily,
-          style: "font-family:" + family
+        const span = createElement("SPAN", {
+          class: classNames.fontFamily
         });
+        span.style.fontFamily = family;
+        return span;
       }
     },
     "font-size": {
       regexp: notWS,
       replace(classNames, size) {
-        return createElement("SPAN", {
-          class: classNames.fontSize,
-          style: "font-size:" + size
+        const span = createElement("SPAN", {
+          class: classNames.fontSize
         });
+        span.style.fontSize = size;
+        return span;
       }
     },
     "text-decoration": {
@@ -751,17 +765,17 @@
       let newTreeTop;
       if (face) {
         fontSpan = createElement("SPAN", {
-          class: classNames.fontFamily,
-          style: "font-family:" + face
+          class: classNames.fontFamily
         });
+        fontSpan.style.fontFamily = face;
         newTreeTop = fontSpan;
         newTreeBottom = fontSpan;
       }
       if (size) {
         sizeSpan = createElement("SPAN", {
-          class: classNames.fontSize,
-          style: "font-size:" + fontSizes[size] + "px"
+          class: classNames.fontSize
         });
+        sizeSpan.style.fontSize = fontSizes[size] + "px";
         if (!newTreeTop) {
           newTreeTop = sizeSpan;
         }
@@ -775,9 +789,9 @@
           color = "#" + color;
         }
         colorSpan = createElement("SPAN", {
-          class: classNames.color,
-          style: "color:" + color
+          class: classNames.color
         });
+        colorSpan.style.color = color;
         if (!newTreeTop) {
           newTreeTop = colorSpan;
         }
@@ -803,9 +817,38 @@
       return el;
     }
   };
-  var allowedBlock = /^(?:A(?:DDRESS|RTICLE|SIDE|UDIO)|BLOCKQUOTE|CAPTION|D(?:[DLT]|IV)|F(?:IGURE|IGCAPTION|OOTER)|H[1-6]|HEADER|L(?:ABEL|EGEND|I)|O(?:L|UTPUT)|P(?:RE)?|SECTION|T(?:ABLE|BODY|D|FOOT|H|HEAD|R)|COL(?:GROUP)?|UL)$/;
-  var blacklist = /^(?:HEAD|META|STYLE)/;
-  var cleanTree = (node, config, preserveWS) => {
+  var allowedBlock = /^(?:A(?:DDRESS|RTICLE|SIDE|UDIO)?|BLOCKQUOTE|CAPTION|D(?:[DLT]|IV)|F(?:IGURE|IGCAPTION|OOTER)|H[1-6]|HEADER|L(?:ABEL|EGEND|I)|O(?:L|UTPUT)|P(?:RE)?|SECTION|T(?:ABLE|BODY|D|FOOT|H|HEAD|R)|COL(?:GROUP)?|UL)$/;
+  var blacklist = /^(?:HEAD|META|STYLE)$/;
+  var hasInlineContent = (walker, start, forwards, cache2) => {
+    const visited = [];
+    let result = false;
+    let cacheable = true;
+    let node;
+    walker.currentNode = start;
+    while (node = forwards ? walker.nextNode() : walker.previousPONode()) {
+      const cached = cache2.get(node);
+      if (cached !== void 0) {
+        result = cached;
+        break;
+      }
+      if (node.nodeName === "IMG" || node instanceof Text && notWS.test(node.data)) {
+        result = true;
+        break;
+      }
+      if (!isInline(node)) {
+        cacheable = !forwards || allowedBlock.test(node.nodeName) && !stylesRewriters[node.nodeName];
+        break;
+      }
+      visited.push(node);
+    }
+    if (cacheable) {
+      for (const visitedNode of visited) {
+        cache2.set(visitedNode, result);
+      }
+    }
+    return result;
+  };
+  var cleanTree = (node, config, preserveWS, wsCache = { before: /* @__PURE__ */ new WeakMap(), after: /* @__PURE__ */ new WeakMap() }) => {
     const children = node.childNodes;
     let nonInlineParent = node;
     while (isInline(nonInlineParent)) {
@@ -835,7 +878,12 @@
           continue;
         }
         if (childLength) {
-          cleanTree(child, config, preserveWS || nodeName === "PRE");
+          cleanTree(
+            child,
+            config,
+            preserveWS || nodeName === "PRE",
+            wsCache
+          );
         }
       } else {
         if (child instanceof Text) {
@@ -846,32 +894,16 @@
             continue;
           }
           if (startsWithWS) {
-            walker.currentNode = child;
-            let sibling;
-            while (sibling = walker.previousPONode()) {
-              if (sibling.nodeName === "IMG" || sibling instanceof Text && notWS.test(sibling.data)) {
-                break;
-              }
-              if (!isInline(sibling)) {
-                sibling = null;
-                break;
-              }
-            }
-            data = data.replace(/^[ \t\r\n]+/g, sibling ? " " : "");
+            data = data.replace(
+              /^[ \t\r\n]+/g,
+              hasInlineContent(walker, child, false, wsCache.before) ? " " : ""
+            );
           }
-          if (endsWithWS) {
-            walker.currentNode = child;
-            let sibling;
-            while (sibling = walker.nextNode()) {
-              if (sibling.nodeName === "IMG" || sibling instanceof Text && notWS.test(sibling.data)) {
-                break;
-              }
-              if (!isInline(sibling)) {
-                sibling = null;
-                break;
-              }
-            }
-            data = data.replace(/[ \t\r\n]+$/g, sibling ? " " : "");
+          if (endsWithWS && data) {
+            data = data.replace(
+              /[ \t\r\n]+$/g,
+              hasInlineContent(walker, child, true, wsCache.after) ? " " : ""
+            );
           }
           if (data) {
             child.data = data;
@@ -1238,25 +1270,30 @@
     }
     moveRangeBoundariesDownTree(range);
     range.collapse(false);
-    const stopPoint = getNearest(range.endContainer, root, "BLOCKQUOTE") || root;
+    let stopPoint = getNearest(range.endContainer, root, "BLOCKQUOTE") || root;
     let block = getStartBlockOfRange(range, root);
     let blockContentsAfterSplit = null;
     const firstBlockInFrag = getNextBlock(frag, frag);
     const replaceBlock = !firstInFragIsInline && !!block && isEmptyBlock(block);
     if (block && firstBlockInFrag && !replaceBlock && // Don't merge table cells or PRE elements into block
-      !getNearest(firstBlockInFrag, frag, "PRE") && !getNearest(firstBlockInFrag, frag, "TABLE")) {
+    !getNearest(firstBlockInFrag, frag, "PRE") && !getNearest(firstBlockInFrag, frag, "TABLE")) {
       moveRangeBoundariesUpTree(range, block, block, root);
       range.collapse(true);
       let container = range.endContainer;
       let offset = range.endOffset;
       cleanupBRs(block, root, false);
       if (isInline(container)) {
-        const nodeAfterSplit = split(
+        let nodeAfterSplit = split(
           container,
           offset,
           getPreviousBlock(container, root) || root,
           root
         );
+        if (nodeAfterSplit && nodeAfterSplit.nodeName === "A" && (!nodeAfterSplit.textContent || nodeAfterSplit.textContent === ZWS)) {
+          const text = document.createTextNode("");
+          nodeAfterSplit.replaceWith(text);
+          nodeAfterSplit = text;
+        }
         container = nodeAfterSplit.parentNode;
         offset = Array.from(container.childNodes).indexOf(
           nodeAfterSplit
@@ -1272,17 +1309,28 @@
         }
       }
       mergeWithBlock(container, firstBlockInFrag, range, root);
-      offset = Array.from(container.parentNode.childNodes).indexOf(
-        container
-      ) + 1;
-      container = container.parentNode;
-      range.setEnd(container, offset);
+      if (container === root) {
+        range.setEnd(root, getLength(root));
+      } else {
+        offset = Array.from(container.parentNode.childNodes).indexOf(
+          container
+        ) + 1;
+        container = container.parentNode;
+        range.setEnd(container, offset);
+      }
     }
     if (getLength(frag)) {
       if (replaceBlock && block) {
         range.setEndBefore(block);
         range.collapse(false);
         detach(block);
+      }
+      if (!stopPoint.contains(range.endContainer)) {
+        if (!root.contains(range.endContainer)) {
+          range.setEnd(root, getLength(root));
+          range.collapse(false);
+        }
+        stopPoint = getNearest(range.endContainer, root, "BLOCKQUOTE") || root;
       }
       moveRangeBoundariesUpTree(range, stopPoint, stopPoint, root);
       let nodeAfterSplit = split(
@@ -1361,35 +1409,31 @@
       }
       node = walker.nextNode();
     }
-    textContent = textContent.replace(/ /g, " ");
+    textContent = textContent.replace(/ /g, " ");
     return textContent;
   };
 
   // source/Clipboard.ts
   var indexOf = Array.prototype.indexOf;
-  var extractRangeToClipboard = (event, range, root, removeRangeFromDocument, toCleanHTML, toPlainText, plainTextOnly) => {
-    const clipboardData = event.clipboardData;
-    if (isLegacyEdge || !clipboardData) {
-      return false;
-    }
+  var extractRange = (range, root, removeRangeFromDocument, toCleanHTML, toPlainText) => {
     let text = toPlainText ? "" : getTextContentsOfRange(range);
     const startBlock = getStartBlockOfRange(range, root);
     const endBlock = getEndBlockOfRange(range, root);
+    let parent = range.commonAncestorContainer;
     let copyRoot = root;
-    if (startBlock === endBlock && (startBlock == null ? void 0 : startBlock.contains(range.commonAncestorContainer))) {
+    if (startBlock === endBlock && (startBlock == null ? void 0 : startBlock.contains(parent))) {
       copyRoot = startBlock;
     }
     let contents;
     if (removeRangeFromDocument) {
       contents = deleteContentsOfRange(range, root);
+      if (!parent.isConnected) {
+        parent = range.commonAncestorContainer;
+      }
     } else {
-      range = range.cloneRange();
-      moveRangeBoundariesDownTree(range);
-      moveRangeBoundariesUpTree(range, copyRoot, copyRoot, root);
       contents = range.cloneContents();
     }
-    let parent = range.commonAncestorContainer;
-    if (parent instanceof Text) {
+    while (parent && !(parent instanceof Element)) {
       parent = parent.parentNode;
     }
     while (parent && parent !== copyRoot) {
@@ -1400,8 +1444,8 @@
     }
     let html;
     if (contents.childNodes.length === 1 && contents.childNodes[0] instanceof Text) {
-      text = contents.childNodes[0].data.replace(/ /g, " ");
-      plainTextOnly = true;
+      text = contents.childNodes[0].data.replace(/ /g, " ");
+      html = void 0;
     } else {
       const node = createElement("DIV");
       node.appendChild(contents);
@@ -1413,15 +1457,34 @@
     if (toPlainText && html !== void 0) {
       text = toPlainText(html);
     }
+    if (text === html) {
+      html = void 0;
+    }
     if (isWin) {
       text = text.replace(/\r?\n/g, "\r\n");
     }
-    if (!plainTextOnly && html && text !== html) {
+    if (html) {
       html = "<!-- squire -->" + html;
+    }
+    return [text, html];
+  };
+  var extractRangeToClipboard = (event, range, root, removeRangeFromDocument, toCleanHTML, toPlainText, plainTextOnly) => {
+    const clipboardData = event.clipboardData;
+    if (isLegacyEdge || !clipboardData) {
+      return false;
+    }
+    let [text, html] = extractRange(
+      range,
+      root,
+      removeRangeFromDocument,
+      toCleanHTML,
+      toPlainText
+    );
+    event.preventDefault();
+    if (!plainTextOnly && html) {
       clipboardData.setData("text/html", html);
     }
     clipboardData.setData("text/plain", text);
-    event.preventDefault();
     return true;
   };
   var _onCut = function(event) {
@@ -1469,7 +1532,11 @@
   var _onPaste = function(event) {
     const clipboardData = event.clipboardData;
     const items = clipboardData == null ? void 0 : clipboardData.items;
-    const choosePlain = this._isShiftDown;
+    const choosePlain = this._isShiftDown || !!getNearest(
+      this.getSelection().commonAncestorContainer,
+      this._root,
+      "PRE"
+    );
     let hasRTF = false;
     let hasImage = false;
     let plainItem = null;
@@ -1489,7 +1556,7 @@
           hasImage = true;
         }
       }
-      if (hasImage && !(hasRTF && htmlItem)) {
+      if (hasImage && !(hasRTF && htmlItem) && !plainItem) {
         event.preventDefault();
         this.fireEvent("pasteImage", {
           clipboardData
@@ -1504,17 +1571,17 @@
           });
         } else if (plainItem) {
           plainItem.getAsString((text) => {
-            let isLink = false;
             const range2 = this.getSelection();
             if (!range2.collapsed && notWS.test(range2.toString())) {
               const match = this.linkRegExp.exec(text);
-              isLink = !!match && match[0].length === text.length;
+              const isLink = !!match && match[0].length === text.length;
+              if (isLink) {
+                const href = match[1] ? /^(?:ht|f)tps?:/i.test(match[1]) ? match[1] : "http://" + match[1] : "mailto:" + match[0];
+                this.makeLink(href);
+                return;
+              }
             }
-            if (isLink) {
-              this.makeLink(text);
-            } else {
-              this.insertPlainText(text, true);
-            }
+            this.insertPlainText(text, true);
           });
         }
         return;
@@ -1574,28 +1641,108 @@
       }
     }, 0);
   };
+  var _onDragStart = function() {
+    const range = this.getSelection();
+    if (range && !range.collapsed && this._root.contains(range.commonAncestorContainer)) {
+      this._dragRange = range.cloneRange();
+    } else {
+      this._dragRange = null;
+    }
+  };
+  var _onDragEnd = function() {
+    this._dragRange = null;
+  };
+  var getCaretRangeFromPoint = (x, y, root) => {
+    let range = null;
+    const doc = document;
+    if (doc.caretPositionFromPoint) {
+      const pos = doc.caretPositionFromPoint(x, y);
+      if (pos) {
+        range = document.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+      }
+    } else if (doc.caretRangeFromPoint) {
+      range = doc.caretRangeFromPoint(x, y);
+    }
+    if (range && !root.contains(range.commonAncestorContainer)) {
+      return null;
+    }
+    return range;
+  };
+  var pointIsWithinRange = (point, source) => {
+    return point.compareBoundaryPoints(Range.START_TO_START, source) >= 0 && point.compareBoundaryPoints(Range.END_TO_END, source) <= 0;
+  };
   var _onDrop = function(event) {
-    if (!event.dataTransfer) {
+    const dataTransfer = event.dataTransfer;
+    if (!dataTransfer) {
       return;
     }
-    const types = event.dataTransfer.types;
-    let l = types.length;
+    const types = dataTransfer.types;
     let hasPlain = false;
     let hasHTML = false;
-    while (l--) {
-      switch (types[l]) {
+    for (let i = 0, l = types.length; i < l; i += 1) {
+      switch (types[i]) {
         case "text/plain":
           hasPlain = true;
           break;
         case "text/html":
           hasHTML = true;
           break;
-        default:
-          return;
       }
     }
-    if (hasHTML || hasPlain && this.saveUndoState) {
-      this.saveUndoState();
+    if (!hasPlain && !hasHTML) {
+      return;
+    }
+    event.preventDefault();
+    const root = this._root;
+    let dropRange = getCaretRangeFromPoint(event.clientX, event.clientY, root);
+    const dragRange = this._dragRange;
+    this._dragRange = null;
+    if (!dropRange) {
+      return;
+    }
+    let text, html;
+    if (dragRange) {
+      if (pointIsWithinRange(dropRange, dragRange)) {
+        return;
+      }
+      this._recordUndoState(dragRange, this._isInUndoState);
+      const bookmark = document.createComment("");
+      dropRange.insertNode(bookmark);
+      this._getRangeAndRemoveBookmark(dragRange);
+      [text, html] = extractRange(
+        dragRange,
+        root,
+        dataTransfer.dropEffect !== "copy",
+        this._config.willCutCopy,
+        this._config.toPlainText
+      );
+      bookmark.replaceWith(
+        createElement("INPUT", {
+          id: this.startSelectionId,
+          type: "hidden"
+        }),
+        createElement("INPUT", {
+          id: this.endSelectionId,
+          type: "hidden"
+        })
+      );
+      this._getRangeAndRemoveBookmark(dropRange);
+      resetNodeCategoryCache();
+    } else {
+      this.saveUndoState(dropRange);
+      if (hasHTML) {
+        html = dataTransfer.getData("text/html");
+      } else {
+        text = dataTransfer.getData("text/plain");
+      }
+    }
+    this.setSelection(dropRange);
+    if (html !== void 0) {
+      this.insertHTML(html, true);
+    } else if (text !== void 0) {
+      this.insertPlainText(text, true);
     }
   };
 
@@ -1933,8 +2080,9 @@
     }
     key = modifiers + key;
     const range = this.getSelection();
-    if (this._keyHandlers[key]) {
-      this._keyHandlers[key](this, event, range);
+    const handler = this._keyHandlers[key];
+    if (handler) {
+      handler(this, event, range);
     } else if (!range.collapsed && !event.ctrlKey && !event.metaKey && key.length === 1) {
       this.saveUndoState(range);
       deleteContentsOfRange(range, this._root);
@@ -1961,7 +2109,7 @@
         do {
           if (node.nodeName === "CODE") {
             let next = node.nextSibling;
-            if (!(next instanceof Text)) {
+            if (!(next instanceof Text) || next.length === 0) {
               const textNode = document.createTextNode("\xA0");
               node.parentNode.insertBefore(textNode, next);
               next = textNode;
@@ -2050,15 +2198,16 @@
     self.undo();
   };
   keyHandlers[ctrlKey + "y"] = // Depending on platform, the Shift may cause the key to come through as
-    // upper case, but sometimes not. Just add both as shortcuts — the browser
-    // will only ever fire one or the other.
-    keyHandlers[ctrlKey + "Shift-z"] = keyHandlers[ctrlKey + "Shift-Z"] = (self, event) => {
-      event.preventDefault();
-      self.redo();
-    };
+  // upper case, but sometimes not. Just add both as shortcuts — the browser
+  // will only ever fire one or the other.
+  keyHandlers[ctrlKey + "Shift-z"] = keyHandlers[ctrlKey + "Shift-Z"] = (self, event) => {
+    event.preventDefault();
+    self.redo();
+  };
 
   // source/Editor.ts
   var Squire = class {
+    // _imageResizer: ImageResizer;
     constructor(root, config) {
       /**
        * Subscribing to these events won't automatically add a listener to the
@@ -2092,13 +2241,15 @@
                   'www\\d{0,3}[.]' +
                   // or
                   '|' +
-                  // foo90.com/
-                  '[a-z0-9][a-z0-9.\\-]*[.][a-z]{2,}\\/' +
+                  // foo90.com/ (bounded by the 253-character limit on
+                  // domain names, so a long dotted run can't make every
+                  // boundary in it rescan the rest)
+                  '[a-z0-9][a-z0-9.\\-]{0,252}[.][a-z]{2,}\\/' +
               ')' +
               // Then we get one or more:
               '(?:' +
-                  // Run of non-spaces, non ()<>
-                  '[^\\s()<>]+' +
+                  // Non-space, non ()<>
+                  '[^\\s()<>]' +
                   // or
                   '|' +
                   // balanced parentheses (one level deep only)
@@ -2115,8 +2266,9 @@
               ')' +
           // Capture group 2: Emails
           ')|(' +
-              // Add links to emails
-              '[\\w\\-.%+]+@(?:[\\w\\-]+\\.)+[a-z]{2,}\\b' +
+              // Add links to emails (local part bounded by the 64-character
+              // limit, for the same reason as the domain above)
+              '[\\w\\-.%+]{1,64}@(?:[\\w\\-]+\\.)+[a-z]{2,}\\b' +
               // Allow query parameters in the mailto: style
               '(?:' +
                   '[?][^&?\\s]+=[^\\s?&`!()\\[\\]{};:\'".,<>«»“”‘’]+' +
@@ -2126,7 +2278,7 @@
           'i'
       );
       */
-      this.linkRegExp = /\b(?:((?:(?:ht|f)tps?:\/\/|www\d{0,3}[.]|[a-z0-9][a-z0-9.\-]*[.][a-z]{2,}\/)(?:[^\s()<>]+|\([^\s()<>]+\))+(?:[^\s?&`!()\[\]{};:'".,<>«»“”‘’]|\([^\s()<>]+\)))|([\w\-.%+]+@(?:[\w\-]+\.)+[a-z]{2,}\b(?:[?][^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+(?:&[^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+)*)?))/i;
+      this.linkRegExp = /\b(?:((?:(?:ht|f)tps?:\/\/|www\d{0,3}[.]|[a-z0-9][a-z0-9.\-]{0,252}[.][a-z]{2,}\/)(?:[^\s()<>]|\([^\s()<>]+\))+(?:[^\s?&`!()\[\]{};:'".,<>«»“”‘’]|\([^\s()<>]+\)))|([\w\-.%+]{1,64}@(?:[\w\-]+\.)+[a-z]{2,}\b(?:[?][^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+(?:&[^&?\s]+=[^\s?&`!()\[\]{};:'".,<>«»“”‘’]+)*)?))/i;
       this.tagAfterSplit = {
         DT: "DD",
         DD: "DT",
@@ -2141,6 +2293,7 @@
       this._mayHaveZWS = false;
       this._lastAnchorNode = null;
       this._lastFocusNode = null;
+      this._lastPathRange = null;
       this._path = "";
       this._events = /* @__PURE__ */ new Map();
       this._undoIndex = -1;
@@ -2159,6 +2312,9 @@
       this.addEventListener("cut", _onCut);
       this.addEventListener("copy", _onCopy);
       this.addEventListener("paste", _onPaste);
+      this._dragRange = null;
+      this.addEventListener("dragstart", _onDragStart);
+      this.addEventListener("dragend", _onDragEnd);
       this.addEventListener("drop", _onDrop);
       this.addEventListener(
         "keydown",
@@ -2263,7 +2419,7 @@
           event.preventDefault();
           this.bold();
           break;
-        case "formaItalic":
+        case "formatItalic":
           event.preventDefault();
           this.italic();
           break;
@@ -2457,9 +2613,11 @@
     }
     _getRangeAndRemoveBookmark(range) {
       const root = this._root;
-      const start = root.querySelector("#" + this.startSelectionId);
-      const end = root.querySelector("#" + this.endSelectionId);
-      if (start && end) {
+      const starts = root.querySelectorAll("#" + this.startSelectionId);
+      const ends = root.querySelectorAll("#" + this.endSelectionId);
+      const start = starts[0];
+      const end = ends[0];
+      if (start && end && !!(start.compareDocumentPosition(end) & Node.DOCUMENT_POSITION_FOLLOWING)) {
         let startContainer = start.parentNode;
         let endContainer = end.parentNode;
         const startOffset = Array.from(startContainer.childNodes).indexOf(
@@ -2493,6 +2651,12 @@
             }
           }
         }
+      }
+      for (let i = 0; i < starts.length; i += 1) {
+        starts[i].remove();
+      }
+      for (let i = 0; i < ends.length; i += 1) {
+        ends[i].remove();
       }
       return range || null;
     }
@@ -2582,10 +2746,23 @@
     }
     _updatePathOnEvent() {
       if (this._isFocused) {
-        this._updatePath(this.getSelection());
+        const lastPathRange = this._lastPathRange;
+        const selection = this.getSelection();
+        if (!lastPathRange || !lastPathRange.commonAncestorContainer.isConnected || selection.compareBoundaryPoints(
+          0,
+          // Range.START_TO_START,
+          lastPathRange
+        ) !== 0 || selection.compareBoundaryPoints(
+          2,
+          //Range.END_TO_END
+          lastPathRange
+        ) !== 0) {
+          this._updatePath(selection);
+        }
       }
     }
     _updatePath(range, force) {
+      this._lastPathRange = range.cloneRange();
       const anchor = range.startContainer;
       const focus = range.endContainer;
       let newPath;
@@ -2725,11 +2902,16 @@
       return this;
     }
     saveUndoState(range) {
+      let rangeIsFromSelection = false;
       if (!range) {
         range = this.getSelection();
+        rangeIsFromSelection = true;
       }
       this._recordUndoState(range, this._isInUndoState);
       this._getRangeAndRemoveBookmark(range);
+      if (rangeIsFromSelection) {
+        this.setSelection(range);
+      }
       return this;
     }
     undo() {
@@ -2797,14 +2979,26 @@
     }
     getHTML(withBookmark) {
       let range;
-      if (withBookmark) {
-        range = this.getSelection();
-        this._saveRangeToBookmark(range);
-      }
-      const html = this._getRawHTML().replace(/\u200B/g, "");
-      if (withBookmark) {
-        this._getRangeAndRemoveBookmark(range);
-      }
+      let html = "";
+      this.modifyDocument(() => {
+        if (withBookmark) {
+          range = this.getSelection();
+          this._saveRangeToBookmark(range);
+        }
+        const resizeContainer = this._root.querySelector(
+          ".squire-image-resize-container"
+        );
+        if (resizeContainer) {
+          resizeContainer.remove();
+        }
+        html = this._getRawHTML().replace(/\u200B/g, "");
+        if (resizeContainer) {
+          this._root.appendChild(resizeContainer);
+        }
+        if (withBookmark) {
+          this._getRangeAndRemoveBookmark(range);
+        }
+      });
       return html;
     }
     setHTML(html) {
@@ -2953,20 +3147,6 @@
     insertPlainText(plainText, isPaste) {
       const range = this.getSelection();
       if (range.collapsed && getNearest(range.startContainer, this._root, "PRE")) {
-        const startContainer = range.startContainer;
-        let offset = range.startOffset;
-        let textNode;
-        if (!startContainer || !(startContainer instanceof Text)) {
-          const text = document.createTextNode("");
-          startContainer.insertBefore(
-            text,
-            startContainer.childNodes[offset]
-          );
-          textNode = text;
-          offset = 0;
-        } else {
-          textNode = startContainer;
-        }
         let doInsert = true;
         if (isPaste) {
           const event = new CustomEvent("willPaste", {
@@ -2980,6 +3160,27 @@
           doInsert = !event.defaultPrevented;
         }
         if (doInsert) {
+          this.saveUndoState(range);
+          const startContainer = range.startContainer;
+          let offset = range.startOffset;
+          let textNode;
+          if (startContainer instanceof Text) {
+            textNode = startContainer;
+          } else {
+            let nodeBeforeCursor = offset ? startContainer.childNodes[offset - 1] : null;
+            if (nodeBeforeCursor instanceof Text) {
+              textNode = nodeBeforeCursor;
+              offset = textNode.length;
+            } else {
+              const text = document.createTextNode("");
+              startContainer.insertBefore(
+                text,
+                startContainer.childNodes[offset]
+              );
+              textNode = text;
+              offset = 0;
+            }
+          }
           textNode.insertData(offset, plainText);
           range.setStart(textNode, offset + plainText.length);
           range.collapse(true);
@@ -3456,8 +3657,11 @@
     // --- Block formatting
     _ensureBottomLine() {
       const root = this._root;
-      const last = root.lastElementChild;
-      if (!last || last.nodeName !== this._config.blockTag || !isBlock(last)) {
+      let last = root;
+      do {
+        last = last.lastElementChild;
+      } while (last && isContainer(last));
+      if (!last || !isBlock(last)) {
         root.appendChild(this.createDefaultBlock());
       }
     }
@@ -3494,10 +3698,11 @@
       if (block && (parent = getNearest(block, root, "PRE"))) {
         moveRangeBoundariesDownTree(range);
         node = range.startContainer;
-        const offset2 = range.startOffset;
+        let offset2 = range.startOffset;
         if (!(node instanceof Text)) {
           node = document.createTextNode("");
           parent.insertBefore(node, parent.firstChild);
+          offset2 = 0;
         }
         if (!lineBreakOnly && node instanceof Text && (node.data.charAt(offset2 - 1) === "\n" || rangeDoesStartAtBlockBoundary(range, root)) && (node.data.charAt(offset2) === "\n" || rangeDoesEndAtBlockBoundary(range, root))) {
           node.deleteData(offset2 && offset2 - 1, offset2 ? 2 : 1);
@@ -3519,7 +3724,9 @@
           range.setStart(node, 0);
         } else {
           node.insertData(offset2, "\n");
-          fixCursor(parent);
+          if (!node.nextSibling) {
+            parent.appendChild(createElement("BR"));
+          }
           if (node.length === offset2 + 1) {
             range.setStartAfter(node);
           } else {
@@ -3532,10 +3739,23 @@
         this._docWasChanged();
         return this;
       }
+      if (!block && !lineBreakOnly) {
+        this._saveRangeToBookmark(range);
+        fixContainer(root, root);
+        this._getRangeAndRemoveBookmark(range);
+        block = getStartBlockOfRange(range, root);
+      }
       if (!block || lineBreakOnly || /^T[HD]$/.test(block.nodeName)) {
         moveRangeBoundaryOutOf(range, "A", root);
-        insertNodeInRange(range, createElement("BR"));
+        const br = createElement("BR");
+        insertNodeInRange(range, br);
         range.collapse(false);
+        if (!isLineBreak(br, false)) {
+          const filler = createElement("BR");
+          br.after(filler);
+          range.setStartBefore(filler);
+          range.collapse(true);
+        }
         this.setSelection(range);
         this._updatePath(range, true);
         return this;
@@ -3961,7 +4181,7 @@
           }
           const textWalker = new TreeIterator(output, SHOW_TEXT);
           while (node = textWalker.nextNode()) {
-            node.data = node.data.replace(/ /g, " ");
+            node.data = node.data.replace(/ /g, " ");
           }
           output.normalize();
           return fixCursor(

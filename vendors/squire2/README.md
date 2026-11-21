@@ -25,5 +25,22 @@ To rebuild:
     npm ci && node build.js
     cp dist/squire-raw.js /path/to/tachyon/vendors/squire2/dist/
 
-`plugins/compact-composer/js/squire-raw.js` is a separate, plain fastmail
-build exposed as `window.Squire2`, and is not built from this.
+## compact-composer
+
+`plugins/compact-composer/js/squire-raw.js` is a separate build: plain
+https://github.com/fastmail/Squire at a2dee68 (v2.4.11) with
+`compact-composer.patch`, exposed as `window.Squire2` so it can sit beside the
+main composer's `window.Squire`. The patch carries the same fixes as above,
+except the cleanupBRs one, which fastmail's own code does not need, and turns
+the image resizer off as the main composer's Squire does.
+
+    git clone https://github.com/fastmail/Squire.git && cd Squire
+    git checkout a2dee68
+    git apply /path/to/compact-composer.patch
+    npm ci && node build.js
+    cp dist/squire-raw.js /path/to/tachyon/plugins/compact-composer/js/
+
+The release build regenerates `squire-raw.min.js` from it (build/plugins.php);
+commit what that writes.
+
+Bump the plugin's VERSION in its index.php with it.

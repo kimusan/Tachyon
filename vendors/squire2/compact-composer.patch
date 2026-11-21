@@ -1,0 +1,153 @@
+diff --git a/source/Editor.ts b/source/Editor.ts
+index a316559..1059741 100644
+--- a/source/Editor.ts
++++ b/source/Editor.ts
+@@ -61,7 +61,8 @@ import {
+ import { keyHandlers, _onKey } from './keyboard/KeyHandlers';
+ import { linkifyText } from './keyboard/KeyHelpers';
+ import { getTextContentsOfRange } from './range/Contents';
+-import { ImageResizer } from './ImageResize';
++// The image resizer stays off, as in the main composer's Squire (the-djmaze/Squire 2c2c7de)
++// import { ImageResizer } from './ImageResize';
+ 
+ declare const DOMPurify: any;
+ 
+@@ -127,7 +128,7 @@ class Squire {
+     _dragRange: Range | null;
+ 
+     _mutation: MutationObserver;
+-    _imageResizer: ImageResizer;
++    // _imageResizer: ImageResizer;
+ 
+     constructor(root: HTMLElement, config?: Partial<SquireConfig>) {
+         this._root = root;
+@@ -210,7 +211,7 @@ class Squire {
+         );
+ 
+         // Initialize image resizer
+-        this._imageResizer = new ImageResizer(root, this);
++        // this._imageResizer = new ImageResizer(root, this);
+ 
+         this.setHTML('');
+     }
+@@ -223,7 +224,7 @@ class Squire {
+         this._mutation.disconnect();
+ 
+         // Cleanup image resizer
+-        this._imageResizer.destroy();
++        // this._imageResizer.destroy();
+ 
+         this._undoIndex = -1;
+         this._undoStack = [];
+@@ -2138,13 +2139,47 @@ class Squire {
+             return this;
+         }
+ 
++        if (!block && !lineBreakOnly) {
++            /**
++             * No block to split, so this used to insert a bare BR. That BR is then
++             * the last node of its line, which no browser renders as a line break,
++             * and Firefox drops it on the next keystroke: the line the user just
++             * made disappeared and their typing continued on the line above.
++             * Reachable by typing at the very top of a reply, where the caret sits
++             * at the root itself and Firefox leaves the text there unwrapped.
++             * Wrap the loose inline run into a block and split that instead. The
++             * bookmark is needed because fixContainer() detaches the nodes, and
++             * removing a node collapses any live range inside it. Tachyon #165.
++             */
++            this._saveRangeToBookmark(range);
++            fixContainer(root, root);
++            this._getRangeAndRemoveBookmark(range);
++            block = getStartBlockOfRange(range, root);
++        }
++
+         // If this is a malformed bit of document or in a table;
+         // just play it safe and insert a <br>.
+         if (!block || lineBreakOnly || /^T[HD]$/.test(block.nodeName)) {
+             // If inside an <a>, move focus out
+             moveRangeBoundaryOutOf(range, 'A', root);
+-            insertNodeInRange(range, createElement('BR'));
++            const br = createElement('BR');
++            insertNodeInRange(range, br);
+             range.collapse(false);
++            /**
++             * With nothing after it in the line this BR renders as no break at all,
++             * and Firefox drops it on the next keystroke, so shift+enter at the end
++             * of a paragraph did nothing. A second BR gives the new line something
++             * to be, the way fixCursor() does for an empty block, and the caret
++             * goes between the two. A trailing BR is not rendered by anything, so
++             * the filler costs the sent message no blank line. isLineBreak() is
++             * Squire's own test for whether a BR has anything after it in its line.
++             */
++            if (!isLineBreak(br, false)) {
++                const filler = createElement('BR');
++                br.after(filler);
++                range.setStartBefore(filler);
++                range.collapse(true);
++            }
+             this.setSelection(range);
+             this._updatePath(range, true);
+             return this;
+diff --git a/source/Legacy.ts b/source/Legacy.ts
+index e5c0f4b..06bd8fc 100644
+--- a/source/Legacy.ts
++++ b/source/Legacy.ts
+@@ -1,3 +1,4 @@
+ import { Squire } from './Editor';
+ 
+-(window as any).Squire = Squire;
++// Squire2: the main composer has its own Squire as window.Squire
++(window as any).Squire2 = Squire;
+diff --git a/source/keyboard/Space.ts b/source/keyboard/Space.ts
+index 8ce1a25..6db4170 100644
+--- a/source/keyboard/Space.ts
++++ b/source/keyboard/Space.ts
+@@ -31,8 +31,6 @@ const Space = (self: Squire, event: KeyboardEvent, range: Range): void => {
+             const text = block.textContent?.trimEnd().replace(ZWS, '');
+             if (text === '*' || text === '1.') {
+                 event.preventDefault();
+-                self.insertPlainText(' ', false);
+-                self._docWasChanged();
+                 self.saveUndoState(range);
+                 const walker = new TreeIterator<Text>(block, SHOW_TEXT);
+                 let textNode: Text | null;
+diff --git a/source/range/InsertDelete.ts b/source/range/InsertDelete.ts
+index ea6d15a..e377a35 100644
+--- a/source/range/InsertDelete.ts
++++ b/source/range/InsertDelete.ts
+@@ -1,4 +1,5 @@
+ import { cleanupBRs } from '../Clean';
++import { ZWS } from '../Constants';
+ import {
+     split,
+     fixCursor,
+@@ -351,12 +352,28 @@ const insertTreeFragmentIntoRange = (
+         cleanupBRs(block as HTMLElement, root, false);
+         if (isInline(container)) {
+             // Split up to block parent.
+-            const nodeAfterSplit = split(
++            let nodeAfterSplit = split(
+                 container,
+                 offset,
+                 getPreviousBlock(container, root) || root,
+                 root,
+             ) as Node;
++            /**
++             * Splitting at the end of a link leaves the clone of it with nothing in
++             * it, and this path never cleaned that up: inserting anything beside a
++             * link left an empty one behind, which then travelled in the sent
++             * message. splitBlock() meets the same case and swaps the empty link
++             * for an empty text node, which keeps the position this needs.
++             */
++            if (
++                nodeAfterSplit &&
++                nodeAfterSplit.nodeName === 'A' &&
++                (!nodeAfterSplit.textContent || nodeAfterSplit.textContent === ZWS)
++            ) {
++                const text = document.createTextNode('');
++                (nodeAfterSplit as ChildNode).replaceWith(text);
++                nodeAfterSplit = text;
++            }
+             container = nodeAfterSplit.parentNode!;
+             offset = Array.from(container.childNodes).indexOf(
+                 nodeAfterSplit as ChildNode,
