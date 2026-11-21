@@ -569,7 +569,10 @@ export class MessageModel extends AbstractModel {
 				src, useProxy = !!SettingsGet('proxyExternalImages');
 			body.querySelectorAll('img[' + attr + ']').forEach(node => {
 				src = node.getAttribute(attr);
-				if (isValid(src)) {
+				// An inline image keeps its cid: here for Compose, while its src is
+				// already the attachment. Pointing src at the cid:, or at the proxy
+				// for it, broke every inline image the moment images were shown.
+				if (!src.startsWith('cid:') && isValid(src)) {
 					node.src = useProxy ? proxy(src) : src;
 				}
 			});
