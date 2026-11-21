@@ -189,6 +189,8 @@ trait UserAuth
 		), \LOG_NOTICE, 'LOGIN');
 
 		if ($bMainAccount) {
+			// A new session for the new login, see Utils::RotateSessionToken()
+			Utils::RotateSessionToken();
 			$this->StorageProvider()->Put($oAccount, StorageType::SESSION, Utils::GetSessionToken(), (string) \time());
 
 			// Must be here due to bug #1241

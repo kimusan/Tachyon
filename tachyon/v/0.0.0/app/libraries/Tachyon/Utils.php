@@ -71,6 +71,30 @@ class Utils
 		return \sha1('Session'.APP_SALT.$sToken.'Token'.APP_SALT);
 	}
 
+	/**
+	 * Start a new session cookie, at login: the login cookies' key hangs on
+	 * it (Cookies::setSecure()), so one that existed before the login, made by
+	 * the mailto flow or planted, must not carry on into the session. The
+	 * cookies encrypted with the session token are carried over: the mailto
+	 * token, which is read after the login, and an admin panel session open
+	 * in the same browser.
+	 */
+	public static function RotateSessionToken() : void
+	{
+		$aCarry = [];
+		foreach ([Actions::AUTH_MAILTO_TOKEN_KEY, 'smadmin'] as $sName) {
+			$sValue = \Tachyon\Util\Cookies::get($sName);
+			if (null !== $sValue && ($aValues = static::DecodeKeyValuesQ($sValue))) {
+				$aCarry[$sName] = $aValues;
+			}
+		}
+		\Tachyon\Util\Log::debug('TOKENS', 'New SESSION_TOKEN (login)');
+		\Tachyon\Util\Cookies::set(self::SESSION_TOKEN, \MailSo\Base\Utils::Sha1Rand(APP_SALT));
+		foreach ($aCarry as $sName => $aValues) {
+			\Tachyon\Util\Cookies::set($sName, static::EncodeKeyValuesQ($aValues));
+		}
+	}
+
 	public static function GetConnectionToken() : string
 	{
 		$oActions = \Tachyon\Api::Actions();
