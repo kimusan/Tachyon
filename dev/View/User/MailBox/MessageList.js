@@ -745,7 +745,9 @@ export class MailMessageList extends AbstractViewRight {
 				}
 			},
 			dblclick: event => {
-				let msg = ko.dataFor(eqs(event, '.messageListItem'));
+				// Ticking and unticking a message quickly is a double click on its checkbox,
+				// and it opened the thread or went fullscreen
+				let msg = eqs(event, '.checkboxMessage') ? null : ko.dataFor(eqs(event, '.messageListItem'));
 				if (msg) {
 					msg.threadsLen() ? this.gotoThread(msg) : toggleFullscreen();
 				}
