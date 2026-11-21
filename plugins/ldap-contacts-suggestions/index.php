@@ -4,9 +4,9 @@ class LdapContactsSuggestionsPlugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Contacts suggestions (LDAP)',
-		VERSION  = '2.14',
-		RELEASE  = '2024-03-12',
-		REQUIRED = '2.35.3',
+		VERSION  = '2.17',
+		RELEASE  = '2026-11-12',
+		REQUIRED = '2.36.1',
 		CATEGORY = 'Contacts',
 		DESCRIPTION = 'Get contacts suggestions from LDAP.';
 
@@ -79,7 +79,7 @@ class LdapContactsSuggestionsPlugin extends \Tachyon\Plugins\AbstractPlugin
 				->SetType(\Tachyon\Enumerations\PluginPropertyType::PASSWORD)
 				->SetDefaultValue(''),
 			\Tachyon\Plugins\Property::NewInstance('base_dn')->SetLabel('Search base DN')
-				->SetDescription('DN to use as the search base. Supported tokens: {domain}, {domain:dc}, {email}, {email:user}, {email:domain}, {login}, {imap:login}, {imap:host}, {imap:port}')
+				->SetDescription('DN to use as the search base. Supported tokens: {domain}, {domain:dc}, {email}, {email:user}, {email:domain}, {login}, {imap:login}, {imap:host}, {imap:port} Several branches may be given, separated by | - useful when meeting rooms or other resources live outside the people branch.')
 				->SetDefaultValue('ou=People,dc=example,dc=com'),
 			\Tachyon\Plugins\Property::NewInstance('object_classes')->SetLabel('objectClasses')
 				->SetDescription('LDAP objectClasses to search for, comma separated list')
