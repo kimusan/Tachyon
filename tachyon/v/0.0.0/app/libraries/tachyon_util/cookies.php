@@ -43,7 +43,7 @@ class Cookies
 	public static function getSecure(string $sName)
 	{
 		return isset($_COOKIE[$sName])
-			? Crypt::DecryptFromJSON(\MailSo\Base\Utils::UrlSafeBase64Decode(static::get($sName)))
+			? Crypt::DecryptFromJSON(\MailSo\Base\Utils::UrlSafeBase64Decode(static::get($sName)), null, true)
 			: null;
 	}
 

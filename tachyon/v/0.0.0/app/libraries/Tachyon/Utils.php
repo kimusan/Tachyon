@@ -44,11 +44,16 @@ class Utils
 		);
 	}
 
+	/**
+	 * Only used for cookies (smadmin, the mailto token), so the token comes
+	 * from the client: sodium only, where available (see Crypt::Decrypt()).
+	 */
 	public static function DecodeKeyValuesQ(string $sEncodedValues, string $sCustomKey = '') : array
 	{
 		return \Tachyon\Util\Crypt::DecryptUrlSafe(
 			$sEncodedValues,
-			\sha1(APP_SALT.$sCustomKey.'Q'.static::GetSessionToken(false))
+			\sha1(APP_SALT.$sCustomKey.'Q'.static::GetSessionToken(false)),
+			true
 		) ?: array();
 	}
 

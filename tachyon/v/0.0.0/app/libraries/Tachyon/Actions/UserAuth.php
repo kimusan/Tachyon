@@ -382,7 +382,7 @@ trait UserAuth
 		$sSignMeToken = Cookies::get(self::AUTH_SIGN_ME_TOKEN_KEY);
 		if ($sSignMeToken) {
 			\Tachyon\Util\Log::notice(self::AUTH_SIGN_ME_TOKEN_KEY, 'decrypt');
-			$aResult = \Tachyon\Util\Crypt::DecryptUrlSafe($sSignMeToken, 'signme');
+			$aResult = \Tachyon\Util\Crypt::DecryptUrlSafe($sSignMeToken, 'signme', true);
 			if (isset($aResult['e'], $aResult['u']) && \Tachyon\Util\UUID::isValid($aResult['u'])) {
 				if (!isset($aResult['c'])) {
 					$aResult['c'] = \array_key_last($aResult);
@@ -432,7 +432,7 @@ trait UserAuth
 					$aTokenData['c'],
 					\base64_decode($aTokenData['d']),
 					$sAuthToken
-				], 'signme');
+				], 'signme', true); // algorithm and nonce come from the cookie
 				if (!\is_array($aAccountHash)) {
 					throw new \RuntimeException('token decrypt failed');
 				}
