@@ -93,7 +93,7 @@ class Utils
 	{
 		\setlocale(LC_CTYPE, 'en_US.UTF-8');
 
-		$aHeaders = \fgetcsv($rFile, 5000, $sDelimiter, '"');
+		$aHeaders = \fgetcsv($rFile, 5000, $sDelimiter, '"', '');
 		if (!$aHeaders || 3 >= \count($aHeaders)) {
 			return;
 		}
@@ -107,7 +107,7 @@ class Utils
 			$aHeaders[$iIndex] = $sItemName;
 		}
 
-		while (false !== ($mRow = \fgetcsv($rFile, 5000, $sDelimiter, '"'))) {
+		while (false !== ($mRow = \fgetcsv($rFile, 5000, $sDelimiter, '"', ''))) {
 			\MailSo\Base\Utils::ResetTimeLimit();
 			$iCount = 0;
 			$oVCard = new VCard;
@@ -152,7 +152,7 @@ class Utils
 				'Home Street', 'Home City', 'Home State', 'Home Postal Code', 'Home Country',
 				'Business Email', 'Business Phone',
 				'Business Street', 'Business City', 'Business State', 'Business Postal Code', 'Business Country'
-			));
+			), ',', '"', '');
 		}
 
 		$aName = isset($oVCard->N) ? $oVCard->N->getParts() : ['','','','',''];
@@ -195,7 +195,7 @@ class Utils
 			$adrWork[4],                // State
 			$adrWork[5],                // Postal Code
 			$adrWork[6]                 // Country
-		));
+		), ',', '"', '');
 	}
 
 	public static function VcfStreamToContacts(/*resource*/ $rFile) : iterable
