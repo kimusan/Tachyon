@@ -230,6 +230,11 @@ class ImapClient extends \MailSo\Net\NetClient
 		}
 		catch (Exceptions\NegativeResponseException $oException)
 		{
+			// Told apart so the user sees a server problem, keeps a "stay signed
+			// in" token, and does not land in the failed-login log
+			if ($oException->isTemporaryLoginFailure()) {
+				$this->writeLogException($oException, \LOG_ERR);
+			}
 			$this->writeLogException(new Exceptions\LoginBadCredentialsException($oException->GetResponses(), '', 0, $oException));
 		}
 

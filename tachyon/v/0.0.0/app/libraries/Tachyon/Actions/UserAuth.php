@@ -448,10 +448,13 @@ trait UserAuth
 			catch (\Throwable $oException)
 			{
 				\Tachyon\Util\Log::warning(self::AUTH_SIGN_ME_TOKEN_KEY, $oException->getMessage());
-				// A mail server that could not be reached says nothing about the token.
+				// A mail server that could not be reached, or refused the login for a
+				// reason of its own (RFC 5530 UNAVAILABLE and the like), says nothing
+				// about the token.
 				// Clearing it here signed people out for good over a network blip, so it
 				// is kept and the next request signs in with it again.
-				if ($oException instanceof ClientException && Notifications::ConnectionError === $oException->getCode()) {
+				if ($oException instanceof ClientException && \in_array($oException->getCode(),
+					[Notifications::ConnectionError, Notifications::MailServerError], true)) {
 					throw $oException;
 				}
 				$this->ClearSignMeData();
@@ -530,6 +533,10 @@ trait UserAuth
 			} else {
 				throw new ClientException(Notifications::AuthError, $oException);
 			}
+		} catch (\MailSo\Imap\Exceptions\NegativeResponseException $oException) {
+			// A refusal that is not about the credentials: Login() passes a
+			// temporary one on as it is (RFC 5530 UNAVAILABLE, INUSE, SERVERBUG)
+			throw new ClientException(Notifications::MailServerError, $oException);
 		} catch (\Throwable $oException) {
 			throw new ClientException(Notifications::AuthError, $oException);
 		}
