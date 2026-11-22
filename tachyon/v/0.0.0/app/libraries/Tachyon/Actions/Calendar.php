@@ -221,6 +221,121 @@ trait Calendar
 	}
 
 	/**
+	 * The user's addresses, the order identities are listed in, so the one the
+	 * user put first answers when an invitation went to more than one of them.
+	 *
+	 * @return array<string, \Tachyon\Model\Identity> keyed by address
+	 */
+	private function invitationIdentities(\Tachyon\Model\Account $oAccount) : array
+	{
+		$aResult = array();
+		foreach ($this->GetIdentities($oAccount) as $oIdentity) {
+			$sEmail = \trim($oIdentity->Email());
+			if (\strlen($sEmail) && !isset($aResult[\strtolower($sEmail)])) {
+				$aResult[\strtolower($sEmail)] = $oIdentity;
+			}
+		}
+		return $aResult;
+	}
+
+	private function invitationFromParams() : \Tachyon\Providers\Calendar\Invitation
+	{
+		$oInvitation = \Tachyon\Providers\Calendar\Invitation::fromIcal((string) $this->GetActionParam('Ical', ''));
+		if (!$oInvitation) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Not an iCalendar event');
+		}
+		return $oInvitation;
+	}
+
+	/**
+	 * What an invitation in a mail is, and whether the user can answer it.
+	 * Works without the calendar: answering is mail, not storage.
+	 */
+	public function DoCalendarInvitation() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$aIdentities = $this->invitationIdentities($oAccount);
+		return $this->DefaultResponse(
+			$this->invitationFromParams()->Describe(\array_keys($aIdentities))
+		);
+	}
+
+	/**
+	 * Answer an invitation: send the METHOD:REPLY to the organizer, from the
+	 * identity it was sent to.
+	 */
+	public function DoCalendarInvitationReply() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$oInvitation = $this->invitationFromParams();
+		$sPartstat = \strtoupper((string) $this->GetActionParam('Partstat', ''));
+		if (!\in_array($sPartstat, \Tachyon\Providers\Calendar\Invitation::PARTSTATS, true)) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Unknown answer');
+		}
+
+		$aIdentities = $this->invitationIdentities($oAccount);
+		$aInfo = $oInvitation->Describe(\array_keys($aIdentities));
+		if (empty($aInfo['CanReply'])) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'This invitation cannot be answered');
+		}
+		$sEmail = $aInfo['Attendee']['Email'];
+		$oIdentity = $aIdentities[\strtolower($sEmail)];
+
+		$oReply = $oInvitation->Reply($sEmail, $sPartstat);
+		if (!$oReply) {
+			throw new ClientException(\Tachyon\Notifications::CantSendMessage, null, 'No reply could be made');
+		}
+
+		$oMessage = new \MailSo\Mime\Message();
+		if ($this->Config()->Get('security', 'hide_x_mailer_header', true)) {
+			$oMessage->DoesNotAddDefaultXMailer();
+		}
+		$oMessage->SetFrom(new \MailSo\Mime\Email($oIdentity->Email(), $oIdentity->Name()));
+		$oFrom = $oMessage->GetFrom();
+		$oMessage->RegenerateMessageId($oFrom ? $oFrom->GetDomain() : '');
+		$oMessage->SetTo(new \MailSo\Mime\EmailCollection(array(
+			new \MailSo\Mime\Email($aInfo['Organizer']['Email'], $aInfo['Organizer']['Name'])
+		)));
+
+		$sSubject = \trim((string) $this->GetActionParam('Subject', ''));
+		$oMessage->SetSubject(\strlen($sSubject) ? $sSubject : \ucfirst(\strtolower($sPartstat)) . ': ' . $aInfo['Summary']);
+
+		// RFC 6047 2.4: the calendar goes in text/calendar with the method
+		// repeated in the Content-Type; the text is for people whose client
+		// does not understand it
+		$oAlternative = new \MailSo\Mime\Part;
+		$oAlternative->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'multipart/alternative');
+		$oAlternative->addPlain((string) $this->GetActionParam('Plain', ''));
+
+		$oCalendarPart = new \MailSo\Mime\Part;
+		$oCalendarPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'text/calendar; charset=utf-8; method=REPLY');
+		$oCalendarPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TRANSFER_ENCODING, 'quoted-printable');
+		$oCalendarPart->Body = \MailSo\Base\StreamWrappers\Binary::CreateStream(
+			\MailSo\Base\ResourceRegistry::CreateMemoryResourceFromString($oReply->serialize()),
+			'convert.quoted-printable-encode'
+		);
+		$oAlternative->SubParts->append($oCalendarPart);
+		$oMessage->SubParts->append($oAlternative);
+
+		$this->Plugins()->RunHook('filter.build-invitation-reply', array($oMessage, $oAccount, $oReply));
+
+		$rMessageStream = \MailSo\Base\ResourceRegistry::CreateMemoryResource();
+		$iMessageStreamSize = \MailSo\Base\Utils::WriteStream(
+			$oMessage->ToStream(true), $rMessageStream, 8192, true, true
+		);
+		if (false === $iMessageStreamSize) {
+			throw new ClientException(\Tachyon\Notifications::CantSendMessage);
+		}
+		try {
+			$this->smtpSendMessage($oAccount, $oMessage, $rMessageStream, $iMessageStreamSize, false);
+		} finally {
+			\is_resource($rMessageStream) && \fclose($rMessageStream);
+		}
+
+		return $this->TrueResponse(array('Partstat' => $sPartstat));
+	}
+
+	/**
 	 * One VCALENDAR per UID, keyed by it.
 	 *
 	 * A file can hold many unrelated events, and an event can be several

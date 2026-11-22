@@ -322,6 +322,39 @@
 		padding: 10px;
 	}
 
+	/* An invitation; the rows inherit padding and border from .bodySubHeader > * */
+	.bodySubHeader > .invitationCard {
+		cursor: default;
+		display: flex;
+		flex-direction: column;
+		gap: .35em;
+
+		&.cancelled .invitationTitle > span:first-child {
+			text-decoration: line-through;
+		}
+	}
+
+	.invitationTitle {
+		font-weight: bold;
+	}
+
+	.invitationBadge {
+		border: 1px solid var(--border-color, #bbb);
+		border-radius: var(--border-radius, 5px);
+		font-size: .85em;
+		font-weight: normal;
+		margin-inline-start: .5em;
+		padding: 0 .4em;
+	}
+
+	.invitationActions {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: .5em;
+		margin-top: .25em;
+	}
+
 	.pgpInfo {
 		padding: 5px 15px;
 		border-bottom: 1px solid var(--border-color, #bbb);

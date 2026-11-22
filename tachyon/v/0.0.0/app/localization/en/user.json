@@ -246,7 +246,22 @@
 		"ERROR_BAD_START": "The start date is not a valid date and time",
 		"ERROR_BAD_END": "The end date is not a valid date and time",
 		"ERROR_END_BEFORE_START": "The event ends before it starts",
-		"ERROR_NO_CALENDAR": "Choose a calendar for the event"
+		"ERROR_NO_CALENDAR": "Choose a calendar for the event",
+		"INVITATION_ORGANIZER": "Organizer:",
+		"INVITATION_CANCELLED": "Cancelled",
+		"INVITATION_RECURRING": "Repeats",
+		"INVITATION_ACCEPT": "Accept",
+		"INVITATION_TENTATIVE": "Maybe",
+		"INVITATION_DECLINE": "Decline",
+		"INVITATION_SUBJECT_ACCEPTED": "Accepted: %SUMMARY%",
+		"INVITATION_SUBJECT_TENTATIVE": "Tentatively accepted: %SUMMARY%",
+		"INVITATION_SUBJECT_DECLINED": "Declined: %SUMMARY%",
+		"INVITATION_TEXT_ACCEPTED": "%EMAIL% has accepted the invitation to %SUMMARY%.",
+		"INVITATION_TEXT_TENTATIVE": "%EMAIL% has tentatively accepted the invitation to %SUMMARY%.",
+		"INVITATION_TEXT_DECLINED": "%EMAIL% has declined the invitation to %SUMMARY%.",
+		"INVITATION_SENT_ACCEPTED": "You accepted. The organizer has been told.",
+		"INVITATION_SENT_TENTATIVE": "You answered maybe. The organizer has been told.",
+		"INVITATION_SENT_DECLINED": "You declined. The organizer has been told."
 	},
 	"CONTACTS": {
 		"TAB_CONTACT": "Contact",

@@ -250,6 +250,34 @@
 					<div class="bodySubHeader" data-bind="if: message, i18nUpdate: message">
 						<div class="readReceipt" data-bind="visible: askReadReceipt, click: readReceipt"
 							data-icon="mail" data-i18n="MESSAGE/BUTTON_NOTIFY_READ_RECEIPT"></div>
+						<!-- Always in the DOM, so i18nUpdate above translates it with the
+						     message; the invitation is read after the message is shown -->
+						<div class="invitationCard" style="display:none" data-bind="visible: invitationShown, css: { cancelled: invitation()?.Cancelled }">
+							<div class="invitationTitle" data-icon="calendar">
+								<span data-bind="text: invitation()?.Summary"></span>
+								<span class="invitationBadge" data-bind="visible: invitation()?.Cancelled" data-i18n="CALENDAR/INVITATION_CANCELLED"></span>
+								<span class="invitationBadge" data-bind="visible: invitation()?.Recurring" data-i18n="CALENDAR/INVITATION_RECURRING"></span>
+							</div>
+							<div data-bind="text: invitationWhen()"></div>
+							<div data-bind="visible: invitation()?.Location, text: invitation()?.Location"></div>
+							<div data-bind="visible: invitationOrganizer()">
+								<span data-i18n="CALENDAR/INVITATION_ORGANIZER"></span>
+								<span data-bind="text: invitationOrganizer()"></span>
+							</div>
+							<div class="invitationActions" data-bind="visible: invitation()?.CanReply">
+								<button class="btn" data-bind="click: () => answerInvitation('ACCEPTED'), disable: invitationBusy,
+									css: { active: 'ACCEPTED' === invitationAnswer() }, attr: { 'aria-pressed': 'ACCEPTED' === invitationAnswer() ? 'true' : 'false' }"><i class="icon-check" style="display:none" data-bind="visible: 'ACCEPTED' === invitationAnswer()"></i>
+									<span data-i18n="CALENDAR/INVITATION_ACCEPT"></span></button>
+								<button class="btn" data-bind="click: () => answerInvitation('TENTATIVE'), disable: invitationBusy,
+									css: { active: 'TENTATIVE' === invitationAnswer() }, attr: { 'aria-pressed': 'TENTATIVE' === invitationAnswer() ? 'true' : 'false' }"><i class="icon-check" style="display:none" data-bind="visible: 'TENTATIVE' === invitationAnswer()"></i>
+									<span data-i18n="CALENDAR/INVITATION_TENTATIVE"></span></button>
+								<button class="btn" data-bind="click: () => answerInvitation('DECLINED'), disable: invitationBusy,
+									css: { active: 'DECLINED' === invitationAnswer() }, attr: { 'aria-pressed': 'DECLINED' === invitationAnswer() ? 'true' : 'false' }"><i class="icon-check" style="display:none" data-bind="visible: 'DECLINED' === invitationAnswer()"></i>
+									<span data-i18n="CALENDAR/INVITATION_DECLINE"></span></button>
+								<i class="icon-spinner" style="display:none" data-bind="visible: invitationBusy"></i>
+							</div>
+							<div data-bind="visible: invitationMessage, text: invitationMessage, css: { 'text-error': invitationFailed }"></div>
+						</div>
 						<details class="attachmentsPlace" data-bind="visible: hasAttachments, css: {'selection-mode' : showAttachmentControls}, attr: { open: hasAttachments }">
 							<summary data-i18n="MESSAGE/PRINT_LABEL_ATTACHMENTS"></summary>
 							<!-- ko ifnot: simpleAttachmentsList -->

@@ -155,11 +155,38 @@ export class MailMessageView extends AbstractViewRight {
 			calendarImportAttachment: null,
 			calendarImportBusy: false,
 			calendarImportMessage: '',
-			calendarImportFailed: false
+			calendarImportFailed: false,
+			// An invitation (iTIP REQUEST) in the open message, as the server
+			// read it, and the answer sent for it while the message is open
+			invitation: null,
+			invitationBusy: false,
+			invitationAnswer: '',
+			invitationMessage: '',
+			invitationFailed: false
 		});
 
 		this.calendarImportChoices = ko.observableArray();
 		this.capaCalendar = SettingsCapa('Calendar');
+
+		// The calendar part as it was downloaded, sent back with the answer so
+		// the server builds the REPLY from what the user saw, and the message it
+		// came from: the card must never answer for another message than the open one
+		this.invitationIcal = '';
+		this.invitationOwner = null;
+		this.invitationShown = ko.computed(() =>
+			!!this.invitation() && this.invitationOwner === currentMessage());
+		// The body, and with it the attachments, arrives after the message is set,
+		// and the list can be filled more than once for the same message
+		ko.computed(() =>
+			currentMessage()?.attachments().find(attachment =>
+				attachment.download && 'text/calendar' === attachment.mimeType.toLowerCase()) || null
+		).subscribe(attachment => {
+			const message = currentMessage();
+			if (message !== this.invitationLoadedFor?.[0] || attachment?.download !== this.invitationLoadedFor?.[1]) {
+				this.invitationLoadedFor = [message, attachment?.download];
+				this.loadInvitation(attachment, message);
+			}
+		});
 
 		this.moveAction = moveAction;
 
@@ -758,6 +785,105 @@ export class MailMessageView extends AbstractViewRight {
 	calendarImportError(text) {
 		this.calendarImportFailed(true);
 		this.calendarImportMessage(text);
+	}
+
+	/**
+	 * Ask the server what the invitation in a message is. Like the import, the
+	 * file goes to the server as it arrived, and the server does the reading.
+	 */
+	loadInvitation(attachment, message) {
+		const token = {};
+		this.invitationToken = token;
+		this.invitation(null);
+		this.invitationIcal = '';
+		this.invitationOwner = null;
+		this.invitationAnswer('');
+		this.invitationMessage('');
+		this.invitationFailed(false);
+		attachment && rl.fetch(attachment.linkDownload())
+			.then(response => response.ok ? response.text() : Promise.reject(new Error('download')))
+			.then(ical => new Promise((resolve, reject) =>
+				Remote.request('CalendarInvitation',
+					(iError, data) => iError ? reject(iError) : resolve([ical, data?.Result]),
+					{ Ical: ical }
+				)
+			))
+			.then(([ical, info]) => {
+				// Another message may have been opened while this one was read
+				if (token === this.invitationToken && info?.Method) {
+					this.invitationIcal = ical;
+					this.invitationOwner = message;
+					this.invitation(info);
+				}
+			})
+			// Not an invitation, or one the server cannot read: the attachment
+			// is still there to open or add to a calendar
+			.catch(() => 0);
+	}
+
+	invitationWhen() {
+		const info = this.invitation();
+		if (!info?.Start) {
+			return '';
+		}
+		const start = new Date(info.Start * 1000);
+		if (info.AllDay) {
+			// Dates without a time come as midnight UTC, and DTEND is the day after
+			const options = { dateStyle: 'full', timeZone: 'UTC' },
+				last = new Date(Math.max(info.Start, (info.End || info.Start) - 86400) * 1000);
+			return last > start
+				? start.format(options) + ' - ' + last.format(options)
+				: start.format(options);
+		}
+		const end = new Date((info.End || info.Start) * 1000),
+			sameDay = start.toDateString() === end.toDateString();
+		return start.format({ dateStyle: 'full', timeStyle: 'short' })
+			+ (info.End > info.Start
+				? ' - ' + end.format(sameDay ? { timeStyle: 'short' } : { dateStyle: 'full', timeStyle: 'short' })
+				: '');
+	}
+
+	invitationOrganizer() {
+		const organizer = this.invitation()?.Organizer;
+		return organizer
+			? (organizer.Name ? organizer.Name + ' <' + organizer.Email + '>' : organizer.Email)
+			: '';
+	}
+
+	/**
+	 * Send the answer to the organizer. Subject and text are written here, in the
+	 * user's language; the server adds the calendar part that clients act on.
+	 */
+	answerInvitation(partstat) {
+		const info = this.invitation();
+		if (!info?.CanReply || !this.invitationShown() || this.invitationBusy()) {
+			return;
+		}
+		const params = { SUMMARY: info.Summary || '', EMAIL: info.Attendee?.Email || '' },
+			token = this.invitationToken;
+		this.invitationBusy(true);
+		this.invitationMessage('');
+		this.invitationFailed(false);
+		Remote.request('CalendarInvitationReply', iError => {
+			this.invitationBusy(false);
+			// Another message was opened meanwhile: the answer went out, but this
+			// card is not its card any more
+			if (token !== this.invitationToken) {
+				return;
+			}
+			if (iError) {
+				this.invitationFailed(true);
+				this.invitationMessage(getNotification(iError));
+			} else {
+				this.invitationAnswer(partstat);
+				this.invitationMessage(i18n('CALENDAR/INVITATION_SENT_' + partstat, params));
+			}
+		}, {
+			Ical: this.invitationIcal,
+			Partstat: partstat,
+			Subject: i18n('CALENDAR/INVITATION_SUBJECT_' + partstat, params),
+			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params)
+		});
 	}
 
 	/**
