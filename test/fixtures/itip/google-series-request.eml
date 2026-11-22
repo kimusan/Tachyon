@@ -1,0 +1,77 @@
+X-Fixture: Google Calendar REQUEST, SEQUENCE 0; real mail, masked
+MIME-Version: 1.0
+Reply-To: "Example Organizer" <organizer@example.com>
+Sender: "Example Sender 1" <other1@example.com>
+Message-ID: <261c36a610ae035f3450402d4ad8@example.com>
+Date: Tue, 05 May 2015 21:23:53 +0000
+Subject: Einladung: Example Meeting
+From: "Example Organizer" <organizer@example.com>
+To: "Example Attendee" <attendee@example.com>, "Example Attendee 2" <attendee2@example.com>
+Content-Type: multipart/mixed; boundary=440e17d003da477ab641580e3ba6
+
+--440e17d003da477ab641580e3ba6
+Content-Type: multipart/alternative; boundary=822a81b058ba489cad69404b8dc8
+
+--822a81b058ba489cad69404b8dc8
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed; delsp=yes
+Content-Transfer-Encoding: base64
+
+RXhhbXBsZSBNZWV0aW5nDQoNCkV4YW1wbGUgZGVzY3JpcHRpb24uDQo=
+--822a81b058ba489cad69404b8dc8
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><p>Example Meeting</p><p>Example description.</p></body></html>
+--822a81b058ba489cad69404b8dc8
+Content-Type: text/calendar; charset=UTF-8; method=REQUEST
+Content-Transfer-Encoding: quoted-printable
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20150508T083000Z
+DTEND:20150508T100000Z
+DTSTAMP:20150505T212353Z
+ORGANIZER;CN=3DExample Organizer:mailto:organizer@example.com
+UID:l7d48ol3djp8m89k6k5kefytu6@example.com
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
+;RSVP=3D
+ TRUE;CN=3DExample Attendee 2;X-NUM-GUESTS=3D0:mailto:attendee2@example.com
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
+;RSVP=3D
+ TRUE;CN=3DExample Attendee;X-NUM-GUESTS=3D0:mailto:attendee@example.com
+CREATED:20150505T212352Z
+DESCRIPTION:Example description.
+LAST-MODIFIED:20150505T212352Z
+LOCATION:Example Room
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Example Meeting
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+--822a81b058ba489cad69404b8dc8--
+--440e17d003da477ab641580e3ba6
+Content-Type: application/ics; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vR29vZ2xlIEluYy8vR29vZ2xlIENhbGVuZGFyIDcw
+LjkwNTQvL0VODQpWRVJTSU9OOjIuMA0KQ0FMU0NBTEU6R1JFR09SSUFODQpNRVRIT0Q6UkVRVUVT
+VA0KQkVHSU46VkVWRU5UDQpEVFNUQVJUOjIwMTUwNTA4VDA4MzAwMFoNCkRURU5EOjIwMTUwNTA4
+VDEwMDAwMFoNCkRUU1RBTVA6MjAxNTA1MDVUMjEyMzUzWg0KT1JHQU5JWkVSO0NOPUV4YW1wbGUg
+T3JnYW5pemVyOm1haWx0bzpvcmdhbml6ZXJAZXhhbXBsZS5jb20NClVJRDpsN2Q0OG9sM2RqcDht
+ODlrNms1a2VmeXR1NkBleGFtcGxlLmNvbQ0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Uk9M
+RT1SRVEtUEFSVElDSVBBTlQ7UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9DQogVFJVRTtDTj1F
+eGFtcGxlIEF0dGVuZGVlIDI7WC1OVU0tR1VFU1RTPTA6bWFpbHRvOmF0dGVuZGVlMkBleGFtcGxl
+LmNvbQ0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Uk9MRT1SRVEtUEFSVElDSVBBTlQ7UEFS
+VFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9DQogVFJVRTtDTj1FeGFtcGxlIEF0dGVuZGVlO1gtTlVN
+LUdVRVNUUz0wOm1haWx0bzphdHRlbmRlZUBleGFtcGxlLmNvbQ0KQ1JFQVRFRDoyMDE1MDUwNVQy
+MTIzNTJaDQpERVNDUklQVElPTjpFeGFtcGxlIGRlc2NyaXB0aW9uLg0KTEFTVC1NT0RJRklFRDoy
+MDE1MDUwNVQyMTIzNTJaDQpMT0NBVElPTjpFeGFtcGxlIFJvb20NClNFUVVFTkNFOjANClNUQVRV
+UzpDT05GSVJNRUQNClNVTU1BUlk6RXhhbXBsZSBNZWV0aW5nDQpUUkFOU1A6T1BBUVVFDQpFTkQ6
+VkVWRU5UDQpFTkQ6VkNBTEVOREFSDQo=
+--440e17d003da477ab641580e3ba6--

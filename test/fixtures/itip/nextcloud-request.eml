@@ -1,0 +1,74 @@
+X-Fixture: Nextcloud REQUEST, SEQUENCE 2, sent via the Mail app; real mail,
+ masked
+From: "Example Organizer" <organizer@example.com>
+To: "Example Attendee" <attendee@example.com>
+Subject: Einladung: Example Meeting
+Message-ID: <04225704059807.Stopl.PNOpRznF5lRUpkjqJBaJkPh@example.com>
+User-Agent: Horde Application Framework 5
+Date: Tue, 17 Jun 2025 18:21:00 +0000
+Content-Type: multipart/mixed; boundary="=_A15vhF4wRfOBlTcAMqbFsYs"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+--=_A15vhF4wRfOBlTcAMqbFsYs
+Content-Type: multipart/alternative; boundary="=_xXQJ_RLoruQ8ciPV6OpBryT"
+Content-Transfer-Encoding: 8bit
+
+--=_xXQJ_RLoruQ8ciPV6OpBryT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+Example Meeting
+
+Example description.
+--=_xXQJ_RLoruQ8ciPV6OpBryT
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html><body><p>Example Meeting</p><p>Example description.</p></body></html>
+--=_xXQJ_RLoruQ8ciPV6OpBryT--
+--=_A15vhF4wRfOBlTcAMqbFsYs
+Content-Type: text/calendar; name=event.ics; method=REQUEST
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Sabre//Sabre VObject 4.5.6//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CREATED:20250617T181759Z
+LAST-MODIFIED:20250617T182100Z
+SEQUENCE:2
+UID:21457b4a-9a32-644b-dc30-e73ba22cb127
+DTSTART;TZID=Europe/Berlin:20250629T123000
+DTEND;TZID=Europe/Berlin:20250629T140000
+STATUS:CONFIRMED
+SUMMARY:Example Meeting
+LOCATION:Example Room
+DESCRIPTION:Example description.
+ATTENDEE;CN=Example Attendee;CUTYPE=INDIVIDUAL;PARTSTAT=NEEDS-ACTION;ROLE=R
+ EQ-PARTICIPANT;RSVP=TRUE:mailto:attendee@example.com
+ATTENDEE;CN=Example Attendee 7;CUTYPE=INDIVIDUAL;PARTSTAT=NEEDS-ACTION;ROLE
+ =REQ-PARTICIPANT;RSVP=TRUE:mailto:attendee7@example.com
+ORGANIZER;CN=Example Organizer:mailto:organizer@example.com
+DTSTAMP:20250617T182100Z
+END:VEVENT
+END:VCALENDAR
+--=_A15vhF4wRfOBlTcAMqbFsYs--
