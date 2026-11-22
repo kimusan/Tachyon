@@ -118,10 +118,10 @@ abstract class Document extends Component
     public function create(string $name)
     {
         if (isset(static::$componentMap[strtoupper($name)])) {
-            return call_user_func_array([$this, 'createComponent'], func_get_args());
-        } else {
-            return call_user_func_array([$this, 'createProperty'], func_get_args());
+            return $this->createComponent(...func_get_args());
         }
+
+        return $this->createProperty(...func_get_args());
     }
 
     /**
@@ -180,31 +180,38 @@ abstract class Document extends Component
 
         $class = null;
 
+        // If a VALUE parameter is supplied, we have to use that
+        // According to https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.20
+        //  If the property's value is the default value type, then this
+        //  parameter need not be specified.  However, if the property's
+        //  default value type is overridden by some other allowable value
+        //  type, then this parameter MUST be specified.
+        if (!$valueType) {
+            $valueType = $parameters['VALUE'] ?? null;
+            // Apple writes BDAY;VALUE=DATE,X-APPLE-OMIT-YEAR=1604 with a
+            // comma where the spec wants a semicolon, so the parser hands
+            // over a multi-valued VALUE parameter. Only the first part names
+            // the value type. Passing the array straight on was a TypeError
+            // under PHP 8, which dropped the whole contact.
+            if (is_array($valueType)) {
+                $valueType = (string) reset($valueType);
+            }
+        }
+
         if ($valueType) {
             // The valueType argument comes first to figure out the correct
             // class.
             $class = $this->getClassNameForPropertyValue($valueType);
         }
 
+        // If the value parameter is not set or set to something we do not recognize
+        // we do not attempt to interpret or parse the datass value as specified in
+        // https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.20
+        // So when we so far did not get a class-name, we use the default for the property
         if (is_null($class)) {
-            // If a VALUE parameter is supplied, we should use that.
-            if (isset($parameters['VALUE'])) {
-                // Apple writes BDAY;VALUE=DATE,X-APPLE-OMIT-YEAR=1604 with a
-                // comma where the spec wants a semicolon, so the parser hands
-                // over a multi-valued VALUE parameter. Only the first part names
-                // the value type. Passing the array straight on was a TypeError
-                // under PHP 8, which dropped the whole contact.
-                $valueParam = is_array($parameters['VALUE'])
-                    ? (string) reset($parameters['VALUE'])
-                    : (string) $parameters['VALUE'];
-                $class = $this->getClassNameForPropertyValue($valueParam);
-                if (is_null($class)) {
-                    throw new InvalidDataException('Unsupported VALUE parameter for '.$name.' property. You supplied "'.$valueParam.'"');
-                }
-            } else {
-                $class = $this->getClassNameForPropertyName($name);
-            }
+            $class = $this->getClassNameForPropertyName($name);
         }
+
         if (is_null($parameters)) {
             $parameters = [];
         }
