@@ -162,8 +162,12 @@ export class MailMessageView extends AbstractViewRight {
 			invitationBusy: false,
 			invitationAnswer: '',
 			invitationMessage: '',
-			invitationFailed: false
+			invitationFailed: false,
+			// Where a first answer stores the event, when there is a choice
+			invitationCalendar: ''
 		});
+
+		this.invitationCalendars = ko.observableArray();
 
 		this.calendarImportChoices = ko.observableArray();
 		this.capaCalendar = SettingsCapa('Calendar');
@@ -800,6 +804,7 @@ export class MailMessageView extends AbstractViewRight {
 		this.invitationAnswer('');
 		this.invitationMessage('');
 		this.invitationFailed(false);
+		this.invitationCalendars([]);
 		attachment && rl.fetch(attachment.linkDownload())
 			.then(response => response.ok ? response.text() : Promise.reject(new Error('download')))
 			.then(ical => new Promise((resolve, reject) =>
@@ -813,12 +818,69 @@ export class MailMessageView extends AbstractViewRight {
 				if (token === this.invitationToken && info?.Method) {
 					this.invitationIcal = ical;
 					this.invitationOwner = message;
-					this.invitation(info);
+					this.showInvitation(info, token);
 				}
 			})
 			// Not an invitation, or one the server cannot read: the attachment
 			// is still there to open or add to a calendar
 			.catch(() => 0);
+	}
+
+	/**
+	 * Show what the server said, with the answer the calendar already holds
+	 * marked, and the calendars a first answer could go into.
+	 */
+	showInvitation(info, token) {
+		const calendar = info.Calendar || {},
+			stored = calendar.Stored?.Partstat;
+		this.invitation(info);
+		this.invitationCalendars([]);
+		this.invitationAnswer(['ACCEPTED', 'TENTATIVE', 'DECLINED'].includes(stored) ? stored : '');
+		if (calendar.Active && !calendar.Stored && calendar.CanStore && info.CanReply) {
+			CalendarUserStore.fetchCalendars((iError, calendars) => {
+				if (!iError && token === this.invitationToken) {
+					const writable = calendars.filter(cal => !cal.readOnly);
+					this.invitationCalendars(writable);
+					this.invitationCalendar(writable[0]?.uuid || '');
+				}
+			});
+		}
+	}
+
+	invitationStoredText() {
+		const stored = this.invitation()?.Calendar?.Stored;
+		if (!stored) {
+			return '';
+		}
+		return i18n(['ACCEPTED', 'TENTATIVE'].includes(stored.Partstat)
+			? 'CALENDAR/INVITATION_IN_CALENDAR_' + stored.Partstat
+			: 'CALENDAR/INVITATION_IN_CALENDAR', { CALENDAR: stored.Name });
+	}
+
+	/**
+	 * A cancellation: take the event, or the cancelled dates, out of the calendar
+	 */
+	removeInvitationEvent() {
+		if (!this.invitationShown() || this.invitationBusy()) {
+			return;
+		}
+		const token = this.invitationToken;
+		this.invitationBusy(true);
+		Remote.request('CalendarInvitationRemove', (iError, data) => {
+			this.invitationBusy(false);
+			if (token !== this.invitationToken) {
+				return;
+			}
+			if (iError) {
+				this.invitationFailed(true);
+				this.invitationMessage(getNotification(iError));
+			} else {
+				data?.Result?.Method && this.showInvitation(data.Result, token);
+				this.invitationFailed(false);
+				this.invitationMessage(i18n('CALENDAR/INVITATION_REMOVED'));
+				CalendarUserStore.synced(Date.now());
+			}
+		}, { Ical: this.invitationIcal });
 	}
 
 	invitationWhen() {
@@ -864,7 +926,7 @@ export class MailMessageView extends AbstractViewRight {
 		this.invitationBusy(true);
 		this.invitationMessage('');
 		this.invitationFailed(false);
-		Remote.request('CalendarInvitationReply', iError => {
+		Remote.request('CalendarInvitationReply', (iError, data) => {
 			this.invitationBusy(false);
 			// Another message was opened meanwhile: the answer went out, but this
 			// card is not its card any more
@@ -875,11 +937,19 @@ export class MailMessageView extends AbstractViewRight {
 				this.invitationFailed(true);
 				this.invitationMessage(getNotification(iError));
 			} else {
+				// Read again from what the calendar now holds: after a decline
+				// took the event out, the next answer needs a calendar to go to
+				data?.Invitation?.Method && this.showInvitation(data.Invitation, token);
 				this.invitationAnswer(partstat);
-				this.invitationMessage(i18n('CALENDAR/INVITATION_SENT_' + partstat, params));
+				// The answer went out either way; the calendar copy is reported apart
+				this.invitationFailed(!!data?.CalendarError);
+				this.invitationMessage(i18n('CALENDAR/INVITATION_SENT_' + partstat, params)
+					+ (data?.CalendarError ? ' ' + i18n('CALENDAR/INVITATION_NOT_STORED', { ERROR: data.CalendarError }) : ''));
+				info.Calendar?.Active && CalendarUserStore.synced(Date.now());
 			}
 		}, {
 			Ical: this.invitationIcal,
+			Calendar: this.invitationCalendar(),
 			Partstat: partstat,
 			Subject: i18n('CALENDAR/INVITATION_SUBJECT_' + partstat, params),
 			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params)

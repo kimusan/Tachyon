@@ -28,6 +28,14 @@ class Invitation
 		$this->oVCalendar = $oVCalendar;
 	}
 
+	/**
+	 * A stored copy read the same way, to find our answer in it.
+	 */
+	public static function fromVCalendar(VCalendar $oVCalendar) : ?self
+	{
+		return isset($oVCalendar->VEVENT) ? new self($oVCalendar) : null;
+	}
+
 	public static function fromIcal(string $sIcal) : ?self
 	{
 		if (!\strlen(\trim($sIcal)) || self::MAX_BYTES < \strlen($sIcal)) {
@@ -214,6 +222,135 @@ class Invitation
 	private static function sequence(VEvent $oVEvent) : int
 	{
 		return isset($oVEvent->SEQUENCE) ? (int) $oVEvent->SEQUENCE->getValue() : 0;
+	}
+
+	public function SequenceNumber() : int
+	{
+		return static::sequence($this->Event());
+	}
+
+	/**
+	 * Whether the invitation carries the whole event, rather than only changed
+	 * dates of a series (a VEVENT with RECURRENCE-ID and no master), which
+	 * only mean something next to the series they belong to.
+	 */
+	public function HasMaster() : bool
+	{
+		foreach ($this->oVCalendar->VEVENT as $oVEvent) {
+			if (!isset($oVEvent->{'RECURRENCE-ID'})) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Our PARTSTAT in this calendar, as the attendee at one of $aEmails.
+	 */
+	public function Partstat(array $aEmails) : string
+	{
+		$aMatch = $this->FindAttendee($aEmails);
+		return $aMatch && isset($aMatch[0]['PARTSTAT']) ? \strtoupper((string) $aMatch[0]['PARTSTAT']) : '';
+	}
+
+	private static function recurrenceKey(VEvent $oVEvent) : ?int
+	{
+		return isset($oVEvent->{'RECURRENCE-ID'}) ? $oVEvent->{'RECURRENCE-ID'}->getDateTime()->getTimestamp() : null;
+	}
+
+	/**
+	 * The copy to keep in the user's calendar after answering as $sEmail.
+	 *
+	 * A whole invitation replaces what was stored, as an update from the
+	 * organizer does. Changed dates alone go into the stored series in place of
+	 * the ones they change; without a stored series there is nothing to put them
+	 * in, and null is returned.
+	 *
+	 * The organizer gets SCHEDULE-AGENT=CLIENT (RFC 6638 7.1): the reply was
+	 * sent by mail already, and a CalDAV server that schedules on its own
+	 * (Nextcloud, through Sabre) would otherwise send a second one when it sees
+	 * our PARTSTAT change.
+	 */
+	public function StoredCopy(?VCalendar $oStored, string $sEmail, string $sPartstat) : ?VCalendar
+	{
+		if ($this->HasMaster()) {
+			$oCopy = new VCalendar();
+			foreach ($this->oVCalendar->getComponents() as $oComponent) {
+				$oCopy->add(clone $oComponent);
+			}
+		} else if ($oStored) {
+			$oCopy = clone $oStored;
+			foreach ($this->oVCalendar->VEVENT as $oVEvent) {
+				$iKey = static::recurrenceKey($oVEvent);
+				foreach ($oCopy->select('VEVENT') as $oOld) {
+					if (null !== $iKey && static::recurrenceKey($oOld) === $iKey) {
+						$oCopy->remove($oOld);
+					}
+				}
+				$oCopy->add(clone $oVEvent);
+			}
+			foreach ($this->oVCalendar->select('VTIMEZONE') as $oTimezone) {
+				$sTzid = (string) $oTimezone->TZID;
+				$bHave = false;
+				foreach ($oCopy->select('VTIMEZONE') as $oHave) {
+					$bHave = $bHave || (string) $oHave->TZID === $sTzid;
+				}
+				$bHave || $oCopy->add(clone $oTimezone);
+			}
+		} else {
+			return null;
+		}
+
+		$aMatch = (new self($oCopy))->FindAttendee(array($sEmail));
+		$sHref = $aMatch ? static::href($aMatch[0]) : '';
+		foreach ($oCopy->VEVENT as $oVEvent) {
+			foreach ($oVEvent->ATTENDEE ?? array() as $oAttendee) {
+				if (static::href($oAttendee) === $sHref) {
+					$oAttendee['PARTSTAT'] = \strtoupper($sPartstat);
+					unset($oAttendee['RSVP']);
+				}
+			}
+			if (isset($oVEvent->ORGANIZER)) {
+				$oVEvent->ORGANIZER['SCHEDULE-AGENT'] = 'CLIENT';
+			}
+		}
+		unset($oCopy->METHOD);
+		return $oCopy;
+	}
+
+	/**
+	 * The stored series without the dates this message names, for a
+	 * cancellation or a decline of single dates: each becomes an EXDATE, and
+	 * its changed copy, if there was one, goes. Null when the message is about
+	 * the whole event, which then goes as a whole.
+	 */
+	public function WithoutDates(VCalendar $oStored) : ?VCalendar
+	{
+		if ($this->HasMaster()) {
+			return null;
+		}
+		$oCopy = clone $oStored;
+		$oMaster = null;
+		foreach ($oCopy->VEVENT as $oVEvent) {
+			if (!isset($oVEvent->{'RECURRENCE-ID'})) {
+				$oMaster = $oVEvent;
+			}
+		}
+		if (!$oMaster) {
+			return null;
+		}
+		foreach ($this->oVCalendar->VEVENT as $oVEvent) {
+			$oRecurrenceId = $oVEvent->{'RECURRENCE-ID'};
+			$iKey = static::recurrenceKey($oVEvent);
+			foreach ($oCopy->select('VEVENT') as $oOld) {
+				if (static::recurrenceKey($oOld) === $iKey) {
+					$oCopy->remove($oOld);
+				}
+			}
+			$oMaster->add('EXDATE', $oRecurrenceId->getDateTime(),
+				$oRecurrenceId->hasTime() ? array() : array('VALUE' => 'DATE'));
+		}
+		return $oCopy;
 	}
 
 	/**

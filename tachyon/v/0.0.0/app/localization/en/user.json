@@ -291,7 +291,15 @@
 		"INVITATION_TEXT_DECLINED": "%EMAIL% has declined the invitation to %SUMMARY%.",
 		"INVITATION_SENT_ACCEPTED": "You accepted. The organizer has been told.",
 		"INVITATION_SENT_TENTATIVE": "You answered maybe. The organizer has been told.",
-		"INVITATION_SENT_DECLINED": "You declined. The organizer has been told."
+		"INVITATION_SENT_DECLINED": "You declined. The organizer has been told.",
+		"INVITATION_IN_CALENDAR": "In your calendar %CALENDAR%.",
+		"INVITATION_IN_CALENDAR_ACCEPTED": "Accepted, in your calendar %CALENDAR%.",
+		"INVITATION_IN_CALENDAR_TENTATIVE": "Answered maybe, in your calendar %CALENDAR%.",
+		"INVITATION_OUTDATED": "This invitation is out of date: your calendar has a newer version.",
+		"INVITATION_ADD_TO": "Add to calendar:",
+		"INVITATION_NOT_STORED": "It could not be saved in your calendar: %ERROR%",
+		"INVITATION_REMOVE": "Remove from calendar",
+		"INVITATION_REMOVED": "Removed from your calendar."
 	},
 	"CONTACTS": {
 		"TAB_CONTACT": "Contact",

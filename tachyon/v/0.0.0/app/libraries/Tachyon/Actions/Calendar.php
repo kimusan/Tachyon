@@ -254,10 +254,131 @@ trait Calendar
 	public function DoCalendarInvitation() : array
 	{
 		$oAccount = $this->getAccountFromToken();
-		$aIdentities = $this->invitationIdentities($oAccount);
-		return $this->DefaultResponse(
-			$this->invitationFromParams()->Describe(\array_keys($aIdentities))
+		$oInvitation = $this->invitationFromParams();
+		$aEmails = \array_keys($this->invitationIdentities($oAccount));
+		return $this->DefaultResponse($this->describeInvitation($oAccount, $oInvitation, $aEmails));
+	}
+
+	/**
+	 * The invitation, plus what the user's calendar holds of it: the copy an
+	 * earlier answer stored, and whether this mail is older than that copy.
+	 */
+	private function describeInvitation(\Tachyon\Model\Account $oAccount,
+		\Tachyon\Providers\Calendar\Invitation $oInvitation, array $aEmails) : array
+	{
+		$aInfo = $oInvitation->Describe($aEmails);
+		$oProvider = $this->CalendarProvider($oAccount);
+		$aStored = null;
+		$bOutdated = false;
+		if ($oProvider->IsActive() && \strlen($aInfo['Uid'])) {
+			try {
+				$aFound = $oProvider->FindEventByUid($aInfo['Uid']);
+			} catch (\Throwable $oException) {
+				$aFound = null;
+				\Tachyon\Util\Log::warning('Calendar', 'Invitation lookup failed: ' . $oException->getMessage());
+			}
+			$oStored = $aFound ? $aFound[1]->VCalendar() : null;
+			$oStoredInvitation = $oStored ? \Tachyon\Providers\Calendar\Invitation::fromVCalendar($oStored) : null;
+			if ($oStoredInvitation) {
+				$aStored = array(
+					'Uuid' => $aFound[0]->Uuid,
+					'Name' => $aFound[0]->Name,
+					'Partstat' => $oStoredInvitation->Partstat($aEmails),
+					'Sequence' => $oStoredInvitation->SequenceNumber()
+				);
+				// An update for one date carries that date's SEQUENCE, which says
+				// nothing against the series', so only a whole event is compared
+				$bOutdated = $oInvitation->HasMaster() && $oInvitation->SequenceNumber() < $aStored['Sequence'];
+			}
+		}
+		$aInfo['CanReply'] = $aInfo['CanReply'] && !$bOutdated;
+		$aInfo['Calendar'] = array(
+			'Active' => $oProvider->IsActive(),
+			'Stored' => $aStored,
+			'Outdated' => $bOutdated,
+			// Changed dates alone can only go into a series that is stored already
+			'CanStore' => $oInvitation->HasMaster() || null !== $aStored
 		);
+		return $aInfo;
+	}
+
+	/**
+	 * After an answer went out: keep the event in the calendar with that
+	 * answer. Accepting or a maybe stores it, in the calendar that already
+	 * holds it, else the one the user chose; declining takes it out.
+	 *
+	 * @return string an error to show, '' when done or nothing was to be done
+	 */
+	private function storeInvitationAnswer(\Tachyon\Model\Account $oAccount,
+		\Tachyon\Providers\Calendar\Invitation $oInvitation, string $sEmail, string $sPartstat) : string
+	{
+		$oProvider = $this->CalendarProvider($oAccount);
+		if (!$oProvider->IsActive()) {
+			return '';
+		}
+		try {
+			$sUid = $oInvitation->Describe(array($sEmail))['Uid'];
+			$aFound = $oProvider->FindEventByUid($sUid);
+			$oStored = $aFound ? $aFound[1]->VCalendar() : null;
+
+			if ('DECLINED' === $sPartstat) {
+				if (!$aFound) {
+					return '';
+				}
+				$oRest = $oStored ? $oInvitation->WithoutDates($oStored) : null;
+				if ($oRest) {
+					return $this->saveInvitationCopy($oProvider, $aFound[0]->Uuid, $sUid, $oRest);
+				}
+				return $oProvider->DeleteEvent($aFound[0]->Uuid, $sUid) ? '' : 'The calendar server refused to remove the event';
+			}
+
+			$sCalendarUuid = $aFound ? $aFound[0]->Uuid : (string) $this->GetActionParam('Calendar', '');
+			if (!\strlen($sCalendarUuid)) {
+				return '';
+			}
+			$oCopy = $oInvitation->StoredCopy($oStored, $sEmail, $sPartstat);
+			return $oCopy ? $this->saveInvitationCopy($oProvider, $sCalendarUuid, $sUid, $oCopy) : '';
+		} catch (\Throwable $oException) {
+			\Tachyon\Util\Log::warning('Calendar', 'Storing the answer failed: ' . $oException->getMessage());
+			return $oException->getMessage();
+		}
+	}
+
+	private function saveInvitationCopy(\Tachyon\Providers\Calendar $oProvider, string $sCalendarUuid,
+		string $sUid, \Sabre\VObject\Component\VCalendar $oVCalendar) : string
+	{
+		$oEvent = new \Tachyon\Providers\Calendar\Classes\Event;
+		$oEvent->Uid = $sUid;
+		$oEvent->setVCalendar($oVCalendar);
+		return $oProvider->EventSave($sCalendarUuid, $oEvent) ? '' : 'The calendar server rejected the event';
+	}
+
+	/**
+	 * A cancellation of an event the calendar holds: take it out, or only the
+	 * cancelled dates of a series.
+	 */
+	public function DoCalendarInvitationRemove() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$oInvitation = $this->invitationFromParams();
+		$aEmails = \array_keys($this->invitationIdentities($oAccount));
+		if ('CANCEL' !== $oInvitation->Method()) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Not a cancellation');
+		}
+		$oProvider = $this->CalendarProvider($oAccount);
+		$sUid = $oInvitation->Describe($aEmails)['Uid'];
+		$aFound = $oProvider->IsActive() ? $oProvider->FindEventByUid($sUid) : null;
+		if ($aFound) {
+			$oStored = $aFound[1]->VCalendar();
+			$oRest = $oStored ? $oInvitation->WithoutDates($oStored) : null;
+			$sError = $oRest
+				? $this->saveInvitationCopy($oProvider, $aFound[0]->Uuid, $sUid, $oRest)
+				: ($oProvider->DeleteEvent($aFound[0]->Uuid, $sUid) ? '' : 'The calendar server refused to remove the event');
+			if (\strlen($sError)) {
+				throw new ClientException(\Tachyon\Notifications::CantSaveMessage, null, $sError);
+			}
+		}
+		return $this->DefaultResponse($this->describeInvitation($oAccount, $oInvitation, $aEmails));
 	}
 
 	/**
@@ -274,7 +395,7 @@ trait Calendar
 		}
 
 		$aIdentities = $this->invitationIdentities($oAccount);
-		$aInfo = $oInvitation->Describe(\array_keys($aIdentities));
+		$aInfo = $this->describeInvitation($oAccount, $oInvitation, \array_keys($aIdentities));
 		if (empty($aInfo['CanReply'])) {
 			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'This invitation cannot be answered');
 		}
@@ -332,7 +453,15 @@ trait Calendar
 			\is_resource($rMessageStream) && \fclose($rMessageStream);
 		}
 
-		return $this->TrueResponse(array('Partstat' => $sPartstat));
+		// The answer has gone out whatever happens to the calendar copy, so a
+		// failure there is reported beside the success rather than instead of it
+		$sCalendarError = $this->storeInvitationAnswer($oAccount, $oInvitation, $sEmail, $sPartstat);
+
+		return $this->TrueResponse(array(
+			'Partstat' => $sPartstat,
+			'CalendarError' => $sCalendarError,
+			'Invitation' => $this->describeInvitation($oAccount, $oInvitation, \array_keys($aIdentities))
+		));
 	}
 
 	/**

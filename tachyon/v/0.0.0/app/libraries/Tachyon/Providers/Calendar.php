@@ -56,6 +56,28 @@ class Calendar extends AbstractProvider
 		return $this->IsActive() ? $this->oDriver->GetEventByUid($sCalendarUuid, $sUid) : null;
 	}
 
+	/**
+	 * The event with this UID in whichever of the user's calendars holds it,
+	 * for an invitation that may have been answered before. Built on
+	 * GetEventByUid() rather than added to CalendarInterface, so a backend
+	 * from a plugin does not have to implement it.
+	 *
+	 * @return array{0: Calendar\Classes\Calendar, 1: Calendar\Classes\Event}|null
+	 */
+	public function FindEventByUid(string $sUid) : ?array
+	{
+		if (!\strlen($sUid)) {
+			return null;
+		}
+		foreach ($this->GetCalendars() as $oCalendar) {
+			$oEvent = $this->GetEventByUid($oCalendar->Uuid, $sUid);
+			if ($oEvent) {
+				return array($oCalendar, $oEvent);
+			}
+		}
+		return null;
+	}
+
 	public function EventSave(string $sCalendarUuid, Calendar\Classes\Event $oEvent) : bool
 	{
 		return $this->IsActive() ? $this->oDriver->EventSave($sCalendarUuid, $oEvent) : false;

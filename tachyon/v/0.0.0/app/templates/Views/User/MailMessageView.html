@@ -264,6 +264,15 @@
 								<span data-i18n="CALENDAR/INVITATION_ORGANIZER"></span>
 								<span data-bind="text: invitationOrganizer()"></span>
 							</div>
+							<div data-bind="visible: invitationStoredText(), text: invitationStoredText()"></div>
+							<div class="text-warning" data-bind="visible: invitation()?.Calendar?.Outdated" data-i18n="CALENDAR/INVITATION_OUTDATED"></div>
+							<div class="invitationCalendarChoice" data-bind="visible: 1 < invitationCalendars().length && invitation()?.CanReply">
+								<span data-i18n="CALENDAR/INVITATION_ADD_TO"></span>
+								<select data-bind="options: invitationCalendars, optionsText: 'name', optionsValue: 'uuid', value: invitationCalendar, disable: invitationBusy"></select>
+							</div>
+							<div class="invitationActions" data-bind="visible: invitation()?.Cancelled && invitation()?.Calendar?.Stored">
+								<button class="btn" data-bind="click: () => removeInvitationEvent(), disable: invitationBusy" data-i18n="CALENDAR/INVITATION_REMOVE"></button>
+							</div>
 							<div class="invitationActions" data-bind="visible: invitation()?.CanReply">
 								<button class="btn" data-bind="click: () => answerInvitation('ACCEPTED'), disable: invitationBusy,
 									css: { active: 'ACCEPTED' === invitationAnswer() }, attr: { 'aria-pressed': 'ACCEPTED' === invitationAnswer() ? 'true' : 'false' }"><i class="icon-check" style="display:none" data-bind="visible: 'ACCEPTED' === invitationAnswer()"></i>

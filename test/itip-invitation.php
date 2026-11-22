@@ -140,4 +140,51 @@ check(null === Invitation::fromIcal(str_repeat('x', Invitation::MAX_BYTES + 1)),
 check(null === Invitation::fromIcal(ical('google-request'))->Reply('attendee@example.com', 'NEEDS-ACTION'), 'NEEDS-ACTION sent as an answer');
 check(null === Invitation::fromIcal(ical('google-request'))->Reply('nobody@example.com', 'ACCEPTED'), 'a reply for someone not invited');
 
+// 9. The copy kept in the calendar after answering: no METHOD, our answer,
+//    and SCHEDULE-AGENT=CLIENT on the organizer so a CalDAV server that
+//    schedules (Sabre, as in Nextcloud) does not send a second REPLY
+foreach (['google-request', 'outlook-request', 'icloud-email-param', 'horde-request'] as $name) {
+	$me = 'icloud-email-param' === $name ? 'attendee4@example.com' : 'attendee@example.com';
+	$invitation = Invitation::fromIcal(ical($name));
+	$copy = $invitation->StoredCopy(null, $me, 'ACCEPTED');
+	check(null !== $copy && !isset($copy->METHOD), "$name: stored copy has a METHOD");
+	check('ACCEPTED' === Invitation::fromVCalendar($copy)->Partstat([$me]), "$name: answer not in the stored copy");
+	check('CLIENT' === (string) $copy->VEVENT->ORGANIZER['SCHEDULE-AGENT'], "$name: no SCHEDULE-AGENT=CLIENT");
+	$copy->serialize();
+
+	// What the CalDAV server's broker makes of the change from the invitation
+	// as received to our answered copy
+	$before = $invitation->StoredCopy(null, $me, 'NEEDS-ACTION');
+	$href = (string) Invitation::fromVCalendar($copy)->FindAttendee([$me])[0]->getNormalizedValue();
+	check([] === (new Sabre\VObject\ITip\Broker)->parseEvent(clone $copy, $href, $before),
+		"$name: the server would send its own REPLY");
+	// ... and without the parameter it would, which is the second reply prevented
+	foreach ([$copy, $before] as $c) {
+		foreach ($c->VEVENT as $e) {
+			unset($e->ORGANIZER['SCHEDULE-AGENT']);
+		}
+	}
+	check(1 === count((new Sabre\VObject\ITip\Broker)->parseEvent(clone $copy, $href, $before)),
+		"$name: control failed, the server would not reply anyway");
+}
+
+// 10. Changed dates of a series: merged into the stored series; a cancel or
+//     a decline of one date leaves the series without it
+$series = Invitation::fromIcal("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nMETHOD:REQUEST\r\nBEGIN:VEVENT\r\nUID:s1\r\nDTSTAMP:20261101T000000Z\r\n"
+	."DTSTART:20261102T090000Z\r\nDTEND:20261102T093000Z\r\nRRULE:FREQ=WEEKLY\r\nSUMMARY:Standup\r\nORGANIZER:mailto:organizer@example.com\r\n"
+	."ATTENDEE;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:attendee@example.com\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n");
+$stored = $series->StoredCopy(null, 'attendee@example.com', 'ACCEPTED');
+$one = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nMETHOD:%s\r\nBEGIN:VEVENT\r\nUID:s1\r\nDTSTAMP:20261101T000000Z\r\nSEQUENCE:1\r\n"
+	."RECURRENCE-ID:20261109T090000Z\r\nDTSTART:20261109T110000Z\r\nDTEND:20261109T113000Z\r\nSUMMARY:Standup, later\r\n"
+	."ORGANIZER:mailto:organizer@example.com\r\nATTENDEE;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:attendee@example.com\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
+$moved = Invitation::fromIcal(sprintf($one, 'REQUEST'));
+check(!$moved->HasMaster() && null === $moved->StoredCopy(null, 'attendee@example.com', 'ACCEPTED'), 'a changed date stored without its series');
+$merged = $moved->StoredCopy($stored, 'attendee@example.com', 'TENTATIVE');
+check(2 === count($merged->VEVENT) && isset($merged->VEVENT[0]->RRULE), 'changed date not merged into the series');
+$merged2 = $moved->StoredCopy($merged, 'attendee@example.com', 'ACCEPTED');
+check(2 === count($merged2->VEVENT), 'the same changed date added twice');
+$cancelled = Invitation::fromIcal(sprintf($one, 'CANCEL'))->WithoutDates($merged2);
+check(1 === count($cancelled->VEVENT) && '20261109T090000Z' === $cancelled->VEVENT->EXDATE->getValue(), 'cancelled date not excluded');
+check(null === Invitation::fromIcal(ical('google-cancel'))->WithoutDates($stored), 'a whole cancel kept part of the event');
+
 echo "itip-invitation: ok\n";
