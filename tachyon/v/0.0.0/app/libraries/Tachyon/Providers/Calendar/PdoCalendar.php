@@ -271,11 +271,25 @@ class PdoCalendar
 				// Ask the iterator for the end rather than reusing a stored duration,
 				// since an overridden instance may be longer or shorter than the rest.
 				$oOccEnd = $oIterator->getDtEnd();
-				$aResult[] = $aBase + array(
+				// An occurrence changed on its own has its own title and place,
+				// and is named by its original start, which a move does not change
+				$oInstance = $oIterator->getEventObject();
+				$aResult[] = array(
 					'id' => $oEvent->Uid . '@' . $oOccStart->getTimestamp(),
 					'start' => $oOccStart->getTimestamp(),
-					'end' => $oOccEnd ? $oOccEnd->getTimestamp() : $oOccStart->getTimestamp()
-				);
+					'end' => $oOccEnd ? $oOccEnd->getTimestamp() : $oOccStart->getTimestamp(),
+					'title' => isset($oInstance->SUMMARY) ? (string) $oInstance->SUMMARY : '',
+					'location' => isset($oInstance->LOCATION) ? (string) $oInstance->LOCATION : '',
+					'description' => isset($oInstance->DESCRIPTION) ? (string) $oInstance->DESCRIPTION : '',
+					'allDay' => isset($oInstance->DTSTART) ? !$oInstance->DTSTART->hasTime() : $aBase['allDay'],
+					'recurrenceId' => isset($oInstance->{'RECURRENCE-ID'})
+						? $oInstance->{'RECURRENCE-ID'}->getDateTime()->getTimestamp() : $oOccStart->getTimestamp(),
+					// The series' own values, for the editor when it edits them all
+					'seriesTitle' => $aBase['title'],
+					'seriesLocation' => $aBase['location'],
+					'seriesDescription' => $aBase['description'],
+					'seriesAllDay' => $aBase['allDay']
+				) + $aBase;
 				++$iCount;
 				$oIterator->next();
 			}

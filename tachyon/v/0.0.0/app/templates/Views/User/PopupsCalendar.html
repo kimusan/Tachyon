@@ -60,7 +60,13 @@
 		<div class="b-calendar-editor" data-bind="visible: editorVisible">
 			<form class="b-calendar-editor-form" spellcheck="false" data-bind="css: {'read-only': editReadOnly()}">
 
-				<div class="b-calendar-editor-note" data-bind="visible: editRecurring"
+				<div class="b-calendar-scope" data-bind="visible: editRecurring() && editRecurrenceId()">
+					<a href="#" role="button" class="btn" data-bind="click: () => editScope('occurrence'),
+						css: { 'btn-success': 'occurrence' === editScope() }" data-i18n="CALENDAR/SCOPE_OCCURRENCE"></a>
+					<a href="#" role="button" class="btn" data-bind="click: () => editScope('series'),
+						css: { 'btn-success': 'series' === editScope() }" data-i18n="CALENDAR/SCOPE_SERIES"></a>
+				</div>
+				<div class="b-calendar-editor-note" data-bind="visible: editRecurring() && 'series' === editScope()"
 					data-i18n="CALENDAR/RECURRING_SERIES"></div>
 
 				<div class="control-group">
@@ -125,7 +131,8 @@
 					<!-- /ko -->
 				</div>
 
-				<div class="control-group">
+				<!-- one occurrence has no rule of its own -->
+				<div class="control-group" data-bind="visible: !(editRecurring() && 'occurrence' === editScope())">
 					<label data-i18n="CALENDAR/LABEL_REPEAT"></label>
 					<div data-bind="component: {
 						name: 'Select',
@@ -143,7 +150,8 @@
 
 				<!-- visible rather than if throughout: the popup is translated once,
 				     when it opens, and nodes an if adds later would keep their keys -->
-				<div class="b-calendar-repeat" data-bind="visible: editRepeat() && !editRuleCustom()">
+				<div class="b-calendar-repeat" data-bind="visible: editRepeat() && !editRuleCustom()
+					&& !(editRecurring() && 'occurrence' === editScope())">
 					<div class="control-group">
 						<label data-i18n="CALENDAR/REPEAT_EVERY"></label>
 						<input type="number" min="1" max="999" class="b-calendar-interval"

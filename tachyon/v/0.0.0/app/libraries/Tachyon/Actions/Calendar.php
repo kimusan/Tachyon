@@ -555,11 +555,28 @@ trait Calendar
 			return $this->FalseResponse();
 		}
 
+		$sCalendarUuid = (string) $this->GetActionParam('Calendar', '');
+		$sUid = (string) $this->GetActionParam('Uid', '');
+		$iRecurrenceId = (int) $this->GetActionParam('RecurrenceId', 0);
 		try {
-			$bResult = $oProvider->DeleteEvent(
-				(string) $this->GetActionParam('Calendar', ''),
-				(string) $this->GetActionParam('Uid', '')
-			);
+			if (0 < $iRecurrenceId) {
+				// One occurrence of a series: the series stays, without it
+				$oEvent = $oProvider->GetEventByUid($sCalendarUuid, $sUid);
+				$oVCalendar = $oEvent ? $oEvent->VCalendar() : null;
+				if (!$oVCalendar) {
+					throw new \ValueError('Unknown event');
+				}
+				$oVCalendar = clone $oVCalendar;
+				try {
+					\Tachyon\Providers\Calendar\EventEditor::excludeOccurrence($oVCalendar, $iRecurrenceId);
+				} catch (\InvalidArgumentException $oException) {
+					throw new \ValueError($oException->getMessage());
+				}
+				$oEvent->setVCalendar($oVCalendar);
+				$bResult = $oProvider->EventSave($sCalendarUuid, $oEvent);
+			} else {
+				$bResult = $oProvider->DeleteEvent($sCalendarUuid, $sUid);
+			}
 		} catch (\ValueError $oException) {
 			throw new ClientException(\Tachyon\Notifications::CantDeleteMessage, $oException, $oException->getMessage());
 		}
@@ -711,16 +728,27 @@ trait Calendar
 			$mValue = $this->GetActionParam($sName, null);
 			return null === $mValue ? null : (string) $mValue;
 		};
+		$aFields = array(
+			'summary' => $fText('Summary'),
+			'location' => $fText('Location'),
+			'description' => $fText('Description'),
+			'start' => $iStart,
+			'end' => $iEnd,
+			'allDay' => !empty($this->GetActionParam('AllDay', 0)),
+			'rrule' => $fText('Rrule')
+		);
+		// One occurrence of a series, named by its original start
+		$iRecurrenceId = (int) $this->GetActionParam('RecurrenceId', 0);
 		try {
-			\Tachyon\Providers\Calendar\EventEditor::apply($oVCalendar, array(
-				'summary' => $fText('Summary'),
-				'location' => $fText('Location'),
-				'description' => $fText('Description'),
-				'start' => $iStart,
-				'end' => $iEnd,
-				'allDay' => !empty($this->GetActionParam('AllDay', 0)),
-				'rrule' => $fText('Rrule')
-			), $oTimeZone);
+			if (0 < $iRecurrenceId) {
+				if (!$oExisting) {
+					throw new \InvalidArgumentException('Unknown event');
+				}
+				unset($aFields['rrule']);
+				\Tachyon\Providers\Calendar\EventEditor::applyOccurrence($oVCalendar, $iRecurrenceId, $aFields, $oTimeZone);
+			} else {
+				\Tachyon\Providers\Calendar\EventEditor::apply($oVCalendar, $aFields, $oTimeZone);
+			}
 		} catch (\InvalidArgumentException $oException) {
 			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, $oException, $oException->getMessage());
 		}

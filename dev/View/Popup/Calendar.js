@@ -132,6 +132,10 @@ export class CalendarPopupView extends AbstractViewPopup {
 			// MONTHLY_BYDAY (on the nth weekday), YEARLY, or CUSTOM for a stored
 			// rule these controls cannot show
 			editRepeat: '',
+			// For a series: edit the occurrence that was opened, or all of them.
+			// The occurrence is named by its original start (RECURRENCE-ID).
+			editScope: 'occurrence',
+			editRecurrenceId: 0,
 			editInterval: 1,
 			editEnds: 'never',
 			editUntil: '',
@@ -141,6 +145,13 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editWeekdays = ko.observableArray();
 		// Kept so a rule read with a week start writes it back
 		this.editWkst = '';
+
+		// The fields hold the occurrence's own values or the series', whichever
+		// is being edited
+		this.editScope.subscribe(scope => {
+			const values = 'series' === scope ? this.editSeriesValues : this.editOccurrenceValues;
+			values && this.fillEditor(values);
+		});
 
 		// Weekly needs a day, and the start's own day is the one meant
 		this.editRepeat.subscribe(repeat => {
@@ -309,7 +320,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 						start: event.allDay ? toAllDayDate(event.start) : toDate(event.start),
 						end: event.allDay ? toAllDayDate(event.end) : toDate(event.end),
 						allDay: !!event.allDay,
-						editable: !event.readOnly && !event.recurring,
+						// Dragging an occurrence of a series moves that occurrence alone
+						editable: !event.readOnly,
 						backgroundColor: event.color || DEFAULT_EVENT_COLOR,
 						textColor: readableOn(event.color || DEFAULT_EVENT_COLOR),
 						extendedProps: {
@@ -318,8 +330,13 @@ export class CalendarPopupView extends AbstractViewPopup {
 							readOnly: !!event.readOnly,
 							recurring: !!event.recurring,
 							rrule: event.rrule || '',
+							recurrenceId: event.recurrenceId || 0,
 							seriesStart: event.seriesStart || 0,
 							seriesEnd: event.seriesEnd || 0,
+							seriesTitle: event.seriesTitle || '',
+							seriesLocation: event.seriesLocation || '',
+							seriesDescription: event.seriesDescription || '',
+							seriesAllDay: !!event.seriesAllDay,
 							location: event.location || '',
 							description: event.description || ''
 						}
@@ -454,6 +471,9 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editStart(this.toInput(start, allDay));
 		this.editEnd(this.toInput(end, allDay));
 		this.editRecurring(false);
+		this.editRecurrenceId(0);
+		this.editSeriesValues = this.editOccurrenceValues = null;
+		this.editScope('series');
 		this.setRepeat('');
 		this.editReadOnly(false);
 		this.editError('');
@@ -475,18 +495,35 @@ export class CalendarPopupView extends AbstractViewPopup {
 		const props = event.extendedProps || {};
 		this.editUid(props.uid || '');
 		this.editCalendar(props.calendarUuid || '');
-		this.editSummary(event.title || '');
-		this.editLocation(props.location || '');
-		this.editDescription(props.description || '');
-		this.editAllDay(!!event.allDay);
-		// A series is edited as a whole, so it shows the series' own first
-		// occurrence rather than the one that was clicked
+		this.editOccurrenceValues = {
+			summary: event.title || '',
+			location: props.location || '',
+			description: props.description || '',
+			allDay: !!event.allDay,
+			start: this.toInput(event.start, event.allDay),
+			end: this.toInput(event.end, event.allDay)
+		};
+		// The series as a whole shows its own first occurrence, whichever one
+		// was clicked
 		const series = !!props.recurring && 0 < props.seriesStart,
-			toWhen = value => event.allDay ? toAllDayDate(value) : toDate(value);
-		this.editStart(this.toInput(series ? toWhen(props.seriesStart) : event.start, event.allDay));
-		this.editEnd(this.toInput(series ? toWhen(props.seriesEnd) : event.end, event.allDay));
+			toWhen = value => props.seriesAllDay ? toAllDayDate(value) : toDate(value);
+		this.editSeriesValues = series ? {
+			summary: props.seriesTitle || '',
+			location: props.seriesLocation || '',
+			description: props.seriesDescription || '',
+			allDay: !!props.seriesAllDay,
+			start: this.toInput(toWhen(props.seriesStart), props.seriesAllDay),
+			end: this.toInput(toWhen(props.seriesEnd), props.seriesAllDay)
+		} : null;
 		this.editRecurring(!!props.recurring);
-		this.setRepeat(props.rrule || '');
+		this.editRecurrenceId(series ? props.recurrenceId || 0 : 0);
+		this.fillEditor(this.editOccurrenceValues);
+		// valueHasMutated so the fields refill even when the scope is unchanged
+		this.editScope(series ? 'occurrence' : 'series');
+		this.editScope.valueHasMutated();
+		// Read against the series' start, not the occurrence on screen: a
+		// weekly rule without BYDAY means the series' weekday
+		this.setRepeat(series ? props.rrule : '', series ? this.editSeriesValues.start : '');
 		this.editReadOnly(!!props.readOnly);
 		this.editError('');
 		this.editorVisible(true);
@@ -624,7 +661,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 			return i18n('CALENDAR/ERROR_NO_CALENDAR');
 		}
 		const repeat = this.editRepeat();
-		if (repeat && !this.editRuleCustom()) {
+		// One occurrence is saved without the rule, so the rule is not checked
+		if (repeat && !this.editRuleCustom() && !this.editingOccurrence()) {
 			if (!(1 <= parseInt(this.editInterval(), 10))) {
 				return i18n('CALENDAR/REPEAT_ERROR_INTERVAL');
 			}
@@ -646,20 +684,33 @@ export class CalendarPopupView extends AbstractViewPopup {
 	 * Drag and resize write straight through, so a failure has to put the event back
 	 */
 	persistMove(info) {
-		const props = info.event.extendedProps || {};
-		if (props.readOnly || props.recurring) {
+		const props = info.event.extendedProps || {},
+			allDay = info.event.allDay;
+		if (props.readOnly) {
 			info.revert();
 			return;
 		}
 		Remote.request('CalendarEventSave',
-			iError => iError && (this.failed(getNotification(iError)), info.revert()),
+			// An occurrence keeps its RECURRENCE-ID, so the grid has to fetch
+			// again rather than trust the moved copy it holds
+			iError => {
+				if (iError) {
+					this.failed(getNotification(iError));
+					info.revert();
+				} else if (props.recurring) {
+					this.ec?.refetchEvents();
+				}
+			},
 			{
 				Calendar: props.calendarUuid,
 				Uid: props.uid,
-				Summary: info.event.title,
-				Start: toStamp(info.event.start),
-				End: toStamp(info.event.end),
-				AllDay: info.event.allDay ? 1 : 0
+				// An all-day boundary is a date, sent as UTC midnight like the editor does
+				Start: allDay ? fromAllDayDate(info.event.start) : toStamp(info.event.start),
+				End: allDay ? fromAllDayDate(info.event.end) : toStamp(info.event.end),
+				AllDay: allDay ? 1 : 0,
+				Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+				// A drag of an occurrence moves that occurrence alone
+				...(props.recurring && props.recurrenceId ? { RecurrenceId: props.recurrenceId } : {})
 			}
 		);
 	}
@@ -693,18 +744,30 @@ export class CalendarPopupView extends AbstractViewPopup {
 				AllDay: allDay ? 1 : 0,
 				// For an event that has no zone yet and a calendar that names none
 				Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
-				// Left out for a custom rule, which the server then keeps as stored
-				...(this.editRuleCustom() ? {} : { Rrule: this.buildRrule() })
+				// One occurrence carries no rule; a custom rule is left out so the
+				// server keeps it as stored
+				...(this.editingOccurrence()
+					? { RecurrenceId: this.editRecurrenceId() }
+					: (this.editRuleCustom() ? {} : { Rrule: this.buildRrule() }))
 			}
 		);
+	}
+
+	fillEditor(values) {
+		this.editSummary(values.summary);
+		this.editLocation(values.location);
+		this.editDescription(values.description);
+		this.editAllDay(values.allDay);
+		this.editStart(values.start);
+		this.editEnd(values.end);
 	}
 
 	/**
 	 * Fill the repeat controls from a stored RRULE, or mark it custom when they
 	 * cannot show it.
 	 */
-	setRepeat(rule) {
-		const start = startDateOf(this.editStart()),
+	setRepeat(rule, startValue) {
+		const start = startDateOf(startValue || this.editStart()),
 			state = this.parseRrule(rule || '', isNaN(start) ? new Date() : start);
 		this.editRepeat(state.repeat);
 		this.editInterval(state.interval || 1);
@@ -833,9 +896,18 @@ export class CalendarPopupView extends AbstractViewPopup {
 		}
 	}
 
+	/**
+	 * Whether the editor works on one occurrence of a series
+	 */
+	editingOccurrence() {
+		return this.editRecurring() && 'occurrence' === this.editScope() && 0 < this.editRecurrenceId();
+	}
+
 	deleteEventCommand() {
+		const occurrence = this.editingOccurrence();
 		AskPopupView.showModal([
-			i18n(this.editRecurring() ? 'CALENDAR/CONFIRM_DELETE_SERIES' : 'CALENDAR/CONFIRM_DELETE_EVENT'),
+			i18n(occurrence ? 'CALENDAR/CONFIRM_DELETE_OCCURRENCE'
+				: (this.editRecurring() ? 'CALENDAR/CONFIRM_DELETE_SERIES' : 'CALENDAR/CONFIRM_DELETE_EVENT')),
 			() => {
 				this.isSaving(true);
 				Remote.request('CalendarEventDelete',
@@ -849,7 +921,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 						}
 					}, {
 						Calendar: this.editCalendar(),
-						Uid: this.editUid()
+						Uid: this.editUid(),
+						...(occurrence ? { RecurrenceId: this.editRecurrenceId() } : {})
 					}
 				);
 			}

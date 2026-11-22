@@ -169,4 +169,67 @@ check(isset($ev->DTSTAMP) && !isset($ev->SEQUENCE) && !isset($ev->LOCATION), 'ne
 check(['11-12 12:00', '11-26 12:00', '12-10 12:00', '12-24 12:00'] === occurrences($vcal), 'fortnightly rule with UNTIL wrong');
 check(1 === preg_match('/^DTSTART;TZID=Europe\/Berlin:20261112T120000\r$/m', $vcal->serialize()), 'new event not in the calendar zone');
 
+// 12. One occurrence on its own: the 9 Nov standup moved to 14:00 and
+//     retitled becomes an override; the series is otherwise unchanged
+$vcal = $series();
+EventEditor::applyOccurrence($vcal, at('2026-11-09 09:00'), ['summary' => 'Standup, afternoon',
+	'start' => at('2026-11-09 14:00'), 'end' => at('2026-11-09 14:30'), 'allDay' => false], new DateTimeZone(BERLIN));
+check(['10-19 09:00', '10-26 11:00', '11-09 14:00', '11-16 09:00'] === array_slice(occurrences($vcal), 0, 4),
+	'occurrence not moved on its own: '.implode(', ', occurrences($vcal)));
+check(3 === count($vcal->VEVENT), 'no override made');
+$override = $vcal->VEVENT[2];
+check('20261109T090000' === $override->{'RECURRENCE-ID'}->getValue() && 'Standup, afternoon' === (string) $override->SUMMARY
+	&& !isset($override->RRULE) && !isset($override->EXDATE) && isset($override->ATTENDEE), 'override built wrong');
+check('Standup' === (string) EventEditor::master($vcal)->SUMMARY, 'the series title changed');
+
+// 13. An occurrence that has an override is edited in it, not given a second one
+EventEditor::applyOccurrence($vcal, at('2026-10-26 09:00'), ['start' => at('2026-10-26 12:00'), 'end' => at('2026-10-26 12:30'),
+	'allDay' => false], new DateTimeZone(BERLIN));
+check(3 === count($vcal->VEVENT) && '10-26 12:00' === occurrences($vcal)[1], 'existing override not edited');
+check('Standup, later' === (string) $vcal->VEVENT[1]->SUMMARY, 'a drag changed the override title');
+
+// 14. Deleting occurrences: a plain one becomes an EXDATE, one with an
+//     override loses the override too
+EventEditor::excludeOccurrence($vcal, at('2026-11-16 09:00'));
+EventEditor::excludeOccurrence($vcal, at('2026-10-26 09:00'));
+check(['10-19 09:00', '11-09 14:00', '11-23 09:00'] === array_slice(occurrences($vcal), 0, 3),
+	'occurrences not deleted: '.implode(', ', occurrences($vcal)));
+check(2 === count($vcal->VEVENT), 'override of a deleted occurrence kept');
+
+// 15. A date that is not an occurrence, or an event that does not repeat, is refused
+foreach ([[$series(), at('2026-11-10 09:00')], [$single(), at('2026-11-10 09:00')]] as [$v, $when]) {
+	try {
+		EventEditor::applyOccurrence($v, $when, ['start' => $when, 'end' => $when + 1800, 'allDay' => false], new DateTimeZone(BERLIN));
+		check(false, 'a non-occurrence was edited');
+	} catch (InvalidArgumentException $e) {
+	}
+}
+
+// 16. An all-day series: occurrences are dates
+$days = Reader::read("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//t//t//EN\r\nBEGIN:VEVENT\r\nUID:d1\r\nDTSTAMP:20261001T000000Z\r\n"
+	."DTSTART;VALUE=DATE:20261102\r\nDTEND;VALUE=DATE:20261103\r\nRRULE:FREQ=DAILY;COUNT=5\r\nSUMMARY:Offsite\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n");
+EventEditor::applyOccurrence($days, at('2026-11-04 00:00', 'UTC'), ['summary' => 'Offsite, remote',
+	'start' => at('2026-11-04 00:00', 'UTC'), 'end' => at('2026-11-05 00:00', 'UTC'), 'allDay' => true], new DateTimeZone('America/New_York'));
+EventEditor::excludeOccurrence($days, at('2026-11-05 00:00', 'UTC'));
+check('20261104' === $days->VEVENT[1]->{'RECURRENCE-ID'}->getValue() && 'DATE' === (string) $days->VEVENT[1]->{'RECURRENCE-ID'}['VALUE'],
+	'all-day override not named by its date');
+check('20261105' === EventEditor::master($days)->EXDATE->getValue(), 'all-day EXDATE not a date');
+check(4 === count(occurrences($days, '2026-11-01', 10)), 'all-day series lost the wrong days');
+
+// 17. Moving the series afterwards takes the new override along
+$vcal = $series();
+EventEditor::applyOccurrence($vcal, at('2026-11-09 09:00'), ['start' => at('2026-11-09 14:00'), 'end' => at('2026-11-09 14:30'),
+	'allDay' => false], new DateTimeZone(BERLIN));
+apply($vcal, ['start' => at('2026-10-19 08:00'), 'end' => at('2026-10-19 08:30'), 'allDay' => false]);
+check('20261109T080000' === $vcal->VEVENT[2]->{'RECURRENCE-ID'}->getValue(), 'override not moved with the series');
+
+// 18. Retitling the series retitles occurrences that still had its title,
+//     not the one given a title of its own
+$vcal = $series();
+EventEditor::applyOccurrence($vcal, at('2026-11-09 09:00'), ['start' => at('2026-11-09 14:00'), 'end' => at('2026-11-09 14:30'),
+	'allDay' => false], new DateTimeZone(BERLIN));
+apply($vcal, ['summary' => 'Daily standup', 'start' => at('2026-10-19 09:00'), 'end' => at('2026-10-19 09:30'), 'allDay' => false]);
+check('Standup, later' === (string) $vcal->VEVENT[1]->SUMMARY, 'an occurrence title of its own was overwritten');
+check('Daily standup' === (string) $vcal->VEVENT[2]->SUMMARY, 'a moved occurrence kept the old series title');
+
 echo "calendar-event-editor: ok\n";

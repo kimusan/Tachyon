@@ -79,11 +79,23 @@ class EventEditor
 			throw new \InvalidArgumentException('No master VEVENT');
 		}
 
-		foreach (array('summary' => 'SUMMARY', 'location' => 'LOCATION', 'description' => 'DESCRIPTION') as $sKey => $sName) {
-			if (isset($aFields[$sKey])) {
-				$sValue = (string) $aFields[$sKey];
-				unset($oMaster->{$sName});
-				\strlen($sValue) && $oMaster->add($sName, $sValue);
+		// A changed occurrence copied the series' title, place and description
+		// when it was made; where it still has them, it follows the series
+		$aOld = array();
+		foreach (array('SUMMARY', 'LOCATION', 'DESCRIPTION') as $sName) {
+			$aOld[$sName] = isset($oMaster->{$sName}) ? (string) $oMaster->{$sName} : '';
+		}
+		static::setText($oMaster, $aFields);
+		foreach ($oVCalendar->select('VEVENT') as $oVEvent) {
+			if (isset($oVEvent->{'RECURRENCE-ID'})) {
+				$aSame = array();
+				foreach (array('summary' => 'SUMMARY', 'location' => 'LOCATION', 'description' => 'DESCRIPTION') as $sKey => $sName) {
+					$sValue = isset($oVEvent->{$sName}) ? (string) $oVEvent->{$sName} : '';
+					if (isset($aFields[$sKey]) && $sValue === $aOld[$sName]) {
+						$aSame[$sKey] = $aFields[$sKey];
+					}
+				}
+				$aSame && static::setText($oVEvent, $aSame);
 			}
 		}
 
@@ -92,26 +104,7 @@ class EventEditor
 		$bWasAllDay = isset($oMaster->DTSTART) && !$oMaster->DTSTART->hasTime();
 		$sOldRule = isset($oMaster->RRULE) ? (string) $oMaster->RRULE : '';
 
-		// A date has no zone, and read in a zone west of Greenwich, UTC midnight
-		// is the evening before. A timed event keeps the zone it was written in.
-		if ($bAllDay) {
-			$oZone = new \DateTimeZone('UTC');
-		} else if ($oOldStart && !$bWasAllDay && 'UTC' !== $oOldStart->getTimezone()->getName()) {
-			$oZone = $oOldStart->getTimezone();
-		} else {
-			$oZone = $oTimeZone;
-		}
-		$oStart = (new \DateTimeImmutable('@' . (int) $aFields['start']))->setTimezone($oZone);
-		$oEnd = (new \DateTimeImmutable('@' . (int) $aFields['end']))->setTimezone($oZone);
-
-		unset($oMaster->DTSTART, $oMaster->DTEND, $oMaster->DURATION);
-		if ($bAllDay) {
-			$oMaster->add('DTSTART', $oStart, array('VALUE' => 'DATE'));
-			$oMaster->add('DTEND', $oEnd, array('VALUE' => 'DATE'));
-		} else {
-			$oMaster->add('DTSTART', $oStart);
-			$oMaster->add('DTEND', $oEnd);
-		}
+		[$oStart, $oZone] = static::setTimes($oMaster, $aFields, $oTimeZone);
 
 		$sRule = $sOldRule;
 		if (isset($aFields['rrule'])) {
@@ -132,18 +125,194 @@ class EventEditor
 			if ($oOldStart && $oOldStart->getTimestamp() !== $oStart->getTimestamp()) {
 				static::shiftExceptions($oVCalendar, $oMaster, $oOldStart->setTimezone($oZone), $oStart);
 			}
-			static::pruneExceptions($oVCalendar, $oMaster, $oStart, $bAllDay);
+			static::pruneExceptions($oVCalendar, $oMaster);
 		}
 
-		$oNow = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 		$bReschedule = !$oOldStart || $oOldStart->getTimestamp() !== $oStart->getTimestamp()
 			|| $bWasAllDay !== $bAllDay || $sOldRule !== $sRule;
-		if ($bReschedule && $oOldStart) {
-			// RFC 5545 3.8.7.4: a change of time or rule is a new revision
-			$oMaster->SEQUENCE = (isset($oMaster->SEQUENCE) ? (int) $oMaster->SEQUENCE->getValue() : 0) + 1;
+		static::touch($oMaster, $bReschedule && $oOldStart);
+	}
+
+	/**
+	 * Change one occurrence of a series on its own: an override VEVENT,
+	 * named by the occurrence's original start ($iRecurrenceId), made from the
+	 * series the first time and edited in place after that.
+	 *
+	 * @param array $aFields as for apply(), without rrule
+	 * @throws \InvalidArgumentException
+	 */
+	public static function applyOccurrence(VCalendar $oVCalendar, int $iRecurrenceId, array $aFields,
+		\DateTimeZone $oTimeZone) : void
+	{
+		$oMaster = static::seriesMaster($oVCalendar);
+		$oOverride = static::occurrence($oVCalendar, $oMaster, $iRecurrenceId);
+		if (!$oOverride) {
+			$oRecurrenceId = static::recurrenceDate($oMaster, $iRecurrenceId);
+			$oOverride = clone $oMaster;
+			unset($oOverride->RRULE, $oOverride->RDATE, $oOverride->EXDATE, $oOverride->EXRULE, $oOverride->SEQUENCE);
+			$oOverride->add('RECURRENCE-ID', $oRecurrenceId,
+				$oMaster->DTSTART->hasTime() ? array() : array('VALUE' => 'DATE'));
+			$oVCalendar->add($oOverride);
 		}
-		$oMaster->DTSTAMP = $oNow;
-		$oMaster->{'LAST-MODIFIED'} = $oNow;
+
+		static::setText($oOverride, $aFields);
+		$iOldStart = isset($oOverride->DTSTART) ? $oOverride->DTSTART->getDateTime()->getTimestamp() : 0;
+		$iOldEnd = isset($oOverride->DTEND) ? $oOverride->DTEND->getDateTime()->getTimestamp() : 0;
+		static::setTimes($oOverride, $aFields, $oTimeZone);
+		static::touch($oOverride, $iOldStart !== (int) $aFields['start'] || $iOldEnd !== (int) $aFields['end']);
+	}
+
+	/**
+	 * Take one occurrence out of a series: an EXDATE for its original start,
+	 * and its override, if it had one, goes.
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public static function excludeOccurrence(VCalendar $oVCalendar, int $iRecurrenceId) : void
+	{
+		$oMaster = static::seriesMaster($oVCalendar);
+		$oOverride = static::occurrence($oVCalendar, $oMaster, $iRecurrenceId);
+		$oRecurrenceId = static::recurrenceDate($oMaster, $iRecurrenceId);
+		$oOverride && $oVCalendar->remove($oOverride);
+		$oMaster->add('EXDATE', $oRecurrenceId, $oMaster->DTSTART->hasTime() ? array() : array('VALUE' => 'DATE'));
+		static::touch($oMaster, true);
+	}
+
+	private static function seriesMaster(VCalendar $oVCalendar) : VEvent
+	{
+		$oMaster = static::master($oVCalendar);
+		if (!$oMaster || !isset($oMaster->DTSTART) || (!isset($oMaster->RRULE) && !isset($oMaster->RDATE))) {
+			throw new \InvalidArgumentException('Not a repeating event');
+		}
+		return $oMaster;
+	}
+
+	/**
+	 * The override for the occurrence originally at $iRecurrenceId, or null when
+	 * it has none yet. Throws when the series has no such occurrence.
+	 */
+	private static function occurrence(VCalendar $oVCalendar, VEvent $oMaster, int $iRecurrenceId) : ?VEvent
+	{
+		$oRecurrenceId = static::recurrenceDate($oMaster, $iRecurrenceId);
+		$bAllDay = !$oMaster->DTSTART->hasTime();
+		foreach ($oVCalendar->select('VEVENT') as $oVEvent) {
+			if (isset($oVEvent->{'RECURRENCE-ID'})) {
+				$oDate = $oVEvent->{'RECURRENCE-ID'}->getDateTime(new \DateTimeZone('UTC'));
+				if ($bAllDay ? $oDate->format('Ymd') === $oRecurrenceId->format('Ymd')
+					: $oDate->getTimestamp() === $oRecurrenceId->getTimestamp()) {
+					return $oVEvent;
+				}
+			}
+		}
+		if (!static::isOccurrence($oMaster, $oRecurrenceId)) {
+			throw new \InvalidArgumentException('Not an occurrence of this event');
+		}
+		return null;
+	}
+
+	/**
+	 * An occurrence's original start, in the form the series' DTSTART has:
+	 * a date for an all-day series, else a time in the series' zone.
+	 */
+	private static function recurrenceDate(VEvent $oMaster, int $iTimestamp) : \DateTimeImmutable
+	{
+		$oDate = new \DateTimeImmutable('@' . $iTimestamp);
+		if (!$oMaster->DTSTART->hasTime()) {
+			$oUtc = $oDate->setTimezone(new \DateTimeZone('UTC'));
+			return new \DateTimeImmutable($oUtc->format('Y-m-d'), new \DateTimeZone('UTC'));
+		}
+		return $oDate->setTimezone($oMaster->DTSTART->getDateTime()->getTimezone());
+	}
+
+	/**
+	 * Whether the series' rule, or its RDATEs, put an occurrence at $oDate.
+	 */
+	public static function isOccurrence(VEvent $oMaster, \DateTimeInterface $oDate) : bool
+	{
+		$bAllDay = !$oMaster->DTSTART->hasTime();
+		$fSame = fn (\DateTimeInterface $a) => $bAllDay
+			? $a->format('Ymd') === $oDate->format('Ymd')
+			: $a->getTimestamp() === $oDate->getTimestamp();
+		foreach ($oMaster->select('RDATE') as $oRdate) {
+			foreach ($oRdate->getDateTimes(new \DateTimeZone('UTC')) as $oRdateDate) {
+				if ($fSame($oRdateDate)) {
+					return true;
+				}
+			}
+		}
+		if (!isset($oMaster->RRULE)) {
+			return false;
+		}
+		try {
+			$oIterator = new RRuleIterator((string) $oMaster->RRULE,
+				$oMaster->DTSTART->getDateTime($bAllDay ? new \DateTimeZone('UTC') : null));
+			$oIterator->fastForward($bAllDay ? new \DateTimeImmutable($oDate->format('Y-m-d'), new \DateTimeZone('UTC')) : $oDate);
+			return $oIterator->valid() && $fSame($oIterator->current());
+		} catch (\Throwable $oException) {
+			return false;
+		}
+	}
+
+	/**
+	 * SUMMARY, LOCATION and DESCRIPTION from the fields; null leaves one alone.
+	 */
+	private static function setText(VEvent $oVEvent, array $aFields) : void
+	{
+		foreach (array('summary' => 'SUMMARY', 'location' => 'LOCATION', 'description' => 'DESCRIPTION') as $sKey => $sName) {
+			if (isset($aFields[$sKey])) {
+				$sValue = (string) $aFields[$sKey];
+				unset($oVEvent->{$sName});
+				\strlen($sValue) && $oVEvent->add($sName, $sValue);
+			}
+		}
+	}
+
+	/**
+	 * DTSTART and DTEND from the fields.
+	 *
+	 * @return array{0: \DateTimeImmutable, 1: \DateTimeZone} the start and the zone written in
+	 */
+	private static function setTimes(VEvent $oVEvent, array $aFields, \DateTimeZone $oTimeZone) : array
+	{
+		$bAllDay = !empty($aFields['allDay']);
+		$oOldStart = isset($oVEvent->DTSTART) ? $oVEvent->DTSTART->getDateTime() : null;
+		$bWasAllDay = isset($oVEvent->DTSTART) && !$oVEvent->DTSTART->hasTime();
+
+		// A date has no zone, and read in a zone west of Greenwich, UTC midnight
+		// is the evening before. A timed event keeps the zone it was written in.
+		if ($bAllDay) {
+			$oZone = new \DateTimeZone('UTC');
+		} else if ($oOldStart && !$bWasAllDay && 'UTC' !== $oOldStart->getTimezone()->getName()) {
+			$oZone = $oOldStart->getTimezone();
+		} else {
+			$oZone = $oTimeZone;
+		}
+		$oStart = (new \DateTimeImmutable('@' . (int) $aFields['start']))->setTimezone($oZone);
+		$oEnd = (new \DateTimeImmutable('@' . (int) $aFields['end']))->setTimezone($oZone);
+
+		unset($oVEvent->DTSTART, $oVEvent->DTEND, $oVEvent->DURATION);
+		if ($bAllDay) {
+			$oVEvent->add('DTSTART', $oStart, array('VALUE' => 'DATE'));
+			$oVEvent->add('DTEND', $oEnd, array('VALUE' => 'DATE'));
+		} else {
+			$oVEvent->add('DTSTART', $oStart);
+			$oVEvent->add('DTEND', $oEnd);
+		}
+		return array($oStart, $oZone);
+	}
+
+	/**
+	 * DTSTAMP and LAST-MODIFIED now, and SEQUENCE up for a change of time or
+	 * rule (RFC 5545 3.8.7.4).
+	 */
+	private static function touch(VEvent $oVEvent, bool $bReschedule) : void
+	{
+		$oNow = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+		if ($bReschedule) {
+			$oVEvent->SEQUENCE = (isset($oVEvent->SEQUENCE) ? (int) $oVEvent->SEQUENCE->getValue() : 0) + 1;
+		}
+		$oVEvent->DTSTAMP = $oNow;
+		$oVEvent->{'LAST-MODIFIED'} = $oNow;
 	}
 
 	private static function removeOverrides(VCalendar $oVCalendar, callable $fWhich) : void
@@ -186,31 +355,9 @@ class EventEditor
 	 * stands names nothing. Sabre would still show such an override, as an
 	 * event of its own, so it goes.
 	 */
-	private static function pruneExceptions(VCalendar $oVCalendar, VEvent $oMaster,
-		\DateTimeImmutable $oStart, bool $bAllDay) : void
+	private static function pruneExceptions(VCalendar $oVCalendar, VEvent $oMaster) : void
 	{
-		$aRdates = array();
-		foreach ($oMaster->select('RDATE') as $oRdate) {
-			foreach ($oRdate->getDateTimes() as $oDate) {
-				$aRdates[] = $oDate->getTimestamp();
-			}
-		}
-		$sRule = (string) $oMaster->RRULE;
-		$fIsOccurrence = function (\DateTimeInterface $oDate) use ($sRule, $oStart, $aRdates, $bAllDay) : bool {
-			if (\in_array($oDate->getTimestamp(), $aRdates, true)) {
-				return true;
-			}
-			try {
-				$oIterator = new RRuleIterator($sRule, $oStart);
-				$oIterator->fastForward($oDate);
-				$oCurrent = $oIterator->valid() ? $oIterator->current() : null;
-			} catch (\Throwable $oException) {
-				return false;
-			}
-			return $oCurrent && ($bAllDay
-				? $oCurrent->format('Ymd') === $oDate->format('Ymd')
-				: $oCurrent->getTimestamp() === $oDate->getTimestamp());
-		};
+		$fIsOccurrence = fn (\DateTimeInterface $oDate) => static::isOccurrence($oMaster, $oDate);
 
 		static::removeOverrides($oVCalendar,
 			fn (VEvent $oVEvent) => !$fIsOccurrence($oVEvent->{'RECURRENCE-ID'}->getDateTime()));
