@@ -37,13 +37,13 @@
 	--nc-color-text-lighter: var(--color-text-lighter, #767676);
 	--nc-color-text-maxcontrast: var(--color-text-maxcontrast, #767676);
 	--nc-color-scrollbar: var(--color-scrollbar, rgba(34, 34, 34, .15));
-	--nc-color-error: var(--color-error, #e9322d);
+	--nc-color-error: var(--color-element-error, var(--color-error, #e9322d));
 	--nc-color-error-rgb: var(--color-error-rgb, 233, 50, 45);
 	--nc-color-error-hover: var(--color-error-hover, #ed5a56);
-	--nc-color-warning: var(--color-warning, #eca700);
+	--nc-color-warning: var(--color-element-warning, var(--color-warning, #eca700));
 	--nc-color-warning-rgb: var(--color-warning-rgb, 236, 167, 0);
 	--nc-color-warning-hover: var(--color-warning-hover, #efb832);
-	--nc-color-success: var(--color-success, #46ba61);
+	--nc-color-success: var(--color-element-success, var(--color-success, #46ba61));
 	--nc-color-success-rgb: var(--color-success-rgb, 70, 186, 97);
 	--nc-color-success-hover: var(--color-success-hover, #6ac780);
 	--nc-color-loading-light: var(--color-loading-light, #cccccc);
@@ -101,13 +101,13 @@
 		--nc-color-text-lighter: var(--color-text-lighter, #a5a5a5);
 		--nc-color-text-maxcontrast: var(--color-text-maxcontrast, #8c8c8c);
 		--nc-color-scrollbar: var(--color-scrollbar, #3d3d3d);
-		--nc-color-error: var(--color-error, #e9322d);
+		--nc-color-error: var(--color-element-error, var(--color-error, #e9322d));
 		--nc-color-error-rgb: var(--color-error-rgb, 233, 50, 45);
 		--nc-color-error-hover: var(--color-error-hover, #ed5a56);
-		--nc-color-warning: var(--color-warning, #eca700);
+		--nc-color-warning: var(--color-element-warning, var(--color-warning, #eca700));
 		--nc-color-warning-rgb: var(--color-warning-rgb, 236, 167, 0);
 		--nc-color-warning-hover: var(--color-warning-hover, #efb832);
-		--nc-color-success: var(--color-success, #46ba61);
+		--nc-color-success: var(--color-element-success, var(--color-success, #46ba61));
 		--nc-color-success-rgb: var(--color-success-rgb, 70, 186, 97);
 		--nc-color-success-hover: var(--color-success-hover, #6ac780);
 		--nc-color-loading-light: var(--color-loading-light, #777);
@@ -2625,9 +2625,9 @@ html[data-color-scheme="dark"] :not([data-themes~="light"]) {
 	--nc-color-text-lighter: var(--color-text-lighter, #a5a5a5);
 	--nc-color-text-maxcontrast: var(--color-text-maxcontrast, #8c8c8c);
 	--nc-color-scrollbar: var(--color-scrollbar, #3d3d3d);
-	--nc-color-error: var(--color-error, #e9322d);
-	--nc-color-warning: var(--color-warning, #eca700);
-	--nc-color-success: var(--color-success, #46ba61);
+	--nc-color-error: var(--color-element-error, var(--color-error, #e9322d));
+	--nc-color-warning: var(--color-element-warning, var(--color-warning, #eca700));
+	--nc-color-success: var(--color-element-success, var(--color-success, #46ba61));
 	--nc-color-loading-light: var(--color-loading-light, #777);
 	--nc-color-loading-dark: var(--color-loading-dark, #CCC);
 	--nc-color-box-shadow: var(--color-box-shadow, #000000);
@@ -2662,9 +2662,9 @@ html[data-color-scheme="light"] :not([data-themes~="dark"]) {
 	--nc-color-text-lighter: var(--color-text-lighter, #767676);
 	--nc-color-text-maxcontrast: var(--color-text-maxcontrast, #767676);
 	--nc-color-scrollbar: var(--color-scrollbar, rgba(34, 34, 34, .15));
-	--nc-color-error: var(--color-error, #e9322d);
-	--nc-color-warning: var(--color-warning, #eca700);
-	--nc-color-success: var(--color-success, #46ba61);
+	--nc-color-error: var(--color-element-error, var(--color-error, #e9322d));
+	--nc-color-warning: var(--color-element-warning, var(--color-warning, #eca700));
+	--nc-color-success: var(--color-element-success, var(--color-success, #46ba61));
 	--nc-color-loading-light: var(--color-loading-light, #cccccc);
 	--nc-color-loading-dark: var(--color-loading-dark, #444444);
 	--nc-color-box-shadow: var(--color-box-shadow, rgba(77,77,77, 0.5));
@@ -2680,4 +2680,36 @@ html[data-color-scheme="light"] :not([data-themes~="dark"]) {
 	--nc-color-primary-element: var(--color-primary-element, #00639a);
 	--nc-color-primary-element-text: var(--color-primary-element-text, #ffffff);
 	--nc-color-primary-element-hover: var(--color-primary-element-hover, #3282ae);
+}
+
+/*
+ * Nextcloud 31 and later split each status colour in two: --color-error is now
+ * a pale background tint (#FFE7E7 in 34) and --color-element-error the strong
+ * colour for text, borders and filled buttons, which is what this theme meant
+ * by it. The variables above prefer the element colour, so on those versions
+ * the delete button and red error text were pale pink. The hover and tint
+ * values from Nextcloud are tints as well now, so they are derived from the
+ * resolved colour instead, where the browser can.
+ */
+@supports (color: color-mix(in srgb, red, blue)) {
+	/* every element, as the variables above are declared on every element */
+	#rl-app,
+	#rl-app * {
+		--nc-color-error-hover: color-mix(in srgb, var(--nc-color-error) 85%, white);
+		--nc-color-warning-hover: color-mix(in srgb, var(--nc-color-warning) 85%, white);
+		--nc-color-success-hover: color-mix(in srgb, var(--nc-color-success) 85%, white);
+	}
+
+	#rl-app .alert,
+	#rl-app .alert.alert-warning {
+		background-color: color-mix(in srgb, var(--nc-color-warning) 10%, transparent);
+	}
+
+	#rl-app .alert.alert-success {
+		background-color: color-mix(in srgb, var(--nc-color-success) 10%, transparent);
+	}
+
+	#rl-app .alert.alert-error {
+		background-color: color-mix(in srgb, var(--nc-color-error) 10%, transparent);
+	}
 }
