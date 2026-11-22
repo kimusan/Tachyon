@@ -74,7 +74,27 @@ const
 			luminance = 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
 		// Contrast against white vs against black, whichever is further away
 		return (1.05 / (luminance + 0.05)) >= ((luminance + 0.05) / 0.05) ? '#fff' : '#000';
-	};
+	},
+
+	// RRULE weekday codes, indexed like Date.getDay()
+	WEEKDAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'],
+
+	// The RRULE parts the repeat controls can show. A rule with any other part
+	// is kept as it is and not sent back, so the server leaves it alone.
+	EDITABLE_RULE_PARTS = ['FREQ', 'INTERVAL', 'COUNT', 'UNTIL', 'BYDAY', 'WKST'],
+
+	// The local date of an editor value, "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm"
+	startDateOf = value => new Date((value || '').split('T')[0] + 'T00:00'),
+
+	// Which of its weekday in the month a date is: 1 to 4, or -1 for a fifth,
+	// which is the last one
+	weekdayOrdinal = date => {
+		const n = Math.ceil(date.getDate() / 7);
+		return 4 < n ? -1 : n;
+	},
+
+	// "2TU" for the second Tuesday, "-1FR" for the last Friday
+	monthlyByDay = date => weekdayOrdinal(date) + WEEKDAYS[date.getDay()];
 
 export class CalendarPopupView extends AbstractViewPopup {
 	constructor() {
@@ -106,7 +126,28 @@ export class CalendarPopupView extends AbstractViewPopup {
 			editAllDay: false,
 			editReadOnly: false,
 			editRecurring: false,
-			editError: ''
+			editError: '',
+
+			// Repeat: '' for none, DAILY, WEEKLY, MONTHLY (on the day),
+			// MONTHLY_BYDAY (on the nth weekday), YEARLY, or CUSTOM for a stored
+			// rule these controls cannot show
+			editRepeat: '',
+			editInterval: 1,
+			editEnds: 'never',
+			editUntil: '',
+			editCount: 10
+		});
+
+		this.editWeekdays = ko.observableArray();
+		// Kept so a rule read with a week start writes it back
+		this.editWkst = '';
+
+		// Weekly needs a day, and the start's own day is the one meant
+		this.editRepeat.subscribe(repeat => {
+			if ('WEEKLY' === repeat && !this.editWeekdays().length) {
+				const start = startDateOf(this.editStart());
+				isNaN(start) || this.editWeekdays([WEEKDAYS[start.getDay()]]);
+			}
 		});
 
 		// Switching the inputs between date and datetime-local leaves the old
@@ -146,7 +187,52 @@ export class CalendarPopupView extends AbstractViewPopup {
 				return this.calendars().find(cal => cal.uuid === uuid)?.name || '';
 			},
 
-			visibleCalendarUuids: () => this.calendars().filter(cal => cal.visible()).map(cal => cal.uuid)
+			visibleCalendarUuids: () => this.calendars().filter(cal => cal.visible()).map(cal => cal.uuid),
+
+			editRuleCustom: () => 'CUSTOM' === this.editRepeat(),
+
+			// The monthly choices name the start's day, so they follow it
+			repeatOptions: () => {
+				const start = startDateOf(this.editStart()),
+					valid = !isNaN(start),
+					n = valid ? weekdayOrdinal(start) : 1,
+					options = [
+						{ id: '', name: i18n('CALENDAR/REPEAT_NONE') },
+						{ id: 'DAILY', name: i18n('CALENDAR/REPEAT_DAILY') },
+						{ id: 'WEEKLY', name: i18n('CALENDAR/REPEAT_WEEKLY') },
+						{ id: 'MONTHLY', name: i18n('CALENDAR/REPEAT_MONTHLY_DAY', { DAY: valid ? start.getDate() : '' }) },
+						{ id: 'MONTHLY_BYDAY', name: i18n('CALENDAR/REPEAT_MONTHLY_WEEKDAY', {
+							NTH: i18n('CALENDAR/ORDINAL_' + (0 > n ? 'LAST' : n)),
+							WEEKDAY: valid ? start.format({ weekday: 'long' }) : ''
+						}) },
+						{ id: 'YEARLY', name: i18n('CALENDAR/REPEAT_YEARLY') }
+					];
+				this.editRuleCustom() && options.push({ id: 'CUSTOM', name: i18n('CALENDAR/REPEAT_CUSTOM') });
+				return options;
+			},
+
+			repeatUnit: () => {
+				const repeat = this.editRepeat();
+				return repeat && !this.editRuleCustom()
+					? i18n('CALENDAR/REPEAT_UNIT_' + ('MONTHLY_BYDAY' === repeat ? 'MONTHLY' : repeat))
+					: '';
+			},
+
+			// In the user's week order, from Settings > Calendar
+			weekdayChoices: () => {
+				const first = parseInt(SettingsUserStore.calendarFirstDay(), 10) || 0;
+				return WEEKDAYS.map((code, i) => WEEKDAYS[(i + first) % 7]).map(code => ({
+					code: code,
+					// 4 January 2026 was a Sunday
+					label: new Date(2026, 0, 4 + WEEKDAYS.indexOf(code)).format({ weekday: 'short' })
+				}));
+			},
+
+			repeatEndOptions: () => [
+				{ id: 'never', name: i18n('CALENDAR/REPEAT_ENDS_NEVER') },
+				{ id: 'until', name: i18n('CALENDAR/REPEAT_ENDS_UNTIL') },
+				{ id: 'count', name: i18n('CALENDAR/REPEAT_ENDS_COUNT') }
+			]
 		});
 
 		// Half hours, offered as a pick list so the field is not a bare box. The
@@ -231,6 +317,9 @@ export class CalendarPopupView extends AbstractViewPopup {
 							calendarUuid: event.calendarUuid,
 							readOnly: !!event.readOnly,
 							recurring: !!event.recurring,
+							rrule: event.rrule || '',
+							seriesStart: event.seriesStart || 0,
+							seriesEnd: event.seriesEnd || 0,
 							location: event.location || '',
 							description: event.description || ''
 						}
@@ -365,6 +454,7 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editStart(this.toInput(start, allDay));
 		this.editEnd(this.toInput(end, allDay));
 		this.editRecurring(false);
+		this.setRepeat('');
 		this.editReadOnly(false);
 		this.editError('');
 		this.editorVisible(true);
@@ -389,12 +479,15 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editLocation(props.location || '');
 		this.editDescription(props.description || '');
 		this.editAllDay(!!event.allDay);
-		this.editStart(this.toInput(event.start, event.allDay));
-		this.editEnd(this.toInput(event.end, event.allDay));
+		// A series is edited as a whole, so it shows the series' own first
+		// occurrence rather than the one that was clicked
+		const series = !!props.recurring && 0 < props.seriesStart,
+			toWhen = value => event.allDay ? toAllDayDate(value) : toDate(value);
+		this.editStart(this.toInput(series ? toWhen(props.seriesStart) : event.start, event.allDay));
+		this.editEnd(this.toInput(series ? toWhen(props.seriesEnd) : event.end, event.allDay));
 		this.editRecurring(!!props.recurring);
-		// Saving rebuilds the VEVENT from the fields below, which carry no RRULE,
-		// so editing a series here would quietly turn it into a single event
-		this.editReadOnly(!!props.readOnly || !!props.recurring);
+		this.setRepeat(props.rrule || '');
+		this.editReadOnly(!!props.readOnly);
 		this.editError('');
 		this.editorVisible(true);
 	}
@@ -530,6 +623,22 @@ export class CalendarPopupView extends AbstractViewPopup {
 		if (!this.editCalendar()) {
 			return i18n('CALENDAR/ERROR_NO_CALENDAR');
 		}
+		const repeat = this.editRepeat();
+		if (repeat && !this.editRuleCustom()) {
+			if (!(1 <= parseInt(this.editInterval(), 10))) {
+				return i18n('CALENDAR/REPEAT_ERROR_INTERVAL');
+			}
+			if ('WEEKLY' === repeat && !this.editWeekdays().length) {
+				return i18n('CALENDAR/REPEAT_ERROR_NO_DAYS');
+			}
+			if ('count' === this.editEnds() && !(1 <= parseInt(this.editCount(), 10))) {
+				return i18n('CALENDAR/REPEAT_ERROR_COUNT');
+			}
+			if ('until' === this.editEnds()
+			 && (!this.editUntil() || startDateOf(this.editUntil()) < startDateOf(this.editStart()))) {
+				return i18n('CALENDAR/REPEAT_ERROR_UNTIL');
+			}
+		}
 		return '';
 	}
 
@@ -581,14 +690,152 @@ export class CalendarPopupView extends AbstractViewPopup {
 				Description: this.editDescription().trim(),
 				Start: this.fromInput(this.editStart(), allDay),
 				End: this.fromInput(this.editEnd(), allDay),
-				AllDay: allDay ? 1 : 0
+				AllDay: allDay ? 1 : 0,
+				// For an event that has no zone yet and a calendar that names none
+				Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+				// Left out for a custom rule, which the server then keeps as stored
+				...(this.editRuleCustom() ? {} : { Rrule: this.buildRrule() })
 			}
 		);
 	}
 
+	/**
+	 * Fill the repeat controls from a stored RRULE, or mark it custom when they
+	 * cannot show it.
+	 */
+	setRepeat(rule) {
+		const start = startDateOf(this.editStart()),
+			state = this.parseRrule(rule || '', isNaN(start) ? new Date() : start);
+		this.editRepeat(state.repeat);
+		this.editInterval(state.interval || 1);
+		this.editWeekdays(state.weekdays || []);
+		this.editEnds(state.ends || 'never');
+		this.editUntil(state.until || '');
+		this.editCount(state.count || 10);
+		this.editWkst = state.wkst || '';
+	}
+
+	parseRrule(rule, start) {
+		const custom = { repeat: 'CUSTOM' },
+			parts = {};
+		if (!rule) {
+			return { repeat: '' };
+		}
+		for (const part of rule.split(';')) {
+			const [key, value] = part.split('=');
+			if (!key || undefined === value) {
+				return custom;
+			}
+			parts[key.toUpperCase()] = value.toUpperCase();
+		}
+		if (Object.keys(parts).some(key => !EDITABLE_RULE_PARTS.includes(key)) || (parts.COUNT && parts.UNTIL)) {
+			return custom;
+		}
+		const state = {
+				repeat: parts.FREQ,
+				interval: parseInt(parts.INTERVAL || '1', 10),
+				weekdays: [],
+				ends: 'never',
+				wkst: parts.WKST || ''
+			},
+			byDay = parts.BYDAY ? parts.BYDAY.split(',') : [];
+		if (!(1 <= state.interval)) {
+			return custom;
+		}
+		switch (parts.FREQ) {
+			case 'DAILY':
+			case 'YEARLY':
+				if (byDay.length) {
+					return custom;
+				}
+				break;
+			case 'WEEKLY':
+				if (byDay.some(day => !WEEKDAYS.includes(day))) {
+					return custom;
+				}
+				state.weekdays = byDay.length ? byDay : [WEEKDAYS[start.getDay()]];
+				break;
+			case 'MONTHLY':
+				if (byDay.length) {
+					// Only the nth weekday the start itself falls on
+					if (1 < byDay.length || byDay[0] !== monthlyByDay(start)) {
+						return custom;
+					}
+					state.repeat = 'MONTHLY_BYDAY';
+				}
+				break;
+			default:
+				return custom;
+		}
+		if (parts.COUNT) {
+			state.ends = 'count';
+			state.count = parseInt(parts.COUNT, 10);
+			if (!(1 <= state.count)) {
+				return custom;
+			}
+		} else if (parts.UNTIL) {
+			const m = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z?))?$/.exec(parts.UNTIL);
+			if (!m) {
+				return custom;
+			}
+			// A UTC moment is shown as the local date it falls on
+			const until = m[4] && m[7]
+				? new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +m[6]))
+				: new Date(+m[1], m[2] - 1, +m[3]);
+			state.ends = 'until';
+			state.until = this.toInput(until, true);
+		}
+		return state;
+	}
+
+	/**
+	 * The RRULE for the repeat controls, '' for none.
+	 */
+	buildRrule() {
+		const repeat = this.editRepeat();
+		if (!repeat || this.editRuleCustom()) {
+			return '';
+		}
+		const start = startDateOf(this.editStart()),
+			interval = parseInt(this.editInterval(), 10),
+			pad = value => String(value).padStart(2, '0');
+		let rule = 'FREQ=' + ('MONTHLY_BYDAY' === repeat ? 'MONTHLY' : repeat);
+		if (1 < interval) {
+			rule += ';INTERVAL=' + interval;
+		}
+		if ('WEEKLY' === repeat) {
+			rule += ';BYDAY=' + WEEKDAYS.filter(day => this.editWeekdays().includes(day)).join(',');
+		} else if ('MONTHLY_BYDAY' === repeat) {
+			rule += ';BYDAY=' + monthlyByDay(start);
+		}
+		if (this.editWkst) {
+			rule += ';WKST=' + this.editWkst;
+		}
+		if ('count' === this.editEnds()) {
+			rule += ';COUNT=' + parseInt(this.editCount(), 10);
+		} else if ('until' === this.editEnds()) {
+			if (this.editAllDay()) {
+				rule += ';UNTIL=' + this.editUntil().replace(/-/g, '');
+			} else {
+				// RFC 5545 3.3.10: with a zoned start, UNTIL is in UTC. The end of
+				// the chosen day, so an occurrence on it is still included.
+				const until = new Date(this.editUntil() + 'T23:59:59');
+				rule += ';UNTIL=' + until.getUTCFullYear() + pad(until.getUTCMonth() + 1) + pad(until.getUTCDate())
+					+ 'T' + pad(until.getUTCHours()) + pad(until.getUTCMinutes()) + pad(until.getUTCSeconds()) + 'Z';
+			}
+		}
+		return rule;
+	}
+
+	toggleWeekday(code) {
+		if (!this.editReadOnly()) {
+			this.editWeekdays().includes(code) ? this.editWeekdays.remove(code) : this.editWeekdays.push(code);
+		}
+	}
+
 	deleteEventCommand() {
 		AskPopupView.showModal([
-			i18n('CALENDAR/CONFIRM_DELETE_EVENT'),
+			i18n(this.editRecurring() ? 'CALENDAR/CONFIRM_DELETE_SERIES' : 'CALENDAR/CONFIRM_DELETE_EVENT'),
 			() => {
 				this.isSaving(true);
 				Remote.request('CalendarEventDelete',

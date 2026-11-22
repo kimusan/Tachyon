@@ -61,7 +61,7 @@
 			<form class="b-calendar-editor-form" spellcheck="false" data-bind="css: {'read-only': editReadOnly()}">
 
 				<div class="b-calendar-editor-note" data-bind="visible: editRecurring"
-					data-i18n="CALENDAR/RECURRING_READ_ONLY"></div>
+					data-i18n="CALENDAR/RECURRING_SERIES"></div>
 
 				<div class="control-group">
 					<label data-i18n="CALENDAR/LABEL_SUMMARY"></label>
@@ -123,6 +123,69 @@
 						data-bind="value: editEndTime, enable: !editReadOnly(), event: { focus: openTimeList }">
 					</div>
 					<!-- /ko -->
+				</div>
+
+				<div class="control-group">
+					<label data-i18n="CALENDAR/LABEL_REPEAT"></label>
+					<div data-bind="component: {
+						name: 'Select',
+						params: {
+							options: repeatOptions,
+							value: editRepeat,
+							optionsText: 'name',
+							optionsValue: 'id',
+							disabled: editReadOnly
+						}
+					}"></div>
+					<div class="b-calendar-editor-hint" data-bind="visible: editRuleCustom"
+						data-i18n="CALENDAR/REPEAT_CUSTOM_HINT"></div>
+				</div>
+
+				<!-- visible rather than if throughout: the popup is translated once,
+				     when it opens, and nodes an if adds later would keep their keys -->
+				<div class="b-calendar-repeat" data-bind="visible: editRepeat() && !editRuleCustom()">
+					<div class="control-group">
+						<label data-i18n="CALENDAR/REPEAT_EVERY"></label>
+						<input type="number" min="1" max="999" class="b-calendar-interval"
+							data-bind="value: editInterval, enable: !editReadOnly()">
+						<span data-bind="text: repeatUnit"></span>
+					</div>
+
+					<div class="control-group" data-bind="visible: 'WEEKLY' === editRepeat()">
+						<label data-i18n="CALENDAR/REPEAT_ON"></label>
+						<div class="b-calendar-weekdays" data-bind="foreach: weekdayChoices">
+							<!-- a link like the Save button: inside Nextcloud, its own CSS
+							     restyles every button element and hid the selected state -->
+							<a href="#" role="button" class="btn" data-bind="text: label,
+								css: { 'btn-success': $parent.editWeekdays().includes(code), disabled: $parent.editReadOnly() },
+								attr: { 'aria-pressed': $parent.editWeekdays().includes(code) ? 'true' : 'false' },
+								click: () => $parent.toggleWeekday(code)"></a>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label data-i18n="CALENDAR/REPEAT_ENDS"></label>
+						<div class="b-calendar-ends">
+							<div data-bind="component: {
+								name: 'Select',
+								params: {
+									options: repeatEndOptions,
+									value: editEnds,
+									optionsText: 'name',
+									optionsValue: 'id',
+									disabled: editReadOnly
+								}
+							}"></div>
+							<span data-bind="visible: 'until' === editEnds()">
+								<input type="date" data-bind="datePicker: editUntil, enable: !editReadOnly()">
+							</span>
+							<span data-bind="visible: 'count' === editEnds()">
+								<input type="number" min="1" max="999" class="b-calendar-interval"
+									data-bind="value: editCount, enable: !editReadOnly()">
+								<span data-i18n="CALENDAR/REPEAT_TIMES"></span>
+							</span>
+						</div>
+					</div>
 				</div>
 
 				<div class="control-group">

@@ -532,7 +532,9 @@ trait Calendar
 
 	/**
 	 * Builds an iCalendar body from plain fields, for a client that does not want
-	 * to compose one itself.
+	 * to compose one itself. An event that exists is edited in place, so what the
+	 * editor does not show (attendees, alarms, the exceptions of a series)
+	 * survives the save; see Providers\Calendar\EventEditor.
 	 */
 	private function vCalendarFromParams(string $sUid, string $sCalendarUuid,
 		\Tachyon\Providers\Calendar $oProvider) : \Sabre\VObject\Component\VCalendar
@@ -548,50 +550,50 @@ trait Calendar
 				'The event ends before it starts');
 		}
 
-		$bAllDay = !empty($this->GetActionParam('AllDay', 0));
-
+		// The zone a new event is written in: the calendar's own, else the
+		// browser's. Falling back to the server's (usually UTC) made a weekly
+		// 09:00 move by an hour at every change to or from summer time.
 		$oCalendar = $oProvider->GetCalendarByUuid($sCalendarUuid);
-		$sTimezone = $oCalendar && \strlen($oCalendar->Timezone)
-			? $oCalendar->Timezone
-			: (\date_default_timezone_get() ?: 'UTC');
-
-		try {
-			$oTimeZone = new \DateTimeZone($sTimezone);
-		} catch (\Throwable $oException) {
-			$oTimeZone = new \DateTimeZone('UTC');
+		$oTimeZone = null;
+		foreach (array($oCalendar ? $oCalendar->Timezone : '', (string) $this->GetActionParam('Timezone', ''),
+			\date_default_timezone_get()) as $sTimezone) {
+			if (\strlen($sTimezone)) {
+				try {
+					$oTimeZone = new \DateTimeZone($sTimezone);
+					break;
+				} catch (\Throwable $oException) {
+					// An unknown name, try the next
+				}
+			}
 		}
+		$oTimeZone = $oTimeZone ?: new \DateTimeZone('UTC');
 
-		$oVCalendar = new \Sabre\VObject\Component\VCalendar();
-		$oVEvent = $oVCalendar->add('VEVENT', array(
-			'UID' => $sUid,
-			'SUMMARY' => (string) $this->GetActionParam('Summary', ''),
-			'DTSTAMP' => new \DateTimeImmutable('now', new \DateTimeZone('UTC'))
-		));
-
-		$sDescription = (string) $this->GetActionParam('Description', '');
-		if (\strlen($sDescription)) {
-			$oVEvent->add('DESCRIPTION', $sDescription);
-		}
-		$sLocation = (string) $this->GetActionParam('Location', '');
-		if (\strlen($sLocation)) {
-			$oVEvent->add('LOCATION', $sLocation);
-		}
-
-		$oStart = (new \DateTimeImmutable('@' . $iStart))->setTimezone($oTimeZone);
-		$oEnd = (new \DateTimeImmutable('@' . $iEnd))->setTimezone($oTimeZone);
-
-		if ($bAllDay) {
-			// Date only, so the event cannot acquire a time through a conversion
-			$oVEvent->add('DTSTART', $oStart, array('VALUE' => 'DATE'));
-			$oVEvent->add('DTEND', $oEnd, array('VALUE' => 'DATE'));
+		$oExisting = $oProvider->GetEventByUid($sCalendarUuid, $sUid);
+		$oVCalendar = $oExisting ? $oExisting->VCalendar() : null;
+		if ($oVCalendar) {
+			$oVCalendar = clone $oVCalendar;
 		} else {
-			$oVEvent->add('DTSTART', $oStart);
-			$oVEvent->add('DTEND', $oEnd);
+			$oVCalendar = new \Sabre\VObject\Component\VCalendar();
+			$oVCalendar->add('VEVENT', array('UID' => $sUid));
 		}
 
-		$sRrule = \trim((string) $this->GetActionParam('Rrule', ''));
-		if (\strlen($sRrule)) {
-			$oVEvent->add('RRULE', $sRrule);
+		// Null leaves a field as stored: a drag sends only the times
+		$fText = function (string $sName) : ?string {
+			$mValue = $this->GetActionParam($sName, null);
+			return null === $mValue ? null : (string) $mValue;
+		};
+		try {
+			\Tachyon\Providers\Calendar\EventEditor::apply($oVCalendar, array(
+				'summary' => $fText('Summary'),
+				'location' => $fText('Location'),
+				'description' => $fText('Description'),
+				'start' => $iStart,
+				'end' => $iEnd,
+				'allDay' => !empty($this->GetActionParam('AllDay', 0)),
+				'rrule' => $fText('Rrule')
+			), $oTimeZone);
+		} catch (\InvalidArgumentException $oException) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, $oException, $oException->getMessage());
 		}
 
 		return $oVCalendar;

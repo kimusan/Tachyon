@@ -222,7 +222,12 @@ class PdoCalendar
 			'allDay' => !empty($aRow['all_day']),
 			'color' => $oCalendar->Color,
 			'readOnly' => $oCalendar->ReadOnly,
-			'recurring' => '' !== (string) $aRow['rrule']
+			'recurring' => '' !== (string) $aRow['rrule'],
+			// The editor works on the whole series, so it needs the rule and the
+			// series' own first start and end, not the occurrence that was clicked
+			'rrule' => (string) $aRow['rrule'],
+			'seriesStart' => (int) $aRow['dtstart'],
+			'seriesEnd' => (int) $aRow['dtend']
 		);
 
 		if ('' === (string) $aRow['rrule']) {
