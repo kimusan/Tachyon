@@ -187,4 +187,38 @@ $cancelled = Invitation::fromIcal(sprintf($one, 'CANCEL'))->WithoutDates($merged
 check(1 === count($cancelled->VEVENT) && '20261109T090000Z' === $cancelled->VEVENT->EXDATE->getValue(), 'cancelled date not excluded');
 check(null === Invitation::fromIcal(ical('google-cancel'))->WithoutDates($stored), 'a whole cancel kept part of the event');
 
+// 11. Answering one date of a stored series: a REPLY for that date alone,
+//     with its RECURRENCE-ID, and the answer kept in that date's override;
+//     declining one date takes it out of the calendar
+$accepted = $series->StoredCopy(null, 'attendee@example.com', 'ACCEPTED');
+$date = (new DateTimeImmutable('2026-11-16 09:00', new DateTimeZone('UTC')))->getTimestamp();
+$reply = Invitation::fromVCalendar($accepted)->Reply('attendee@example.com', 'TENTATIVE', $date);
+check(null !== $reply && 1 === count($reply->VEVENT), 'no single-date reply');
+check('20261116T090000Z' === $reply->VEVENT->{'RECURRENCE-ID'}->getValue()
+	&& 'TENTATIVE' === (string) $reply->VEVENT->ATTENDEE['PARTSTAT'], 'single-date reply wrong: '.$reply->serialize());
+// the same answer as the series still goes out
+check(null !== Invitation::fromVCalendar($accepted)->Reply('attendee@example.com', 'ACCEPTED', $date), 'a date answered like the series sends nothing');
+check(null === Invitation::fromVCalendar($accepted)->Reply('attendee@example.com', 'ACCEPTED', $date + 3600), 'a reply for a date that is not one');
+
+$maybe = Invitation::AnswerStored($accepted, 'attendee@example.com', 'TENTATIVE', $date);
+$stored = Invitation::fromVCalendar($maybe);
+check('TENTATIVE' === $stored->PartstatOn(['attendee@example.com'], $date)
+	&& 'ACCEPTED' === $stored->PartstatOn(['attendee@example.com'], $date + 7 * 86400)
+	&& 'ACCEPTED' === $stored->PartstatOn(['attendee@example.com'], null), 'per-date answer not kept');
+check('CLIENT' === (string) $maybe->VEVENT[1]->ORGANIZER['SCHEDULE-AGENT'], 'the new override lets the server reply');
+$declined = Invitation::AnswerStored($accepted, 'attendee@example.com', 'DECLINED', $date);
+check(1 === count($declined->VEVENT) && '20261116T090000Z' === $declined->VEVENT->EXDATE->getValue(), 'declined date not taken out');
+// the whole series at once
+$all = Invitation::AnswerStored($maybe, 'attendee@example.com', 'DECLINED', null);
+check('DECLINED' === Invitation::fromVCalendar($all)->PartstatOn(['attendee@example.com'], $date), 'series answer missed an override');
+
+// 12. A change to a date declined earlier: the card says declined, and
+//     answering the change puts the date back
+$moved9 = Invitation::fromIcal(sprintf($one, 'REQUEST'));
+$nine = $moved9->RecurrenceIds()[0];
+$without = Invitation::AnswerStored($accepted, 'attendee@example.com', 'DECLINED', $nine);
+check(Invitation::fromVCalendar($without)->IsExcluded($nine) && !Invitation::fromVCalendar($accepted)->IsExcluded($nine), 'IsExcluded wrong');
+$back = $moved9->StoredCopy($without, 'attendee@example.com', 'ACCEPTED');
+check(!Invitation::fromVCalendar($back)->IsExcluded($nine) && 2 === count($back->VEVENT), 'a re-accepted date stays excluded');
+
 echo "itip-invitation: ok\n";

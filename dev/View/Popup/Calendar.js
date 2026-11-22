@@ -137,6 +137,12 @@ export class CalendarPopupView extends AbstractViewPopup {
 			editScope: 'occurrence',
 			editRecurrenceId: 0,
 			editCanSplit: false,
+			// When the user is an attendee of the event opened: their answer for
+			// the date or the series, which can be changed from here
+			editInvitation: null,
+			editAnswerBusy: false,
+			editAnswerMessage: '',
+			editAnswerFailed: false,
 			editInterval: 1,
 			editEnds: 'never',
 			editUntil: '',
@@ -150,6 +156,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 		// The fields hold the occurrence's own values or the series', whichever
 		// is being edited
 		this.editScope.subscribe(scope => {
+			// The answer shown is the one for what the scope covers
+			this.loadEventInvitation();
 			// "This and following" starts from the occurrence, like "This occurrence"
 			const values = 'series' === scope ? this.editSeriesValues : this.editOccurrenceValues;
 			values && this.fillEditor(values);
@@ -484,6 +492,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editRecurrenceId(0);
 		this.editSeriesValues = this.editOccurrenceValues = null;
 		this.editSeriesCount = 0;
+		this.editInvitationToken = null;
+		this.editInvitation(null);
 		this.editScope('series');
 		this.editCanSplit(false);
 		this.setRepeat('');
@@ -547,6 +557,73 @@ export class CalendarPopupView extends AbstractViewPopup {
 		this.editReadOnly(!!props.readOnly);
 		this.editError('');
 		this.editorVisible(true);
+	}
+
+	/**
+	 * Whether the user is invited to the event in the editor, and their answer
+	 * for the date or the series, per the scope. Read from the stored copy, so
+	 * it asks the server rather than the grid's data.
+	 */
+	loadEventInvitation() {
+		const token = {};
+		this.editInvitationToken = token;
+		this.editInvitation(null);
+		this.editAnswerMessage('');
+		this.editAnswerFailed(false);
+		if (!this.editUid() || 'following' === this.editScope()) {
+			return;
+		}
+		Remote.request('CalendarEventInvitation', (iError, data) => {
+			if (!iError && token === this.editInvitationToken && data?.Result?.Invited) {
+				this.editInvitation(data.Result);
+			}
+		}, {
+			Calendar: this.editCalendar(),
+			Uid: this.editUid(),
+			...(this.editingOccurrence() ? { RecurrenceId: this.editRecurrenceId() } : {})
+		});
+	}
+
+	/**
+	 * Answer the invitation from the calendar: the reply goes to the organizer,
+	 * for the one date when the scope is that, else for the series.
+	 */
+	answerEvent(partstat) {
+		const info = this.editInvitation(),
+			occurrence = this.editingOccurrence();
+		if (!info || this.editAnswerBusy()) {
+			return;
+		}
+		const summary = (this.editSeriesValues || this.editOccurrenceValues)?.summary || this.editSummary(),
+			when = occurrence ? new Date(this.editRecurrenceId() * 1000).format({ dateStyle: 'medium' }) : '',
+			params = { SUMMARY: when ? summary + ' (' + when + ')' : summary, EMAIL: info.Email };
+		this.editAnswerBusy(true);
+		Remote.request('CalendarEventAnswer', (iError, data) => {
+			this.editAnswerBusy(false);
+			if (iError) {
+				this.editAnswerFailed(true);
+				this.editAnswerMessage(getNotification(iError));
+				return;
+			}
+			this.ec?.refetchEvents();
+			// A declined date leaves the calendar, so there is nothing left to edit
+			if (occurrence && 'DECLINED' === partstat && !data?.CalendarError) {
+				this.editorVisible(false);
+				return;
+			}
+			this.editInvitation(Object.assign({}, info, { Partstat: partstat }));
+			this.editAnswerFailed(!!data?.CalendarError);
+			this.editAnswerMessage(i18n('CALENDAR/INVITATION_SENT_' + partstat, params)
+				+ (data?.CalendarError ? ' ' + i18n('CALENDAR/INVITATION_NOT_STORED', { ERROR: data.CalendarError }) : ''));
+		}, {
+			Calendar: this.editCalendar(),
+			Uid: this.editUid(),
+			...(occurrence ? { RecurrenceId: this.editRecurrenceId() } : {}),
+			Partstat: partstat,
+			Summary: summary,
+			Subject: i18n('CALENDAR/INVITATION_SUBJECT_' + partstat, params),
+			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params)
+		});
 	}
 
 	closeEditor() {

@@ -144,22 +144,38 @@ class EventEditor
 	public static function applyOccurrence(VCalendar $oVCalendar, int $iRecurrenceId, array $aFields,
 		\DateTimeZone $oTimeZone) : void
 	{
-		$oMaster = static::seriesMaster($oVCalendar);
-		$oOverride = static::occurrence($oVCalendar, $oMaster, $iRecurrenceId);
-		if (!$oOverride) {
-			$oRecurrenceId = static::recurrenceDate($oMaster, $iRecurrenceId);
-			$oOverride = clone $oMaster;
-			unset($oOverride->RRULE, $oOverride->RDATE, $oOverride->EXDATE, $oOverride->EXRULE, $oOverride->SEQUENCE);
-			$oOverride->add('RECURRENCE-ID', $oRecurrenceId,
-				$oMaster->DTSTART->hasTime() ? array() : array('VALUE' => 'DATE'));
-			$oVCalendar->add($oOverride);
-		}
+		$oOverride = static::ensureOverride($oVCalendar, $iRecurrenceId);
 
 		static::setText($oOverride, $aFields);
 		$iOldStart = isset($oOverride->DTSTART) ? $oOverride->DTSTART->getDateTime()->getTimestamp() : 0;
 		$iOldEnd = isset($oOverride->DTEND) ? $oOverride->DTEND->getDateTime()->getTimestamp() : 0;
 		static::setTimes($oOverride, $aFields, $oTimeZone);
 		static::touch($oOverride, $iOldStart !== (int) $aFields['start'] || $iOldEnd !== (int) $aFields['end']);
+	}
+
+	/**
+	 * The override for the occurrence originally at $iRecurrenceId, made from
+	 * the series, at that occurrence's time, when it has none yet.
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public static function ensureOverride(VCalendar $oVCalendar, int $iRecurrenceId) : VEvent
+	{
+		$oMaster = static::seriesMaster($oVCalendar);
+		$oOverride = static::occurrence($oVCalendar, $oMaster, $iRecurrenceId);
+		if (!$oOverride) {
+			$oRecurrenceId = static::recurrenceDate($oMaster, $iRecurrenceId);
+			$oDuration = $oMaster->DTSTART->getDateTime()->diff(static::endOf($oMaster));
+			$aDate = $oMaster->DTSTART->hasTime() ? array() : array('VALUE' => 'DATE');
+			$oOverride = clone $oMaster;
+			unset($oOverride->RRULE, $oOverride->RDATE, $oOverride->EXDATE, $oOverride->EXRULE, $oOverride->SEQUENCE,
+				$oOverride->DTSTART, $oOverride->DTEND, $oOverride->DURATION);
+			$oOverride->add('DTSTART', $oRecurrenceId, $aDate);
+			$oOverride->add('DTEND', $oRecurrenceId->add($oDuration), $aDate);
+			$oOverride->add('RECURRENCE-ID', $oRecurrenceId, $aDate);
+			$oVCalendar->add($oOverride);
+		}
+		return $oOverride;
 	}
 
 	/**

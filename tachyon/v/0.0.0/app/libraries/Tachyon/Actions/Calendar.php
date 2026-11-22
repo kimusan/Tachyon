@@ -296,10 +296,14 @@ trait Calendar
 			$oStored = $aFound ? $aFound[1]->VCalendar() : null;
 			$oStoredInvitation = $oStored ? \Tachyon\Providers\Calendar\Invitation::fromVCalendar($oStored) : null;
 			if ($oStoredInvitation) {
+				// For one date of a series, the answer on that date: declined,
+				// it was taken out of the series
+				$iDate = $oInvitation->RecurrenceIds()[0] ?? null;
 				$aStored = array(
 					'Uuid' => $aFound[0]->Uuid,
 					'Name' => $aFound[0]->Name,
-					'Partstat' => $oStoredInvitation->Partstat($aEmails),
+					'Partstat' => null !== $iDate && $oStoredInvitation->IsExcluded($iDate)
+						? 'DECLINED' : $oStoredInvitation->PartstatOn($aEmails, $iDate),
 					'Sequence' => $oStoredInvitation->SequenceNumber()
 				);
 				// An update for one date carries that date's SEQUENCE, which says
@@ -370,6 +374,138 @@ trait Calendar
 	}
 
 	/**
+	 * Mail a METHOD:REPLY to the organizer from the identity that was invited
+	 * (RFC 6047 2.4). Subject and text come from the client, in the user's
+	 * language.
+	 */
+	private function sendInvitationReply(\Tachyon\Model\Account $oAccount, \Tachyon\Model\Identity $oIdentity,
+		string $sOrganizerEmail, string $sOrganizerName, \Sabre\VObject\Component\VCalendar $oReply,
+		string $sPartstat, string $sSummary) : void
+	{
+		$oMessage = new \MailSo\Mime\Message();
+		if ($this->Config()->Get('security', 'hide_x_mailer_header', true)) {
+			$oMessage->DoesNotAddDefaultXMailer();
+		}
+		$oMessage->SetFrom(new \MailSo\Mime\Email($oIdentity->Email(), $oIdentity->Name()));
+		$oFrom = $oMessage->GetFrom();
+		$oMessage->RegenerateMessageId($oFrom ? $oFrom->GetDomain() : '');
+		$oMessage->SetTo(new \MailSo\Mime\EmailCollection(array(
+			new \MailSo\Mime\Email($sOrganizerEmail, $sOrganizerName)
+		)));
+
+		$sSubject = \trim((string) $this->GetActionParam('Subject', ''));
+		$oMessage->SetSubject(\strlen($sSubject) ? $sSubject : \ucfirst(\strtolower($sPartstat)) . ': ' . $sSummary);
+
+		// RFC 6047 2.4: the calendar goes in text/calendar with the method
+		// repeated in the Content-Type; the text is for people whose client
+		// does not understand it
+		$oAlternative = new \MailSo\Mime\Part;
+		$oAlternative->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'multipart/alternative');
+		$oAlternative->addPlain((string) $this->GetActionParam('Plain', ''));
+
+		$oCalendarPart = new \MailSo\Mime\Part;
+		$oCalendarPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'text/calendar; charset=utf-8; method=REPLY');
+		$oCalendarPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TRANSFER_ENCODING, 'quoted-printable');
+		$oCalendarPart->Body = \MailSo\Base\StreamWrappers\Binary::CreateStream(
+			\MailSo\Base\ResourceRegistry::CreateMemoryResourceFromString($oReply->serialize()),
+			'convert.quoted-printable-encode'
+		);
+		$oAlternative->SubParts->append($oCalendarPart);
+		$oMessage->SubParts->append($oAlternative);
+
+		$this->Plugins()->RunHook('filter.build-invitation-reply', array($oMessage, $oAccount, $oReply));
+
+		$rMessageStream = \MailSo\Base\ResourceRegistry::CreateMemoryResource();
+		$iMessageStreamSize = \MailSo\Base\Utils::WriteStream(
+			$oMessage->ToStream(true), $rMessageStream, 8192, true, true
+		);
+		if (false === $iMessageStreamSize) {
+			throw new ClientException(\Tachyon\Notifications::CantSendMessage);
+		}
+		try {
+			$this->smtpSendMessage($oAccount, $oMessage, $rMessageStream, $iMessageStreamSize, false);
+		} finally {
+			\is_resource($rMessageStream) && \fclose($rMessageStream);
+		}
+	}
+
+	/**
+	 * For the calendar's editor: whether the user is invited to this event,
+	 * and their answer on the date opened (RecurrenceId) or the series.
+	 */
+	public function DoCalendarEventInvitation() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		[$oInvitation, $sEmail, $iRecurrenceId] = $this->storedInvitationFromParams($oAccount, false);
+		return $this->DefaultResponse($oInvitation ? array(
+			'Invited' => true,
+			'Email' => $sEmail,
+			'Partstat' => $oInvitation->PartstatOn(array($sEmail), $iRecurrenceId),
+			'Organizer' => $oInvitation->OrganizerEmail()
+		) : array('Invited' => false));
+	}
+
+	/**
+	 * Answer, from the calendar, an invitation stored there: the series, or one
+	 * date of it (RecurrenceId). The reply goes out first, then the stored copy
+	 * is updated; declining one date takes it out of the calendar.
+	 */
+	public function DoCalendarEventAnswer() : array
+	{
+		$oAccount = $this->getAccountFromToken();
+		$sPartstat = \strtoupper((string) $this->GetActionParam('Partstat', ''));
+		if (!\in_array($sPartstat, \Tachyon\Providers\Calendar\Invitation::PARTSTATS, true)) {
+			throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Unknown answer');
+		}
+		[$oInvitation, $sEmail, $iRecurrenceId, $oEvent, $oStored] = $this->storedInvitationFromParams($oAccount, true);
+
+		$oReply = $oInvitation->Reply($sEmail, $sPartstat, $iRecurrenceId);
+		if (!$oReply) {
+			throw new ClientException(\Tachyon\Notifications::CantSendMessage, null, 'No reply could be made');
+		}
+		$oOrganizer = $oInvitation->Organizer();
+		$oIdentity = $this->invitationIdentities($oAccount)[\strtolower($sEmail)];
+		$this->sendInvitationReply($oAccount, $oIdentity, $oInvitation->OrganizerEmail(),
+			isset($oOrganizer['CN']) ? (string) $oOrganizer['CN'] : '', $oReply, $sPartstat,
+			(string) ($this->GetActionParam('Summary', '') ?: ($oInvitation->Event()->SUMMARY ?? '')));
+
+		$sCalendarError = '';
+		try {
+			$oEvent->setVCalendar(\Tachyon\Providers\Calendar\Invitation::AnswerStored($oStored, $sEmail, $sPartstat, $iRecurrenceId));
+			$this->CalendarProvider($oAccount)->EventSave((string) $this->GetActionParam('Calendar', ''), $oEvent)
+				|| $sCalendarError = 'The calendar server rejected the event';
+		} catch (\Throwable $oException) {
+			$sCalendarError = $oException->getMessage();
+		}
+		return $this->TrueResponse(array('Partstat' => $sPartstat, 'CalendarError' => $sCalendarError));
+	}
+
+	/**
+	 * The stored event the editor names (Calendar, Uid, RecurrenceId), read as
+	 * an invitation to one of the user's addresses from someone else.
+	 *
+	 * @return array{0: ?\Tachyon\Providers\Calendar\Invitation, 1: string, 2: ?int, 3: ?\Tachyon\Providers\Calendar\Classes\Event, 4: ?\Sabre\VObject\Component\VCalendar}
+	 */
+	private function storedInvitationFromParams(\Tachyon\Model\Account $oAccount, bool $bRequired) : array
+	{
+		$oProvider = $this->CalendarProvider($oAccount);
+		$iRecurrenceId = (int) $this->GetActionParam('RecurrenceId', 0) ?: null;
+		$oEvent = $oProvider->IsActive() ? $oProvider->GetEventByUid(
+			(string) $this->GetActionParam('Calendar', ''), (string) $this->GetActionParam('Uid', '')) : null;
+		$oStored = $oEvent ? $oEvent->VCalendar() : null;
+		$oInvitation = $oStored ? \Tachyon\Providers\Calendar\Invitation::fromVCalendar($oStored) : null;
+		$aEmails = \array_keys($this->invitationIdentities($oAccount));
+		$aMatch = $oInvitation ? $oInvitation->FindAttendee($aEmails) : null;
+		if (!$aMatch || !\strlen($oInvitation->OrganizerEmail()) || $oInvitation->IsOrganizer($aEmails)) {
+			if ($bRequired) {
+				throw new ClientException(\Tachyon\Notifications::InvalidInputArgument, null, 'Not an invitation to you');
+			}
+			return array(null, '', null, null, null);
+		}
+		return array($oInvitation, $aMatch[1], $iRecurrenceId, $oEvent, $oStored);
+	}
+
+	/**
 	 * A cancellation of an event the calendar holds: take it out, or only the
 	 * cancelled dates of a series.
 	 */
@@ -423,51 +559,8 @@ trait Calendar
 			throw new ClientException(\Tachyon\Notifications::CantSendMessage, null, 'No reply could be made');
 		}
 
-		$oMessage = new \MailSo\Mime\Message();
-		if ($this->Config()->Get('security', 'hide_x_mailer_header', true)) {
-			$oMessage->DoesNotAddDefaultXMailer();
-		}
-		$oMessage->SetFrom(new \MailSo\Mime\Email($oIdentity->Email(), $oIdentity->Name()));
-		$oFrom = $oMessage->GetFrom();
-		$oMessage->RegenerateMessageId($oFrom ? $oFrom->GetDomain() : '');
-		$oMessage->SetTo(new \MailSo\Mime\EmailCollection(array(
-			new \MailSo\Mime\Email($aInfo['Organizer']['Email'], $aInfo['Organizer']['Name'])
-		)));
-
-		$sSubject = \trim((string) $this->GetActionParam('Subject', ''));
-		$oMessage->SetSubject(\strlen($sSubject) ? $sSubject : \ucfirst(\strtolower($sPartstat)) . ': ' . $aInfo['Summary']);
-
-		// RFC 6047 2.4: the calendar goes in text/calendar with the method
-		// repeated in the Content-Type; the text is for people whose client
-		// does not understand it
-		$oAlternative = new \MailSo\Mime\Part;
-		$oAlternative->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'multipart/alternative');
-		$oAlternative->addPlain((string) $this->GetActionParam('Plain', ''));
-
-		$oCalendarPart = new \MailSo\Mime\Part;
-		$oCalendarPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TYPE, 'text/calendar; charset=utf-8; method=REPLY');
-		$oCalendarPart->Headers->AddByName(\MailSo\Mime\Enumerations\Header::CONTENT_TRANSFER_ENCODING, 'quoted-printable');
-		$oCalendarPart->Body = \MailSo\Base\StreamWrappers\Binary::CreateStream(
-			\MailSo\Base\ResourceRegistry::CreateMemoryResourceFromString($oReply->serialize()),
-			'convert.quoted-printable-encode'
-		);
-		$oAlternative->SubParts->append($oCalendarPart);
-		$oMessage->SubParts->append($oAlternative);
-
-		$this->Plugins()->RunHook('filter.build-invitation-reply', array($oMessage, $oAccount, $oReply));
-
-		$rMessageStream = \MailSo\Base\ResourceRegistry::CreateMemoryResource();
-		$iMessageStreamSize = \MailSo\Base\Utils::WriteStream(
-			$oMessage->ToStream(true), $rMessageStream, 8192, true, true
-		);
-		if (false === $iMessageStreamSize) {
-			throw new ClientException(\Tachyon\Notifications::CantSendMessage);
-		}
-		try {
-			$this->smtpSendMessage($oAccount, $oMessage, $rMessageStream, $iMessageStreamSize, false);
-		} finally {
-			\is_resource($rMessageStream) && \fclose($rMessageStream);
-		}
+		$this->sendInvitationReply($oAccount, $oIdentity, $aInfo['Organizer']['Email'], $aInfo['Organizer']['Name'],
+			$oReply, $sPartstat, $aInfo['Summary']);
 
 		// The answer has gone out whatever happens to the calendar copy, so a
 		// failure there is reported beside the success rather than instead of it

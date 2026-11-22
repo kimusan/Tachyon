@@ -68,6 +68,19 @@
 					<a href="#" role="button" class="btn" data-bind="click: () => editScope('series'),
 						css: { 'btn-success': 'series' === editScope() }" data-i18n="CALENDAR/SCOPE_SERIES"></a>
 				</div>
+				<div class="b-calendar-answer" data-bind="visible: editInvitation">
+					<span data-i18n="CALENDAR/YOUR_ANSWER"></span>
+					<a href="#" role="button" class="btn" data-bind="click: () => answerEvent('ACCEPTED'),
+						css: { 'btn-success': 'ACCEPTED' === editInvitation()?.Partstat, disabled: editAnswerBusy }"
+						data-i18n="CALENDAR/INVITATION_ACCEPT"></a>
+					<a href="#" role="button" class="btn" data-bind="click: () => answerEvent('TENTATIVE'),
+						css: { 'btn-success': 'TENTATIVE' === editInvitation()?.Partstat, disabled: editAnswerBusy }"
+						data-i18n="CALENDAR/INVITATION_TENTATIVE"></a>
+					<a href="#" role="button" class="btn" data-bind="click: () => answerEvent('DECLINED'),
+						css: { 'btn-success': 'DECLINED' === editInvitation()?.Partstat, disabled: editAnswerBusy }"
+						data-i18n="CALENDAR/INVITATION_DECLINE"></a>
+					<div data-bind="visible: editAnswerMessage, text: editAnswerMessage, css: { 'text-error': editAnswerFailed }"></div>
+				</div>
 				<div class="b-calendar-editor-note" data-bind="visible: editRecurring() && 'series' === editScope()"
 					data-i18n="CALENDAR/RECURRING_SERIES"></div>
 				<div class="b-calendar-editor-note" data-bind="visible: editRecurring() && 'following' === editScope()"

@@ -852,7 +852,7 @@ export class MailMessageView extends AbstractViewRight {
 		if (!stored) {
 			return '';
 		}
-		return i18n(['ACCEPTED', 'TENTATIVE'].includes(stored.Partstat)
+		return i18n(['ACCEPTED', 'TENTATIVE', 'DECLINED'].includes(stored.Partstat)
 			? 'CALENDAR/INVITATION_IN_CALENDAR_' + stored.Partstat
 			: 'CALENDAR/INVITATION_IN_CALENDAR', { CALENDAR: stored.Name });
 	}

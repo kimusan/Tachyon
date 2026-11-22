@@ -203,6 +203,8 @@ class Invitation
 			'End' => $iEnd,
 			'AllDay' => $bAllDay,
 			'Recurring' => isset($oVEvent->RRULE) || isset($oVEvent->RDATE),
+			// A change to one date of a series, mailed without the series
+			'SingleDate' => !$this->HasMaster(),
 			'Cancelled' => $bCancelled,
 			'Organizer' => $oOrganizer ? array(
 				'Email' => $this->OrganizerEmail(),
@@ -280,6 +282,7 @@ class Invitation
 			}
 		} else if ($oStored) {
 			$oCopy = clone $oStored;
+			$oMaster = EventEditor::master($oCopy);
 			foreach ($this->oVCalendar->VEVENT as $oVEvent) {
 				$iKey = static::recurrenceKey($oVEvent);
 				foreach ($oCopy->select('VEVENT') as $oOld) {
@@ -288,6 +291,17 @@ class Invitation
 					}
 				}
 				$oCopy->add(clone $oVEvent);
+				// A date declined before was taken out; answering it again puts it back
+				foreach ($oMaster ? $oMaster->select('EXDATE') : array() as $oExdate) {
+					$aKeep = \array_values(\array_filter($oExdate->getDateTimes(new \DateTimeZone('UTC')),
+						fn ($oDate) => $oDate->getTimestamp() !== $iKey));
+					if (!$aKeep) {
+						$oMaster->remove($oExdate);
+					} else if (\count($aKeep) < \count($oExdate->getDateTimes())) {
+						$oExdate->setDateTimes(\array_map(fn ($oDate) => $oDate->setTimezone($oExdate->getDateTime()->getTimezone()), $aKeep),
+							$oExdate->isFloating());
+					}
+				}
 			}
 			foreach ($this->oVCalendar->select('VTIMEZONE') as $oTimezone) {
 				$sTzid = (string) $oTimezone->TZID;
@@ -316,6 +330,98 @@ class Invitation
 		}
 		unset($oCopy->METHOD);
 		return $oCopy;
+	}
+
+	/**
+	 * Our answer in a stored copy: on every date, or, for one date of a
+	 * series, in that date's override; declining one date takes it out, as
+	 * the organizer's other attendees would no longer see us there.
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public static function AnswerStored(VCalendar $oStored, string $sEmail, string $sPartstat, ?int $iRecurrenceId) : VCalendar
+	{
+		$oCopy = clone $oStored;
+		if (null !== $iRecurrenceId && 'DECLINED' === $sPartstat) {
+			EventEditor::excludeOccurrence($oCopy, $iRecurrenceId);
+			return $oCopy;
+		}
+		$aMatch = (new self($oCopy))->FindAttendee(array($sEmail));
+		if (!$aMatch) {
+			throw new \InvalidArgumentException('Not invited');
+		}
+		$sHref = static::href($aMatch[0]);
+		$aEvents = null !== $iRecurrenceId ? array(EventEditor::ensureOverride($oCopy, $iRecurrenceId)) : $oCopy->select('VEVENT');
+		foreach ($aEvents as $oVEvent) {
+			foreach ($oVEvent->ATTENDEE ?? array() as $oAttendee) {
+				if (static::href($oAttendee) === $sHref) {
+					$oAttendee['PARTSTAT'] = $sPartstat;
+					unset($oAttendee['RSVP']);
+				}
+			}
+		}
+		foreach ($oCopy->VEVENT as $oVEvent) {
+			if (isset($oVEvent->ORGANIZER)) {
+				$oVEvent->ORGANIZER['SCHEDULE-AGENT'] = 'CLIENT';
+			}
+		}
+		return $oCopy;
+	}
+
+	/**
+	 * The original starts of the dates an invitation for single dates of a
+	 * series is about; empty for a whole event.
+	 *
+	 * @return int[]
+	 */
+	public function RecurrenceIds() : array
+	{
+		$aResult = array();
+		foreach ($this->oVCalendar->VEVENT as $oVEvent) {
+			null !== ($iKey = static::recurrenceKey($oVEvent)) && $aResult[] = $iKey;
+		}
+		return $aResult;
+	}
+
+	/**
+	 * Whether the series excludes the date originally at $iRecurrenceId, as a
+	 * declined date is taken out.
+	 */
+	public function IsExcluded(int $iRecurrenceId) : bool
+	{
+		$oMaster = EventEditor::master($this->oVCalendar);
+		foreach ($oMaster ? $oMaster->select('EXDATE') : array() as $oExdate) {
+			foreach ($oExdate->getDateTimes(new \DateTimeZone('UTC')) as $oDate) {
+				if ($oDate->getTimestamp() === $iRecurrenceId) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Our answer on the date originally at $iRecurrenceId, or for the series
+	 * when null: the override's if it has one, else the series'.
+	 */
+	public function PartstatOn(array $aEmails, ?int $iRecurrenceId) : string
+	{
+		if (null !== $iRecurrenceId) {
+			foreach ($this->oVCalendar->VEVENT as $oVEvent) {
+				if (static::recurrenceKey($oVEvent) === $iRecurrenceId) {
+					$oInvitation = new self(new VCalendar());
+					$oInvitation->oVCalendar->add(clone $oVEvent);
+					return $oInvitation->Partstat($aEmails);
+				}
+			}
+		}
+		$oMaster = EventEditor::master($this->oVCalendar);
+		if ($oMaster) {
+			$oInvitation = new self(new VCalendar());
+			$oInvitation->oVCalendar->add(clone $oMaster);
+			return $oInvitation->Partstat($aEmails);
+		}
+		return $this->Partstat($aEmails);
 	}
 
 	/**
@@ -361,7 +467,7 @@ class Invitation
 	 * old state is taken as NEEDS-ACTION: an organizer may send an update that
 	 * already says ACCEPTED for us, and answering it again must still go out.
 	 */
-	public function Reply(string $sEmail, string $sPartstat) : ?VCalendar
+	public function Reply(string $sEmail, string $sPartstat, ?int $iRecurrenceId = null) : ?VCalendar
 	{
 		$sPartstat = \strtoupper($sPartstat);
 		if (!\in_array($sPartstat, self::PARTSTATS, true)) {
@@ -374,7 +480,24 @@ class Invitation
 			return null;
 		}
 		$sHref = static::href($aMatch[0]);
+		// A stored copy says SCHEDULE-AGENT=CLIENT so the CalDAV server leaves
+		// replying to us, and the broker honours that as well: here, we are the
+		// client that replies
 		foreach ($oOld->VEVENT as $oVEvent) {
+			isset($oVEvent->ORGANIZER) && $oVEvent->ORGANIZER->offsetUnset('SCHEDULE-AGENT');
+		}
+
+		// One date of a series is answered in its override, which the broker
+		// then replies for alone, with its RECURRENCE-ID
+		$oOnly = null;
+		if (null !== $iRecurrenceId) {
+			try {
+				$oOnly = EventEditor::ensureOverride($oOld, $iRecurrenceId);
+			} catch (\InvalidArgumentException $oException) {
+				return null;
+			}
+		}
+		foreach ($oOnly ? array($oOnly) : $oOld->VEVENT as $oVEvent) {
 			foreach ($oVEvent->ATTENDEE ?? array() as $oAttendee) {
 				if (static::href($oAttendee) === $sHref) {
 					$oAttendee['PARTSTAT'] = 'NEEDS-ACTION';
@@ -383,7 +506,8 @@ class Invitation
 		}
 
 		$oNew = clone $oOld;
-		foreach ($oNew->VEVENT as $oVEvent) {
+		$oNewOnly = $oOnly ? EventEditor::ensureOverride($oNew, $iRecurrenceId) : null;
+		foreach ($oNewOnly ? array($oNewOnly) : $oNew->VEVENT as $oVEvent) {
 			foreach ($oVEvent->ATTENDEE ?? array() as $oAttendee) {
 				if (static::href($oAttendee) === $sHref) {
 					$oAttendee['PARTSTAT'] = $sPartstat;
