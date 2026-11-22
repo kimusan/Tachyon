@@ -269,10 +269,6 @@ abstract class Service
 				}
 			}
 
-			$SameSite = \strtolower($oConfig->Get('security', 'cookie_samesite', 'Strict'));
-			$Secure = (isset($_SERVER['HTTPS']) || 'none' == $SameSite) ? ';secure' : '';
-			$sResult = \str_replace('samesite=strict', "samesite={$SameSite}{$Secure}", $sResult);
-
 			$sScriptNonce = \Tachyon\Util\UUID::generate();
 			static::setCSP($sScriptNonce);
 			$sResult = \str_replace('nonce=""', 'nonce="'.$sScriptNonce.'"', $sResult);

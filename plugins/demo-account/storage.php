@@ -31,11 +31,13 @@ class DemoStorage extends \Tachyon\Providers\Storage\FileStorage
 			}
 		}
 
-		// $_COOKIE['smtoken']
-		if (empty($_COOKIE['smctoken'])) {
-			\Tachyon\Util\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
+		// One data directory per visitor
+		$sVisitor = \Tachyon\Util\Cookies::get('smdemo');
+		if (!$sVisitor || !\ctype_xdigit($sVisitor)) {
+			$sVisitor = \bin2hex(\random_bytes(16));
+			\Tachyon\Util\Cookies::set('smdemo', $sVisitor);
 		}
-		$sDataPath .= '/' . \MailSo\Base\Utils::SecureFileName($_COOKIE['smctoken']);
+		$sDataPath .= '/' . $sVisitor;
 		if (!\is_dir($sDataPath) && \mkdir($sDataPath, 0700, true)) {
 			\file_put_contents("{$sDataPath}/settings",'{"RemoveColors":true,"ListInlineAttachments":true,"listGrouped":true}');
 			\file_put_contents("{$sDataPath}/settings_local",'{"UseThreads":true}');

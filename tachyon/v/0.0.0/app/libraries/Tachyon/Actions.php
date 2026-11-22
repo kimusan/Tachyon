@@ -601,7 +601,7 @@ class Actions
 					$aResult,
 					[
 						'Auth' => true,
-						'accountSignMe' => isset($_COOKIE[self::AUTH_SIGN_ME_TOKEN_KEY]),
+						'accountSignMe' => \Tachyon\Util\Cookies::has(self::AUTH_SIGN_ME_TOKEN_KEY),
 						'allowSpellcheck' => $oConfig->Get('defaults', 'allow_spellcheck', false),
 						'ViewHTML' => (bool) $oConfig->Get('defaults', 'view_html', true),
 						'ViewImages' => $oConfig->Get('defaults', 'view_images', 'ask'),

@@ -189,6 +189,8 @@ trait UserAuth
 		), \LOG_NOTICE, 'LOGIN');
 
 		if ($bMainAccount) {
+			// A new session for the new login, see Utils::RotateSessionToken()
+			Utils::RotateSessionToken();
 			$this->StorageProvider()->Put($oAccount, StorageType::SESSION, Utils::GetSessionToken(), (string) \time());
 
 			// Must be here due to bug #1241
@@ -247,7 +249,7 @@ trait UserAuth
 	{
 		$this->getMainAccountFromToken($bThrowExceptionOnFalse);
 
-		if (false === $this->oAdditionalAuthAccount && isset($_COOKIE[self::AUTH_ADDITIONAL_TOKEN_KEY])) {
+		if (false === $this->oAdditionalAuthAccount && Cookies::has(self::AUTH_ADDITIONAL_TOKEN_KEY)) {
 			$aData = Cookies::getSecure(self::AUTH_ADDITIONAL_TOKEN_KEY);
 			if ($aData) {
 				$this->oAdditionalAuthAccount = AdditionalAccount::NewInstanceFromTokenArray(
@@ -282,7 +284,7 @@ trait UserAuth
 				$sToken = Utils::GetSessionToken(false);
 				if (!$sToken) {
 //					\MailSo\Base\Http::StatusHeader(401);
-					if (isset($_COOKIE[Utils::SESSION_TOKEN])) {
+					if (Cookies::has(Utils::SESSION_TOKEN)) {
 						\Tachyon\Util\Log::notice('TOKENS', 'SESSION_TOKEN invalid');
 					} else {
 						\Tachyon\Util\Log::notice('TOKENS', 'SESSION_TOKEN not set');
@@ -301,7 +303,7 @@ trait UserAuth
 						// a minute; 'true' is a session from before this and starts counting now.
 						$iIdle = \is_numeric($sTokenValue) ? \time() - (int) $sTokenValue : 60;
 						if ($sTokenValue && 60 <= $iIdle) {
-							$iAutoLogout = isset($_COOKIE[self::AUTH_SIGN_ME_TOKEN_KEY]) ? 0
+							$iAutoLogout = Cookies::has(self::AUTH_SIGN_ME_TOKEN_KEY) ? 0
 								: (int) $this->SettingsProvider()->Load($oMainAuthAccount)->GetConf('AutoLogout',
 									$this->Config()->Get('defaults', 'autologout', 30));
 							// Three minutes of grace: the stored time trails the last request by up
@@ -382,7 +384,7 @@ trait UserAuth
 		$sSignMeToken = Cookies::get(self::AUTH_SIGN_ME_TOKEN_KEY);
 		if ($sSignMeToken) {
 			\Tachyon\Util\Log::notice(self::AUTH_SIGN_ME_TOKEN_KEY, 'decrypt');
-			$aResult = \Tachyon\Util\Crypt::DecryptUrlSafe($sSignMeToken, 'signme');
+			$aResult = \Tachyon\Util\Crypt::DecryptUrlSafe($sSignMeToken, 'signme', true);
 			if (isset($aResult['e'], $aResult['u']) && \Tachyon\Util\UUID::isValid($aResult['u'])) {
 				if (!isset($aResult['c'])) {
 					$aResult['c'] = \array_key_last($aResult);
@@ -432,7 +434,7 @@ trait UserAuth
 					$aTokenData['c'],
 					\base64_decode($aTokenData['d']),
 					$sAuthToken
-				], 'signme');
+				], 'signme', true); // algorithm and nonce come from the cookie
 				if (!\is_array($aAccountHash)) {
 					throw new \RuntimeException('token decrypt failed');
 				}

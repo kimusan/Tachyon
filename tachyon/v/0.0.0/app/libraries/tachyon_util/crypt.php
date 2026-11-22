@@ -75,7 +75,10 @@ abstract class Crypt
 	}
 
 	/**
-	 * When $key is empty, it will use the smctoken.
+	 * When $key is empty, the key of the encrypted login cookies
+	 * (Cookies::setSecure/getSecure): derived from APP_SALT and the session
+	 * cookie, so neither the server nor a single leaked cookie value is enough
+	 * to read them, and a new session (login, logout) gets a new key.
 	 */
 	private static function Passphrase(
 		#[\SensitiveParameter]
@@ -83,18 +86,24 @@ abstract class Crypt
 	) : string
 	{
 		if (!$key) {
-			if (empty($_COOKIE['smctoken'])) {
-				\Tachyon\Util\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
-//				throw new \RuntimeException('Missing smctoken');
-			}
-			$key = $_COOKIE['smctoken'] . APP_VERSION;
+			return \hash_hkdf('sha256', APP_SALT, 32, 'tachyon-cookie-v1/' . APP_VERSION,
+				(string) Cookies::get(\Tachyon\Utils::SESSION_TOKEN));
 		}
 		return \sha1($key . APP_SALT, true);
 	}
 
+	/**
+	 * $bFromClient: the token (or its algorithm name) came from the client, e.g.
+	 * a cookie. Only sodium authenticates what it decrypts; the openssl ciphers
+	 * Encrypt() uses are CBC without a MAC, so a modified ciphertext decrypts
+	 * to modified data. When sodium is available Encrypt() never writes another
+	 * algorithm, so a client token that names one was not made by this server.
+	 * Data the server stored itself may predate sodium and stays readable.
+	 */
 	public static function Decrypt(array $data,
 		#[\SensitiveParameter]
-		?string $key = null
+		?string $key = null,
+		bool $bFromClient = false
 	) /* : mixed */
 	{
 		if (3 === \count($data) && isset($data[0], $data[1], $data[2]) && \strlen($data[0])) {
@@ -105,10 +114,13 @@ abstract class Crypt
 			// derivation fix below its 16 byte salt was the entire key, so anyone
 			// could mint one.
 			$algo = \strtolower($data[0]);
-			if ('xxtea' === $algo
-			 && (\is_callable('sodium_crypto_aead_xchacha20poly1305_ietf_decrypt') || static::openSSLUsable())
-			) {
+			$bSodium = \is_callable('sodium_crypto_aead_xchacha20poly1305_ietf_decrypt');
+			if ('xxtea' === $algo && ($bSodium || static::openSSLUsable())) {
 				Log::warning('Crypt', 'xxtea token refused, a stronger algorithm is available');
+				return null;
+			}
+			if ($bFromClient && $bSodium && 'sodium' !== $algo) {
+				Log::warning('Crypt', "{$algo} token from the client refused, sodium is available");
 				return null;
 			}
 			$fn = "{$algo}Decrypt";
@@ -132,7 +144,8 @@ abstract class Crypt
 
 	public static function DecryptFromJSON(string $data,
 		#[\SensitiveParameter]
-		?string $key = null
+		?string $key = null,
+		bool $bFromClient = false
 	) /* : mixed */
 	{
 		$data = static::jsonDecode($data);
@@ -140,12 +153,13 @@ abstract class Crypt
 			Log::notice('Crypt', 'DecryptFromJSON() invalid $data');
 			return null;
 		}
-		return static::Decrypt(\array_map('base64_decode', $data), $key);
+		return static::Decrypt(\array_map('base64_decode', $data), $key, $bFromClient);
 	}
 
 	public static function DecryptUrlSafe(string $data,
 		#[\SensitiveParameter]
-		?string $key = null
+		?string $key = null,
+		bool $bFromClient = false
 	) /* : mixed */
 	{
 		$data = \explode('.', $data);
@@ -153,7 +167,7 @@ abstract class Crypt
 			Log::notice('Crypt', 'DecryptUrlSafe() invalid $data');
 			return null;
 		}
-		return static::Decrypt(\array_map('MailSo\\Base\\Utils::UrlSafeBase64Decode', $data), $key);
+		return static::Decrypt(\array_map('MailSo\\Base\\Utils::UrlSafeBase64Decode', $data), $key, $bFromClient);
 	}
 
 	public static function Encrypt(

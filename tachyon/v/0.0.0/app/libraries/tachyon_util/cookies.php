@@ -10,6 +10,13 @@ class Cookies
 
 	static $SameSite = 'Strict';
 
+	/**
+	 * "__Host-" names: the browser accepts such a cookie only over HTTPS, with
+	 * Secure, Path=/ and no Domain, so a sibling subdomain or a plain-HTTP
+	 * man in the middle cannot plant one (session fixation, login CSRF).
+	 */
+	static $HostPrefix = false;
+
 	private static function init() : bool
 	{
 		static $bOne = false;
@@ -17,16 +24,39 @@ class Cookies
 			$oConfig = \Tachyon\Api::Config();
 			static::$DefaultPath = $oConfig->Get('labs', 'cookie_default_path', '');
 			static::$SameSite = $oConfig->Get('security', 'cookie_samesite', 'Strict');
-			static::$Secure = isset($_SERVER['HTTPS'])
+			// IsSecure() also honours X-Forwarded-Proto/-Ssl, so cookies keep the
+			// Secure flag behind a TLS-terminating proxy. Trusting the header is
+			// safe here: a client that fakes it only gets Secure cookies over a
+			// plain connection, which its own browser then does not send back.
+			$bTls = \MailSo\Base\Http::SingletonInstance()->IsSecure();
+			static::$Secure = $bTls
 				|| 'None' == static::$SameSite
 				|| !!$oConfig->Get('labs', 'cookie_default_secure', false);
+			// Only where the browser will take them: over HTTPS, and with the
+			// whole site as path (labs.cookie_default_path keeps plain names)
+			static::$HostPrefix = $bTls && \in_array(static::$DefaultPath, ['', '/'], true);
 			$bOne = true;
 		}
 		return $bOne;
 	}
 
+	/**
+	 * The name the cookie $sName has in the browser.
+	 */
+	public static function name(string $sName) : string
+	{
+		static::init();
+		return static::$HostPrefix ? "__Host-{$sName}" : $sName;
+	}
+
+	public static function has(string $sName) : bool
+	{
+		return isset($_COOKIE[static::name($sName)]);
+	}
+
 	public static function get(string $sName) : ?string
 	{
+		$sName = static::name($sName);
 		if (isset($_COOKIE[$sName])) {
 			$aParts = [];
 			foreach (\array_keys($_COOKIE) as $sCookieName) {
@@ -34,7 +64,8 @@ class Cookies
 					$aParts[$sCookieName] = $_COOKIE[$sCookieName];
 				}
 			}
-			\ksort($aParts);
+			// Naturally: sorted as strings, "name~10" came before "name~2"
+			\ksort($aParts, \SORT_NATURAL);
 			return \implode('', $aParts);
 		}
 		return null;
@@ -42,9 +73,10 @@ class Cookies
 
 	public static function getSecure(string $sName)
 	{
-		return isset($_COOKIE[$sName])
-			? Crypt::DecryptFromJSON(\MailSo\Base\Utils::UrlSafeBase64Decode(static::get($sName)))
-			: null;
+		$sValue = static::get($sName);
+		return null === $sValue
+			? null
+			: Crypt::DecryptFromJSON(\MailSo\Base\Utils::UrlSafeBase64Decode($sValue), null, true);
 	}
 
 	public static function setSecure(string $sName, $data): void
@@ -52,6 +84,8 @@ class Cookies
 		if (\is_null($data)) {
 			static::clear($sName);
 		} else {
+			// The key is bound to the session cookie (Crypt::Passphrase)
+			\Tachyon\Utils::GetSessionToken();
 			static::set(
 				$sName,
 				\MailSo\Base\Utils::UrlSafeBase64Encode(Crypt::EncryptToJSON($data))
@@ -115,7 +149,8 @@ class Cookies
 	 */
 	public static function set(string $sName, string $sValue, int $iExpire = 0, bool $httponly = true) : void
 	{
-		static::init();
+		static::dropPlain($sName);
+		$sName = static::name($sName);
 		$sPath = static::$DefaultPath;
 		$sPath = $sPath && \strlen($sPath) ? $sPath : '/';
 		// https://github.com/the-djmaze/snappymail/issues/451
@@ -144,7 +179,23 @@ class Cookies
 
 	public static function clear(string $sName) : void
 	{
-		static::init();
+		static::dropPlain($sName);
+		static::clearNamed(static::name($sName));
+	}
+
+	/**
+	 * With "__Host-" names, a cookie of the plain name is left over from
+	 * before (or planted): expire it.
+	 */
+	private static function dropPlain(string $sName) : void
+	{
+		if (static::name($sName) !== $sName && isset($_COOKIE[$sName])) {
+			static::clearNamed($sName);
+		}
+	}
+
+	private static function clearNamed(string $sName) : void
+	{
 		static::_set($sName, '', 0);
 		// Delete 4K split cookie parts
 		foreach (\array_keys($_COOKIE) as $sCookieName) {

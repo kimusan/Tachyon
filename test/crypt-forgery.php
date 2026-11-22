@@ -27,7 +27,7 @@ namespace Tachyon {
 namespace {
 	define('APP_SALT', 'test-salt-'.bin2hex(random_bytes(8)));
 	define('APP_VERSION', 'test');
-	$_COOKIE['smctoken'] = base64_encode(random_bytes(16));
+	$_COOKIE['smsession'] = bin2hex(random_bytes(20));
 	spl_autoload_register(static function (string $class): void {
 		$base = dirname(__DIR__).'/tachyon/v/0.0.0/app/libraries/';
 		$file = str_starts_with($class, 'Tachyon\\Util\\')

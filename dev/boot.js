@@ -26,16 +26,11 @@ const
 			doc.head.append(script);
 		}) : Promise.reject('src is empty');
 
+// The login cookies' key no longer comes from the browser: drop what earlier
+// versions kept for it
 try {
-	let smctoken = doc.cookie.match(/(^|;) ?smctoken=([^;]+)/);
-	smctoken = smctoken ? smctoken[2] : localStorage.getItem('smctoken');
-	if (!smctoken) {
-		let data = new Uint8Array(16);
-		crypto.getRandomValues(data);
-		smctoken = encodeURIComponent(btoa(String.fromCharCode(...data)));
-	}
-	localStorage.setItem('smctoken', smctoken);
-	doc.cookie = 'smctoken='+smctoken+";path=/;samesite=strict";
+	localStorage.removeItem('smctoken');
+	doc.cookie = 'smctoken=;path=/;max-age=0';
 } catch (e) {
 	console.error(e);
 }
