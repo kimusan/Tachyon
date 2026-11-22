@@ -6,6 +6,7 @@ import { LanguageStore } from 'Stores/Language';
 import { staticLink } from 'Common/Links';
 import { i18n, getNotification } from 'Common/Translator';
 import { CalendarUserStore } from 'Stores/User/Calendar';
+import { FolderUserStore } from 'Stores/User/Folder';
 import { SettingsUserStore } from 'Stores/User/Settings';
 
 import Remote from 'Remote/User/Fetch';
@@ -622,7 +623,8 @@ export class CalendarPopupView extends AbstractViewPopup {
 			Partstat: partstat,
 			Summary: summary,
 			Subject: i18n('CALENDAR/INVITATION_SUBJECT_' + partstat, params),
-			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params)
+			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params),
+			SentFolder: FolderUserStore.sentFolder()
 		});
 	}
 

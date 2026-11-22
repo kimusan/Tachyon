@@ -424,6 +424,23 @@ trait Calendar
 		}
 		try {
 			$this->smtpSendMessage($oAccount, $oMessage, $rMessageStream, $iMessageStreamSize, false);
+
+			// A copy goes to Sent as compose would put it: the identity's folder,
+			// else the account's as the client knows it. The answer has already
+			// gone out, so a failed copy is only logged
+			$sSentFolder = (string) $oIdentity->sSentFolder ?: (string) $this->GetActionParam('SentFolder', '');
+			if (\strlen($sSentFolder) && '__UNUSE__' !== $sSentFolder) {
+				try {
+					$this->initMailClientConnection();
+					\rewind($rMessageStream);
+					$this->Plugins()->RunHook('filter.send-message-stream',
+						array($oAccount, &$rMessageStream, &$iMessageStreamSize));
+					$this->ImapClient()->MessageAppendStream($sSentFolder, $rMessageStream, $iMessageStreamSize,
+						array(\MailSo\Imap\Enumerations\MessageFlag::SEEN));
+				} catch (\Throwable $oException) {
+					$this->logException($oException, \LOG_ERR);
+				}
+			}
 		} finally {
 			\is_resource($rMessageStream) && \fclose($rMessageStream);
 		}

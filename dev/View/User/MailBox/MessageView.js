@@ -952,7 +952,8 @@ export class MailMessageView extends AbstractViewRight {
 			Calendar: this.invitationCalendar(),
 			Partstat: partstat,
 			Subject: i18n('CALENDAR/INVITATION_SUBJECT_' + partstat, params),
-			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params)
+			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params),
+			SentFolder: FolderUserStore.sentFolder()
 		});
 	}
 
