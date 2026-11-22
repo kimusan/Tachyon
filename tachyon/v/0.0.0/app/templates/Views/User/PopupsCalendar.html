@@ -63,11 +63,15 @@
 				<div class="b-calendar-scope" data-bind="visible: editRecurring() && editRecurrenceId()">
 					<a href="#" role="button" class="btn" data-bind="click: () => editScope('occurrence'),
 						css: { 'btn-success': 'occurrence' === editScope() }" data-i18n="CALENDAR/SCOPE_OCCURRENCE"></a>
+					<a href="#" role="button" class="btn" data-bind="visible: editCanSplit, click: () => editScope('following'),
+						css: { 'btn-success': 'following' === editScope() }" data-i18n="CALENDAR/SCOPE_FOLLOWING"></a>
 					<a href="#" role="button" class="btn" data-bind="click: () => editScope('series'),
 						css: { 'btn-success': 'series' === editScope() }" data-i18n="CALENDAR/SCOPE_SERIES"></a>
 				</div>
 				<div class="b-calendar-editor-note" data-bind="visible: editRecurring() && 'series' === editScope()"
 					data-i18n="CALENDAR/RECURRING_SERIES"></div>
+				<div class="b-calendar-editor-note" data-bind="visible: editRecurring() && 'following' === editScope()"
+					data-i18n="CALENDAR/RECURRING_FOLLOWING"></div>
 
 				<div class="control-group">
 					<label data-i18n="CALENDAR/LABEL_SUMMARY"></label>

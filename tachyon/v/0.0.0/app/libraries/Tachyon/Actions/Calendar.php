@@ -125,11 +125,27 @@ trait Calendar
 				}
 			}
 		} else {
-			$oEvent->setVCalendar($this->vCalendarFromParams($oEvent->Uid, $sCalendarUuid, $oProvider));
+			$oSplitOff = null;
+			$oEvent->setVCalendar($this->vCalendarFromParams($oEvent->Uid, $sCalendarUuid, $oProvider, $oSplitOff));
 		}
 
 		try {
+			// "This and following": the new series goes first, so a failure
+			// leaves the old one as it was rather than cut short with no
+			// continuation; and if cutting it short fails, the new one goes again
+			if ($oSplitOff) {
+				$oNewEvent = new \Tachyon\Providers\Calendar\Classes\Event;
+				$oNewEvent->Uid = (string) \Tachyon\Providers\Calendar\EventEditor::master($oSplitOff)->UID;
+				$oNewEvent->setVCalendar($oSplitOff);
+				if (!$oProvider->EventSave($sCalendarUuid, $oNewEvent)) {
+					throw new ClientException(\Tachyon\Notifications::CantSaveMessage, null,
+						'The calendar server rejected the event');
+				}
+			}
 			$bResult = $oProvider->EventSave($sCalendarUuid, $oEvent);
+			if (!$bResult && $oSplitOff) {
+				$oProvider->DeleteEvent($sCalendarUuid, $oNewEvent->Uid);
+			}
 		} catch (\ValueError $oException) {
 			throw new ClientException(\Tachyon\Notifications::CantSaveMessage, $oException, $oException->getMessage());
 		}
@@ -567,13 +583,24 @@ trait Calendar
 					throw new \ValueError('Unknown event');
 				}
 				$oVCalendar = clone $oVCalendar;
+				$bWhole = false;
 				try {
-					\Tachyon\Providers\Calendar\EventEditor::excludeOccurrence($oVCalendar, $iRecurrenceId);
+					if ('following' === $this->GetActionParam('Scope', '')) {
+						// End the series before it; from the first on is all of it
+						$bWhole = null === \Tachyon\Providers\Calendar\EventEditor::splitAt(
+							$oVCalendar, $iRecurrenceId, \Tachyon\Util\UUID::generate());
+					} else {
+						\Tachyon\Providers\Calendar\EventEditor::excludeOccurrence($oVCalendar, $iRecurrenceId);
+					}
 				} catch (\InvalidArgumentException $oException) {
 					throw new \ValueError($oException->getMessage());
 				}
-				$oEvent->setVCalendar($oVCalendar);
-				$bResult = $oProvider->EventSave($sCalendarUuid, $oEvent);
+				if ($bWhole) {
+					$bResult = $oProvider->DeleteEvent($sCalendarUuid, $sUid);
+				} else {
+					$oEvent->setVCalendar($oVCalendar);
+					$bResult = $oProvider->EventSave($sCalendarUuid, $oEvent);
+				}
 			} else {
 				$bResult = $oProvider->DeleteEvent($sCalendarUuid, $sUid);
 			}
@@ -683,7 +710,7 @@ trait Calendar
 	 * survives the save; see Providers\Calendar\EventEditor.
 	 */
 	private function vCalendarFromParams(string $sUid, string $sCalendarUuid,
-		\Tachyon\Providers\Calendar $oProvider) : \Sabre\VObject\Component\VCalendar
+		\Tachyon\Providers\Calendar $oProvider, ?\Sabre\VObject\Component\VCalendar &$oSplitOff = null) : \Sabre\VObject\Component\VCalendar
 	{
 		$iStart = (int) $this->GetActionParam('Start', 0);
 		$iEnd = (int) $this->GetActionParam('End', 0);
@@ -740,10 +767,16 @@ trait Calendar
 		// One occurrence of a series, named by its original start
 		$iRecurrenceId = (int) $this->GetActionParam('RecurrenceId', 0);
 		try {
-			if (0 < $iRecurrenceId) {
-				if (!$oExisting) {
-					throw new \InvalidArgumentException('Unknown event');
-				}
+			if (0 < $iRecurrenceId && !$oExisting) {
+				throw new \InvalidArgumentException('Unknown event');
+			}
+			$bFollowing = 0 < $iRecurrenceId && 'following' === $this->GetActionParam('Scope', '');
+			// From the first occurrence on is the whole series
+			$oSplitOff = $bFollowing ? \Tachyon\Providers\Calendar\EventEditor::splitAt(
+				$oVCalendar, $iRecurrenceId, \Tachyon\Util\UUID::generate()) : null;
+			if ($oSplitOff) {
+				\Tachyon\Providers\Calendar\EventEditor::apply($oSplitOff, $aFields, $oTimeZone);
+			} else if (0 < $iRecurrenceId && !$bFollowing) {
 				unset($aFields['rrule']);
 				\Tachyon\Providers\Calendar\EventEditor::applyOccurrence($oVCalendar, $iRecurrenceId, $aFields, $oTimeZone);
 			} else {

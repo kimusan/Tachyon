@@ -232,4 +232,42 @@ apply($vcal, ['summary' => 'Daily standup', 'start' => at('2026-10-19 09:00'), '
 check('Standup, later' === (string) $vcal->VEVENT[1]->SUMMARY, 'an occurrence title of its own was overwritten');
 check('Daily standup' === (string) $vcal->VEVENT[2]->SUMMARY, 'a moved occurrence kept the old series title');
 
+// 19. "This and following" from 9 Nov: the old series keeps 19 Oct and its
+//     26 Oct change and ends; the new one starts on 9 Nov with the rule and
+//     what comes after (its own changed 16 Nov)
+$vcal = $series();
+EventEditor::applyOccurrence($vcal, at('2026-11-16 09:00'), ['summary' => 'Standup, guest', 'start' => at('2026-11-16 09:00'),
+	'end' => at('2026-11-16 09:30'), 'allDay' => false], new DateTimeZone(BERLIN));
+$new = EventEditor::splitAt($vcal, at('2026-11-09 09:00'), 'split-new');
+check(['10-19 09:00', '10-26 11:00'] === occurrences($vcal, '2026-10-01', 20), 'old series not ended: '.implode(', ', occurrences($vcal, '2026-10-01', 20)));
+check(1 === preg_match('/UNTIL=20261109T075959Z/', (string) EventEditor::master($vcal)->RRULE), 'old UNTIL wrong: '.EventEditor::master($vcal)->RRULE);
+check(!isset(EventEditor::master($vcal)->EXDATE) || '20261102T090000' === EventEditor::master($vcal)->EXDATE->getValue(), 'old EXDATE wrong');
+check('split-new' === (string) EventEditor::master($new)->UID && 2 === count($new->VEVENT), 'new series built wrong');
+check(['11-09 09:00', '11-16 09:00', '11-23 09:00'] === array_slice(occurrences($new), 0, 3), 'new series wrong: '.implode(', ', occurrences($new)));
+check('Standup, guest' === (string) $new->VEVENT[1]->SUMMARY && 'split-new' === (string) $new->VEVENT[1]->UID, 'change after the split not moved over');
+check(!isset(EventEditor::master($new)->SEQUENCE) && isset(EventEditor::master($new)->ATTENDEE), 'new series kept SEQUENCE or lost the attendee');
+
+// ... and moving the new series an hour later moves its change along
+apply($new, ['start' => at('2026-11-09 10:00'), 'end' => at('2026-11-09 10:30'), 'allDay' => false]);
+check(['11-09 10:00', '11-16 09:00', '11-23 10:00'] === array_slice(occurrences($new), 0, 3)
+	&& '20261116T100000' === $new->VEVENT[1]->{'RECURRENCE-ID'}->getValue(), 'new series move wrong: '.implode(', ', occurrences($new)));
+
+// 20. COUNT: six Mondays split at the third: two stay, four go on
+$counted = Reader::read("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//t//t//EN\r\nBEGIN:VEVENT\r\nUID:c1\r\nDTSTAMP:20261001T000000Z\r\n"
+	."DTSTART;TZID=Europe/Berlin:20261102T090000\r\nDTEND;TZID=Europe/Berlin:20261102T100000\r\nRRULE:FREQ=WEEKLY;COUNT=6\r\nSUMMARY:Course\r\n"
+	."END:VEVENT\r\nEND:VCALENDAR\r\n");
+$rest = EventEditor::splitAt($counted, at('2026-11-16 09:00'), 'c2');
+check(2 === count(occurrences($counted, '2026-11-01', 20)) && !str_contains((string) EventEditor::master($counted)->RRULE, 'COUNT'), 'old COUNT not turned into UNTIL');
+check(4 === count(occurrences($rest, '2026-11-01', 20)) && str_contains((string) EventEditor::master($rest)->RRULE, 'COUNT=4'), 'new COUNT not reduced');
+
+// 21. From the first occurrence it is the whole series: nothing to split
+check(null === EventEditor::splitAt($series(), at('2026-10-19 09:00'), 'x'), 'split at the first occurrence');
+
+// 22. All-day: the old series ends the day before
+$days = Reader::read("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//t//t//EN\r\nBEGIN:VEVENT\r\nUID:d1\r\nDTSTAMP:20261001T000000Z\r\n"
+	."DTSTART;VALUE=DATE:20261102\r\nDTEND;VALUE=DATE:20261103\r\nRRULE:FREQ=DAILY\r\nSUMMARY:Offsite\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n");
+$later = EventEditor::splitAt($days, at('2026-11-05 00:00', 'UTC'), 'd2');
+check(str_contains((string) EventEditor::master($days)->RRULE, 'UNTIL=20261104') && '20261105' === EventEditor::master($later)->DTSTART->getValue()
+	&& '20261106' === EventEditor::master($later)->DTEND->getValue(), 'all-day split wrong');
+
 echo "calendar-event-editor: ok\n";

@@ -259,6 +259,17 @@ class PdoCalendar
 			$oWindowStart = (new \DateTimeImmutable)->setTimestamp($iStart);
 			$oWindowEnd = (new \DateTimeImmutable)->setTimestamp($iEnd);
 
+			// For a rule with COUNT, where each occurrence stands in it, so the
+			// editor can say how many are left from one on ("this and following")
+			$aIndex = array();
+			$oMaster = EventEditor::master($oVCalendar);
+			if ($oMaster && isset($oMaster->RRULE) && \str_contains(\strtoupper((string) $oMaster->RRULE), 'COUNT=')) {
+				$oRule = new \Sabre\VObject\Recur\RRuleIterator((string) $oMaster->RRULE, $oMaster->DTSTART->getDateTime());
+				for ($i = 1; $oRule->valid() && $i <= $this->iMaxOccurrences && $oRule->current() <= $oWindowEnd; ++$i, $oRule->next()) {
+					$aIndex[$oRule->current()->getTimestamp()] = $i;
+				}
+			}
+
 			$oIterator->fastForward($oWindowStart);
 
 			$iCount = 0;
@@ -282,8 +293,9 @@ class PdoCalendar
 					'location' => isset($oInstance->LOCATION) ? (string) $oInstance->LOCATION : '',
 					'description' => isset($oInstance->DESCRIPTION) ? (string) $oInstance->DESCRIPTION : '',
 					'allDay' => isset($oInstance->DTSTART) ? !$oInstance->DTSTART->hasTime() : $aBase['allDay'],
-					'recurrenceId' => isset($oInstance->{'RECURRENCE-ID'})
+					'recurrenceId' => $iRecurrenceId = isset($oInstance->{'RECURRENCE-ID'})
 						? $oInstance->{'RECURRENCE-ID'}->getDateTime()->getTimestamp() : $oOccStart->getTimestamp(),
+					'seriesIndex' => $aIndex[$iRecurrenceId] ?? 0,
 					// The series' own values, for the editor when it edits them all
 					'seriesTitle' => $aBase['title'],
 					'seriesLocation' => $aBase['location'],

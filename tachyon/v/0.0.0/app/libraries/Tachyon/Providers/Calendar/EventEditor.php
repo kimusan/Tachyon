@@ -178,6 +178,106 @@ class EventEditor
 		static::touch($oMaster, true);
 	}
 
+	/**
+	 * "This and following": end the series before the occurrence originally at
+	 * $iRecurrenceId, and return a new series, under $sNewUid, that starts with
+	 * it. Changed and skipped dates go with the part they fall in. The new
+	 * series starts at the occurrence's original time and keeps the rule, with
+	 * a COUNT reduced by the occurrences left behind, so applying the editor's
+	 * fields to it with apply() moves its exceptions as any series move does.
+	 *
+	 * Null for the first occurrence: that is the whole series, left untouched.
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public static function splitAt(VCalendar $oVCalendar, int $iRecurrenceId, string $sNewUid) : ?VCalendar
+	{
+		$oMaster = static::seriesMaster($oVCalendar);
+		static::occurrence($oVCalendar, $oMaster, $iRecurrenceId);
+		$bAllDay = !$oMaster->DTSTART->hasTime();
+		$oSplit = static::recurrenceDate($oMaster, $iRecurrenceId);
+		$oStart = $oMaster->DTSTART->getDateTime($bAllDay ? new \DateTimeZone('UTC') : null);
+		$fBefore = fn (\DateTimeInterface $oDate) => $bAllDay
+			? $oDate->format('Ymd') < $oSplit->format('Ymd')
+			: $oDate->getTimestamp() < $oSplit->getTimestamp();
+		if (!$fBefore($oStart)) {
+			return null;
+		}
+
+		$aParts = isset($oMaster->RRULE) ? $oMaster->RRULE->getParts() : array();
+		$iBefore = 0;
+		if (isset($aParts['COUNT'])) {
+			$oIterator = new RRuleIterator($aParts, $oStart);
+			while ($oIterator->valid() && $fBefore($oIterator->current())) {
+				++$iBefore;
+				$oIterator->next();
+			}
+		}
+
+		// The new series: what is at or after the split
+		$oNew = clone $oVCalendar;
+		$oNewMaster = static::master($oNew);
+		foreach ($oNew->select('VEVENT') as $oVEvent) {
+			$oVEvent->UID = $sNewUid;
+		}
+		static::removeOverrides($oNew, fn (VEvent $oVEvent) => $fBefore($oVEvent->{'RECURRENCE-ID'}->getDateTime(new \DateTimeZone('UTC'))));
+		static::filterDates($oNewMaster, fn (\DateTimeInterface $oDate) => !$fBefore($oDate));
+		$oDuration = $oMaster->DTSTART->getDateTime()->diff(static::endOf($oMaster));
+		unset($oNewMaster->DTSTART, $oNewMaster->DTEND, $oNewMaster->DURATION, $oNewMaster->SEQUENCE);
+		$aDate = $bAllDay ? array('VALUE' => 'DATE') : array();
+		$oNewMaster->add('DTSTART', $oSplit, $aDate);
+		$oNewMaster->add('DTEND', $oSplit->add($oDuration), $aDate);
+		if (isset($aParts['COUNT'])) {
+			$aNewParts = $aParts;
+			$aNewParts['COUNT'] = \max(1, (int) $aParts['COUNT'] - $iBefore);
+			$oNewMaster->RRULE->setParts($aNewParts);
+		}
+
+		// The old series: what is before it, ending the moment before
+		static::removeOverrides($oVCalendar, fn (VEvent $oVEvent) => !$fBefore($oVEvent->{'RECURRENCE-ID'}->getDateTime(new \DateTimeZone('UTC'))));
+		static::filterDates($oMaster, $fBefore);
+		if (isset($oMaster->RRULE)) {
+			unset($aParts['COUNT']);
+			$aParts['UNTIL'] = $bAllDay
+				? $oSplit->modify('-1 day')->format('Ymd')
+				: $oSplit->modify('-1 second')->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\\THis\\Z');
+			$oMaster->RRULE->setParts($aParts);
+		}
+		static::touch($oMaster, true);
+
+		return $oNew;
+	}
+
+	/**
+	 * Keep only the EXDATE and RDATE values $fKeep accepts.
+	 */
+	private static function filterDates(VEvent $oVEvent, callable $fKeep) : void
+	{
+		foreach (array('EXDATE', 'RDATE') as $sName) {
+			foreach ($oVEvent->select($sName) as $oProperty) {
+				$aKeep = \array_values(\array_filter($oProperty->getDateTimes(new \DateTimeZone('UTC')), $fKeep));
+				if ($aKeep) {
+					$oProperty->setDateTimes(\array_map(
+						fn ($oDate) => $oDate->setTimezone($oProperty->getDateTime()->getTimezone()), $aKeep), $oProperty->isFloating());
+				} else {
+					$oVEvent->remove($oProperty);
+				}
+			}
+		}
+	}
+
+	private static function endOf(VEvent $oVEvent) : \DateTimeImmutable
+	{
+		$oStart = $oVEvent->DTSTART->getDateTime();
+		if (isset($oVEvent->DTEND)) {
+			return $oVEvent->DTEND->getDateTime();
+		}
+		if (isset($oVEvent->DURATION)) {
+			return $oStart->add($oVEvent->DURATION->getDateInterval());
+		}
+		return $oVEvent->DTSTART->hasTime() ? $oStart : $oStart->modify('+1 day');
+	}
+
 	private static function seriesMaster(VCalendar $oVCalendar) : VEvent
 	{
 		$oMaster = static::master($oVCalendar);
