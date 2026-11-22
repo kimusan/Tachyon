@@ -1,0 +1,73 @@
+X-Fixture: iCalcreator event mail, method=REQUEST but no METHOD, ORGANIZER
+ or ATTENDEE; real mail, masked
+To: "Example Attendee" <attendee@example.com>
+Subject: Example Meeting
+Date: Fri, 8 May 2026 21:22:58 +0200
+From: "Example Sender 4" <other4@example.com>
+Message-ID: <9072a403d8290d8bcf8ecc196971fc10@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/related; type="text/html";
+	boundary="z9_2044e366d3256f0rgx4tlz850923ii23"
+
+--z9_2044e366d3256f0rgx4tlz850923ii23
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
+
+<html><body><p>Example Meeting</p><p>Example description.</p><img src="cid:img0"><img src="cid:img1"></body></html>
+--z9_2044e366d3256f0rgx4tlz850923ii23
+Content-Type: text/calendar; charset="utf-8"; method=REQUEST;
+	name="invite.ics"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="invite.ics"
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//BE-9806//NONSGML kigkonsult.se iCalcreator 2.20//
+X-WR-TIMEZONE:Europe/Berlin
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+X-LIC-LOCATION:Europe/Berlin
+BEGIN:STANDARD
+DTSTART:20251026T030000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+RDATE:20261025T030000
+TZNAME:CET
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20260329T020000
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:28672796U017574ETSK-1189INojHM@example.com
+DTSTAMP:20260508T180557Z
+COMMENT:Example comment.
+DTSTART:20260519T100000
+DTEND:20260519T113000
+LOCATION:Example Room
+SUMMARY:Example Meeting
+URL:https://example.com/
+X-ALT-DESC;FMTTYPE=TEXT/HTML:<html><body>Example description.</body></html>
+END:VEVENT
+END:VCALENDAR
+--z9_2044e366d3256f0rgx4tlz850923ii23
+Content-Type: image/png; name="image39.png"
+Content-Transfer-Encoding: base64
+Content-ID: <img0>
+Content-Disposition: inline; filename="image39.png"
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVQI12NoAAAAggCB3UNq9AAA
+AABJRU5ErkJggg==
+--z9_2044e366d3256f0rgx4tlz850923ii23
+Content-Type: image/jpg; name="image40.jpg"
+Content-Transfer-Encoding: base64
+Content-ID: <img1>
+Content-Disposition: inline; filename="image40.jpg"
+
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkI
+CQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/wAALCAABAAEBAREA/8QAFAABAAAAAAAA
+AAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==
+--z9_2044e366d3256f0rgx4tlz850923ii23--

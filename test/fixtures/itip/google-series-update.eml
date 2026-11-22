@@ -1,0 +1,78 @@
+X-Fixture: Google Calendar update of google-series-request, SEQUENCE 1;
+ real mail, masked
+MIME-Version: 1.0
+Reply-To: "Example Organizer" <organizer@example.com>
+Sender: "Example Sender 1" <other1@example.com>
+Message-ID: <437d1ebb56a1128262830619c7fd@example.com>
+Date: Thu, 07 May 2015 07:21:55 +0000
+Subject: Aktualisierte Einladung: Example Meeting
+From: "Example Organizer" <organizer@example.com>
+To: "Example Attendee" <attendee@example.com>, "Example Attendee 2" <attendee2@example.com>
+Content-Type: multipart/mixed; boundary=793f5bdc36e7526154866156a1bb
+
+--793f5bdc36e7526154866156a1bb
+Content-Type: multipart/alternative; boundary=420c1cdb31f8056296489466b2a0
+
+--420c1cdb31f8056296489466b2a0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed; delsp=yes
+Content-Transfer-Encoding: base64
+
+RXhhbXBsZSBNZWV0aW5nDQoNCkV4YW1wbGUgZGVzY3JpcHRpb24uDQo=
+--420c1cdb31f8056296489466b2a0
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><p>Example Meeting</p><p>Example description.</p></body></html>
+--420c1cdb31f8056296489466b2a0
+Content-Type: text/calendar; charset=UTF-8; method=REQUEST
+Content-Transfer-Encoding: quoted-printable
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20150513T070000Z
+DTEND:20150513T083000Z
+DTSTAMP:20150507T072155Z
+ORGANIZER;CN=3DExample Organizer:mailto:organizer@example.com
+UID:l7d48ol3djp8m89k6k5kefytu6@example.com
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
+;RSVP=3D
+ TRUE;CN=3DExample Attendee 2;X-NUM-GUESTS=3D0:mailto:attendee2@example.com
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
+;RSVP=3D
+ TRUE;CN=3DExample Attendee;X-NUM-GUESTS=3D0:mailto:attendee@example.com
+CREATED:20150505T212352Z
+DESCRIPTION:Example description.
+LAST-MODIFIED:20150507T072155Z
+LOCATION:Example Room
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Example Meeting
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+--420c1cdb31f8056296489466b2a0--
+--793f5bdc36e7526154866156a1bb
+Content-Type: application/ics; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vR29vZ2xlIEluYy8vR29vZ2xlIENhbGVuZGFyIDcw
+LjkwNTQvL0VODQpWRVJTSU9OOjIuMA0KQ0FMU0NBTEU6R1JFR09SSUFODQpNRVRIT0Q6UkVRVUVT
+VA0KQkVHSU46VkVWRU5UDQpEVFNUQVJUOjIwMTUwNTEzVDA3MDAwMFoNCkRURU5EOjIwMTUwNTEz
+VDA4MzAwMFoNCkRUU1RBTVA6MjAxNTA1MDdUMDcyMTU1Wg0KT1JHQU5JWkVSO0NOPUV4YW1wbGUg
+T3JnYW5pemVyOm1haWx0bzpvcmdhbml6ZXJAZXhhbXBsZS5jb20NClVJRDpsN2Q0OG9sM2RqcDht
+ODlrNms1a2VmeXR1NkBleGFtcGxlLmNvbQ0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Uk9M
+RT1SRVEtUEFSVElDSVBBTlQ7UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9DQogVFJVRTtDTj1F
+eGFtcGxlIEF0dGVuZGVlIDI7WC1OVU0tR1VFU1RTPTA6bWFpbHRvOmF0dGVuZGVlMkBleGFtcGxl
+LmNvbQ0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Uk9MRT1SRVEtUEFSVElDSVBBTlQ7UEFS
+VFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9DQogVFJVRTtDTj1FeGFtcGxlIEF0dGVuZGVlO1gtTlVN
+LUdVRVNUUz0wOm1haWx0bzphdHRlbmRlZUBleGFtcGxlLmNvbQ0KQ1JFQVRFRDoyMDE1MDUwNVQy
+MTIzNTJaDQpERVNDUklQVElPTjpFeGFtcGxlIGRlc2NyaXB0aW9uLg0KTEFTVC1NT0RJRklFRDoy
+MDE1MDUwN1QwNzIxNTVaDQpMT0NBVElPTjpFeGFtcGxlIFJvb20NClNFUVVFTkNFOjENClNUQVRV
+UzpDT05GSVJNRUQNClNVTU1BUlk6RXhhbXBsZSBNZWV0aW5nDQpUUkFOU1A6T1BBUVVFDQpFTkQ6
+VkVWRU5UDQpFTkQ6VkNBTEVOREFSDQo=
+--793f5bdc36e7526154866156a1bb--

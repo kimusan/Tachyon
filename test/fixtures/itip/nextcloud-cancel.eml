@@ -1,0 +1,70 @@
+X-Fixture: Nextcloud CANCEL of nextcloud-request, SEQUENCE 3; real mail,
+ masked
+From: "Example Organizer" <organizer@example.com>
+To: "Example Attendee" <attendee@example.com>
+Subject: Abgesagt: Example Meeting
+Message-ID: <56764073093143.Rsdtz.0RLJXsfXTq_AIEqb5SvdRXp@example.com>
+User-Agent: Horde Application Framework 5
+Date: Wed, 25 Jun 2025 22:01:40 +0000
+Content-Type: multipart/mixed; boundary="=_BBd6REQhT1ulVY-i0fuNrll"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+--=_BBd6REQhT1ulVY-i0fuNrll
+Content-Type: multipart/alternative; boundary="=_TGh-fcXkEnG_438Z6GDWF8y"
+Content-Transfer-Encoding: 8bit
+
+--=_TGh-fcXkEnG_438Z6GDWF8y
+Content-Type: text/plain; charset=utf-8
+
+Example Meeting
+
+Example description.
+--=_TGh-fcXkEnG_438Z6GDWF8y
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html><body><p>Example Meeting</p><p>Example description.</p></body></html>
+--=_TGh-fcXkEnG_438Z6GDWF8y--
+--=_BBd6REQhT1ulVY-i0fuNrll
+Content-Type: text/calendar; name=event.ics; method=CANCEL
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Sabre//Sabre VObject 4.5.6//EN
+CALSCALE:GREGORIAN
+METHOD:CANCEL
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CREATED:20250617T181759Z
+LAST-MODIFIED:20250617T182100Z
+UID:21457b4a-9a32-644b-dc30-e73ba22cb127
+DTSTART;TZID=Europe/Berlin:20250629T123000
+DTEND;TZID=Europe/Berlin:20250629T140000
+STATUS:CONFIRMED
+SUMMARY:Example Meeting
+LOCATION:Example Room
+DESCRIPTION:Example description.
+ORGANIZER;CN=Example Organizer:mailto:organizer@example.com
+ATTENDEE;CN=Example Attendee:mailto:attendee@example.com
+DTSTAMP:20250625T220139Z
+SEQUENCE:3
+END:VEVENT
+END:VCALENDAR
+--=_BBd6REQhT1ulVY-i0fuNrll--

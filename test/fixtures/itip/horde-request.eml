@@ -1,0 +1,102 @@
+X-Fixture: Horde Kronolith REQUEST without SEQUENCE; real mail, masked
+Subject: Example Meeting
+To: "Example Attendee" <attendee@example.com>
+From: "Example Organizer" <organizer@example.com>
+User-Agent: Kronolith H5 (4.2.27)
+Message-ID: <09195326614709.Bblwv.wPKP9A-saNeKKaUFaAa7Lhr@example.com>
+Date: Tue, 17 Mar 2020 14:31:40 +0100
+Content-Type: multipart/mixed; boundary="=_CWG14FHI9a9ETqNXfJnvroT"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+--=_CWG14FHI9a9ETqNXfJnvroT
+Content-Type: multipart/alternative; boundary="=_ws6BQ5bL3Aal1RE1TBwMKBb"
+Content-Transfer-Encoding: 8bit
+
+--=_ws6BQ5bL3Aal1RE1TBwMKBb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+Example Meeting
+
+Example description.
+--=_ws6BQ5bL3Aal1RE1TBwMKBb
+Content-Type: multipart/related; boundary="=_FXZfc3gnRaKnpvonEmjN6lg";
+ start="FmBO-4DRuqqjG6no0tq1iDA@example.com"
+Content-Transfer-Encoding: 8bit
+
+--=_FXZfc3gnRaKnpvonEmjN6lg
+Content-Type: text/html; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-ID: <FmBO-4DRuqqjG6no0tq1iDA@example.com>
+
+<html><body><p>Example Meeting</p><p>Example description.</p><img src="cid:DJplHUrgZkqDWMcAS7FUTa5@example.com"></body></html>
+--=_FXZfc3gnRaKnpvonEmjN6lg
+Content-Type: image/png
+Content-Disposition: attachment
+Content-Transfer-Encoding: base64
+Content-ID: <DJplHUrgZkqDWMcAS7FUTa5@example.com>
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVQI12NoAAAAggCB3UNq9AAA
+AABJRU5ErkJggg==
+--=_FXZfc3gnRaKnpvonEmjN6lg--
+--=_ws6BQ5bL3Aal1RE1TBwMKBb
+Content-Type: text/calendar; charset=utf-8; name=event-invitation.ics;
+ METHOD=REQUEST
+Content-Disposition: attachment; filename=event-invitation.ics
+
+BEGIN:VCALENDAR
+VERSION:2.0
+METHOD:REQUEST
+X-WR-CALNAME:Example Calendar
+PRODID:-//The Horde Project//Horde iCalendar Library//EN
+BEGIN:VEVENT
+DTSTART:20200318T090000Z
+DTEND:20200318T100000Z
+DTSTAMP:20200317T133140Z
+UID:040000008200E00074C5B7101A82E00800000000A7E29A2016CEC818000000000000000
+ 010000000D3E3889AE9AE32287712184CE257203E
+CREATED:20200317T133110Z
+LAST-MODIFIED:20200317T133140Z
+SUMMARY:Example Meeting
+ORGANIZER;CN=Example Organizer:mailto:organizer@example.com
+DESCRIPTION:Example description.
+CLASS:PUBLIC
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:attend
+ ee@example.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:attend
+ ee6@example.com
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Example description.
+TRIGGER;VALUE=DURATION:-PT15M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+--=_ws6BQ5bL3Aal1RE1TBwMKBb--
+--=_CWG14FHI9a9ETqNXfJnvroT
+Content-Type: application/ics; name=event-invitation.ics; METHOD=REQUEST
+Content-Disposition: attachment; filename=event-invitation.ics
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpWRVJTSU9OOjIuMA0KTUVUSE9EOlJFUVVFU1QNClgtV1ItQ0FMTkFN
+RTpFeGFtcGxlIENhbGVuZGFyDQpQUk9ESUQ6LS8vVGhlIEhvcmRlIFByb2plY3QvL0hvcmRlIGlD
+YWxlbmRhciBMaWJyYXJ5Ly9FTg0KQkVHSU46VkVWRU5UDQpEVFNUQVJUOjIwMjAwMzE4VDA5MDAw
+MFoNCkRURU5EOjIwMjAwMzE4VDEwMDAwMFoNCkRUU1RBTVA6MjAyMDAzMTdUMTMzMTQwWg0KVUlE
+OjA0MDAwMDAwODIwMEUwMDA3NEM1QjcxMDFBODJFMDA4MDAwMDAwMDBBN0UyOUEyMDE2Q0VDODE4
+MDAwMDAwMDAwMDAwMDAwDQogMDEwMDAwMDAwRDNFMzg4OUFFOUFFMzIyODc3MTIxODRDRTI1NzIw
+M0UNCkNSRUFURUQ6MjAyMDAzMTdUMTMzMTEwWg0KTEFTVC1NT0RJRklFRDoyMDIwMDMxN1QxMzMx
+NDBaDQpTVU1NQVJZOkV4YW1wbGUgTWVldGluZw0KT1JHQU5JWkVSO0NOPUV4YW1wbGUgT3JnYW5p
+emVyOm1haWx0bzpvcmdhbml6ZXJAZXhhbXBsZS5jb20NCkRFU0NSSVBUSU9OOkV4YW1wbGUgZGVz
+Y3JpcHRpb24uDQpDTEFTUzpQVUJMSUMNClNUQVRVUzpDT05GSVJNRUQNClRSQU5TUDpPUEFRVUUN
+CkFUVEVOREVFO1JPTEU9UkVRLVBBUlRJQ0lQQU5UO1BBUlRTVEFUPU5FRURTLUFDVElPTjtSU1ZQ
+PVRSVUU6bWFpbHRvOmF0dGVuZA0KIGVlQGV4YW1wbGUuY29tDQpBVFRFTkRFRTtST0xFPVJFUS1Q
+QVJUSUNJUEFOVDtQQVJUU1RBVD1ORUVEUy1BQ1RJT047UlNWUD1UUlVFOm1haWx0bzphdHRlbmQN
+CiBlZTZAZXhhbXBsZS5jb20NCkJFR0lOOlZBTEFSTQ0KQUNUSU9OOkRJU1BMQVkNCkRFU0NSSVBU
+SU9OOkV4YW1wbGUgZGVzY3JpcHRpb24uDQpUUklHR0VSO1ZBTFVFPURVUkFUSU9OOi1QVDE1TQ0K
+RU5EOlZBTEFSTQ0KRU5EOlZFVkVOVA0KRU5EOlZDQUxFTkRBUg0K
+--=_CWG14FHI9a9ETqNXfJnvroT--

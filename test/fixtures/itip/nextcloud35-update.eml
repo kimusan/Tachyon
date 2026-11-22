@@ -1,0 +1,68 @@
+X-Fixture: Nextcloud 35.0.2 update of nextcloud35-request, SEQUENCE 1; real
+ mail, masked
+Date: Fri, 20 Nov 2026 21:44:14 +0000
+Message-ID: <76117294355532.Pxrid.OMsz2n1OCMIywvY_USut6pB@example.com>
+From: "Example Organizer" <organizer@example.com>
+To: "Example Attendee" <attendee@example.com>
+Subject: Einladung aktualisiert: Example Meeting
+Content-Type: multipart/mixed; boundary="=_WUY27UUMnojSK8VjILZIPsc"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+--=_WUY27UUMnojSK8VjILZIPsc
+Content-Type: multipart/alternative; boundary="=_Cc5oRata_KryEScMfY6577Z"
+Content-Transfer-Encoding: 8bit
+
+--=_Cc5oRata_KryEScMfY6577Z
+Content-Type: text/plain; charset=utf-8
+
+Example Meeting
+
+Example description.
+--=_Cc5oRata_KryEScMfY6577Z
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html><body><p>Example Meeting</p><p>Example description.</p></body></html>
+--=_Cc5oRata_KryEScMfY6577Z--
+--=_WUY27UUMnojSK8VjILZIPsc
+Content-Type: text/calendar; charset=utf-8; method=REQUEST; name=event.ics
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example//itip-fixture//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Europe/Vienna
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:qjzrp-uxig-upfgdzk-60109731-8t6161dd
+CREATED:20261120T220000Z
+DTSTAMP:20261120T220500Z
+LAST-MODIFIED:20261120T220500Z
+SEQUENCE:1
+SUMMARY:Example Meeting
+DTSTART;TZID=Europe/Vienna:20261127T140000
+DTEND;TZID=Europe/Vienna:20261127T143000
+STATUS:CONFIRMED
+ORGANIZER;CN=Example Organizer:mailto:organizer@example.com
+ATTENDEE;CN=Example Attendee;CUTYPE=INDIVIDUAL;PARTSTAT=NEEDS-ACTION;ROLE=R
+ EQ-PARTICIPANT;RSVP=TRUE;LANGUAGE=de:mailto:attendee@example.com
+END:VEVENT
+END:VCALENDAR
+--=_WUY27UUMnojSK8VjILZIPsc--
