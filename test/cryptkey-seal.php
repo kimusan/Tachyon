@@ -145,9 +145,9 @@ namespace {
 	// Password changed: refused until resealed with the old one
 	$sKeyD = (string) account('d@example.com', 'old')->CryptKey();
 	check(refused(fn() => account('d@example.com', 'new')->CryptKey()), 'seal opened with the new password before the reseal');
+	check(refused(fn() => account('d@example.com', 'new')->resealCryptKey(new \Tachyon\Util\SensitiveString('wrong'))), 'reseal with a wrong old password');
 	check(account('d@example.com', 'new')->resealCryptKey(new \Tachyon\Util\SensitiveString('old')), 'reseal failed');
 	check($sKeyD === (string) account('d@example.com', 'new')->CryptKey(), 'reseal changed the key');
-	check(refused(fn() => account('d@example.com', 'new')->resealCryptKey(new \Tachyon\Util\SensitiveString('wrong'))), 'reseal with a wrong old password');
 	// ... also from an old-format seal: its key is replaced as well
 	$storage->data['e@example.com/.cryptkey'] = \Tachyon\Util\Crypt::EncryptToJSON(sha1('eold'.APP_SALT), 'eold');
 	check(account('e@example.com', 'enew')->resealCryptKey(new \Tachyon\Util\SensitiveString('eold')), 'reseal of an old seal failed');
@@ -183,7 +183,22 @@ namespace {
 	\Tachyon\Api::$config['security.insecure_cryptkey'] = true;
 	$sKeyI = (string) account('i@example.com', 'ipass')->CryptKey();
 	check($sKeyI === (string) account('i@example.com', 'other')->CryptKey(), 'insecure_cryptkey does not use the email address');
+	// ... so a password change has nothing to reseal (change-password calls
+	// resealCryptKey() with the old password, which never opened this seal)
+	$sSealI = $storage->data['i@example.com/.cryptkey'];
+	check(account('i@example.com', 'inew')->resealCryptKey(new \Tachyon\Util\SensitiveString('ipass')),
+		'reseal failed with insecure_cryptkey after a password change');
+	check($sSealI === $storage->data['i@example.com/.cryptkey'], 'reseal rewrote a seal that needed nothing');
+	check($sKeyI === (string) account('i@example.com', 'inew')->CryptKey(), 'reseal with insecure_cryptkey lost the key');
 	\Tachyon\Api::$config = [];
+
+	// Already resealed (or a password change that kept the password): the
+	// current password opens the seal, so there is nothing to do, whatever
+	// the old password given
+	$sSealD = $storage->data['d@example.com/.cryptkey'];
+	check(account('d@example.com', 'new')->resealCryptKey(new \Tachyon\Util\SensitiveString('anything')),
+		'reseal of a seal the current password opens failed');
+	check($sSealD === $storage->data['d@example.com/.cryptkey'], 'reseal rewrote a current seal');
 
 	echo "cryptkey-seal: ok\n";
 }

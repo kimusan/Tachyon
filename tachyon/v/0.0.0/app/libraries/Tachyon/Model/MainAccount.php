@@ -157,6 +157,15 @@ class MainAccount extends Account
 		$oStorage = \Tachyon\Api::Actions()->StorageProvider();
 		$sSealed = $oStorage->Get($this, StorageType::ROOT, '.cryptkey');
 		if ($sSealed) {
+			// Not sealed with the password at all (security.insecure_cryptkey
+			// seals with the email address), or already resealed: nothing to
+			// do. Asking the old password to open it failed after a successful
+			// password change. CryptKey() renews an outdated seal.
+			foreach ($this->cryptKeySecrets() as $sSecret) {
+				if (null !== static::unsealCryptKey($sSealed, $sSecret)) {
+					return true;
+				}
+			}
 			$sKey = static::unsealCryptKey($sSealed, (string) $oOldPass, $bCurrent, $aOld, $bLegacy);
 			$sSecret = $this->cryptKeySecrets()[0] ?? '';
 			if (null === $sKey || !\strlen($sSecret)) {
