@@ -388,6 +388,8 @@ class SearchCriterias
 
 	public static function escapeSearchString(\MailSo\Imap\ImapClient $oImapClient, string $sSearch) : string
 	{
+		// Also for the literal form below: its own line break is added after this check
+		\MailSo\Base\Utils::RefuseLineBreaks($sSearch);
 		// https://github.com/the-djmaze/snappymail/issues/836
 //		return $oImapClient->EscapeString($sSearch);
 //		return \MailSo\Base\Utils::IsAscii($sSearch) || $oImapClient->hasCapability('QQMail'))

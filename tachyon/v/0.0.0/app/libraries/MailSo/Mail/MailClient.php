@@ -655,7 +655,10 @@ class MailClient
 		$aSortTypes = [];
 		if ($bUseSort) {
 			if ($oParams->sSort) {
-				// TODO: $oParams->sortValid($this->oImapClient);
+				// The sort key goes into SORT as it is: only the keys the client offers
+				if (!\preg_match('/^(REVERSE )?(ARRIVAL|CC|DATE|FROM|SIZE|SUBJECT|TO|DISPLAYFROM|DISPLAYTO)$/D', $oParams->sSort)) {
+					throw new \InvalidArgumentException('Unknown sort key');
+				}
 				$aSortTypes[] = $oParams->sSort;
 			}
 			if (!\str_contains($oParams->sSort, 'DATE')) {
@@ -1281,7 +1284,8 @@ class MailClient
 
 		$this->oImapClient->FolderExamine($sFolderName);
 
-		$aUids = $this->oImapClient->MessageSearch('HEADER Message-ID '.$sMessageId);
+		$aUids = $this->oImapClient->MessageSearch('HEADER Message-ID '
+			. \MailSo\Imap\SearchCriterias::escapeSearchString($this->oImapClient, $sMessageId));
 
 		return 1 === \count($aUids) && \is_numeric($aUids[0]) ? (int) $aUids[0] : null;
 	}

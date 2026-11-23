@@ -612,6 +612,9 @@ class ImapClient extends \MailSo\Net\NetClient
 		if (null === $sStringForEscape) {
 			return 'NIL';
 		}
+		// A quoted string cannot carry a line break or NUL: the server would
+		// read the rest as a new command. Refuse instead of sending it.
+		\MailSo\Base\Utils::RefuseLineBreaks($sStringForEscape);
 /*
 		// literal-string
 		$this->hasCapability('LITERAL+')

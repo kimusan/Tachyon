@@ -273,6 +273,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 
 	public function MailFrom(string $sFrom, int $iSizeIfSupported = 0, bool $bDsn = false, bool $bRequireTLS = false, string $sEnvId = '') : self
 	{
+		\MailSo\Base\Utils::RefuseLineBreaks($sFrom);
 //		$sFrom = IDN::emailToAscii($sFrom);
 		$sCmd = "FROM:<{$sFrom}>";
 		// RFC 6531
@@ -331,6 +332,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 	 */
 	public function Rcpt(string $sTo, bool $bDsn = false) : self
 	{
+		\MailSo\Base\Utils::RefuseLineBreaks($sTo);
 		if (!$this->bMail) {
 			$this->writeLogException(new \MailSo\RuntimeException('No sender reverse path has been supplied'), \LOG_ERR);
 		}
@@ -357,6 +359,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 	 */
 	public function MailTo(string $sTo) : self
 	{
+		\MailSo\Base\Utils::RefuseLineBreaks($sTo);
 		return $this->Rcpt($sTo);
 	}
 
@@ -467,6 +470,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 	 */
 	public function Vrfy(string $sUser) : self
 	{
+		\MailSo\Base\Utils::RefuseLineBreaks($sUser);
 		$sUser = \MailSo\Base\Utils::Trim($sUser);
 /*
 		// RFC 6531

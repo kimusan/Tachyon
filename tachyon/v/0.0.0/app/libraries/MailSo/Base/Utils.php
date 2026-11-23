@@ -501,6 +501,20 @@ abstract class Utils
 		return \trim(\preg_replace('/^[\x00-\x1F]+|[\x00-\x1F]+$/Du', '', \trim($sValue)));
 	}
 
+	/**
+	 * Protocol commands (IMAP, ManageSieve, SMTP) are one line each, so a
+	 * value that is written into one must not carry a line break or NUL.
+	 * Otherwise the rest of it is read as a further command.
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public static function RefuseLineBreaks(string $sValue) : void
+	{
+		if (\preg_match('/[\r\n\x00]/', $sValue)) {
+			throw new \InvalidArgumentException('Line break or NUL in a protocol argument');
+		}
+	}
+
 	public static function RecRmDir(string $sDir) : bool
 	{
 		return static::RecTimeDirRemove($sDir, 0);

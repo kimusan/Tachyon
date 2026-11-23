@@ -369,6 +369,14 @@ trait Messages
 			return null;
 		}
 
+		// Flags and keywords are IMAP atoms: no spaces, controls or atom-specials.
+		// The backslash of a system flag (\Seen) is allowed.
+		foreach ($aInputStoreItems as $sItem) {
+			if (\preg_match('/[\x00-\x20\x7f(){%*"\]]/', (string) $sItem)) {
+				throw new \InvalidArgumentException('Invalid flag or keyword');
+			}
+		}
+
 		/**
 		 * TODO:
 		 *   https://datatracker.ietf.org/doc/html/rfc4551#section-3.2

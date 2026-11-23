@@ -100,7 +100,8 @@ class Identity implements \JsonSerializable
 
 	public function FromJSON(array $aData, bool $bJson = false): bool
 	{
-		if (!empty($aData['Email'])) {
+		// The address is written into SMTP MAIL FROM, so no line break is allowed
+		if (!empty($aData['Email']) && !\preg_match('/[\r\n\x00]/', (string) $aData['Email'])) {
 			$this->sId = !empty($aData['Id']) ? $aData['Id'] : '';
 			$this->sLabel = isset($aData['Label']) ? $aData['Label'] : '';
 			$this->sEmail = $bJson ? \Tachyon\Util\IDN::emailToAscii($aData['Email']) : $aData['Email'];

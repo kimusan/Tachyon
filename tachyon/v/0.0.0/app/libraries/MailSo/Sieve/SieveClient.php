@@ -248,8 +248,7 @@ class SieveClient extends \MailSo\Net\NetClient
 	 */
 	public function GetScript(string $sScriptName) : string
 	{
-		$sScriptName = \addcslashes($sScriptName, '"\\');
-		$this->sendRequest('GETSCRIPT "'.$sScriptName.'"');
+		$this->sendRequest('GETSCRIPT '.self::quoteName($sScriptName));
 		$aResponse = $this->parseResponse();
 
 		$sScript = '';
@@ -275,9 +274,8 @@ class SieveClient extends \MailSo\Net\NetClient
 	 */
 	public function PutScript(string $sScriptName, string $sScriptSource) : self
 	{
-		$sScriptName = \addcslashes($sScriptName, '"\\');
 		$sScriptSource = \preg_replace('/\r?\n/', "\r\n", $sScriptSource);
-		$this->sendRequest('PUTSCRIPT "'.$sScriptName.'" {'.\strlen($sScriptSource).'+}');
+		$this->sendRequest('PUTSCRIPT '.self::quoteName($sScriptName).' {'.\strlen($sScriptSource).'+}');
 		$this->sendRequestWithCheck($sScriptSource);
 
 		return $this;
@@ -304,8 +302,7 @@ class SieveClient extends \MailSo\Net\NetClient
 	 */
 	public function SetActiveScript(string $sScriptName) : self
 	{
-		$sScriptName = \addcslashes($sScriptName, '"\\');
-		$this->sendRequestWithCheck('SETACTIVE "'.$sScriptName.'"');
+		$this->sendRequestWithCheck('SETACTIVE '.self::quoteName($sScriptName));
 
 		return $this;
 	}
@@ -317,8 +314,7 @@ class SieveClient extends \MailSo\Net\NetClient
 	 */
 	public function DeleteScript(string $sScriptName) : self
 	{
-		$sScriptName = \addcslashes($sScriptName, '"\\');
-		$this->sendRequestWithCheck('DELETESCRIPT "'.$sScriptName.'"');
+		$this->sendRequestWithCheck('DELETESCRIPT '.self::quoteName($sScriptName));
 
 		return $this;
 	}
@@ -330,9 +326,7 @@ class SieveClient extends \MailSo\Net\NetClient
 	 */
 	public function RenameScript(string $sOldName, string $sNewName) : self
 	{
-		$sOldName = \addcslashes($sOldName, '"\\');
-		$sNewName = \addcslashes($sNewName, '"\\');
-		$this->sendRequestWithCheck('RENAMESCRIPT "'.$sOldName.'" "'.$sNewName.'"');
+		$this->sendRequestWithCheck('RENAMESCRIPT '.self::quoteName($sOldName).' '.self::quoteName($sNewName));
 
 		return $this;
 	}
@@ -376,6 +370,18 @@ class SieveClient extends \MailSo\Net\NetClient
 				}
 			}
 		}
+	}
+
+	/**
+	 * A script name as a ManageSieve quoted-string. A line break would end the
+	 * command early, and a quote or backslash would end the string early.
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	private static function quoteName(string $sName) : string
+	{
+		\MailSo\Base\Utils::RefuseLineBreaks($sName);
+		return '"'.\addcslashes($sName, '"\\').'"';
 	}
 
 	/**
