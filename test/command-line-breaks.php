@@ -158,6 +158,55 @@ if (!$id->FromJSON(['Email' => 'bob@x.test'], false)) {
 	++$failed;
 }
 
+// FETCH sections built from part numbers (MessageMimeStream: download links,
+// attachments, PGP decrypt): only part numbers reach the command
+final class ImapSent extends \RuntimeException {}
+class CapturingImap extends EscapeImap
+{
+	public function IsConnected(bool $bThrowExceptionOnFalse = false) : bool { return true; }
+	public function FolderExamine(string $sFolderName, bool $bForceReselect = false) : \MailSo\Imap\FolderInformation
+	{
+		return (new ReflectionClass(\MailSo\Imap\FolderInformation::class))->newInstanceWithoutConstructor();
+	}
+	protected function sendRaw(string $sRaw, bool $bWriteToLog = true, string $sFakeRaw = '') : void
+	{
+		throw new ImapSent($sRaw);
+	}
+}
+$capImap = new CapturingImap;
+$capImap->Settings = $imap->Settings;
+$mail = (new ReflectionClass(\MailSo\Mail\MailClient::class))->newInstanceWithoutConstructor();
+(new ReflectionProperty(\MailSo\Mail\MailClient::class, 'oImapClient'))->setValue($mail, $capImap);
+$mimeSent = static function (string $sMimeIndex) use ($mail) : string {
+	try {
+		$mail->MessageMimeStream(fn() => null, 'INBOX', 1, $sMimeIndex);
+	} catch (ImapSent $e) {
+		return $e->getMessage();
+	}
+	return '(nothing sent)';
+};
+foreach (["1\r\nX", "1 X", "1]", "1.MIME] X", "0", "1..2", "a", "TEXT"] as $v) {
+	expectRefused('MIME part '.json_encode($v), fn() => $mail->MessageMimeStream(fn() => null, 'INBOX', 1, $v));
+}
+foreach (['1' => 'BODY.PEEK[1.MIME]', '1.2.3' => 'BODY.PEEK[1.2.3.MIME]', '' => 'BODY.PEEK[HEADER]'] as $v => $want) {
+	$line = $mimeSent((string) $v);
+	if (!str_contains($line, $want)) {
+		echo 'FAIL MIME part '.json_encode((string) $v).': expected '.$want.' in '.json_encode($line)."\n";
+		++$failed;
+	}
+}
+foreach (['1', '2', '1.2.3', '10.1'] as $v) {
+	if (!\MailSo\Imap\BodyStructure::IsPartId($v)) {
+		echo "FAIL IsPartId refused $v\n";
+		++$failed;
+	}
+}
+
+// Any FETCH item with a line break is refused before it is sent
+foreach ($bad as $v) {
+	expectRefused('FETCH item '.json_encode($v), fn() => $capImap->Fetch(['BODY.PEEK['.$v.']'], '1', true));
+}
+
 if ($failed) {
 	echo "$failed failed\n";
 	exit(1);

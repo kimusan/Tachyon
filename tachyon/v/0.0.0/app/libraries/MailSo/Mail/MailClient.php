@@ -209,6 +209,10 @@ class MailClient
 		$sPeek = FetchType::BODY_PEEK;
 
 		$sMimeIndex = \trim($sMimeIndex);
+		// It comes from download links and requests, and goes into the FETCH section
+		if (\strlen($sMimeIndex) && !\MailSo\Imap\BodyStructure::IsPartId($sMimeIndex)) {
+			throw new \InvalidArgumentException('Invalid MIME part number');
+		}
 		$aFetchResponse = $this->oImapClient->Fetch(array(
 			\strlen($sMimeIndex)
 				? FetchType::BODY_PEEK.'['.$sMimeIndex.'.MIME]'

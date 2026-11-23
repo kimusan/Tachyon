@@ -281,6 +281,16 @@ class BodyStructure implements \JsonSerializable
 		});
 	}
 
+	/**
+	 * A MIME part number as NewInstance() makes them: 1, 2, 1.2.3. Callers put
+	 * part numbers they got from the client into a FETCH section (BODY[...]),
+	 * so anything else must be refused before it reaches the command.
+	 */
+	public static function IsPartId(string $sPartId) : bool
+	{
+		return 1 === \preg_match('/^[1-9][0-9]*(\.[1-9][0-9]*)*$/D', $sPartId);
+	}
+
 	public function GetPartByMimeIndex(string $sMimeIndex) : self
 	{
 		$oPart = null;

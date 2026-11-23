@@ -77,6 +77,11 @@ trait Messages
 						break;
 				}
 			}
+			// Fetch items are atoms and sections; a line break would end the
+			// command early (callers build sections from part numbers)
+			foreach ($aFetchItems as $sFetchItem) {
+				\MailSo\Base\Utils::RefuseLineBreaks($sFetchItem);
+			}
 			if ($this->hasCapability('OBJECTID')) {
 				$aFetchItems[] = FetchType::EMAILID;
 				$aFetchItems[] = FetchType::THREADID;

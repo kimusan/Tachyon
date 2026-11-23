@@ -327,8 +327,14 @@ trait Pgp
 		} else {
 			$sFolderName = $this->GetActionParam('folder', '');
 			$iUid = (int) $this->GetActionParam('uid', 0);
-			$sPartId = $this->GetActionParam('partId', '');
-			$sSigPartId = $this->GetActionParam('sigPartId', '');
+			$sPartId = (string) $this->GetActionParam('partId', '');
+			$sSigPartId = (string) $this->GetActionParam('sigPartId', '');
+			// Both go into the FETCH section below
+			foreach ([$sPartId, $sSigPartId] as $sId) {
+				if (\strlen($sId) && !\MailSo\Imap\BodyStructure::IsPartId($sId)) {
+					throw new \Tachyon\Exceptions\ClientException(\Tachyon\Notifications::InvalidInputArgument);
+				}
+			}
 //			$sMicAlg = $this->GetActionParam('micAlg', '');
 
 			$this->initMailClientConnection();
