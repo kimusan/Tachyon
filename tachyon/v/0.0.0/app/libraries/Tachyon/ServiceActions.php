@@ -208,6 +208,16 @@ class ServiceActions
 		return $sResult;
 	}
 
+	/**
+	 * Whether the request carries the CSRF token: in the X-SM-Token header, or
+	 * else in the XToken field of the POST.
+	 */
+	public static function hasCsrfToken(string $sToken) : bool
+	{
+		$mGiven = $_SERVER['HTTP_X_SM_TOKEN'] ?? $_POST['XToken'] ?? null;
+		return '' !== $sToken && \is_string($mGiven) && \hash_equals($sToken, $mGiven);
+	}
+
 	private function privateUpload(string $sAction, int $iSizeLimit = 0) : string
 	{
 		$oConfig = $this->Config();
@@ -216,6 +226,13 @@ class ServiceActions
 		$aResponse = null;
 		try
 		{
+			// The same CSRF token the JSON actions need: an upload stores an
+			// attachment, imports contacts or sets the background
+			if (!static::hasCsrfToken(Utils::GetCsrfToken($this->oActions instanceof ActionsAdmin))) {
+				$this->oActions->logWrite('missing or wrong XToken', \LOG_ERR, 'UPLOAD');
+				throw new Exceptions\ClientException(Notifications::InvalidToken, null, 'XToken mismatch');
+			}
+
 			$aFile = null;
 			$sInputName = 'uploader';
 			$iSizeLimit = (0 < $iSizeLimit ? $iSizeLimit : ((int) $oConfig->Get('webmail', 'attachment_size_limit', 0))) * 1024 * 1024;
