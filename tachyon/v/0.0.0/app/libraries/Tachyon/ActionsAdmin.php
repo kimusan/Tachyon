@@ -448,6 +448,13 @@ class ActionsAdmin extends Actions
 			}
 
 			$bResult = $oConfig->Save();
+			// The new credentials end every admin session made with the old
+			// ones; this one carries on with a new session
+			if ($bResult) {
+				$sAdminKey = $this->getAdminAuthKey();
+				$sAdminKey && $this->Cacher(null, true)->Delete(KeyPathHelper::SessionAdminKey($sAdminKey));
+				$this->setAdminAuthToken();
+			}
 		}
 
 		return $this->DefaultResponse($bResult
@@ -687,10 +694,7 @@ class ActionsAdmin extends Actions
 
 	private function setAdminAuthToken() : string
 	{
-		$sRand = \MailSo\Base\Utils::Sha1Rand();
-		if (!$this->Cacher(null, true)->Set(KeyPathHelper::SessionAdminKey($sRand), \time())) {
-			throw new \RuntimeException('Failed to store admin token');
-		}
+		$sRand = $this->newAdminSession();
 		$sToken = Utils::EncodeKeyValuesQ(array('token', $sRand));
 		if (!$sToken) {
 			throw new \RuntimeException('Failed to encode admin token');

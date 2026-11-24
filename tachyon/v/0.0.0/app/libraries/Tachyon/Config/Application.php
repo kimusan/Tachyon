@@ -281,6 +281,8 @@ header as the topmost, so name your own id here if these results are shown.'),
 Lost the authenticator? Blank this line, save the file, and log in with the password
 alone, then set a new secret under Security. Clearing it from the admin panel needs
 only the current password, so the code is never what keeps you out.'),
+				'admin_session_idle'      => array(30, 'Minutes without a request after which an admin panel session ends. 0: never'),
+				'admin_session_lifetime'  => array(720, 'Minutes after the login at which an admin panel session ends, however busy. 0: never'),
 				'dav_allowed_hosts'       => array('', 'Private, loopback or link-local hosts that CardDAV/CalDAV sync may reach: host names, addresses or CIDR ranges, separated by spaces.
 Users choose the sync URL, so without this it reaches public hosts only. List your own DAV server here when it runs on the internal network.'),
 				'insecure_cryptkey'       => array(false, 'Use email address instead of login password for encrypting sensitive data (like account passwords)'),
