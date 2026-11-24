@@ -132,6 +132,17 @@ const
 //			.replace(/mso-[^:;]+:[^;]+/gi, '')
 	,
 
+	// A <style> block skips the remote content consent that style attributes go
+	// through, so a url() in it would load without asking: directly when remote
+	// images are allowed by the CSP, else relative to this origin through
+	// ?/ProxyExternal. Drop every declaration that loads something, except an
+	// inline data:image/ one. A backslash before "(" may be a CSS escape
+	// spelling "url", so such declarations go too.
+	dropCSSUrls = rules => rules
+		.replace(/[^;{}]*\\[^;{}]*\([^;{}]*;?/g, '')
+		.replace(new RegExp(String.raw`[^;{}]*\b(?:url|image|image-set|cross-fade|element|src)\s*\(`
+			+ String.raw`(?!\s*['"]?\s*data:image\/)[^)]*\)[^;{}]*;?`, 'gi'), ''),
+
 	/*
 		Parses given css string, and returns css object
 		keys as selectors and values are css rules
@@ -205,7 +216,7 @@ const
 					// ignores @import, @keyframe, @font-face statements
 					css.push({
 						selector: selector,
-						rules: cleanCSS(arr[4])
+						rules: dropCSSUrls(cleanCSS(arr[4]))
 					});
 				}
 			}
