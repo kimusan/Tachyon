@@ -166,7 +166,7 @@ class Utils
 		$adrWork = $oVCard->getByType('ADR', 'WORK');
 		$adrWork = $adrWork ? $adrWork->getParts() : ['','','','','','',''];
 
-		return \fputcsv($stream, array(
+		return \fputcsv($stream, \array_map([static::class, 'csvCell'], array(
 			$aName[3],                  // Title (name prefix)
 			$aName[1],                  // First Name
 			$aName[2],                  // Middle Name
@@ -198,7 +198,25 @@ class Utils
 			$adrWork[4],                // State
 			$adrWork[5],                // Postal Code
 			$adrWork[6]                 // Country
-		), ',', '"', '');
+		)), ',', '"', '');
+	}
+
+	/**
+	 * A spreadsheet opening the CSV reads a cell that starts with "=", "+", "-",
+	 * "@", a tab or a carriage return as a formula. Contact fields come from
+	 * other people (autosaved recipients keep the display name they sent), so
+	 * such a cell gets a leading "'", which spreadsheets show as text. Phone
+	 * numbers like "+46 8 123 45" are left alone.
+	 */
+	public static function csvCell($mValue) : string
+	{
+		$sValue = (string) $mValue;
+		if ('' !== $sValue && \str_contains("=+-@\t\r", $sValue[0])
+		 && !\preg_match('/^\+[0-9][0-9 ()\/.-]*$/D', $sValue)
+		) {
+			$sValue = "'" . $sValue;
+		}
+		return $sValue;
 	}
 
 	public static function VcfStreamToContacts(/*resource*/ $rFile) : iterable
