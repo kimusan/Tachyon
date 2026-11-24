@@ -290,6 +290,7 @@ Users choose the sync URL, so without this it reaches public hosts only. List yo
 				'max_sys_getloadavg'      => array(0.0, 'https://en.m.wikipedia.org/wiki/Load_(computing)'),
 				'content_security_policy' => array('', 'For example to allow all images use "img-src https:". More info at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives'),
 				'csp_report'              => array(false, 'Report CSP errors to PHP and/or Tachyon Log'),
+				'csp_report_only'         => array(false, 'Only report CSP violations instead of blocking them. For testing a content_security_policy; never leave it on'),
 				'encrypt_cipher'          => array('aes-256-cbc-hmac-sha1', 'A valid cipher method from https://php.net/openssl_get_cipher_methods'),
 				'cookie_samesite'         => array('Strict', 'Strict, Lax or None'),
 				'secfetch_allow'          => array('', 'Additional allowed Sec-Fetch combinations separated by ";".

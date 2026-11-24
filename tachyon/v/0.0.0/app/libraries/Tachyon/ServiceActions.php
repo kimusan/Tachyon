@@ -339,9 +339,9 @@ class ServiceActions
 					if (200 === $oResponse->status && \str_starts_with($sContentType, 'image/')) {
 						try {
 							$this->oActions->cacheByKey($sData);
-							\header('Content-Type: ' . $sContentType);
-							\header('Cache-Control: public');
-							\header('Expires: '.\gmdate('D, j M Y H:i:s', 2592000 + \time()).' UTC');
+							foreach (static::proxyHeaders($sContentType) as $sHeader) {
+								\header($sHeader, false);
+							}
 							\header('X-Content-Redirect-Location: '.$oResponse->final_uri);
 							\rewind($tmp);
 							\fpassthru($tmp);
@@ -359,6 +359,24 @@ class ServiceActions
 
 		\MailSo\Base\Http::StatusHeader(404);
 		return '';
+	}
+
+	/**
+	 * Headers for an image the proxy passes through. An SVG opened directly is
+	 * a document on this origin, so it gets the same sandbox policy as an SVG
+	 * attachment (Actions\Raw): an opaque origin with scripting and forms off.
+	 */
+	public static function proxyHeaders(string $sContentType) : array
+	{
+		$aHeaders = [
+			'Content-Type: ' . $sContentType,
+			'Cache-Control: private',
+			'Expires: '.\gmdate('D, j M Y H:i:s', 2592000 + \time()).' UTC'
+		];
+		if ('image/svg+xml' === \strtolower(\trim(\explode(';', $sContentType, 2)[0]))) {
+			$aHeaders[] = 'Content-Security-Policy: sandbox';
+		}
+		return $aHeaders;
 	}
 
 	public function ServiceCspReport() : void

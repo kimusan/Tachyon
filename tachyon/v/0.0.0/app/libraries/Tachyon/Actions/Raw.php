@@ -216,15 +216,7 @@ trait Raw
 					// Viewed inline under this origin, text/html (or XML, ...) becomes a
 					// page of the sender's choosing, so only a few types are shown inline
 					// as declared.
-					if (!$bDownload) {
-						$sInlineType = static::inlineContentType($sContentType);
-						if (null === $sInlineType) {
-							$bDownload = true;
-							$sContentType = 'application/octet-stream';
-						} else {
-							$sContentType = $sInlineType;
-						}
-					}
+					$sContentType = static::servedContentType($sContentType, $bDownload);
 
 					if (!\headers_sent()) {
 						// SVG is shown inline because messages legitimately use it for
@@ -284,6 +276,25 @@ trait Raw
 				}
 			}, $sFolder, $iUid, $sMimeIndex
 		);
+	}
+
+	/**
+	 * The Content-Type an attachment is served with. Inline: one of the types
+	 * inlineContentType() allows, else it becomes a download. A download is
+	 * always application/octet-stream: the browser saves it either way, and
+	 * with the sender's type (text/javascript, say) the URL would also work as
+	 * a same-origin <script src>, which Content-Disposition does not stop.
+	 */
+	public static function servedContentType(string $sContentType, bool &$bDownload) : string
+	{
+		if (!$bDownload) {
+			$sInlineType = static::inlineContentType($sContentType);
+			if (null !== $sInlineType) {
+				return $sInlineType;
+			}
+			$bDownload = true;
+		}
+		return 'application/octet-stream';
 	}
 
 	/**
