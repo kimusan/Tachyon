@@ -1,8 +1,8 @@
 ## 4.8.0 - 2026-11-24
 
-Update now. A crafted link could make Tachyon send IMAP commands of the attacker's choosing as the logged-in user, such as deleting, moving or copying their mail. The Docker image also moves to PHP 8.2.36, which fixes the PHP security release of 19 November.
+Update now. Somebody found out that the search box was also a command line, if you asked it nicely with a `%0D%0A`. A crafted link could make Tachyon whisper extra IMAP commands to your mail server as you: delete this, move that, copy everything somewhere it shouldn't go. Line breaks are now stopped at the door everywhere a value goes into an IMAP, ManageSieve or SMTP command. The Docker image moves to PHP 8.2.36 as well, because PHP had its own patch day on 19 November.
 
-Beyond that, the calendar learns invitations and repeating events. Accept, Maybe or Decline right from the mail, the answer lands in the calendar and in Sent, and a repeating event can be edited as a series, one date at a time or from a date on.
+The calendar, meanwhile, has read RFC 5546 and is a little smug about it. Invitations get Accept, Maybe and Decline right in the mail, the answer lands in your calendar and in Sent, and a repeating event can be edited one date at a time, from a date on, or as the whole series. Yes, including that weekly meeting you have been meaning to decline since March.
 
 ### Security
 - **IMAP command injection through a link** ([GHSA-3w5p-7qc3-89gm](https://github.com/kimusan/Tachyon/security/advisories/GHSA-3w5p-7qc3-89gm)). Values were written into IMAP commands without refusing line breaks, so a search term in a link, opened while logged in, ended the command and sent the rest as further commands. The same gap was in message keywords, the sort order, ManageSieve script names, SMTP addresses, identity addresses and the part numbers in download links. All of them now refuse a line break or NUL before anything is sent, and the sort order and part numbers only take the values Tachyon itself uses. Reported and fixed by @Alphix
