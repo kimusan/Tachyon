@@ -1,3 +1,40 @@
+## 4.8.0 - 2026-11-24
+
+Update now. A crafted link could make Tachyon send IMAP commands of the attacker's choosing as the logged-in user, such as deleting, moving or copying their mail. The Docker image also moves to PHP 8.2.36, which fixes the PHP security release of 19 November.
+
+Beyond that, the calendar learns invitations and repeating events. Accept, Maybe or Decline right from the mail, the answer lands in the calendar and in Sent, and a repeating event can be edited as a series, one date at a time or from a date on.
+
+### Security
+- **IMAP command injection through a link** ([GHSA-3w5p-7qc3-89gm](https://github.com/kimusan/Tachyon/security/advisories/GHSA-3w5p-7qc3-89gm)). Values were written into IMAP commands without refusing line breaks, so a search term in a link, opened while logged in, ended the command and sent the rest as further commands. The same gap was in message keywords, the sort order, ManageSieve script names, SMTP addresses, identity addresses and the part numbers in download links. All of them now refuse a line break or NUL before anything is sent, and the sort order and part numbers only take the values Tachyon itself uses. Reported and fixed by @Alphix
+- **The Docker image runs PHP 8.2.36**, with the fixes from PHP's 19 November security release, seven of them rated critical. Every earlier image runs 8.2.35. Reported by @avinash-0007 (#223)
+- **Login cookies are keyed to the session.** The key used to be a token the browser kept in localStorage across logouts. It now comes from the server's HttpOnly session cookie, so each login and logout means a new key. A login starts a new session cookie and ends the earlier session on the server. Cookies get `__Host-` names over HTTPS, so a sibling subdomain or plain HTTP cannot plant them, keep the Secure flag behind a TLS-terminating proxy, and an encrypted cookie can no longer pick an unauthenticated cipher. All by @Alphix (#220, #224)
+- A plugin that refused an account through the `filter.account` hook was ignored when the session was restored. By @Alphix (#218)
+- The security docs recommend a hostname of its own over HTTPS, and say what a TLS-terminating proxy has to pass on
+
+### Added
+- **Answer calendar invitations.** A mail with an invitation shows a card with the event and Accept, Maybe or Decline. The answer goes to the organizer from the identity the invitation went to, and a copy is kept in Sent. With the calendar on, an accepted event goes into it, an update from the organizer replaces it, a decline or a cancellation takes it out, and one date of a series can be answered on its own from the calendar. Tested against invitations from Google, Exchange, iCloud, Horde and Nextcloud, thanks to the fixtures @ro0tf1sh collected. Asked for by @ro0tf1sh (#216, #222)
+- **Repeating events.** The event editor gets a Repeat section: daily, weekly on chosen days, monthly, yearly, ending never, on a date or after a number of times. An occurrence opens with a choice of this occurrence, this and following, or all, and can be moved by drag on its own. Saving edits the stored event in place, so attendees, alarms and other fields the editor does not show are kept; a drag also no longer wipes the description and location
+- ldap-contacts-suggestions 2.17 searches several base DNs separated by `|`, so meeting rooms outside the people branch can be suggested. By @Alphix (#217)
+
+### Fixed
+- A network blip while restoring a "stay signed in" session signed the user out for good, and a connection dropped during login was reported as a wrong password. By @lavrentious (#215)
+- A mail server that refused a login for a reason of its own (unavailable, in use) was reported as a wrong password and logged as a failed login, which fail2ban reads
+- A long attachment name cut into RFC 2231 sections was lost or replaced by a made-up name
+- Showing external images broke the inline images of the same message
+- The Nextcloud theme on Nextcloud 31 and later drew error, warning and success colours as pale tints, so the delete button looked disabled
+- Contacts exported to CSV with a field ending in a backslash came back with the next field swallowed
+- Split cookies of ten parts or more were joined in the wrong order, which ended the session. By @Alphix
+- Tachyon could greet the SMTP server with "EHLO _" behind nginx's catch-all server name, which strict servers refuse
+- The new mail sound did not play in Firefox
+- A double click on a message's checkbox opened the message
+- Admin and user plugin scripts shared one cache entry, so one side could get the other's scripts
+- A CSP report from Chromium logged a PHP warning
+
+### Changed
+- The editor moves to Squire 2.4.11, where link detection no longer takes seconds on a URL followed by punctuation. compact-composer 1.0.8 carries the same editor
+- Sabre VObject 5.0.0, with the iTIP and recurrence fixes the invitations need
+- Translations updated for German, Polish and Russian, and Danish, German, Spanish and French cover invitations and repeating events
+
 ## 4.7.0 - 2026-11-17
 
 Update soon if you use the admin panel: saving settings could reset application.ini to its defaults, and that includes switching every plugin off. Beyond that, plugins get a proper way to add buttons and panels without touching core templates, advanced search can look up a single day, and a round of fixes for the admin panel, the date picker and the folder rail.
