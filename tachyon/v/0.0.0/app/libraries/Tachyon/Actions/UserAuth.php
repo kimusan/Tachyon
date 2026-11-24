@@ -319,7 +319,7 @@ trait UserAuth
 						if ($sTokenValue) {
 							$this->oMainAuthAccount = $oMainAuthAccount;
 						} else {
-							$this->StorageProvider()->Clear($oMainAuthAccount, StorageType::SESSION, $sToken);
+							Utils::ClearSession($this->StorageProvider(), $oMainAuthAccount, $sToken);
 							\Tachyon\Util\Log::notice('TOKENS', 'SESSION_TOKEN value invalid: ' . \get_debug_type($sTokenValue));
 						}
 					} else {
@@ -496,7 +496,7 @@ trait UserAuth
 			$sSessionToken = Utils::GetSessionToken(false);
 			$oMainAccount = $this->getMainAccountFromToken(false);
 			if ($sSessionToken && $oMainAccount) {
-				$this->StorageProvider()->Clear($oMainAccount, StorageType::SESSION, $sSessionToken);
+				Utils::ClearSession($this->StorageProvider(), $oMainAccount, $sSessionToken);
 			}
 			Cookies::clear(Utils::SESSION_TOKEN);
 		}
