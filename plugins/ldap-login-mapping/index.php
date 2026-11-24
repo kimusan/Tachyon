@@ -8,9 +8,9 @@ class LDAPLoginMappingPlugin extends AbstractPlugin
 {
 	const
 		NAME     = 'LDAP login mapping',
-		VERSION  = '2.4',
+		VERSION  = '2.5',
 		AUTHOR   = 'RainLoop Team, Ludovic Pouzenc<ludovic@pouzenc.fr>, ZephOne<zephone@protonmail.com>',
-		RELEASE  = '2025-01-09',
+		RELEASE  = '2026-11-24',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'Enable custom mapping using ldap field';
@@ -100,14 +100,13 @@ class LDAPLoginMappingPlugin extends AbstractPlugin
 
 		if (0 < \strlen($this->sObjectClass) && 0 < \strlen($this->sEmailField))
 		{
-			$sIP = $_SERVER['REMOTE_ADDR'];
 			$sResult = $this->ldapSearch($sEmail);
 			if ( is_array($sResult) ) {
 				$sImapUser = $sResult['login'];
 				$sSmtpUser = $sResult['login'];
 				$sEmail = $sResult['email'];
+				$this->oLogger->Write("mapped to {$sImapUser}/{$sEmail}", \LOG_INFO, 'LDAP');
 			}
-			syslog(LOG_WARNING, "plugins/ldap-login-mapping/index.php:FilterLoginСredentials() auth try: $sIP/$sEmail, resolved as $sImapUser/$sEmail");
 		}
 	}
 
@@ -155,15 +154,13 @@ class LDAPLoginMappingPlugin extends AbstractPlugin
 	}
 
 	/**
-	 * @param string $sEmailOrLogin
-	 *
-	 * @return string
+	 * @return array|false ['login' => ..., 'email' => ...] or false
 	 */
 	private function ldapSearch($sEmail)
 	{
 		$bFound = FALSE;
 		foreach ( $this->aDomains as $sDomain ) {
-			$sRegex = '/^[a-z0-9._-]+@' . preg_quote(trim($sDomain)) . '$/i';
+			$sRegex = '/^[a-z0-9._-]+@' . preg_quote(trim($sDomain), '/') . '$/Di';
 			$this->oLogger->Write('DEBUG regex ' . $sRegex, \LOG_INFO, 'LDAP');
 			if ( preg_match($sRegex, $sEmail) === 1) {
 				$bFound = TRUE;
@@ -194,12 +191,7 @@ class LDAPLoginMappingPlugin extends AbstractPlugin
 		}
 		$sSearchDn = $this->sUsersDn;
 		$aItems = array($this->sLoginField, $this->sEmailField);
-		if ( 0 < \strlen($this->sSearchDomain) ) {
-			$sFilter = '(&(objectclass='.$this->sObjectClass.')(|('.$this->sEmailField.'='.$sLogin.'@'.$this->sSearchDomain.')('.$this->sLoginField.'='.$sLogin.')))';
-
-		} else {
-			$sFilter = '(&(objectclass='.$this->sObjectClass.')(|('.$this->sEmailField.'='.$sEmail.')('.$this->sLoginField.'='.$sLogin.')))';
-		}
+		$sFilter = $this->searchFilter($sEmail, $sLogin);
 		$this->oLogger->Write('ldap_search: start: '.$sSearchDn.' / '.$sFilter, \LOG_INFO, 'LDAP');
 		$oS = @\ldap_search($oCon, $sSearchDn, $sFilter, $aItems, 0, 30, 30);
 		if (!$oS) {
@@ -231,6 +223,19 @@ class LDAPLoginMappingPlugin extends AbstractPlugin
 			'login' => $sLogin,
 			'email' => $sEmail,
 		);
+	}
+
+	/**
+	 * The search filter for a login. The values are escaped even though
+	 * ldapSearch() only lets simple addresses through: the filter must not
+	 * depend on that check staying as strict as it is.
+	 */
+	private function searchFilter(string $sEmail, string $sLogin) : string
+	{
+		$sMail = 0 < \strlen($this->sSearchDomain) ? $sLogin.'@'.$this->sSearchDomain : $sEmail;
+		return '(&(objectclass='.$this->sObjectClass.')(|('
+			.$this->sEmailField.'='.\ldap_escape($sMail, '', LDAP_ESCAPE_FILTER).')('
+			.$this->sLoginField.'='.\ldap_escape($sLogin, '', LDAP_ESCAPE_FILTER).')))';
 	}
 
 	/**
