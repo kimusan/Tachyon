@@ -8,6 +8,7 @@ import {
 	ComposeType,
 	ClientSideKeyNameMessageHeaderFullInfo,
 	ClientSideKeyNameMessageAttachmentControls,
+	ClientSideKeyNameInvitationCalendar,
 	FolderType,
 	MessageSetAction
 } from 'Common/EnumsUser';
@@ -839,9 +840,11 @@ export class MailMessageView extends AbstractViewRight {
 		if (calendar.Active && !calendar.Stored && calendar.CanStore && info.CanReply) {
 			CalendarUserStore.fetchCalendars((iError, calendars) => {
 				if (!iError && token === this.invitationToken) {
-					const writable = calendars.filter(cal => !cal.readOnly);
+					// The calendar the last answer went into, while it can still take one
+					const writable = calendars.filter(cal => !cal.readOnly),
+						last = Local.get(ClientSideKeyNameInvitationCalendar);
 					this.invitationCalendars(writable);
-					this.invitationCalendar(writable[0]?.uuid || '');
+					this.invitationCalendar((writable.find(cal => cal.uuid === last) || writable[0])?.uuid || '');
 				}
 			});
 		}
@@ -922,7 +925,8 @@ export class MailMessageView extends AbstractViewRight {
 			return;
 		}
 		const params = { SUMMARY: info.Summary || '', EMAIL: info.Attendee?.Email || '' },
-			token = this.invitationToken;
+			token = this.invitationToken,
+			calendar = this.invitationCalendar();
 		this.invitationBusy(true);
 		this.invitationMessage('');
 		this.invitationFailed(false);
@@ -945,11 +949,12 @@ export class MailMessageView extends AbstractViewRight {
 				this.invitationFailed(!!data?.CalendarError);
 				this.invitationMessage(i18n('CALENDAR/INVITATION_SENT_' + partstat, params)
 					+ (data?.CalendarError ? ' ' + i18n('CALENDAR/INVITATION_NOT_STORED', { ERROR: data.CalendarError }) : ''));
+				calendar && !data?.CalendarError && Local.set(ClientSideKeyNameInvitationCalendar, calendar);
 				info.Calendar?.Active && CalendarUserStore.synced(Date.now());
 			}
 		}, {
 			Ical: this.invitationIcal,
-			Calendar: this.invitationCalendar(),
+			Calendar: calendar,
 			Partstat: partstat,
 			Subject: i18n('CALENDAR/INVITATION_SUBJECT_' + partstat, params),
 			Plain: i18n('CALENDAR/INVITATION_TEXT_' + partstat, params),

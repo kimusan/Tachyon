@@ -66,6 +66,7 @@ ClientSideKeyNameMessageAttachmentControls = 10,
 ClientSideKeyNameLeftPanelCollapsed = 11,
 ClientSideKeyNameAdminLeftPanelCollapsed = 12,
 ClientSideKeyNameSettingsLeftPanelCollapsed = 13,
+ClientSideKeyNameInvitationCalendar = 14,
 
 /**
  * @enum {number}
