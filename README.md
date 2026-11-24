@@ -97,6 +97,7 @@ no third party fonts or scripts, and no external avatar service.
 - **Nextcloud** — install directly from the [Nextcloud App Store](https://apps.nextcloud.com/apps/tachyon), or see `integrations/nextcloud/`
 - **ownCloud** — see `integrations/owncloud/`
 - **Cloudron** — see `integrations/cloudron/`
+- **YunoHost** — install from the [YunoHost app catalog](https://apps.yunohost.org/app/tachyon), packaged by the community at [YunoHost-Apps/tachyon_ynh](https://github.com/YunoHost-Apps/tachyon_ynh)
 - **Docker** — see `examples/docker/`
 - **Debian and derivatives** — each release carries a signed `.deb` and a small apt repository (`Packages`, `Release`, `InRelease`), so a release can be added as an apt source and upgraded with the rest of the system. A signed `.changes` file is included for importing the package into an apt repository tool such as reprepro or aptly. The signing key ships alongside as `tachyon-archive-keyring.asc`. See the [installation instructions](https://github.com/kimusan/Tachyon/wiki/Installation-instructions#debian--devuan) for each variant
 
