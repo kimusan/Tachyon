@@ -77,10 +77,31 @@ class Utils
 	 * the mailto flow or planted, must not carry on into the session. The
 	 * cookies encrypted with the session token are carried over: the mailto
 	 * token, which is read after the login, and an admin panel session open
-	 * in the same browser.
+	 * in the same browser. The earlier session's server-side record is
+	 * cleared, so the earlier session ends here too.
 	 */
-	public static function RotateSessionToken() : void
+	public static function RotateSessionToken(\Tachyon\Providers\Storage $oStorage) : void
 	{
+		// A login while an earlier session is still valid ends that session
+		// now. Its record would otherwise stay until GC, and FileStorage::Get()
+		// touches it on every read, so a copy of the old cookies would keep it
+		// alive. The old login cookie names the account the record lives
+		// under, which need not be the account logging in now.
+		$sOldToken = static::GetSessionToken(false);
+		if ($sOldToken) {
+			// Best effort: an unreadable old login cookie (a split cookie that
+			// lost a part, say) must not stop the login, which replaces it anyway
+			try {
+				$aOld = \Tachyon\Util\Cookies::getSecure(Actions::AUTH_SPEC_TOKEN_KEY);
+				$sOldEmail = \is_array($aOld) ? ($aOld['email'] ?? null) : null;
+				if (\is_string($sOldEmail) && \strlen($sOldEmail)) {
+					$oStorage->Clear($sOldEmail, \Tachyon\Providers\Storage\Enumerations\StorageType::SESSION, $sOldToken);
+				}
+			} catch (\Throwable $e) {
+				\Tachyon\Util\Log::warning('TOKENS', 'Could not end the earlier session: ' . $e->getMessage());
+			}
+		}
+
 		$aCarry = [];
 		foreach ([Actions::AUTH_MAILTO_TOKEN_KEY, 'smadmin'] as $sName) {
 			$sValue = \Tachyon\Util\Cookies::get($sName);
