@@ -44,6 +44,10 @@ trait Contacts
 		}
 
 		$sPassword = $this->GetActionParam('Password', '');
+		// Turning sync off stays possible when the admin has disallowed it
+		if (\intval($this->GetActionParam('Mode', '0')) && \strlen(\trim($this->GetActionParam('Url', '')))) {
+			$this->requireDavSync('contacts');
+		}
 
 		$mData = $this->getContactsSyncData($oAccount);
 
@@ -64,6 +68,7 @@ trait Contacts
 		if (!$this->GetCapa(Capa::CONTACTS)) {
 			throw new ClientException(\Tachyon\Notifications::ContactsSyncError, null, 'Disallowed');
 		}
+		$this->requireDavSync('contacts');
 
 		$oAccount = $this->getAccountFromToken();
 
@@ -95,11 +100,21 @@ trait Contacts
 		if (!$oClient) {
 			throw new ClientException(\Tachyon\Notifications::ContactsSyncError, null, 'No client');
 		}
-		$oClient->propFind($oClient->urlPath, [
-			'{DAV:}getlastmodified',
-			'{DAV:}resourcetype',
-			'{DAV:}getetag'
-		], 1);
+		// Only the status reaches the user, never what the server answered: the
+		// URL is the user's, and may be pointed at anything the server can reach
+		try {
+			$oClient->propFind($oClient->urlPath, [
+				'{DAV:}getlastmodified',
+				'{DAV:}resourcetype',
+				'{DAV:}getetag'
+			], 1);
+		} catch (\Tachyon\Util\HTTP\Exception $oException) {
+			throw new ClientException(\Tachyon\Notifications::ContactsSyncError, $oException,
+				"The server answered HTTP {$oException->getCode()}");
+		} catch (\Throwable $oException) {
+			throw new ClientException(\Tachyon\Notifications::ContactsSyncError, $oException,
+				'No address book found at this address');
+		}
 
 		return $this->TrueResponse();
 	}
@@ -111,6 +126,7 @@ trait Contacts
 		if (!$oAddressBookProvider) {
 			throw new ClientException(\Tachyon\Notifications::ContactsSyncError, null, 'No AddressBookProvider');
 		}
+		$this->requireDavSync('contacts');
 		\ignore_user_abort(true);
 		\Tachyon\Util\HTTP\Stream::start(/*$binary = false*/);
 		\Tachyon\Util\HTTP\Stream::JSON(['messsage'=>'start']);

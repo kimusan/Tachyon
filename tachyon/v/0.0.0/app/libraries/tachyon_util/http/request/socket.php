@@ -54,8 +54,16 @@ class Socket extends \Tachyon\Util\HTTP\Request
 		}
 
 		$context = \stream_context_create();
+		// Connect to the address canFetchURI() checked, not to a fresh DNS
+		// answer; TLS still verifies the certificate for the host name
+		$sConnectHost = $parts['host'];
+		if ($this->pinned && $this->pinned['host'] === \trim($parts['host'], '[]')) {
+			$sIp = $this->pinned['ips'][0];
+			$sConnectHost = \str_contains($sIp, ':') ? "[{$sIp}]" : $sIp;
+			\stream_context_set_option($context, 'ssl', 'peer_name', $this->pinned['host']);
+		}
 		if ('https' === $parts['scheme']) {
-			$parts['host'] = 'ssl://'.$parts['host'];
+			$parts['host'] = 'ssl://'.$sConnectHost;
 			\stream_context_set_option($context, 'ssl', 'verify_peer_name', true);
 			if ($this->verify_peer || $this->ca_bundle) {
 				\stream_context_set_option($context, 'ssl', 'verify_peer', true);
@@ -70,7 +78,7 @@ class Socket extends \Tachyon\Util\HTTP\Request
 				\stream_context_set_option($context, 'ssl', 'allow_self_signed', true);
 			}
 		} else {
-			$parts['host'] = 'tcp://'.$parts['host'];
+			$parts['host'] = 'tcp://'.$sConnectHost;
 		}
 
 		$errno = 0;

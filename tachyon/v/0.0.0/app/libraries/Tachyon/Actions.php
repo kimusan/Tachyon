@@ -1014,6 +1014,20 @@ class Actions
 		return $aResult;
 	}
 
+	/**
+	 * Refuses a CardDAV ('contacts') or CalDAV ('calendar') sync action when
+	 * the admin has turned sync off: hiding it in the interface is not enough,
+	 * the actions can be called directly.
+	 */
+	protected function requireDavSync(string $sSection) : void
+	{
+		if (!$this->oConfig->Get($sSection, 'allow_sync', false)) {
+			throw new Exceptions\ClientException('calendar' === $sSection
+				? Notifications::CalendarSyncError : Notifications::ContactsSyncError,
+				null, 'Sync is turned off by the administrator');
+		}
+	}
+
 	public function GetCapa(string $sName, ?Model\Account $oAccount = null): bool
 	{
 		return !empty($this->Capa(false, $oAccount)[$sName]);
