@@ -39,6 +39,13 @@ Reports will be analyzed and fixed as fast as possible. Disclosure is planned to
   `X-Forwarded-Proto: https` (or `X-Forwarded-Ssl: on`). Without it Tachyon
   sees a plain connection, and its cookies get neither the `Secure` flag nor
   the `__Host-` prefix.
+- Behind a reverse proxy, Tachyon sees the proxy's address, not the
+  client's, which matters for the auth log and fail2ban. Prefer having the
+  web server restore it (nginx `set_real_ip_from` + `real_ip_header
+  X-Forwarded-For`, Apache `mod_remoteip`). Otherwise turn on
+  `labs.http_client_ip_check_proxy` and list the proxies in
+  `labs.http_trusted_proxies` (default: loopback). `X-Forwarded-For` from
+  anyone else is ignored, since any client can send it with any address.
 - `labs.cookie_default_path` is only for running several instances under one
   hostname, which would otherwise overwrite each other's cookies. Such
   instances keep plain cookie names, without the `__Host-` protection; prefer
