@@ -125,15 +125,74 @@ class Http
 		return $bWithoutPort ? \preg_replace('/:\d+$/', '', $sHost) : $sHost;
 	}
 
-	public function GetClientIp(bool $bCheckProxy = false) : string
+	/**
+	 * The client's address. With $bCheckProxy, the address a trusted proxy
+	 * forwarded in X-Forwarded-For, but only when the request came from one of
+	 * $sTrustedProxies (addresses or CIDR ranges): anyone else can send that
+	 * header with any address in it.
+	 */
+	public function GetClientIp(bool $bCheckProxy = false, string $sTrustedProxies = '127.0.0.1/8 ::1') : string
 	{
-		if ($bCheckProxy && null !== static::GetServer('HTTP_CLIENT_IP', null)) {
-			return static::GetServer('HTTP_CLIENT_IP', '');
+		return $bCheckProxy
+			? static::ForwardedClientIp($sTrustedProxies)
+			: (string) static::GetServer('REMOTE_ADDR', '');
+	}
+
+	/**
+	 * REMOTE_ADDR, or when that is a trusted proxy, the nearest address in
+	 * X-Forwarded-For that is not one: each proxy appends the address it got
+	 * the request from, so the entries left of the last untrusted one are
+	 * whatever the client wrote.
+	 */
+	public static function ForwardedClientIp(string $sTrustedProxies) : string
+	{
+		$sIp = (string) static::GetServer('REMOTE_ADDR', '');
+		$sForwarded = (string) static::GetServer('HTTP_X_FORWARDED_FOR', '');
+		if ('' === $sForwarded || !static::IpInList($sIp, $sTrustedProxies)) {
+			return $sIp;
 		}
-		if ($bCheckProxy && null !== static::GetServer('HTTP_X_FORWARDED_FOR', null)) {
-			return static::GetServer('HTTP_X_FORWARDED_FOR', '');
+		foreach (\array_reverse(\explode(',', $sForwarded)) as $sHop) {
+			$sHop = \trim($sHop);
+			if (false === \filter_var($sHop, FILTER_VALIDATE_IP)) {
+				break;
+			}
+			$sIp = $sHop;
+			if (!static::IpInList($sHop, $sTrustedProxies)) {
+				break;
+			}
 		}
-		return static::GetServer('REMOTE_ADDR', '');
+		return $sIp;
+	}
+
+	/**
+	 * Whether $sIp is one of the addresses or CIDR ranges in $sList (separated
+	 * by spaces or commas).
+	 */
+	public static function IpInList(string $sIp, string $sList) : bool
+	{
+		$sBin = @\inet_pton($sIp);
+		if (false === $sBin) {
+			return false;
+		}
+		foreach (\preg_split('/[\s,]+/', $sList, -1, PREG_SPLIT_NO_EMPTY) as $sEntry) {
+			$aEntry = \explode('/', $sEntry, 2);
+			$sNet = @\inet_pton($aEntry[0]);
+			if (false === $sNet || \strlen($sNet) !== \strlen($sBin)) {
+				continue;
+			}
+			$iBits = isset($aEntry[1]) ? (int) $aEntry[1] : 8 * \strlen($sNet);
+			if ($iBits < 0 || $iBits > 8 * \strlen($sNet)) {
+				continue;
+			}
+			$iBytes = $iBits >> 3;
+			$iRest = $iBits & 7;
+			if (\substr($sBin, 0, $iBytes) === \substr($sNet, 0, $iBytes)
+			 && (!$iRest || ((\ord($sBin[$iBytes]) ^ \ord($sNet[$iBytes])) >> (8 - $iRest)) === 0)
+			) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static function checkETag(string $ETag) : void

@@ -11,8 +11,8 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 		NAME = 'DAV autoconfiguration',
 		AUTHOR = 'Clinically',
 		URL = 'https://github.com/kimusan/Tachyon',
-		VERSION = '1.1',
-		RELEASE = '2026-09-11',
+		VERSION = '1.2',
+		RELEASE = '2026-11-24',
 		REQUIRED = '4.2.2',
 		CATEGORY = 'Contacts',
 		LICENSE = 'MIT',
@@ -21,6 +21,7 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 	public function Init() : void
 	{
 		$this->addHook('login.success', 'LoginSuccess');
+		$this->addHook('dav.allowed-hosts', 'AllowedHosts');
 	}
 
 	/**
@@ -40,6 +41,20 @@ class DavAutoconfigPlugin extends \Tachyon\Plugins\AbstractPlugin
 	 * Mode is now kept and only a config that is not there yet gets Mode 1.
 	 * Remove the account from the allow list to stop configuring it at all.
 	 */
+	/**
+	 * The admin chose these servers, so sync may reach them on the internal
+	 * network too (DAV sync is otherwise limited to public hosts).
+	 */
+	public function AllowedHosts(array &$aHosts) : void
+	{
+		foreach (['carddav_url', 'caldav_url'] as $sKey) {
+			$sHost = \parse_url(Rules::collectionUrl((string) $this->Config()->Get('plugin', $sKey, ''), 'x'), PHP_URL_HOST);
+			if (\is_string($sHost) && '' !== $sHost) {
+				$aHosts[] = \trim($sHost, '[]');
+			}
+		}
+	}
+
 	public function LoginSuccess(\Tachyon\Model\MainAccount $oAccount) : void
 	{
 		try {

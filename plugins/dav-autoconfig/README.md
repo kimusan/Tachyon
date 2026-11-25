@@ -43,6 +43,10 @@ credential, which is how to check what an account actually has.
 
 ## Behaviour worth knowing
 
+- The hosts of `carddav_url` and `caldav_url` may be on the internal network:
+  the plugin adds them to the hosts DAV sync may reach (otherwise only public
+  hosts and `security.dav_allowed_hosts`).
+
 - It rewrites the credentials on **every** login, which is what re-seals the
   password after a password change. It does not rewrite `Mode`: turning sync off
   in Settings writes `Mode` 0 to the same file and that choice is kept. Remove

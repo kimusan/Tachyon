@@ -7,7 +7,7 @@ use Sabre\VObject\Component\VCard;
 class Utils
 {
 	private static $aMap = array(
-		'title'               => 'FN',
+		'title'               => 3,
 		'name'                => 'FN',
 		'fullname'            => 'FN',
 		'displayname'         => 'FN',
@@ -22,6 +22,7 @@ class Utils
 		'nameprefix'          => 3,
 		'suffix'              => 4,
 		'namesuffix'          => 4,
+		'jobtitle'            => 'TITLE',
 		'shortname'           => 'NICKNAME',
 		'nickname'            => 'NICKNAME',
 		'birthday'            => 'BDAY',
@@ -74,7 +75,6 @@ class Utils
 	TODO:
 		'company'             => '',
 		'department'          => '',
-		'jobtitle'            => '',
 		'officelocation'      => '',
 		'homestreet'          => '',
 		'homecity'            => '',
@@ -100,7 +100,10 @@ class Utils
 		foreach ($aHeaders as $iIndex => $sItemName) {
 			$sItemName = \MailSo\Base\Utils::Utf8Clear($sItemName);
 			$sItemName = \strtoupper(\trim(\preg_replace('/[\s\-]+/', '', $sItemName)));
-			if (!\array_key_exists($sItemName, VCard::$propertyMap)) {
+			// "Title" is the vCard TITLE (job title) by name, but in the
+			// address book CSV files this reads (Outlook's) it is the name
+			// prefix, and the job title is "Job Title"
+			if ('TITLE' === $sItemName || !\array_key_exists($sItemName, VCard::$propertyMap)) {
 				$sItemName = \strtolower($sItemName);
 				$sItemName = isset(static::$aMap[$sItemName]) ? static::$aMap[$sItemName] : null;
 			}
@@ -163,8 +166,8 @@ class Utils
 		$adrWork = $oVCard->getByType('ADR', 'WORK');
 		$adrWork = $adrWork ? $adrWork->getParts() : ['','','','','','',''];
 
-		return \fputcsv($stream, array(
-			(string) $oVCard->FN,       // Title
+		return \fputcsv($stream, \array_map([static::class, 'csvCell'], array(
+			$aName[3],                  // Title (name prefix)
 			$aName[1],                  // First Name
 			$aName[2],                  // Middle Name
 			$aName[0],                  // Last Name
@@ -172,7 +175,7 @@ class Utils
 			(string) $oVCard->FN,       // Display Name
 			(string) $oVCard->ORG,      // Company
 			'',                         // Department
-			'',                         // Job Title
+			(string) $oVCard->TITLE,    // Job Title
 			'',                         // Office Location
 			(string) $oVCard->EMAIL,    // E-mail Address
 			(string) $oVCard->NOTE,     // Notes
@@ -195,7 +198,25 @@ class Utils
 			$adrWork[4],                // State
 			$adrWork[5],                // Postal Code
 			$adrWork[6]                 // Country
-		), ',', '"', '');
+		)), ',', '"', '');
+	}
+
+	/**
+	 * A spreadsheet opening the CSV reads a cell that starts with "=", "+", "-",
+	 * "@", a tab or a carriage return as a formula. Contact fields come from
+	 * other people (autosaved recipients keep the display name they sent), so
+	 * such a cell gets a leading "'", which spreadsheets show as text. Phone
+	 * numbers like "+46 8 123 45" are left alone.
+	 */
+	public static function csvCell($mValue) : string
+	{
+		$sValue = (string) $mValue;
+		if ('' !== $sValue && \str_contains("=+-@\t\r", $sValue[0])
+		 && !\preg_match('/^\+[0-9][0-9 ()\/.-]*$/D', $sValue)
+		) {
+			$sValue = "'" . $sValue;
+		}
+		return $sValue;
 	}
 
 	public static function VcfStreamToContacts(/*resource*/ $rFile) : iterable

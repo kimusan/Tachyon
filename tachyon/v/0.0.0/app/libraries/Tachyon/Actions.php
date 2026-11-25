@@ -137,7 +137,8 @@ class Actions
 
 			$this->logWrite(
 				'[SM:' . APP_VERSION . '][IP:'
-				. $oHttp->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false))
+				. $oHttp->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false),
+					$this->oConfig->Get('labs', 'http_trusted_proxies', '127.0.0.1/8 ::1'))
 				. '][PID:' . (\MailSo\Base\Utils::FunctionCallable('getmypid') ? \getmypid() : 'unknown')
 				. '][' . \MailSo\Base\Http::GetServer('SERVER_SOFTWARE', '~')
 				. '][' . \PHP_SAPI
@@ -293,7 +294,8 @@ class Actions
 		if (false !== \strpos($sLine, '{request:')) {
 			if (false !== \strpos($sLine, '{request:ip}')) {
 				$sLine = \str_replace('{request:ip}',
-					$this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false)),
+					$this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false),
+					$this->oConfig->Get('labs', 'http_trusted_proxies', '127.0.0.1/8 ::1')),
 					$sLine);
 			}
 
@@ -320,7 +322,8 @@ class Actions
 
 			if (false !== \strpos($sLine, '{user:ip}')) {
 				$sLine = \str_replace('{user:ip}',
-					$this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false)),
+					$this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false),
+					$this->oConfig->Get('labs', 'http_trusted_proxies', '127.0.0.1/8 ::1')),
 					$sLine);
 			}
 
@@ -1012,6 +1015,20 @@ class Actions
 		}
 		$aResult[Capa::SIEVE] = $bAdmin || ($oAccount && $oAccount->Domain()->SieveSettings()->enabled);
 		return $aResult;
+	}
+
+	/**
+	 * Refuses a CardDAV ('contacts') or CalDAV ('calendar') sync action when
+	 * the admin has turned sync off: hiding it in the interface is not enough,
+	 * the actions can be called directly.
+	 */
+	protected function requireDavSync(string $sSection) : void
+	{
+		if (!$this->oConfig->Get($sSection, 'allow_sync', false)) {
+			throw new Exceptions\ClientException('calendar' === $sSection
+				? Notifications::CalendarSyncError : Notifications::ContactsSyncError,
+				null, 'Sync is turned off by the administrator');
+		}
 	}
 
 	public function GetCapa(string $sName, ?Model\Account $oAccount = null): bool

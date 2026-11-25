@@ -63,6 +63,47 @@ class Client
 	}
 
 	/**
+	 * Whether a request may go to this URL's host although it is private,
+	 * loopback or link-local. DAV URLs come from users (and from the answers of
+	 * DAV servers), so by default they reach public hosts only; internal DAV
+	 * servers are listed by the admin in security.dav_allowed_hosts: host
+	 * names, addresses, or CIDR ranges for addresses. Plugins can add to the
+	 * list through the dav.allowed-hosts hook.
+	 */
+	public static function isAllowedHost(string $sUrl) : bool
+	{
+		$sHost = \strtolower(\trim((string) \parse_url($sUrl, PHP_URL_HOST), '[]'));
+		if ('' === $sHost) {
+			return false;
+		}
+		$aList = \preg_split('/[\s,]+/', (string) \Tachyon\Api::Config()->Get('security', 'dav_allowed_hosts', ''),
+			-1, PREG_SPLIT_NO_EMPTY);
+		// Plugins that configure sync for users (dav-autoconfig) add the hosts
+		// the admin gave them
+		\Tachyon\Api::Actions()->Plugins()->RunHook('dav.allowed-hosts', array(&$aList));
+		$sBin = @\inet_pton($sHost);
+		foreach (\array_map('strtolower', \array_filter($aList, 'is_string')) as $sEntry) {
+			if ($sEntry === $sHost) {
+				return true;
+			}
+			$aEntry = \explode('/', $sEntry, 2);
+			$sNet = isset($aEntry[1]) && false !== $sBin ? @\inet_pton($aEntry[0]) : false;
+			if (false !== $sNet && \strlen($sNet) === \strlen($sBin)) {
+				$iBits = (int) $aEntry[1];
+				$iBytes = $iBits >> 3;
+				$iRest = $iBits & 7;
+				if (0 <= $iBits && $iBits <= 8 * \strlen($sNet)
+				 && \substr($sBin, 0, $iBytes) === \substr($sNet, 0, $iBytes)
+				 && (!$iRest || ((\ord($sBin[$iBytes]) ^ \ord($sNet[$iBytes])) >> (8 - $iRest)) === 0)
+				) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Enable/disable SSL peer verification
 	 */
 	public function setVerifyPeer(bool $value) : void
@@ -123,6 +164,7 @@ class Client
 		if (\strlen($this->sPreemptiveAuth) && !isset($headers['Authorization'])) {
 			$headers['Authorization'] = $this->sPreemptiveAuth;
 		}
+		$this->HTTP->block_private_ips = !static::isAllowedHost($url);
 		$response = $this->HTTP->doRequest($method, $url, $body, $headers);
 		// Like: RewriteRule ^\.well-known/carddav /nextcloud/remote.php/dav [R=301,L]
 		// Apache answers 302 without R=301, and Stalwart answers the well-known
@@ -134,6 +176,7 @@ class Client
 			$url = \preg_replace('@^(https?:)?//[^/]+[/$]@', '/', $location);
 			$parts = \parse_url($this->baseUri);
 			$url = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port'])?':' . $parts['port']:'') . $url;
+			$this->HTTP->block_private_ips = !static::isAllowedHost($url);
 			$response = $this->HTTP->doRequest($method, $url, $body, $headers);
 		}
 		if (300 <= $response->status) {
@@ -220,6 +263,9 @@ class Client
 		/**
 		 * Parse the WebDAV multistatus response body
 		 */
+		// libxml's warnings quote the body, which must not end up anywhere the
+		// user sees it either
+		$bInternalErrors = \libxml_use_internal_errors(true);
 		$responseXML = \simplexml_load_string(
 			/**
 			 * Convert all instances of the DAV: namespace to urn:DAV
@@ -232,9 +278,13 @@ class Client
 			 */
 			\preg_replace("/xmlns(:[A-Za-z0-9_]*)?=(\"|\')DAV:(\\2)/", "xmlns\\1=\\2urn:DAV\\2", $sBody),
 			null, LIBXML_NOBLANKS | LIBXML_NOCDATA);
+		\libxml_clear_errors();
+		\libxml_use_internal_errors($bInternalErrors);
 
 		if (false === $responseXML) {
-			throw new \UnexpectedValueException("The passed data is not valid XML\n{$sBody}");
+			// Not in the message: it reaches the user, and the URL is theirs
+			\Tachyon\Util\Log::debug('DAV', "Not valid XML:\n{$sBody}");
+			throw new \UnexpectedValueException('The DAV server did not answer with valid XML');
 		}
 
 		$ns = \array_search('urn:DAV', $responseXML->getNamespaces(true)) ?: 'd';

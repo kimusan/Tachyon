@@ -20,10 +20,18 @@ preg_match('/function Logout\(bool \$bMain\) : void\s*\{(.*?)\n\t\}/s', $sSrc, $
 check(!empty($m[1]), 'could not read Logout()');
 $sBody = $m[1];
 
-check(str_contains($sBody, 'StorageType::SESSION'),
+// Directly, or through Utils::ClearSession(), which also removes what is kept
+// with the record (the OAuth2 tokens)
+$bHelper = str_contains($sBody, 'Utils::ClearSession(');
+check($bHelper || str_contains($sBody, 'StorageType::SESSION'),
 	'Logout() does not touch the server-side session record');
-check(preg_match('/StorageProvider\(\)->Clear\([^)]*StorageType::SESSION/', $sBody) === 1,
+check($bHelper || preg_match('/StorageProvider\(\)->Clear\([^)]*StorageType::SESSION/', $sBody) === 1,
 	'the session record is read but not cleared');
+if ($bHelper) {
+	$sUtils = file_get_contents($sDir.'Utils.php');
+	check(preg_match('/function ClearSession\(.*?->Clear\(\$mAccount, [^,]*StorageType::SESSION, \$sToken\)/s', $sUtils) === 1,
+		'Utils::ClearSession() does not clear the session record');
+}
 check(!preg_match('#^\s*//\s*Cookies::clear\(Utils::SESSION_TOKEN\)#m', $sBody),
 	'the SESSION_TOKEN cookie clear is commented out again');
 check(str_contains($sBody, 'Cookies::clear(Utils::SESSION_TOKEN)'),
@@ -34,7 +42,7 @@ $iResolve = strpos($sBody, 'getMainAccountFromToken(false)');
 $iClear = strpos($sBody, 'Cookies::clear(Utils::SESSION_TOKEN)');
 check(false !== $iResolve, 'Logout() never resolves the account');
 check($iResolve < $iClear, 'the account is resolved after its cookie has been cleared');
-$iDestroy = strpos($sBody, 'StorageProvider()->Clear(');
+$iDestroy = $bHelper ? strpos($sBody, 'Utils::ClearSession(') : strpos($sBody, 'StorageProvider()->Clear(');
 check($iDestroy < $iClear, 'the session is destroyed after the cookie is gone, so the token is unknown');
 
 // Logging out of an additional account must not end the main session.

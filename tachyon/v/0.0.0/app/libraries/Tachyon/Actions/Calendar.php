@@ -733,6 +733,7 @@ trait Calendar
 		if (!$oProvider->IsActive()) {
 			return $this->FalseResponse();
 		}
+		$this->requireDavSync('calendar');
 		// Reported rather than a bare true: a sync that lost events used to look
 		// exactly like a clean one, so the only sign was the debug log.
 		$bResult = $oProvider->Sync();
@@ -754,6 +755,10 @@ trait Calendar
 
 		$iMode = \intval($this->GetActionParam('Mode', '0'));
 		$sUrl = $this->GetActionParam('Url', '');
+		// Turning sync off stays possible when the admin has disallowed it
+		if ($iMode && \strlen(\trim($sUrl))) {
+			$this->requireDavSync('calendar');
+		}
 
 		$bResult = $this->setCalendarSyncData($oAccount, array(
 			'Mode' => $iMode,
@@ -789,6 +794,7 @@ trait Calendar
 			throw new ClientException(\Tachyon\Notifications::CalendarSyncError, null,
 				'The calendar backend is not available');
 		}
+		$this->requireDavSync('calendar');
 
 		$sPassword = $this->GetActionParam('Password', '');
 		$mData = $this->getCalendarSyncData($oAccount);

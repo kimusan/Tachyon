@@ -80,6 +80,23 @@ class Utils
 	 * in the same browser. The earlier session's server-side record is
 	 * cleared, so the earlier session ends here too.
 	 */
+	/**
+	 * Session storage that belongs to a session besides its record: the main
+	 * account's OAuth2 tokens (Plugins\OAuth2Accounts) are kept under this
+	 * prefix + the session token.
+	 */
+	const SESSION_OAUTH2_PREFIX = 'oauth2-';
+
+	/**
+	 * Ends a session on the server: its record and what is kept with it.
+	 */
+	public static function ClearSession(\Tachyon\Providers\Storage $oStorage, $mAccount, string $sToken) : void
+	{
+		$oStorage->Clear($mAccount, \Tachyon\Providers\Storage\Enumerations\StorageType::SESSION, $sToken);
+		$oStorage->Clear($mAccount, \Tachyon\Providers\Storage\Enumerations\StorageType::SESSION,
+			static::SESSION_OAUTH2_PREFIX . $sToken);
+	}
+
 	public static function RotateSessionToken(\Tachyon\Providers\Storage $oStorage) : void
 	{
 		// A login while an earlier session is still valid ends that session
@@ -95,7 +112,7 @@ class Utils
 				$aOld = \Tachyon\Util\Cookies::getSecure(Actions::AUTH_SPEC_TOKEN_KEY);
 				$sOldEmail = \is_array($aOld) ? ($aOld['email'] ?? null) : null;
 				if (\is_string($sOldEmail) && \strlen($sOldEmail)) {
-					$oStorage->Clear($sOldEmail, \Tachyon\Providers\Storage\Enumerations\StorageType::SESSION, $sOldToken);
+					static::ClearSession($oStorage, $sOldEmail, $sOldToken);
 				}
 			} catch (\Throwable $e) {
 				\Tachyon\Util\Log::warning('TOKENS', 'Could not end the earlier session: ' . $e->getMessage());

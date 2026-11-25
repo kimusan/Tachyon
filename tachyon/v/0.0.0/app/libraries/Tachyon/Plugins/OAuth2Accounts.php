@@ -110,10 +110,10 @@ trait OAuth2Accounts
 	 * keeps one per address under the main account, since that is where the
 	 * CryptKey to open it comes from.
 	 *
-	 * The main account's key is the same one LoginProcess writes 'true' to as its
-	 * session marker, so the bundle replaces that value. This is fine, and is what
-	 * the plugins have always done: the check only tests that something truthy is
-	 * there (Actions/UserAuth.php:279), never what it says.
+	 * The main account's bundle has a key of its own next to the session record
+	 * (see oauthSessionKey()). It used to replace that record, but the record is
+	 * the session's AutoLogout clock (#185): the next request wrote the time over
+	 * the bundle.
 	 */
 	protected function oauthTokensFor(Account $oAccount) : ?array
 	{
@@ -126,7 +126,7 @@ trait OAuth2Accounts
 		try {
 			if ($oAccount instanceof MainAccount) {
 				$sBlob = $oActions->StorageProvider()->Get($oAccount, StorageType::SESSION,
-					\Tachyon\Utils::GetSessionToken());
+					static::oauthSessionKey());
 				return $sBlob ? \Tachyon\Util\Crypt::DecryptFromJSON($sBlob, $oAccount->CryptKey()) : null;
 			}
 			if ($oAccount instanceof AdditionalAccount) {
@@ -149,7 +149,7 @@ trait OAuth2Accounts
 		$oActions = \Tachyon\Api::Actions();
 		if ($oAccount instanceof MainAccount) {
 			$oActions->StorageProvider()->Put($oAccount, StorageType::SESSION,
-				\Tachyon\Utils::GetSessionToken(),
+				static::oauthSessionKey(),
 				\Tachyon\Util\Crypt::EncryptToJSON($aTokens, $oAccount->CryptKey()));
 		} else if ($oAccount instanceof AdditionalAccount) {
 			$oMain = $oActions->getMainAccountFromToken(false);
@@ -157,6 +157,15 @@ trait OAuth2Accounts
 				$this->oauthStoreTokens($oMain, $oAccount->Email(), $aTokens);
 			}
 		}
+	}
+
+	/**
+	 * Where the main account's bundle lives: per session, next to the session
+	 * record, and removed with it (Utils::ClearSession()).
+	 */
+	protected static function oauthSessionKey() : string
+	{
+		return \Tachyon\Utils::SESSION_OAUTH2_PREFIX . \Tachyon\Utils::GetSessionToken();
 	}
 
 	protected function oauthStoreTokens(MainAccount $oMain, string $sEmail, array $aTokens) : void

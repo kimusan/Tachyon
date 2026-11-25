@@ -27,6 +27,11 @@ abstract class Request
 		$block_private_ips = false;
 
 	protected
+		// With block_private_ips: the addresses canFetchURI() checked for the
+		// URL about to be fetched, ['host' => ..., 'port' => ..., 'ips' => [...]],
+		// so the connection goes to exactly those and a second DNS answer
+		// (rebinding to a private address) is never asked for
+		$pinned = null,
 		$auth = [
 			'type' => 0,
 			'user' => '',
@@ -101,9 +106,22 @@ abstract class Request
 			\trigger_error('URI fetching not allowed for '.$uri, E_USER_WARNING);
 			return false;
 		}
-		if ($this->block_private_ips && !self::URIHasPublicHost($uri)) {
-			\trigger_error('URI host is not a public IP for '.$uri, E_USER_WARNING);
-			return false;
+		$this->pinned = null;
+		if ($this->block_private_ips) {
+			$ips = static::PublicAddresses($uri);
+			if (null === $ips) {
+				\trigger_error('URI host is not a public IP for '.$uri, E_USER_WARNING);
+				return false;
+			}
+			$parts = \parse_url($uri);
+			$host = \trim($parts['host'], '[]');
+			if (false === \filter_var($host, FILTER_VALIDATE_IP)) {
+				$this->pinned = array(
+					'host' => $host,
+					'port' => $parts['port'] ?? self::getSchemePort(\strtolower($parts['scheme'])),
+					'ips' => $ips
+				);
+			}
 		}
 		return true;
 	}
@@ -116,16 +134,25 @@ abstract class Request
 	 * http://[::1]/) as well as
 	 * hostnames that resolve to one. IPv6 literals with an embedded
 	 * IPv4 address (::ffff:127.0.0.1 and friends) are unwrapped first.
-	 * Fails closed when the host cannot be resolved. Note: this is a
-	 * pre-request
-	 * check; a hostile DNS that rebinds between check and connect (TOCTOU)
-	 * is not covered.
+	 * Fails closed when the host cannot be resolved. With block_private_ips
+	 * the connection is then made to the checked addresses (see $pinned), so
+	 * DNS rebinding between check and connect does not reach a private one;
+	 * through a proxy the proxy resolves the name, and that is not covered.
 	 */
 	public static function URIHasPublicHost(string $uri) : bool
 	{
+		return null !== static::PublicAddresses($uri);
+	}
+
+	/**
+	 * The addresses the URI host resolves to when they are all public (see
+	 * URIHasPublicHost()), else null. For an IP literal, that address.
+	 */
+	public static function PublicAddresses(string $uri) : ?array
+	{
 		$host = \parse_url($uri, PHP_URL_HOST);
 		if (!\is_string($host) || '' === $host) {
-			return false;
+			return null;
 		}
 		// Bracketed IPv6 literals (http://[::1]/): parse_url keeps the
 		// brackets, which filter_var rejects, so strip them first.
@@ -152,25 +179,14 @@ abstract class Request
 			$host = $sNormalized;
 		}
 		if (self::IsPublicIP($host)) {
-			return true;
+			return array($host);
 		}
 		if (\filter_var($host, FILTER_VALIDATE_IP)) {
-			return false; // literal non-public IP
+			return null; // literal non-public IP
 		}
-		$ips = array();
-		foreach (\dns_get_record($host, DNS_A | DNS_AAAA) ?: array() as $record) {
-			if (!empty($record['ip'])) {
-				$ips[] = $record['ip'];
-			}
-			if (!empty($record['ipv6'])) {
-				$ips[] = $record['ipv6'];
-			}
-		}
+		$ips = static::resolveHost($host);
 		if (!$ips) {
-			$ips = \gethostbynamel($host) ?: array();
-		}
-		if (!$ips) {
-			return false; // fail closed on unresolvable hosts
+			return null; // fail closed on unresolvable hosts
 		}
 		foreach ($ips as $ip) {
 			$sUnwrapped = self::UnwrapEmbeddedIPv4($ip);
@@ -178,10 +194,10 @@ abstract class Request
 				$ip = $sUnwrapped;
 			}
 			if (!self::IsPublicIP($ip)) {
-				return false;
+				return null;
 			}
 		}
-		return true;
+		return \array_values(\array_unique($ips));
 	}
 
 	/**
@@ -191,6 +207,23 @@ abstract class Request
 	 * assignments, benchmarking, multicast, and deprecated IPv6 site-local
 	 * and multicast. Verified against PHP 8.4.
 	 */
+	/**
+	 * The IPv4 and IPv6 addresses of a host name.
+	 */
+	protected static function resolveHost(string $host) : array
+	{
+		$ips = array();
+		foreach (\dns_get_record($host, DNS_A | DNS_AAAA) ?: array() as $record) {
+			if (!empty($record['ip'])) {
+				$ips[] = $record['ip'];
+			}
+			if (!empty($record['ipv6'])) {
+				$ips[] = $record['ipv6'];
+			}
+		}
+		return $ips ?: (\gethostbynamel($host) ?: array());
+	}
+
 	private const NON_PUBLIC_RANGES = [
 		'100.64.0.0/10',
 		'192.0.0.0/24',

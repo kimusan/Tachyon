@@ -40,7 +40,9 @@ abstract class Api
 		$oConfig = static::Config();
 		$CSP = new \Tachyon\Util\HTTP\CSP(\trim($oConfig->Get('security', 'content_security_policy', '')));
 		$CSP->report = $oConfig->Get('security', 'csp_report', false);
-		$CSP->report_only = $oConfig->Get('debug', 'enable', false); // || TACHYON_DEV
+		// Its own switch: tied to debug, turning on debug logging switched the
+		// policy off, so a message's SVG opened on its own could run script
+		$CSP->report_only = !!$oConfig->Get('security', 'csp_report_only', false);
 
 		// Allow favicon host, if present
 		$parsedFaviconUrl = parse_url($oConfig->Get('webmail', 'favicon_url', ''));

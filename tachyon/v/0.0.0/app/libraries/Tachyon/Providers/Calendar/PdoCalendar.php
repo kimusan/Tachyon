@@ -109,8 +109,13 @@ class PdoCalendar
 				$this->aDAVConfig['Password']
 			);
 			return \count($aCalendars) ? '' : 'No calendars found at this address';
+		} catch (\Tachyon\Util\HTTP\Exception $oException) {
+			// The status only: the URL is the user's, and what a server it
+			// points at answered is none of their business
+			return "The server answered HTTP {$oException->getCode()}";
 		} catch (\Throwable $oException) {
-			return $oException->getMessage();
+			\Tachyon\Util\Log::notice('CalDAV', $oException->getMessage());
+			return 'No calendars found at this address';
 		}
 	}
 

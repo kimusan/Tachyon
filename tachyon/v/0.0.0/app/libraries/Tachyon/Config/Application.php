@@ -281,6 +281,10 @@ header as the topmost, so name your own id here if these results are shown.'),
 Lost the authenticator? Blank this line, save the file, and log in with the password
 alone, then set a new secret under Security. Clearing it from the admin panel needs
 only the current password, so the code is never what keeps you out.'),
+				'admin_session_idle'      => array(30, 'Minutes without a request after which an admin panel session ends. 0: never'),
+				'admin_session_lifetime'  => array(720, 'Minutes after the login at which an admin panel session ends, however busy. 0: never'),
+				'dav_allowed_hosts'       => array('', 'Private, loopback or link-local hosts that CardDAV/CalDAV sync may reach: host names, addresses or CIDR ranges, separated by spaces.
+Users choose the sync URL, so without this it reaches public hosts only. List your own DAV server here when it runs on the internal network.'),
 				'insecure_cryptkey'       => array(false, 'Use email address instead of login password for encrypting sensitive data (like account passwords)'),
 
 				'force_https'             => array(false),
@@ -288,6 +292,7 @@ only the current password, so the code is never what keeps you out.'),
 				'max_sys_getloadavg'      => array(0.0, 'https://en.m.wikipedia.org/wiki/Load_(computing)'),
 				'content_security_policy' => array('', 'For example to allow all images use "img-src https:". More info at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives'),
 				'csp_report'              => array(false, 'Report CSP errors to PHP and/or Tachyon Log'),
+				'csp_report_only'         => array(false, 'Only report CSP violations instead of blocking them. For testing a content_security_policy; never leave it on'),
 				'encrypt_cipher'          => array('aes-256-cbc-hmac-sha1', 'A valid cipher method from https://php.net/openssl_get_cipher_methods'),
 				'cookie_samesite'         => array('Strict', 'Strict, Lax or None'),
 				'secfetch_allow'          => array('', 'Additional allowed Sec-Fetch combinations separated by ";".
@@ -500,7 +505,8 @@ Enables caching in the system'),
 				'curl_proxy_auth' => array(''),
 				'custom_login_link' => array(''),
 				'custom_logout_link' => array(''),
-				'http_client_ip_check_proxy' => array(false),
+				'http_client_ip_check_proxy' => array(false, 'Log the address in X-Forwarded-For instead of the connecting one, for requests from http_trusted_proxies'),
+				'http_trusted_proxies' => array('127.0.0.1/8 ::1', 'Addresses or CIDR ranges of the reverse proxies in front of Tachyon, separated by spaces'),
 				'use_local_proxy_for_external_images' => array(true),
 				'image_exif_auto_rotate' => array(false),
 				'cookie_default_path' => array(''),

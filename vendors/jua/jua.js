@@ -248,6 +248,9 @@
 				;
 
 				oXhr.open('POST', sAction, true);
+				// The server refuses uploads without the CSRF token
+				const sToken = rl.settings.app('token');
+				sToken && oXhr.setRequestHeader('X-SM-Token', sToken);
 
 				if (fProgressFunction && oXhr.upload)
 				{

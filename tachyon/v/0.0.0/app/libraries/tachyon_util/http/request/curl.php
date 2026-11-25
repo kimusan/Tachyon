@@ -69,6 +69,14 @@ class CURL extends \Tachyon\Util\HTTP\Request
 				\curl_setopt($c, CURLOPT_USERPWD,  $this->auth['user'] . ':' . $this->auth['pass']);
 			}
 		}
+		if ($this->pinned && !$this->proxy) {
+			// Connect to the addresses canFetchURI() checked, not to a fresh
+			// DNS answer
+			\curl_setopt($c, CURLOPT_RESOLVE, array(
+				"{$this->pinned['host']}:{$this->pinned['port']}:" . \implode(',', \array_map(
+					fn($ip) => \str_contains($ip, ':') ? "[{$ip}]" : $ip, $this->pinned['ips']))
+			));
+		}
 		if ($this->proxy) {
 			\curl_setopt($c, CURLOPT_PROXY, $this->proxy);
 			if ($this->proxy_auth) {

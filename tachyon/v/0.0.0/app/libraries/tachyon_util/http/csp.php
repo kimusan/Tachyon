@@ -16,6 +16,9 @@ class CSP implements \Stringable
 	 */
 	private $directives = [
 		'base-uri' => ["'self'"],
+		// Not covered by default-src: a form in content shown on this origin
+		// could otherwise post anywhere (a fake login, say)
+		'form-action' => ["'self'"],
 		'default-src' => ["'self'", 'data:'],
 		// Knockout.js requires eval() for observable binding purposes
 		// Safari < 15.4 does not support strict-dynamic
