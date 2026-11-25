@@ -166,6 +166,37 @@ trait OAuth2Accounts
 			\Tachyon\Util\Crypt::EncryptToJSON($aTokens, $oMain->CryptKey()));
 	}
 
+	/**
+	 * Hook 'main.cryptkey-rotate' (register it in Init()): the tokens are
+	 * encrypted with the main account's CryptKey, which MainAccount replaces
+	 * when it was derived from the password; re-encrypt them under the new one.
+	 * Those of this session's main account are in its session record; other
+	 * sessions' tokens are not reached and are fetched anew when they fail.
+	 */
+	public function oauthRotateCryptKey(MainAccount $oMain, string $sOld, string $sNew) : void
+	{
+		$oActions = \Tachyon\Api::Actions();
+		foreach (\array_keys($oActions->GetAccounts($oMain)) as $sEmail) {
+			$this->oauthReencrypt($oMain, StorageType::CONFIG,
+				$this->oauthTokenKey($this->oauthNormalise((string) $sEmail)), $sOld, $sNew);
+		}
+		$sSession = \Tachyon\Utils::GetSessionToken(false);
+		$sSession && $this->oauthReencrypt($oMain, StorageType::SESSION, $sSession, $sOld, $sNew);
+	}
+
+	private function oauthReencrypt(MainAccount $oMain, int $iType, string $sKey, string $sOld, string $sNew) : void
+	{
+		$oStorage = \Tachyon\Api::Actions()->StorageProvider();
+		$sBlob = $oStorage->Get($oMain, $iType, $sKey);
+		if (!$sBlob || null !== \Tachyon\Util\Crypt::DecryptFromJSON($sBlob, $sNew)) {
+			return;
+		}
+		$sBlob = \Tachyon\Model\CryptKeyRotation::reencryptJSON($sBlob, $sOld, $sNew);
+		if (null !== $sBlob && !$oStorage->Put($oMain, $iType, $sKey, $sBlob)) {
+			throw new \RuntimeException('OAuth2 tokens: could not write the re-encrypted tokens');
+		}
+	}
+
 	protected function oauthClearTokens(MainAccount $oMain, string $sEmail) : void
 	{
 		\Tachyon\Api::Actions()->StorageProvider()->Clear($oMain, StorageType::CONFIG,

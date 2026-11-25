@@ -29,8 +29,8 @@ class LoginO365Plugin extends \Tachyon\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Office365/Outlook OAuth2',
-		VERSION  = '0.6',
-		RELEASE  = '2026-09-29',
+		VERSION  = '0.7',
+		RELEASE  = '2026-11-21',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'Office365/Outlook IMAP, Sieve & SMTP login using RFC 7628 OAuth2';
@@ -77,6 +77,7 @@ class LoginO365Plugin extends \Tachyon\Plugins\AbstractPlugin
 
 		// Cleanup: when an additional account is removed, also remove its encrypted refresh token bundle.
 		$this->addHook('json.after-AccountDelete', 'afterAccountDelete');
+		$this->addHook('main.cryptkey-rotate', 'oauthRotateCryptKey');
 	}
 
 	public function httpPaths(array &$aPaths) : void
