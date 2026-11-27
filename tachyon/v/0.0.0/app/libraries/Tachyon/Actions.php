@@ -372,6 +372,26 @@ class Actions
 
 			$sFileName = \preg_replace('/[\/]+/', '/', \preg_replace('/[.]+/', '.', $sFileName));
 			$sFileName = \preg_replace('/[^a-zA-Z0-9@_+=\-\.\/!()\[\]]/', '', $sFileName);
+
+			// The admin panel can set both the log folder and this name, and the
+			// log holds request data, so a name like shell.php in the web root
+			// was a way to run code (GHSA-9cmw-3ghj-9q55). A log is a .txt or a
+			// .log. Inner dots go too: Apache runs shell.php.txt as PHP where an
+			// AddHandler maps .php, and a leading one makes .user.ini or .htaccess.
+			$iSlash = \strrpos($sFileName, '/');
+			$sDir = false === $iSlash ? '' : \substr($sFileName, 0, $iSlash + 1);
+			$aParts = \explode('.', \substr($sFileName, \strlen($sDir)));
+			$sExt = 1 < \count($aParts) ? \strtolower(\array_pop($aParts)) : '';
+			$sBase = \trim(\implode('-', $aParts), '-');
+			if (\strlen($sBase) || \strlen($sExt)) {
+				if (!\in_array($sExt, ['txt', 'log'], true)) {
+					$sBase = \trim($sBase . '-' . $sExt, '-');
+					$sExt = 'txt';
+				}
+				$sFileName = $sDir . $sBase . '.' . $sExt;
+			} else {
+				$sFileName = '';
+			}
 		}
 
 		if (!\strlen($sFileName)) {
