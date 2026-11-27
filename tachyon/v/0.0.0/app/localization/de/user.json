@@ -86,7 +86,8 @@
 		"DATE_RANGE": "Zwischen Terminen",
 		"DATE_FROM": "Von",
 		"DATE_TO": "Bis",
-		"SENT_DATE": "Sende- statt Empfangsdatum verwenden"
+		"SENT_DATE": "Sende- statt Empfangsdatum verwenden",
+		"DATE_ON": "An Datum"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Erstellen",
@@ -790,7 +791,7 @@
 		"REPEAT_NONE": "Keine Wiederholung",
 		"REPEAT_DAILY": "Täglich",
 		"REPEAT_WEEKLY": "Wöchentlich",
-		"REPEAT_MONTHLY_DAY": "Monatlich am %DAY%.",
+		"REPEAT_MONTHLY_DAY": "Monatlich am %DAY%",
 		"REPEAT_MONTHLY_WEEKDAY": "Monatlich am %NTH% %WEEKDAY%",
 		"REPEAT_YEARLY": "Jährlich",
 		"REPEAT_CUSTOM": "Benutzerdefiniert",
