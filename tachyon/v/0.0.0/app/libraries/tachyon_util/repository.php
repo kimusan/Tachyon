@@ -10,6 +10,8 @@ abstract class Repository
 	private static function httpGet(string $url, array $headers = []) : ?string
 	{
 		$oHTTP = HTTP\Request::factory(/*'socket' or 'curl'*/);
+		// What comes from here ends up as code on this server
+		$oHTTP->verify_peer = true;
 		$oHTTP->proxy = \Tachyon\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \Tachyon\Api::Config()->Get('labs', 'curl_proxy_auth', '');
 		$oHTTP->max_response_kb = 0;
@@ -30,6 +32,8 @@ abstract class Repository
 		}
 
 		$oHTTP = HTTP\Request::factory(/*'socket' or 'curl'*/);
+		// What comes from here ends up as code on this server
+		$oHTTP->verify_peer = true;
 		$oHTTP->proxy = \Tachyon\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \Tachyon\Api::Config()->Get('labs', 'curl_proxy_auth', '');
 		$oHTTP->max_response_kb = 0;
@@ -47,6 +51,28 @@ abstract class Repository
 			$body = \file_get_contents($sTmp);
 			\unlink($sTmp);
 			throw new \Exception(static::body2plain($body), $oResponse->status);
+		}
+		return $sTmp;
+	}
+
+	/**
+	 * Download a release archive and the detached signature published next to
+	 * it, and keep the archive only if the Tachyon release key signed it. The
+	 * signature is read from the same release as the archive, so it always
+	 * belongs to these bytes.
+	 */
+	private static function downloadSigned(string $url) : string
+	{
+		$sTmp = static::download($url);
+		$sSig = null;
+		try {
+			$sSig = static::download($url . '.asc');
+			ReleaseSignature::verifyFile($sTmp, (string) \file_get_contents($sSig));
+		} catch (\Throwable $e) {
+			\unlink($sTmp);
+			throw new \Exception("{$url}: {$e->getMessage()}");
+		} finally {
+			$sSig && \unlink($sSig);
 		}
 		return $sTmp;
 	}
@@ -192,7 +218,7 @@ abstract class Repository
 	{
 		$info = static::getLatestCoreInfo();
 		return ($info && \version_compare(APP_VERSION, $info->version, '<'))
-			? static::download($info->file)
+			? static::downloadSigned($info->file)
 			: null;
 	}
 
@@ -315,7 +341,7 @@ abstract class Repository
 				}
 				if (isset($aList[$sId]) && (!$sFile || $sFile === $aList[$sId]['file'])) {
 					$sRealFile = $aList[$sId]['file'];
-					$sTmp = static::download($aList[$sId]['file']);
+					$sTmp = static::downloadSigned($aList[$sId]['file']);
 				}
 			}
 
